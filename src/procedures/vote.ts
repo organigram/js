@@ -2,26 +2,42 @@ import { web3 } from '../web3'
 import ProcedureVoteContract from '@organigram/contracts/build/contracts/VoteProcedure.json'
 
 export interface ProcedureVoteData  {
-    movesLength: Number
+    votersOrgan: Address
+    vetoersOrgan: Address
+    enactorsOrgan: Address
 }
 
 export class ProcedureVote {
-    public movesLength: Number = 0
+    public votersOrgan: Address
+    public vetoersOrgan: Address
+    public enactorsOrgan: Address
 
-    constructor ({ movesLength }: ProcedureVoteData) {
-        this.movesLength = movesLength
+    constructor ({ votersOrgan, vetoersOrgan, enactorsOrgan }: ProcedureVoteData) {
+        this.votersOrgan = votersOrgan
+        this.vetoersOrgan = vetoersOrgan
+        this.enactorsOrgan = enactorsOrgan
     }
 
     public static load = async (address: Address): Promise<ProcedureVote> => {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureVoteContract.abi, address)
 
-        const movesLength = await contract.methods.getMovesLength().call()
+        const votersOrgan:Address = await contract.methods.votersOrgan().call()
         .catch((error: Error) => {
-            console.warn("Error while loading nominator in nomination procedure.", address, error.message)
+            console.warn("Error while loading voters organ address in vote procedure.", address, error.message)
             return ""
         })
-        return new ProcedureVote({ movesLength })
+        const vetoersOrgan:Address = await contract.methods.vetoersOrgan().call()
+        .catch((error: Error) => {
+            console.warn("Error while loading vetoers organ address in vote procedure.", address, error.message)
+            return ""
+        })
+        const enactorsOrgan:Address = await contract.methods.enactorsOrgan().call()
+        .catch((error: Error) => {
+            console.warn("Error while loading enactors organ address in vote procedure.", address, error.message)
+            return ""
+        })
+        return new ProcedureVote({ votersOrgan, vetoersOrgan, enactorsOrgan })
     }
 }
 

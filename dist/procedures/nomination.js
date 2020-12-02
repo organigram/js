@@ -16,19 +16,19 @@ exports.ProcedureNomination = void 0;
 const web3_1 = require("../web3");
 const SimpleNominationProcedure_json_1 = __importDefault(require("@organigram/contracts/build/contracts/SimpleNominationProcedure.json"));
 class ProcedureNomination {
-    constructor({ organNominator }) {
-        this.organNominator = "";
-        this.organNominator = organNominator;
+    constructor({ nominatersOrgan }) {
+        this.nominatersOrgan = "";
+        this.nominatersOrgan = nominatersOrgan;
     }
 }
 exports.ProcedureNomination = ProcedureNomination;
 ProcedureNomination.load = (address) => __awaiter(void 0, void 0, void 0, function* () {
     const contract = new web3_1.web3.eth.Contract(SimpleNominationProcedure_json_1.default.abi, address);
-    const organNominator = yield contract.methods.organNominator().call()
+    const nominatersOrgan = yield contract.methods.nominatersOrgan().call()
         .catch((error) => {
         console.warn("Error while loading nominator in nomination procedure.", address, error.message);
         return "";
     });
-    return new ProcedureNomination({ organNominator });
+    return new ProcedureNomination({ nominatersOrgan });
 });
 exports.default = ProcedureNomination;
