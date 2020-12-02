@@ -75,16 +75,11 @@ Procedure.loadMetadata = (address) => __awaiter(void 0, void 0, void 0, function
     let metadata = {};
     try {
         metadata.cid = yield contract.methods.getMetadata().call()
-            .then((data) => {
-            console.log("data", data);
-            return data;
-        })
             .then((data) => ipfs_1.multihashToCid({
             ipfsHash: data.ipfsHash,
             hashSize: parseInt(data.hashSize),
             hashFunction: parseInt(data.hashFunction)
         }));
-        console.log("procedure cid", metadata.cid);
     }
     catch (error) {
         console.warn("Error while computing IPFS Content ID for procedure metadata.", address, error.message);
@@ -104,6 +99,9 @@ Procedure.loadData = (type, address) => __awaiter(void 0, void 0, void 0, functi
         case 'nomination':
             const ProcedureNomination = (yield Promise.resolve().then(() => __importStar(require('./procedures/nomination')))).default;
             return ProcedureNomination.load(address);
+        case 'vote':
+            const ProcedureVote = (yield Promise.resolve().then(() => __importStar(require('./procedures/vote')))).default;
+            return ProcedureVote.load(address);
         default:
             return {};
     }

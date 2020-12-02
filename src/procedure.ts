@@ -3,7 +3,6 @@ import all from 'it-all'
 import ProcedureABI from '@organigram/contracts/abis/Procedure.json'
 import { web3 } from './web3'
 import { ipfsNode, multihashToCid } from './ipfs'
-import { truncate } from 'fs'
 
 export interface ProcedureData {
     address: Address
@@ -58,10 +57,6 @@ export class Procedure {
         } = {}
         try {
             metadata.cid = await contract.methods.getMetadata().call()
-            .then((data: any) => {
-                console.log("data", data)
-                return data
-            })
             .then((data: {
                 ipfsHash:string,
                 hashSize:string,
@@ -71,7 +66,6 @@ export class Procedure {
                 hashSize: parseInt(data.hashSize),
                 hashFunction: parseInt(data.hashFunction)
             }))
-            console.log("procedure cid", metadata.cid)
         }
         catch(error) {
             console.warn("Error while computing IPFS Content ID for procedure metadata.", address, error.message)
@@ -94,6 +88,9 @@ export class Procedure {
             case 'nomination':
                 const ProcedureNomination:any = (await import('./procedures/nomination')).default
                 return ProcedureNomination.load(address)
+            case 'vote':
+                const ProcedureVote:any = (await import('./procedures/vote')).default
+                return ProcedureVote.load(address)
             default:
                 return {}
         }

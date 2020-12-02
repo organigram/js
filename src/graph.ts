@@ -39,17 +39,13 @@ export class Graph {
     }
 
     public static async load(contracts: Address[]): Promise<Graph> {
-        const sortedContracts = await Graph.sort(contracts)
-        let organs: Organ[] = [], procedures: Procedure[] = []
-        for await (var address of sortedContracts.organs) {
-            const organ = await Organ.load(address)
-            organs.push(organ)
-        }
-        for await (var address of sortedContracts.procedures) {
-            const procedure = await Procedure.load(address)
-            procedures.push(procedure)
-        }
-        return new Graph({ organs, procedures})
+        const { organs, procedures } = await Graph.sort(contracts)
+        const graph = new Graph({
+            organs: await Promise.all(organs.map(a => Organ.load(a))),
+            procedures: await Promise.all(procedures.map(a => Procedure.load(a)))
+        })
+        console.log("GRAPH IS HERE", graph)
+        return graph
     }
 
     public toString = (): string => JSON.stringify({

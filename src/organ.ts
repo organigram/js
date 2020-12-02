@@ -27,7 +27,7 @@ export class Organ {
     /* Organ API */
 
     public updateMetadata = async (metadata: Metadata): Promise<Organ> => {
-        // @TODO : Call removeEntries(uint256[] memory indexes)
+        // @TODO : Call updateMetadata(uint256[] memory indexes)
         throw new Error("Not implemented.")
     }
 

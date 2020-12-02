@@ -49,7 +49,7 @@ class Graph {
         this.organs = organs;
         this.procedures = procedures;
     }
-    static load(contracts) {
+    static sort(contracts) {
         var contracts_1, contracts_1_1;
         var e_1, _a;
         return __awaiter(this, void 0, void 0, function* () {
@@ -60,24 +60,10 @@ class Graph {
                     const contract = yield new web3_1.web3.eth.Contract(Kelsen_json_1.default, address);
                     const isOrgan = yield contract.methods.isOrgan().call();
                     const isProcedure = yield contract.methods.isProcedure().call();
-                    if (isOrgan) {
-                        try {
-                            const organ = yield organ_1.default.load(address);
-                            organs.push(organ);
-                        }
-                        catch (e) {
-                            console.error("Unable to load organ at ", address, e.message);
-                        }
-                    }
-                    if (isProcedure) {
-                        try {
-                            const procedure = yield procedure_1.default.load(address);
-                            procedures.push(procedure);
-                        }
-                        catch (e) {
-                            console.error("Unable to load procedure at ", address, e.message);
-                        }
-                    }
+                    if (isOrgan)
+                        organs.push(address);
+                    if (isProcedure)
+                        procedures.push(address);
                 }
             }
             catch (e_1_1) { e_1 = { error: e_1_1 }; }
@@ -87,7 +73,18 @@ class Graph {
                 }
                 finally { if (e_1) throw e_1.error; }
             }
-            return new Graph({ organs, procedures });
+            return { organs, procedures };
+        });
+    }
+    static load(contracts) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { organs, procedures } = yield Graph.sort(contracts);
+            const graph = new Graph({
+                organs: yield Promise.all(organs.map(a => organ_1.default.load(a))),
+                procedures: yield Promise.all(procedures.map(a => procedure_1.default.load(a)))
+            });
+            console.log("GRAPH IS HERE", graph);
+            return graph;
         });
     }
 }
