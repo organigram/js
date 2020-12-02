@@ -16,19 +16,30 @@ exports.ProcedureVote = void 0;
 const web3_1 = require("../web3");
 const VoteProcedure_json_1 = __importDefault(require("@organigram/contracts/build/contracts/VoteProcedure.json"));
 class ProcedureVote {
-    constructor({ movesLength }) {
-        this.movesLength = 0;
-        this.movesLength = movesLength;
+    constructor({ votersOrgan, vetoersOrgan, enactorsOrgan }) {
+        this.votersOrgan = votersOrgan;
+        this.vetoersOrgan = vetoersOrgan;
+        this.enactorsOrgan = enactorsOrgan;
     }
 }
 exports.ProcedureVote = ProcedureVote;
 ProcedureVote.load = (address) => __awaiter(void 0, void 0, void 0, function* () {
     const contract = new web3_1.web3.eth.Contract(VoteProcedure_json_1.default.abi, address);
-    const movesLength = yield contract.methods.getMovesLength().call()
+    const votersOrgan = yield contract.methods.votersOrgan().call()
         .catch((error) => {
-        console.warn("Error while loading nominator in nomination procedure.", address, error.message);
+        console.warn("Error while loading voters organ address in vote procedure.", address, error.message);
         return "";
     });
-    return new ProcedureVote({ movesLength });
+    const vetoersOrgan = yield contract.methods.vetoersOrgan().call()
+        .catch((error) => {
+        console.warn("Error while loading vetoers organ address in vote procedure.", address, error.message);
+        return "";
+    });
+    const enactorsOrgan = yield contract.methods.enactorsOrgan().call()
+        .catch((error) => {
+        console.warn("Error while loading enactors organ address in vote procedure.", address, error.message);
+        return "";
+    });
+    return new ProcedureVote({ votersOrgan, vetoersOrgan, enactorsOrgan });
 });
 exports.default = ProcedureVote;
