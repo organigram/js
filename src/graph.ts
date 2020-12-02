@@ -44,7 +44,6 @@ export class Graph {
             organs: await Promise.all(organs.map(a => Organ.load(a))),
             procedures: await Promise.all(procedures.map(a => Procedure.load(a)))
         })
-        console.log("GRAPH IS HERE", graph)
         return graph
     }
 

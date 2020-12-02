@@ -83,7 +83,6 @@ class Graph {
                 organs: yield Promise.all(organs.map(a => organ_1.default.load(a))),
                 procedures: yield Promise.all(procedures.map(a => procedure_1.default.load(a)))
             });
-            console.log("GRAPH IS HERE", graph);
             return graph;
         });
     }
