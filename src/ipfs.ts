@@ -27,25 +27,17 @@ const ipfsNode:Promise<any> = getIpfs({
     return res.ipfs
 })
 
-const multihashToCid = ({ ipfsHash, hashFunction, hashSize }: {
-    ipfsHash: string,
-    hashFunction: Number,
-    hashSize: Number
-}): CID => {
+const multihashToCid = ({ ipfsHash, hashFunction, hashSize }: Multihash): CID => {
     const multihash = Buffer.from(
-        hashFunction.toString(16).padStart(2, "0") +
-        hashSize.toString(16).padStart(2, "0") +
+        parseInt(hashFunction).toString(16).padStart(2, "0") +
+        parseInt(hashSize).toString(16).padStart(2, "0") +
         ipfsHash.substring(2),
         'hex'
     )
     return new IPFS.CID(multihash)
 }
 
-const cidToMultihash = (cid: CID): {
-    ipfsHash: string,
-    hashFunction: Number,
-    hashSize: Number
-} | null => {
+const cidToMultihash = (cid: CID): Multihash | null => {
     const multihash = cid?.hash?.data ?
         Buffer.from(cid.hash.data)
         : cid?.multihash ?
@@ -53,8 +45,8 @@ const cidToMultihash = (cid: CID): {
             : null
     return multihash && {
         ipfsHash: `0x${multihash.slice(2).toString('hex')}`,
-        hashFunction: parseInt(`0x${multihash.slice(1, 2).toString('hex')}`, 16),
-        hashSize: parseInt(`0x${multihash.slice(0, 1).toString('hex')}`, 16)
+        hashSize: `0x${multihash.slice(1, 2).toString('hex')}`,
+        hashFunction: `0x${multihash.slice(0,1).toString('hex')}`
     }
 }
 

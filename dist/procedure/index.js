@@ -22,6 +22,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Procedure = exports.INTERFACE = void 0;
 const concat_1 = __importDefault(require("uint8arrays/concat"));
 const it_all_1 = __importDefault(require("it-all"));
+const src_1 = require("ipfs-core/src");
 const Procedure_json_1 = __importDefault(require("@organigram/contracts/build/contracts/Procedure.json"));
 const web3_1 = require("../web3");
 const ipfs_1 = require("../ipfs");
@@ -35,6 +36,122 @@ class Procedure {
         this.data = null;
         this.movesLength = 0;
         this.moves = [];
+        this.createMove = (cid = new src_1.CID("QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH")) => __awaiter(this, void 0, void 0, function* () {
+            const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
+            const multihash = ipfs_1.cidToMultihash(cid);
+            if (!multihash)
+                throw new Error("Wrong CID.");
+            const { ipfsHash, hashFunction, hashSize } = multihash;
+            return yield contract.methods.createMove(ipfsHash, hashFunction, hashSize).send({ from: web3_1.web3.eth.defaultAccount });
+        });
+        this.lockMove = (moveKey) => __awaiter(this, void 0, void 0, function* () {
+            const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
+            return yield contract.methods.lockMove(moveKey)
+                .send({ from: web3_1.web3.eth.defaultAccount })
+                .then(() => true)
+                .catch((error) => {
+                console.error("Error while locking move.", this.address, moveKey, error.message);
+                return false;
+            });
+        });
+        this.updateMetadata = (cid = new src_1.CID("QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH")) => __awaiter(this, void 0, void 0, function* () {
+            const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
+            const multihash = ipfs_1.cidToMultihash(cid);
+            if (!multihash)
+                throw new Error("Wrong CID.");
+            const { ipfsHash, hashFunction, hashSize } = multihash;
+            return yield contract.methods.updateMetadata(ipfsHash, hashFunction, hashSize)
+                .send({ from: web3_1.web3.eth.defaultAccount })
+                .then(() => true)
+                .catch((error) => {
+                console.error("Error while updating metadata.", this.address, error.message);
+                return false;
+            });
+        });
+        this.updateAdmin = (address) => __awaiter(this, void 0, void 0, function* () {
+            const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
+            return yield contract.methods.updateAdmin(address)
+                .send({ from: web3_1.web3.eth.defaultAccount })
+                .then(() => true)
+                .catch((error) => {
+                console.error("Error while updating admin.", this.address, error.message);
+                return false;
+            });
+        });
+        this.moveAddEntries = (moveKey, organ, entries, lock = false) => __awaiter(this, void 0, void 0, function* () {
+            const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
+            return yield contract.methods.moveAddEntries(moveKey, organ, entries, lock)
+                .send({ from: web3_1.web3.eth.defaultAccount })
+                .then(() => true)
+                .catch((error) => {
+                console.error("Error while adding entries in move.", this.address, moveKey, error.message);
+                return false;
+            });
+        });
+        this.moveRemoveEntry = (moveKey, organ, indexes, lock = false) => __awaiter(this, void 0, void 0, function* () {
+            const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
+            return yield contract.methods.moveRemoveEntry(moveKey, organ, indexes, lock)
+                .send({ from: web3_1.web3.eth.defaultAccount })
+                .then(() => true)
+                .catch((error) => {
+                console.error("Error while removing entry in move.", this.address, moveKey, error.message);
+                return false;
+            });
+        });
+        this.moveReplaceEntry = (moveKey, organ, entry, lock = false) => __awaiter(this, void 0, void 0, function* () {
+            const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
+            const multihash = ipfs_1.cidToMultihash(entry.cid);
+            if (!multihash)
+                throw new Error("Wrong CID.");
+            const { ipfsHash, hashFunction, hashSize } = multihash;
+            return yield contract.methods.moveReplaceEntry(moveKey, organ, entry.index, entry.address, ipfsHash, hashFunction, hashSize, lock)
+                .send({ from: web3_1.web3.eth.defaultAccount })
+                .then(() => true)
+                .catch((error) => {
+                console.error("Error while replacing entry in move.", this.address, moveKey, error.message);
+                return false;
+            });
+        });
+        this.moveAddProcedure = (moveKey, organ, procedure, permissions = "0xffff", lock = false) => __awaiter(this, void 0, void 0, function* () {
+            const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
+            return yield contract.methods.moveAddProcedure(moveKey, organ, procedure, permissions, lock)
+                .send({ from: web3_1.web3.eth.defaultAccount })
+                .then(() => true)
+                .catch((error) => {
+                console.error("Error while adding procedures in move.", this.address, moveKey, error.message);
+                return false;
+            });
+        });
+        this.moveRemoveProcedure = (moveKey, organ, procedure, lock = false) => __awaiter(this, void 0, void 0, function* () {
+            const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
+            return yield contract.methods.moveRemoveProcedure(moveKey, organ, procedure, lock)
+                .send({ from: web3_1.web3.eth.defaultAccount })
+                .then(() => true)
+                .catch((error) => {
+                console.error("Error while removing procedure in move.", this.address, moveKey, error.message);
+                return false;
+            });
+        });
+        this.moveReplaceProcedure = (moveKey, organ, oldProcedure, newProcedure, permissions = "0xffff", lock = false) => __awaiter(this, void 0, void 0, function* () {
+            const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
+            return yield contract.methods.moveReplaceProcedure(moveKey, organ, oldProcedure, newProcedure, permissions, lock)
+                .send({ from: web3_1.web3.eth.defaultAccount })
+                .then(() => true)
+                .catch((error) => {
+                console.error("Error while replacing procedure in move.", this.address, moveKey, error.message);
+                return false;
+            });
+        });
+        this.moveCall = (moveKey, _call, lock = false) => __awaiter(this, void 0, void 0, function* () {
+            const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
+            return yield contract.methods.moveCall(moveKey, _call, lock)
+                .send({ from: web3_1.web3.eth.defaultAccount })
+                .then(() => true)
+                .catch((error) => {
+                console.error("Error while adding special call in move.", this.address, moveKey, error.message);
+                return false;
+            });
+        });
         this.address = address;
         this.type = type;
         this.ProcedureClass = ProcedureClass;
@@ -122,14 +239,22 @@ Procedure.load = (address) => __awaiter(void 0, void 0, void 0, function* () {
     });
     let moves = [];
     const iGenerator = function* () {
-        let i = 1;
-        while (i <= movesLength)
+        let i = 0;
+        while (i < movesLength)
             yield i++;
     };
     try {
         for (var _b = __asyncValues(iGenerator()), _c; _c = yield _b.next(), !_c.done;) {
             let moveKey = _c.value;
-            const move = yield contract.methods.getMove(moveKey).call()
+            const key = `${moveKey}`;
+            const move = yield contract.methods.getMove(key).call()
+                .then(({ creator, locked, applied, processing, metadata, operations }) => ({
+                key, creator, locked, applied, processing,
+                metadata: {
+                    cid: metadata && metadata.ipfsHash && ipfs_1.multihashToCid(metadata)
+                },
+                operations
+            }))
                 .catch((error) => {
                 console.warn("Error while loading move in procedure.", address, moveKey, error.message);
                 return null;
@@ -162,11 +287,7 @@ Procedure.loadMetadata = (address) => __awaiter(void 0, void 0, void 0, function
     let metadata = {};
     try {
         metadata.cid = yield contract.methods.getMetadata().call()
-            .then((data) => ipfs_1.multihashToCid({
-            ipfsHash: data.ipfsHash,
-            hashSize: parseInt(data.hashSize),
-            hashFunction: parseInt(data.hashFunction)
-        }));
+            .then((multihash) => ipfs_1.multihashToCid(multihash));
     }
     catch (error) {
         console.warn("Error while computing IPFS Content ID for procedure metadata.", address, error.message);

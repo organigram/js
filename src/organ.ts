@@ -114,16 +114,8 @@ export class Organ {
         let metadata: { cid?: CID, data?: any } = {}
         try {
             metadata.cid = await contract.methods.getMetadata().call()
-            .then((data: {
-                ipfsHash:string,
-                hashSize:string,
-                hashFunction:string
-            }):CID => {
-                return multihashToCid({
-                    ipfsHash: data.ipfsHash,
-                    hashSize: parseInt(data.hashSize),
-                    hashFunction: parseInt(data.hashFunction)
-                })
+            .then((multihash: Multihash):CID => {
+                return multihashToCid(multihash)
             })
         }
         catch (error) {
@@ -149,7 +141,7 @@ export class Organ {
         .catch(() => "0")
         if (length === "0") return []
 
-        let i = 1, promises = []
+        let i = 0, promises = []
         for (i ; String(i) !== length ; i++) {
             const index = String(i)
             promises.push(
@@ -189,11 +181,7 @@ export class Organ {
                 }) => {
                     let entry:OrganEntry = { index, address: addr, cid: null }
                     try {
-                        entry.cid = multihashToCid({
-                            ipfsHash,
-                            hashSize: parseInt(hashSize),
-                            hashFunction: parseInt(hashFunction)
-                        })
+                        entry.cid = multihashToCid({ ipfsHash, hashSize, hashFunction })
                     }
                     catch(error) {
                         console.warn("Error while computing IPFS Content ID for entry.", address, index, error.message)

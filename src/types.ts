@@ -1,6 +1,11 @@
 type CID = any
 type Address = string
-type Metadata = object
+type Metadata = object | null
+type Multihash = {
+    ipfsHash: string
+    hashFunction: string
+    hashSize: string
+}
 type ProcedureType = string
 type ProcedureData = object
 
@@ -14,7 +19,7 @@ type OrganProcedurePermissions = {
     canRemoveEntries: boolean
     canAddProcedures: boolean
     canRemoveProcedures: boolean
-}
+} | string
 
 type OrganProcedure = {
     address: Address
@@ -38,6 +43,29 @@ type OrganEntry = {
 type Procedure = {
     address: Address
     metadata: Metadata
+}
+
+type ProcedureMoveOperation = {
+    index: string
+    operationType: Number
+    // uint8 with possible masks :
+    // 0: operation on procedure.
+    // 1/2/3: addEntry/removeEntry/replaceEntry.
+    // 4/5/6: addProcedure/removeProcedure/replaceProcedure.
+    // 7: withdraw funds.
+    // 8: withdraw tokens.
+    call: any
+    processed: boolean
+}
+
+type ProcedureMove = {
+    key: string
+    creator: Address
+    metadata: Metadata
+    locked: boolean
+    applied: boolean
+    processing: boolean
+    operations: ProcedureMoveOperation[]
 }
 
 interface LoadGraphOptions {

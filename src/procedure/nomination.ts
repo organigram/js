@@ -4,13 +4,16 @@ import ProcedureNominationContract from '@organigram/contracts/build/contracts/S
 export const INTERFACE = `0xc5f28e49` // nominate signature.
 
 export interface ProcedureNominationData  {
+    address: Address
     nominatersOrgan: Address
 }
 
 export class ProcedureNomination {
+    public address: Address = ""
     public nominatersOrgan: Address = ""
 
-    constructor ({ nominatersOrgan }: ProcedureNominationData) {
+    constructor ({ address, nominatersOrgan }: ProcedureNominationData) {
+        this.address = address
         this.nominatersOrgan = nominatersOrgan
     }
 
@@ -22,8 +25,20 @@ export class ProcedureNomination {
             console.warn("Error while loading nominator in nomination procedure.", address, error.message)
             return ""
         })
-        const nomination = new ProcedureNomination({ nominatersOrgan })
+        const nomination = new ProcedureNomination({ address, nominatersOrgan })
         return nomination
+    }
+    
+    public nominate = async (moveKey: string):Promise<boolean> => {
+        // @ts-ignore
+        const contract = new web3.eth.Contract(ProcedureNominationContract.abi, this.address)
+        return await contract.methods.nominate(moveKey)
+        .send({ from: web3.eth.defaultAccount })
+        .then(() => true)
+        .catch((error:Error) => {
+            console.error("Error while adding special call in move.", this.address, moveKey, error.message)
+            return false
+        })
     }
 }
 

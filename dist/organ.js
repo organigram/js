@@ -132,12 +132,8 @@ Organ.loadMetadata = (address) => __awaiter(void 0, void 0, void 0, function* ()
     let metadata = {};
     try {
         metadata.cid = yield contract.methods.getMetadata().call()
-            .then((data) => {
-            return ipfs_1.multihashToCid({
-                ipfsHash: data.ipfsHash,
-                hashSize: parseInt(data.hashSize),
-                hashFunction: parseInt(data.hashFunction)
-            });
+            .then((multihash) => {
+            return ipfs_1.multihashToCid(multihash);
         });
     }
     catch (error) {
@@ -159,7 +155,7 @@ Organ.loadProcedures = (address) => __awaiter(void 0, void 0, void 0, function* 
         .catch(() => "0");
     if (length === "0")
         return [];
-    let i = 1, promises = [];
+    let i = 0, promises = [];
     for (i; String(i) !== length; i++) {
         const index = String(i);
         promises.push(contract.methods.getProcedure(i).call()
@@ -189,11 +185,7 @@ Organ.loadEntries = (address) => __awaiter(void 0, void 0, void 0, function* () 
             .then(({ addr, ipfsHash, hashFunction, hashSize }) => __awaiter(void 0, void 0, void 0, function* () {
             let entry = { index, address: addr, cid: null };
             try {
-                entry.cid = ipfs_1.multihashToCid({
-                    ipfsHash,
-                    hashSize: parseInt(hashSize),
-                    hashFunction: parseInt(hashFunction)
-                });
+                entry.cid = ipfs_1.multihashToCid({ ipfsHash, hashSize, hashFunction });
             }
             catch (error) {
                 console.warn("Error while computing IPFS Content ID for entry.", address, index, error.message);
