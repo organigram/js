@@ -1,7 +1,5 @@
-import { web3 } from './web3'
 import Organ, { OrganData } from './organ'
 import Procedure, { ProcedureData } from './procedure'
-import KelsenABI from '@organigram/contracts/abis/Kelsen.json'
 
 interface GraphData {
     organs: Organ[]
@@ -26,10 +24,8 @@ export class Graph {
     public static async sort(contracts: Address[]): Promise<GraphAddresses> {
         let organs: Address[] = [], procedures: Address[] = []
         for await (var address of contracts) {
-            // @ts-ignore
-            const contract = await new web3.eth.Contract(KelsenABI, address)
-            const isOrgan = await contract.methods.isOrgan().call()
-            const isProcedure = await contract.methods.isProcedure().call()
+            const isOrgan = await Organ.isOrgan(address)
+            const isProcedure = await Procedure.isProcedure(address)
             if (isOrgan)
                 organs.push(address)
             if (isProcedure)

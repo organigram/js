@@ -1,0 +1,184 @@
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __asyncValues = (this && this.__asyncValues) || function (o) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator], i;
+    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Procedure = exports.INTERFACE = void 0;
+const concat_1 = __importDefault(require("uint8arrays/concat"));
+const it_all_1 = __importDefault(require("it-all"));
+const Procedure_json_1 = __importDefault(require("@organigram/contracts/build/contracts/Procedure.json"));
+const web3_1 = require("../web3");
+const ipfs_1 = require("../ipfs");
+exports.INTERFACE = `0x71dbd330`;
+class Procedure {
+    constructor({ address, type, ProcedureClass, metadata, data, movesLength, moves }) {
+        this.address = "";
+        this.type = "";
+        this.ProcedureClass = "";
+        this.metadata = {};
+        this.data = null;
+        this.movesLength = 0;
+        this.moves = [];
+        this.address = address;
+        this.type = type;
+        this.ProcedureClass = ProcedureClass;
+        this.metadata = metadata;
+        this.data = data;
+        this.movesLength = movesLength;
+        this.moves = moves;
+    }
+    static isProcedure(address) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, address);
+            const isERC165 = yield contract.methods.supportsInterface("0x01ffc9a7").call()
+                .catch(() => false);
+            if (!isERC165)
+                return false;
+            const isProcedure = yield contract.methods.supportsInterface(exports.INTERFACE).call()
+                .catch(() => false);
+            return isProcedure;
+        });
+    }
+    static getType(address) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, address);
+            const procedureType = Promise.all([
+                require('./nomination').INTERFACE,
+                require('./vote').INTERFACE
+            ])
+                .then((proceduresInterfaces) => { var proceduresInterfaces_1, proceduresInterfaces_1_1; return __awaiter(this, void 0, void 0, function* () {
+                var e_1, _a;
+                try {
+                    for (proceduresInterfaces_1 = __asyncValues(proceduresInterfaces); proceduresInterfaces_1_1 = yield proceduresInterfaces_1.next(), !proceduresInterfaces_1_1.done;) {
+                        var procedureInterface = proceduresInterfaces_1_1.value;
+                        if (yield contract.methods.supportsInterface(procedureInterface).call()
+                            .catch(() => false))
+                            return procedureInterface;
+                    }
+                }
+                catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                finally {
+                    try {
+                        if (proceduresInterfaces_1_1 && !proceduresInterfaces_1_1.done && (_a = proceduresInterfaces_1.return)) yield _a.call(proceduresInterfaces_1);
+                    }
+                    finally { if (e_1) throw e_1.error; }
+                }
+                return "";
+            }); });
+            return procedureType;
+        });
+    }
+    static getClass(type) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const ProcedureClass = Promise.all([
+                require('./nomination'),
+                require('./vote')
+            ])
+                .then(([{ default: Nomination, INTERFACE: NominationInterface }, { default: Vote, INTERFACE: VoteInterface }]) => __awaiter(this, void 0, void 0, function* () {
+                switch (type) {
+                    case NominationInterface: return Nomination;
+                    case VoteInterface: return Vote;
+                    default: return null;
+                }
+            }));
+            return ProcedureClass;
+        });
+    }
+}
+exports.Procedure = Procedure;
+Procedure.load = (address) => __awaiter(void 0, void 0, void 0, function* () {
+    var e_2, _a;
+    const isProcedure = yield Procedure.isProcedure(address).catch(() => false);
+    if (!isProcedure)
+        throw new Error("Contract at address is not a Procedure.");
+    const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, address);
+    const type = yield Procedure.getType(address);
+    const ProcedureClass = yield Procedure.getClass(type);
+    const metadata = yield Procedure.loadMetadata(address)
+        .catch(error => {
+        console.warn("Error while loading procedure metadata.", address, error.message);
+        return {};
+    });
+    const movesLength = yield contract.methods.getMovesLength().call().then(parseInt)
+        .catch((error) => {
+        console.warn("Error while loading moves length in procedure.", address, error.message);
+        return 0;
+    });
+    let moves = [];
+    const iGenerator = function* () {
+        let i = 1;
+        while (i <= movesLength)
+            yield i++;
+    };
+    try {
+        for (var _b = __asyncValues(iGenerator()), _c; _c = yield _b.next(), !_c.done;) {
+            let moveKey = _c.value;
+            const move = yield contract.methods.getMove(moveKey).call()
+                .catch((error) => {
+                console.warn("Error while loading move in procedure.", address, moveKey, error.message);
+                return null;
+            });
+            if (move)
+                moves.push(move);
+        }
+    }
+    catch (e_2_1) { e_2 = { error: e_2_1 }; }
+    finally {
+        try {
+            if (_c && !_c.done && (_a = _b.return)) yield _a.call(_b);
+        }
+        finally { if (e_2) throw e_2.error; }
+    }
+    const data = ProcedureClass && "load" in ProcedureClass ? yield ProcedureClass.load(address)
+        .catch((error) => {
+        console.warn("Error while loading procedure data.", address, error.message);
+        return {};
+    }) : null;
+    return new Procedure({ address, type, ProcedureClass, metadata, movesLength, moves, data });
+});
+Procedure.loadMetadata = (address) => __awaiter(void 0, void 0, void 0, function* () {
+    const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, address);
+    const ipfs = yield ipfs_1.ipfsNode;
+    if (!ipfs) {
+        console.info("IPFS was not started. Starting IPFS.");
+        yield ipfs.start();
+    }
+    let metadata = {};
+    try {
+        metadata.cid = yield contract.methods.getMetadata().call()
+            .then((data) => ipfs_1.multihashToCid({
+            ipfsHash: data.ipfsHash,
+            hashSize: parseInt(data.hashSize),
+            hashFunction: parseInt(data.hashFunction)
+        }));
+    }
+    catch (error) {
+        console.warn("Error while computing IPFS Content ID for procedure metadata.", address, error.message);
+    }
+    if (metadata.cid) {
+        try {
+            metadata.data = concat_1.default(yield it_all_1.default(ipfs.cat(metadata.cid)));
+        }
+        catch (error) {
+            console.warn("Error while fetching metadata content for procedure.", address, error.message);
+        }
+    }
+    return metadata;
+});
+exports.default = Procedure;

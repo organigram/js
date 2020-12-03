@@ -20,10 +20,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Graph = void 0;
-const web3_1 = require("./web3");
 const organ_1 = __importDefault(require("./organ"));
 const procedure_1 = __importDefault(require("./procedure"));
-const Kelsen_json_1 = __importDefault(require("@organigram/contracts/abis/Kelsen.json"));
 class Graph {
     constructor({ organs, procedures }) {
         this.organs = [];
@@ -57,9 +55,8 @@ class Graph {
             try {
                 for (contracts_1 = __asyncValues(contracts); contracts_1_1 = yield contracts_1.next(), !contracts_1_1.done;) {
                     var address = contracts_1_1.value;
-                    const contract = yield new web3_1.web3.eth.Contract(Kelsen_json_1.default, address);
-                    const isOrgan = yield contract.methods.isOrgan().call();
-                    const isProcedure = yield contract.methods.isProcedure().call();
+                    const isOrgan = yield organ_1.default.isOrgan(address);
+                    const isProcedure = yield procedure_1.default.isProcedure(address);
                     if (isOrgan)
                         organs.push(address);
                     if (isProcedure)

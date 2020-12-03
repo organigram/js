@@ -1,8 +1,14 @@
 import { web3 } from './web3'
 import all from 'it-all'
-import OrganABI from '@organigram/contracts/abis/Organ.json'
+import OrganContract from '@organigram/contracts/build/contracts/Organ.json'
 import { ipfsNode, multihashToCid } from './ipfs'
 import uint8ArrayConcat from 'uint8arrays/concat'
+
+export const ORGAN_CONTRACT_SIGNATURES: string[] = OrganContract.ast
+    .nodes.find(n => n.name === "")
+    ?.nodes?.map(n =>  n?.functionSelector || "")
+    .filter(i => i !== "")
+    || []
 
 export interface OrganData {
     address: string
@@ -64,6 +70,9 @@ export class Organ {
     /* Static API */
 
     public static async load(address: string): Promise<Organ> {
+        const isOrgan: boolean = await Organ.isOrgan(address).catch(() => false)
+        if (!isOrgan)
+            throw new Error("Contract at address is not an Organ.")
         const metadata: Metadata = await Organ.loadMetadata(address)
         .catch(error => {
             console.warn("Error while loading organ's metadata", address, error.message)
@@ -82,9 +91,21 @@ export class Organ {
         return new Organ({ address, procedures, metadata, entries })
     }
 
+    public static async isOrgan(address: Address):Promise<boolean> {
+        // @ts-ignore
+        const contract = new web3.eth.Contract(OrganContract.abi, address)
+        const isERC165 = await contract.methods.supportsInterface("0x01ffc9a7").call()
+        .catch(() => false)
+        if (!isERC165) return false
+        const ORGAN_INTERFACE = `0xbae78d7b`    // getEntry.
+        const isOrgan = await contract.methods.supportsInterface(ORGAN_INTERFACE).call()
+        .catch(() => false)
+        return isOrgan
+    }
+
     public static loadMetadata = async (address: Address): Promise<Metadata> => {
         // @ts-ignore
-        const contract = new web3.eth.Contract(OrganABI, address)
+        const contract = new web3.eth.Contract(OrganContract.abi, address)
         const ipfs = await ipfsNode
         if (!ipfs) {
             console.info("IPFS was not started. Starting IPFS.")
@@ -122,9 +143,10 @@ export class Organ {
 
     public static loadProcedures = async (address: Address): Promise<OrganProcedure[]> => {
         // @ts-ignore
-        const contract = new web3.eth.Contract(OrganABI, address)
+        const contract = new web3.eth.Contract(OrganContract.abi, address)
 
         const length = await contract.methods.getProceduresLength().call()
+        .catch(() => "0")
         if (length === "0") return []
 
         let i = 1, promises = []
@@ -133,10 +155,10 @@ export class Organ {
             promises.push(
                 contract.methods.getProcedure(i).call()
                 .catch((e: Error) => console.error("Error", e.message))
-                .then((data: any) => ({
+                .then((data: any) => data && {
                     address: data.procedure,
                     permissions: data.permissions.toString()
-                }))
+                })
             )
         }
 
@@ -145,15 +167,15 @@ export class Organ {
 
     public static loadEntries = async (address: Address): Promise<OrganEntry[]> => {
         // @ts-ignore
-        const contract = new web3.eth.Contract(OrganABI, address)
+        const contract = new web3.eth.Contract(OrganContract.abi, address)
         const ipfs = await ipfsNode
         if (!ipfs) {
             console.info("IPFS was not started. Starting IPFS.")
-            await ipfs.start()
+            await ipfs.start().catch((e:Error) => console.warn(e.message))
         }
 
         const length = await contract.methods.getEntriesLength().call()
-        .catch(() => 0)
+        .catch(() => "0")
         if (length === "0") return []
 
         var i = 1, promises = []

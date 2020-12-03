@@ -12,9 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProcedureNomination = void 0;
+exports.ProcedureNomination = exports.INTERFACE = void 0;
 const web3_1 = require("../web3");
 const SimpleNominationProcedure_json_1 = __importDefault(require("@organigram/contracts/build/contracts/SimpleNominationProcedure.json"));
+exports.INTERFACE = `0xc5f28e49`;
 class ProcedureNomination {
     constructor({ nominatersOrgan }) {
         this.nominatersOrgan = "";
@@ -29,6 +30,7 @@ ProcedureNomination.load = (address) => __awaiter(void 0, void 0, void 0, functi
         console.warn("Error while loading nominator in nomination procedure.", address, error.message);
         return "";
     });
-    return new ProcedureNomination({ nominatersOrgan });
+    const nomination = new ProcedureNomination({ nominatersOrgan });
+    return nomination;
 });
 exports.default = ProcedureNomination;

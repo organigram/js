@@ -1,6 +1,8 @@
 import { web3 } from '../web3'
 import ProcedureVoteContract from '@organigram/contracts/build/contracts/VoteProcedure.json'
 
+export const INTERFACE = `0xc9d27afe` // vote signature.
+
 export interface ProcedureVoteData  {
     votersOrgan: Address
     vetoersOrgan: Address
@@ -21,7 +23,6 @@ export class ProcedureVote {
     public static load = async (address: Address): Promise<ProcedureVote> => {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureVoteContract.abi, address)
-
         const votersOrgan:Address = await contract.methods.votersOrgan().call()
         .catch((error: Error) => {
             console.warn("Error while loading voters organ address in vote procedure.", address, error.message)

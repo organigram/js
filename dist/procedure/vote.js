@@ -12,9 +12,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ProcedureVote = void 0;
+exports.ProcedureVote = exports.INTERFACE = void 0;
 const web3_1 = require("../web3");
 const VoteProcedure_json_1 = __importDefault(require("@organigram/contracts/build/contracts/VoteProcedure.json"));
+exports.INTERFACE = `0xc9d27afe`;
 class ProcedureVote {
     constructor({ votersOrgan, vetoersOrgan, enactorsOrgan }) {
         this.votersOrgan = votersOrgan;
