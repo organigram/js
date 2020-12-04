@@ -35,7 +35,7 @@ export class ProcedureNomination {
         return from && contract.methods.nominate(moveKey).send({ from })
         .then(() => true)
         .catch((error:Error) => {
-            console.error("Error while adding special call in move.", this.address, moveKey, error.message)
+            console.error("Error while nominating.", this.address, moveKey, error.message)
             return false
         })
     }
