@@ -279,7 +279,6 @@ export class Procedure {
             console.error("Error while replacing entry in move.", this.address, moveKey, error.message)
             return false
         })
-        
     }
 
     public moveAddProcedure = async (

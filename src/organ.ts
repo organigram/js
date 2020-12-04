@@ -1,8 +1,9 @@
 import { web3 } from './web3'
 import all from 'it-all'
-import OrganContract from '@organigram/contracts/build/contracts/Organ.json'
-import { ipfsNode, multihashToCid } from './ipfs'
 import uint8ArrayConcat from 'uint8arrays/concat'
+import { CID } from 'ipfs-core'
+import OrganContract from '@organigram/contracts/build/contracts/Organ.json'
+import { ipfsNode, multihashToCid, cidToMultihash } from './ipfs'
 
 export const ORGAN_CONTRACT_SIGNATURES: string[] = OrganContract.ast
     .nodes.find(n => n.name === "")
@@ -32,39 +33,106 @@ export class Organ {
 
     /* Organ API */
 
-    public updateMetadata = async (metadata: Metadata): Promise<Organ> => {
-        // @TODO : Call updateMetadata(uint256[] memory indexes)
-        throw new Error("Not implemented.")
+    public updateMetadata = async(cid:CID = new CID("QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH")) => {
+        // @ts-ignore
+        const contract = new web3.eth.Contract(OrganContract.abi, this.address)
+        const multihash:Multihash|null = cidToMultihash(cid)
+        if (!multihash)
+            throw new Error("Wrong CID.")
+        const { ipfsHash, hashFunction, hashSize } = multihash
+        return await contract.methods.updateMetadata(ipfsHash, hashFunction, hashSize)
+        .send({ from: web3.eth.defaultAccount })
+        .then(() => true)
+        .catch((error:Error) => {
+            console.error("Error while updating metadata.", this.address, error.message)
+            return false
+        })
     }
 
     public addEntries = async (entries: OrganEntry[]): Promise<Organ> => {
-        // @TODO : Call addEntries(OrganLibrary.Entry[] memory entries).
-        throw new Error("Not implemented.")
+        // @ts-ignore
+        const contract = new web3.eth.Contract(OrganContract.abi, this.address)
+        const _entries: {
+            addr: Address, ipfsHash: string, hashFunction: string, hashSize: string
+        }[] = entries.map(e => {
+            let multihash:Multihash|null = cidToMultihash(e.cid)
+            if (!multihash)
+                throw new Error(`Wrong IPFS Content ID '${e.cid}' for entry.`)
+            const { ipfsHash, hashFunction, hashSize } = multihash
+            return { addr: e.address, ipfsHash, hashFunction, hashSize }
+        })
+        return await contract.methods.addEntries(_entries)
+        .send({ from: web3.eth.defaultAccount })
+        .then(() => true)
+        .catch((error:Error) => {
+            console.error("Error while adding entries to organ.", this.address, error.message)
+            return false
+        })
     }
 
-    public removeEntries = async (indexes: Number[]): Promise<Organ> => {
-        // @TODO : Call removeEntries(uint256[] memory indexes)
-        throw new Error("Not implemented.")
+    public removeEntries = async (indexes: string[]):Promise<boolean> => {
+        // @ts-ignore
+        const contract = new web3.eth.Contract(OrganContract.abi, this.address)
+        return await contract.methods.removeEntries(indexes)
+        .send({ from: web3.eth.defaultAccount })
+        .then(() => true)
+        .catch((error:Error) => {
+            console.error("Error while removing entries in organ.", this.address, error.message)
+            return false
+        })
     }
 
     public replaceEntry = async (index: Number, entry: OrganEntry): Promise<Organ> => {
-        // @TODO: Call replaceEntry(uint index, address payable addr, bytes32 ipfsHash, uint8 hashFunction, uint8 hashSize)
-        throw new Error("Not implemented.")
+        // @ts-ignore
+        const contract = new web3.eth.Contract(OrganContract.abi, this.address)
+        const multihash:Multihash|null = cidToMultihash(entry.cid)
+        if (!multihash)
+            throw new Error("Wrong CID.")
+        const { ipfsHash, hashFunction, hashSize } = multihash
+        return await contract.methods.replaceEntry(index, entry.address, ipfsHash, hashFunction, hashSize)
+        .send({ from: web3.eth.defaultAccount })
+        .then(() => true)
+        .catch((error:Error) => {
+            console.error("Error while replacing entry in organ.", this.address, error.message)
+            return false
+        })
     }
 
-    public addProcedures = async (procedures: OrganProcedure[]): Promise<Organ> => {
-        // @TODO : Call addProcedure(address procedure, bytes2 permissions)
-        throw new Error("Not implemented.")
+    public addProcedure = async (procedure: OrganProcedure): Promise<Organ> => {
+        // @ts-ignore
+        const contract = new web3.eth.Contract(OrganContract.abi, this.address)
+        return await contract.methods.addProcedure(procedure.address, procedure.permissions)
+        .send({ from: web3.eth.defaultAccount })
+        .then(() => true)
+        .catch((error:Error) => {
+            console.error("Error while adding procedures in organ.", this.address, error.message)
+            return false
+        })
     }
 
-    public removeProcedures = async (indexes: Number[]): Promise<Organ> => {
-        // @TODO : Call removeProcedure(address procedure)
-        throw new Error("Not implemented.")
+    public removeProcedure = async (procedure: Address): Promise<Organ> => {
+        // @ts-ignore
+        const contract = new web3.eth.Contract(OrganContract.abi, this.address)
+        return await contract.methods.removeProcedure(procedure)
+        .send({ from: web3.eth.defaultAccount })
+        .then(() => true)
+        .catch((error:Error) => {
+            console.error("Error while removing procedure in organ.", this.address, error.message)
+            return false
+        })
     }
 
-    public replaceProcedure = async (index: Number, procedure: OrganProcedure): Promise<Organ> => {
-        // @TODO : Call replaceProcedure(address oldProcedure, address newProcedure, bytes2 permissions)
-        throw new Error("Not implemented.")
+    public replaceProcedure = async (oldProcedure: Address, newOrganProcedure: OrganProcedure): Promise<Organ> => {
+        // @ts-ignore
+        const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
+        const { address, permissions } = newOrganProcedure
+        return await contract.methods.moveReplaceProcedure(oldProcedure, address, permissions)
+        .send({ from: web3.eth.defaultAccount })
+        .then(() => true)
+        .catch((error:Error) => {
+            console.error("Error while replacing procedure in organ.", this.address, error.message)
+            return false
+        })
     }
 
     /* Static API */

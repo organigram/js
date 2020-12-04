@@ -16,9 +16,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Organ = exports.ORGAN_CONTRACT_SIGNATURES = void 0;
 const web3_1 = require("./web3");
 const it_all_1 = __importDefault(require("it-all"));
+const concat_1 = __importDefault(require("uint8arrays/concat"));
+const ipfs_core_1 = require("ipfs-core");
 const Organ_json_1 = __importDefault(require("@organigram/contracts/build/contracts/Organ.json"));
 const ipfs_1 = require("./ipfs");
-const concat_1 = __importDefault(require("uint8arrays/concat"));
 exports.ORGAN_CONTRACT_SIGNATURES = ((_b = (_a = Organ_json_1.default.ast
     .nodes.find(n => n.name === "")) === null || _a === void 0 ? void 0 : _a.nodes) === null || _b === void 0 ? void 0 : _b.map(n => (n === null || n === void 0 ? void 0 : n.functionSelector) || "").filter(i => i !== "")) || [];
 class Organ {
@@ -27,26 +28,91 @@ class Organ {
         this.procedures = [];
         this.metadata = {};
         this.entries = [];
-        this.updateMetadata = (metadata) => __awaiter(this, void 0, void 0, function* () {
-            throw new Error("Not implemented.");
+        this.updateMetadata = (cid = new ipfs_core_1.CID("QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH")) => __awaiter(this, void 0, void 0, function* () {
+            const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi, this.address);
+            const multihash = ipfs_1.cidToMultihash(cid);
+            if (!multihash)
+                throw new Error("Wrong CID.");
+            const { ipfsHash, hashFunction, hashSize } = multihash;
+            return yield contract.methods.updateMetadata(ipfsHash, hashFunction, hashSize)
+                .send({ from: web3_1.web3.eth.defaultAccount })
+                .then(() => true)
+                .catch((error) => {
+                console.error("Error while updating metadata.", this.address, error.message);
+                return false;
+            });
         });
         this.addEntries = (entries) => __awaiter(this, void 0, void 0, function* () {
-            throw new Error("Not implemented.");
+            const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi, this.address);
+            const _entries = entries.map(e => {
+                let multihash = ipfs_1.cidToMultihash(e.cid);
+                if (!multihash)
+                    throw new Error(`Wrong IPFS Content ID '${e.cid}' for entry.`);
+                const { ipfsHash, hashFunction, hashSize } = multihash;
+                return { addr: e.address, ipfsHash, hashFunction, hashSize };
+            });
+            return yield contract.methods.addEntries(_entries)
+                .send({ from: web3_1.web3.eth.defaultAccount })
+                .then(() => true)
+                .catch((error) => {
+                console.error("Error while adding entries to organ.", this.address, error.message);
+                return false;
+            });
         });
         this.removeEntries = (indexes) => __awaiter(this, void 0, void 0, function* () {
-            throw new Error("Not implemented.");
+            const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi, this.address);
+            return yield contract.methods.removeEntries(indexes)
+                .send({ from: web3_1.web3.eth.defaultAccount })
+                .then(() => true)
+                .catch((error) => {
+                console.error("Error while removing entries in organ.", this.address, error.message);
+                return false;
+            });
         });
         this.replaceEntry = (index, entry) => __awaiter(this, void 0, void 0, function* () {
-            throw new Error("Not implemented.");
+            const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi, this.address);
+            const multihash = ipfs_1.cidToMultihash(entry.cid);
+            if (!multihash)
+                throw new Error("Wrong CID.");
+            const { ipfsHash, hashFunction, hashSize } = multihash;
+            return yield contract.methods.replaceEntry(index, entry.address, ipfsHash, hashFunction, hashSize)
+                .send({ from: web3_1.web3.eth.defaultAccount })
+                .then(() => true)
+                .catch((error) => {
+                console.error("Error while replacing entry in organ.", this.address, error.message);
+                return false;
+            });
         });
-        this.addProcedures = (procedures) => __awaiter(this, void 0, void 0, function* () {
-            throw new Error("Not implemented.");
+        this.addProcedure = (procedure) => __awaiter(this, void 0, void 0, function* () {
+            const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi, this.address);
+            return yield contract.methods.addProcedure(procedure.address, procedure.permissions)
+                .send({ from: web3_1.web3.eth.defaultAccount })
+                .then(() => true)
+                .catch((error) => {
+                console.error("Error while adding procedures in organ.", this.address, error.message);
+                return false;
+            });
         });
-        this.removeProcedures = (indexes) => __awaiter(this, void 0, void 0, function* () {
-            throw new Error("Not implemented.");
+        this.removeProcedure = (procedure) => __awaiter(this, void 0, void 0, function* () {
+            const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi, this.address);
+            return yield contract.methods.removeProcedure(procedure)
+                .send({ from: web3_1.web3.eth.defaultAccount })
+                .then(() => true)
+                .catch((error) => {
+                console.error("Error while removing procedure in organ.", this.address, error.message);
+                return false;
+            });
         });
-        this.replaceProcedure = (index, procedure) => __awaiter(this, void 0, void 0, function* () {
-            throw new Error("Not implemented.");
+        this.replaceProcedure = (oldProcedure, newOrganProcedure) => __awaiter(this, void 0, void 0, function* () {
+            const contract = new web3_1.web3.eth.Contract(ProcedureContract.abi, this.address);
+            const { address, permissions } = newOrganProcedure;
+            return yield contract.methods.moveReplaceProcedure(oldProcedure, address, permissions)
+                .send({ from: web3_1.web3.eth.defaultAccount })
+                .then(() => true)
+                .catch((error) => {
+                console.error("Error while replacing procedure in organ.", this.address, error.message);
+                return false;
+            });
         });
         this.reload = () => __awaiter(this, void 0, void 0, function* () {
             const { procedures, metadata, entries } = yield Organ.load(this.address);
