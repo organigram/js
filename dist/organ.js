@@ -23,8 +23,9 @@ const ipfs_1 = require("./ipfs");
 exports.ORGAN_CONTRACT_SIGNATURES = ((_b = (_a = Organ_json_1.default.ast
     .nodes.find(n => n.name === "")) === null || _a === void 0 ? void 0 : _a.nodes) === null || _b === void 0 ? void 0 : _b.map(n => (n === null || n === void 0 ? void 0 : n.functionSelector) || "").filter(i => i !== "")) || [];
 class Organ {
-    constructor({ address, procedures, metadata, entries }) {
+    constructor({ address, balance, procedures, metadata, entries }) {
         this.address = "";
+        this.balance = "n/a";
         this.procedures = [];
         this.metadata = {};
         this.entries = [];
@@ -146,6 +147,7 @@ class Organ {
             return this;
         });
         this.address = address;
+        this.balance = balance;
         this.procedures = procedures;
         this.metadata = metadata;
         this.entries = entries;
@@ -155,6 +157,8 @@ class Organ {
             const isOrgan = yield Organ.isOrgan(address).catch(() => false);
             if (!isOrgan)
                 throw new Error("Contract at address is not an Organ.");
+            const balance = yield Organ.getBalance(address)
+                .catch(() => "n/a");
             const metadata = yield Organ.loadMetadata(address)
                 .catch(error => {
                 console.warn("Error while loading organ's metadata", address, error.message);
@@ -170,7 +174,7 @@ class Organ {
                 console.warn("Error while loading organ's entries", address, error.message);
                 return [];
             });
-            return new Organ({ address, procedures, metadata, entries });
+            return new Organ({ address, balance, procedures, metadata, entries });
         });
     }
     static isOrgan(address) {
@@ -188,6 +192,10 @@ class Organ {
     }
 }
 exports.Organ = Organ;
+Organ.getBalance = (address) => __awaiter(void 0, void 0, void 0, function* () {
+    const balance = yield web3_1.web3.eth.getBalance(address);
+    return `${balance}`;
+});
 Organ.loadMetadata = (address) => __awaiter(void 0, void 0, void 0, function* () {
     const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi, address);
     const ipfs = yield ipfs_1.ipfsNode;

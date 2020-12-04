@@ -4,6 +4,7 @@ import { CID } from 'ipfs-core/src'
 import ProcedureContract from '@organigram/contracts/build/contracts/Procedure.json'
 import { web3 } from '../web3'
 import { cidToMultihash, ipfsNode, multihashToCid } from '../ipfs'
+import Organ from '../organ'
 
 export const INTERFACE = `0x71dbd330` // getMove signature.
 
@@ -13,7 +14,6 @@ export interface ProcedureData {
     ProcedureClass: any // Store real Procedure Class.
     metadata: Metadata
     data: any
-    movesLength: Number
     moves: any[]
 }
 
@@ -23,16 +23,14 @@ export class Procedure {
     ProcedureClass: any = ""
     metadata: Metadata = {}
     data: any = null
-    movesLength: Number = 0
     moves: ProcedureMove[] = []
 
-    constructor({ address, type, ProcedureClass, metadata, data, movesLength, moves }: ProcedureData) {
+    constructor({ address, type, ProcedureClass, metadata, data, moves }: ProcedureData) {
         this.address = address
         this.type = type
         this.ProcedureClass = ProcedureClass
         this.metadata = metadata
         this.data = data
-        this.movesLength = movesLength
         this.moves = moves
     }
 
@@ -49,42 +47,13 @@ export class Procedure {
             console.warn("Error while loading procedure metadata.", address, error.message)
             return {}
         })
-        const movesLength: number = await contract.methods.getMovesLength().call().then(parseInt)
-        .catch((error: Error) => {
-            console.warn("Error while loading moves length in procedure.", address, error.message)
-            return 0
-        })
-        let moves: any[] = []
-        const iGenerator = function* () {
-            let i = 0
-            while (i < movesLength) yield i++
-        }
-        for await(let moveKey of iGenerator()) {
-            const key = `${moveKey}`
-            const move:ProcedureMove|null = await contract.methods.getMove(key).call()
-            .then (({ creator, locked, applied, processing, metadata, operations }:{
-                creator: Address, locked: boolean, applied:boolean, processing: boolean,
-                metadata: Multihash, operations: any[]
-            }) => ({
-                key, creator, locked, applied, processing,
-                metadata: {
-                    cid: metadata && metadata.ipfsHash && multihashToCid(metadata)
-                },
-                operations
-            }))
-            .catch((error: Error) => {
-                console.warn("Error while loading move in procedure.", address, moveKey, error.message)
-                return null
-            })
-            if (move)
-                moves.push(move)
-        }
+        const moves = await Procedure.loadMoves(address)
         const data = ProcedureClass && "load" in ProcedureClass ? await ProcedureClass.load(address)
             .catch((error: Error) => {
                 console.warn("Error while loading procedure data.", address, error.message)
                 return {}
             }) : null
-        return new Procedure({ address, type, ProcedureClass, metadata, movesLength, moves, data })
+        return new Procedure({ address, type, ProcedureClass, metadata, moves, data })
     }
 
     static async isProcedure(address: Address):Promise<boolean> {
@@ -135,6 +104,48 @@ export class Procedure {
             }
         })
         return ProcedureClass
+    }
+
+    static loadMoves = async (address: Address): Promise<ProcedureMove[]> => {
+        // @ts-ignore
+        const contract = new web3.eth.Contract(ProcedureContract.abi, address)
+        const movesLength: number = await contract.methods.getMovesLength().call().then(parseInt)
+        .catch((error: Error) => {
+            console.warn("Error while loading moves length in procedure.", address, error.message)
+            return 0
+        })
+        let moves: any[] = []
+        const iGenerator = function* () {
+            let i = 0
+            while (i < movesLength) yield i++
+        }
+        for await(let moveKey of iGenerator()) {
+            const key = `${moveKey}`
+            const move:ProcedureMove|null = await Procedure.loadMove(address, key)
+            .catch((error: Error) => {
+                console.warn("Error while loading move in procedure.", address, moveKey, error.message)
+                return null
+            })
+            if (move)
+                moves.push(move)
+        }
+        return moves
+    }
+
+    static loadMove = async (address: Address, moveKey: string): Promise<ProcedureMove> => {
+        // @ts-ignore
+        const contract = new web3.eth.Contract(ProcedureContract.abi, address)
+        return await contract.methods.getMove(moveKey).call()
+        .then (({ creator, locked, applied, processing, metadata, operations }:{
+            creator: Address, locked: boolean, applied:boolean, processing: boolean,
+            metadata: Multihash, operations: any[]
+        }) => ({
+            key: moveKey, creator, locked, applied, processing,
+            metadata: {
+                cid: metadata && metadata.ipfsHash && multihashToCid(metadata)
+            },
+            operations
+        }))
     }
 
     static loadMetadata = async (address: Address): Promise<Metadata> => {
@@ -347,6 +358,47 @@ export class Procedure {
         .catch((error:Error) => {
             console.error("Error while adding special call in move.", this.address, moveKey, error.message)
             return false
+        })
+    }
+
+    /**
+     * Sync API.
+     */
+
+    reloadMoves = async (): Promise<Procedure> => {
+        const moves = await Procedure.loadMoves(this.address)
+        return new Procedure({
+            address: this.address,
+            ProcedureClass: this.ProcedureClass,
+            metadata: this.metadata,
+            type: this.type,
+            data: this.data,
+            moves
+        })
+    }
+
+    reloadMove = async (moveKey: string): Promise<Procedure> => {
+        const move = await Procedure.loadMove(this.address, moveKey)
+        const moves = this.moves.map(m => m.key === moveKey ? move : m)
+        return new Procedure({
+            address: this.address,
+            ProcedureClass: this.ProcedureClass,
+            metadata: this.metadata,
+            type: this.type,
+            data: this.data,
+            moves
+        })
+    }
+
+    reloadMetadata = async (): Promise<Procedure> => {
+        const moves = await Procedure.loadMoves(this.address)
+        return new Procedure({
+            address: this.address,
+            ProcedureClass: this.ProcedureClass,
+            metadata: this.metadata,
+            type: this.type,
+            data: this.data,
+            moves
         })
     }
 }

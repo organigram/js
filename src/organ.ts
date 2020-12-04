@@ -13,6 +13,7 @@ export const ORGAN_CONTRACT_SIGNATURES: string[] = OrganContract.ast
 
 export interface OrganData {
     address: string
+    balance: string
     metadata: Metadata
     procedures: OrganProcedure[]
     entries: OrganEntry[]
@@ -20,12 +21,14 @@ export interface OrganData {
 
 export class Organ {
     address: string = ""
+    balance: string = "n/a"
     procedures: OrganProcedure[] = []
     metadata: Metadata = {}
     entries: OrganEntry[] = []
 
-    public constructor({ address, procedures, metadata, entries }: OrganData) {
+    public constructor({ address, balance, procedures, metadata, entries }: OrganData) {
         this.address = address
+        this.balance = balance
         this.procedures = procedures
         this.metadata = metadata
         this.entries = entries
@@ -141,6 +144,8 @@ export class Organ {
         const isOrgan: boolean = await Organ.isOrgan(address).catch(() => false)
         if (!isOrgan)
             throw new Error("Contract at address is not an Organ.")
+        const balance:string = await Organ.getBalance(address)
+        .catch(() => "n/a")
         const metadata: Metadata = await Organ.loadMetadata(address)
         .catch(error => {
             console.warn("Error while loading organ's metadata", address, error.message)
@@ -156,7 +161,7 @@ export class Organ {
             console.warn("Error while loading organ's entries", address, error.message)
             return []
         })
-        return new Organ({ address, procedures, metadata, entries })
+        return new Organ({ address, balance, procedures, metadata, entries })
     }
 
     public static async isOrgan(address: Address):Promise<boolean> {
@@ -169,6 +174,11 @@ export class Organ {
         const isOrgan = await contract.methods.supportsInterface(ORGAN_INTERFACE).call()
         .catch(() => false)
         return isOrgan
+    }
+
+    public static getBalance = async (address: Address): Promise<string> => {
+        const balance = await web3.eth.getBalance(address)
+        return `${balance}`
     }
 
     public static loadMetadata = async (address: Address): Promise<Metadata> => {

@@ -28,13 +28,12 @@ const web3_1 = require("../web3");
 const ipfs_1 = require("../ipfs");
 exports.INTERFACE = `0x71dbd330`;
 class Procedure {
-    constructor({ address, type, ProcedureClass, metadata, data, movesLength, moves }) {
+    constructor({ address, type, ProcedureClass, metadata, data, moves }) {
         this.address = "";
         this.type = "";
         this.ProcedureClass = "";
         this.metadata = {};
         this.data = null;
-        this.movesLength = 0;
         this.moves = [];
         this.createMove = (cid = new src_1.CID("QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH")) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
@@ -152,12 +151,45 @@ class Procedure {
                 return false;
             });
         });
+        this.reloadMoves = () => __awaiter(this, void 0, void 0, function* () {
+            const moves = yield Procedure.loadMoves(this.address);
+            return new Procedure({
+                address: this.address,
+                ProcedureClass: this.ProcedureClass,
+                metadata: this.metadata,
+                type: this.type,
+                data: this.data,
+                moves
+            });
+        });
+        this.reloadMove = (moveKey) => __awaiter(this, void 0, void 0, function* () {
+            const move = yield Procedure.loadMove(this.address, moveKey);
+            const moves = this.moves.map(m => m.key === moveKey ? move : m);
+            return new Procedure({
+                address: this.address,
+                ProcedureClass: this.ProcedureClass,
+                metadata: this.metadata,
+                type: this.type,
+                data: this.data,
+                moves
+            });
+        });
+        this.reloadMetadata = () => __awaiter(this, void 0, void 0, function* () {
+            const moves = yield Procedure.loadMoves(this.address);
+            return new Procedure({
+                address: this.address,
+                ProcedureClass: this.ProcedureClass,
+                metadata: this.metadata,
+                type: this.type,
+                data: this.data,
+                moves
+            });
+        });
         this.address = address;
         this.type = type;
         this.ProcedureClass = ProcedureClass;
         this.metadata = metadata;
         this.data = data;
-        this.movesLength = movesLength;
         this.moves = moves;
     }
     static isProcedure(address) {
@@ -220,7 +252,6 @@ class Procedure {
 }
 exports.Procedure = Procedure;
 Procedure.load = (address) => __awaiter(void 0, void 0, void 0, function* () {
-    var e_2, _a;
     const isProcedure = yield Procedure.isProcedure(address).catch(() => false);
     if (!isProcedure)
         throw new Error("Contract at address is not a Procedure.");
@@ -232,6 +263,17 @@ Procedure.load = (address) => __awaiter(void 0, void 0, void 0, function* () {
         console.warn("Error while loading procedure metadata.", address, error.message);
         return {};
     });
+    const moves = yield Procedure.loadMoves(address);
+    const data = ProcedureClass && "load" in ProcedureClass ? yield ProcedureClass.load(address)
+        .catch((error) => {
+        console.warn("Error while loading procedure data.", address, error.message);
+        return {};
+    }) : null;
+    return new Procedure({ address, type, ProcedureClass, metadata, moves, data });
+});
+Procedure.loadMoves = (address) => __awaiter(void 0, void 0, void 0, function* () {
+    var e_2, _a;
+    const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, address);
     const movesLength = yield contract.methods.getMovesLength().call().then(parseInt)
         .catch((error) => {
         console.warn("Error while loading moves length in procedure.", address, error.message);
@@ -247,14 +289,7 @@ Procedure.load = (address) => __awaiter(void 0, void 0, void 0, function* () {
         for (var _b = __asyncValues(iGenerator()), _c; _c = yield _b.next(), !_c.done;) {
             let moveKey = _c.value;
             const key = `${moveKey}`;
-            const move = yield contract.methods.getMove(key).call()
-                .then(({ creator, locked, applied, processing, metadata, operations }) => ({
-                key, creator, locked, applied, processing,
-                metadata: {
-                    cid: metadata && metadata.ipfsHash && ipfs_1.multihashToCid(metadata)
-                },
-                operations
-            }))
+            const move = yield Procedure.loadMove(address, key)
                 .catch((error) => {
                 console.warn("Error while loading move in procedure.", address, moveKey, error.message);
                 return null;
@@ -270,12 +305,18 @@ Procedure.load = (address) => __awaiter(void 0, void 0, void 0, function* () {
         }
         finally { if (e_2) throw e_2.error; }
     }
-    const data = ProcedureClass && "load" in ProcedureClass ? yield ProcedureClass.load(address)
-        .catch((error) => {
-        console.warn("Error while loading procedure data.", address, error.message);
-        return {};
-    }) : null;
-    return new Procedure({ address, type, ProcedureClass, metadata, movesLength, moves, data });
+    return moves;
+});
+Procedure.loadMove = (address, moveKey) => __awaiter(void 0, void 0, void 0, function* () {
+    const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, address);
+    return yield contract.methods.getMove(moveKey).call()
+        .then(({ creator, locked, applied, processing, metadata, operations }) => ({
+        key: moveKey, creator, locked, applied, processing,
+        metadata: {
+            cid: metadata && metadata.ipfsHash && ipfs_1.multihashToCid(metadata)
+        },
+        operations
+    }));
 });
 Procedure.loadMetadata = (address) => __awaiter(void 0, void 0, void 0, function* () {
     const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, address);
