@@ -284,13 +284,12 @@ export class Procedure {
     moveAddProcedure = async (
         moveKey: string,
         organ: Address,
-        procedure: Address,
-        permissions: OrganProcedurePermissions = "0xffff",
+        procedure: OrganProcedure,
         lock: boolean = false
     ): Promise<boolean> => {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
-        return await contract.methods.moveAddProcedure(moveKey, organ, procedure, permissions, lock)
+        return await contract.methods.moveAddProcedure(moveKey, organ, procedure.address, procedure.permissions, lock)
         .send({ from: web3.eth.defaultAccount })
         .then(() => true)
         .catch((error:Error) => {
@@ -302,12 +301,12 @@ export class Procedure {
     moveRemoveProcedure = async (
         moveKey: string,
         organ: Address,
-        procedure: Address,
+        procedure: OrganProcedure,
         lock: boolean = false
     ):Promise<boolean> => {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
-        return await contract.methods.moveRemoveProcedure(moveKey, organ, procedure, lock)
+        return await contract.methods.moveRemoveProcedure(moveKey, organ, procedure.address, lock)
         .send({ from: web3.eth.defaultAccount })
         .then(() => true)
         .catch((error:Error) => {
@@ -320,13 +319,12 @@ export class Procedure {
         moveKey: string,
         organ: Address,
         oldProcedure: Address,
-        newProcedure: Address,
-        permissions: OrganProcedurePermissions = "0xffff",
+        newProcedure: OrganProcedure,
         lock: boolean = false
     ):Promise<boolean> => {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
-        return await contract.methods.moveReplaceProcedure(moveKey, organ, oldProcedure, newProcedure, permissions, lock)
+        return await contract.methods.moveReplaceProcedure(moveKey, organ, oldProcedure, newProcedure.address, newProcedure.permissions, lock)
         .send({ from: web3.eth.defaultAccount })
         .then(() => true)
         .catch((error:Error) => {

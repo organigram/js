@@ -112,9 +112,9 @@ class Procedure {
                 return false;
             });
         });
-        this.moveAddProcedure = (moveKey, organ, procedure, permissions = "0xffff", lock = false) => __awaiter(this, void 0, void 0, function* () {
+        this.moveAddProcedure = (moveKey, organ, procedure, lock = false) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
-            return yield contract.methods.moveAddProcedure(moveKey, organ, procedure, permissions, lock)
+            return yield contract.methods.moveAddProcedure(moveKey, organ, procedure.address, procedure.permissions, lock)
                 .send({ from: web3_1.web3.eth.defaultAccount })
                 .then(() => true)
                 .catch((error) => {
@@ -124,7 +124,7 @@ class Procedure {
         });
         this.moveRemoveProcedure = (moveKey, organ, procedure, lock = false) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
-            return yield contract.methods.moveRemoveProcedure(moveKey, organ, procedure, lock)
+            return yield contract.methods.moveRemoveProcedure(moveKey, organ, procedure.address, lock)
                 .send({ from: web3_1.web3.eth.defaultAccount })
                 .then(() => true)
                 .catch((error) => {
@@ -132,9 +132,9 @@ class Procedure {
                 return false;
             });
         });
-        this.moveReplaceProcedure = (moveKey, organ, oldProcedure, newProcedure, permissions = "0xffff", lock = false) => __awaiter(this, void 0, void 0, function* () {
+        this.moveReplaceProcedure = (moveKey, organ, oldProcedure, newProcedure, lock = false) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
-            return yield contract.methods.moveReplaceProcedure(moveKey, organ, oldProcedure, newProcedure, permissions, lock)
+            return yield contract.methods.moveReplaceProcedure(moveKey, organ, oldProcedure, newProcedure.address, newProcedure.permissions, lock)
                 .send({ from: web3_1.web3.eth.defaultAccount })
                 .then(() => true)
                 .catch((error) => {
