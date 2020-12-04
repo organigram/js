@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProcedureNomination = exports.INTERFACE = void 0;
 const web3_1 = require("../web3");
 const SimpleNominationProcedure_json_1 = __importDefault(require("@organigram/contracts/build/contracts/SimpleNominationProcedure.json"));
+const web3_2 = require("../web3");
 exports.INTERFACE = `0xc5f28e49`;
 class ProcedureNomination {
     constructor({ address, nominatersOrgan }) {
@@ -22,8 +23,8 @@ class ProcedureNomination {
         this.nominatersOrgan = "";
         this.nominate = (moveKey) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(SimpleNominationProcedure_json_1.default.abi, this.address);
-            return yield contract.methods.nominate(moveKey)
-                .send({ from: web3_1.web3.eth.defaultAccount })
+            const from = yield web3_2.getAccount();
+            return from && contract.methods.nominate(moveKey).send({ from })
                 .then(() => true)
                 .catch((error) => {
                 console.error("Error while adding special call in move.", this.address, moveKey, error.message);

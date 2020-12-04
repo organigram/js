@@ -4,6 +4,7 @@ import uint8ArrayConcat from 'uint8arrays/concat'
 import { CID } from 'ipfs-core'
 import OrganContract from '@organigram/contracts/build/contracts/Organ.json'
 import { ipfsNode, multihashToCid, cidToMultihash } from './ipfs'
+import { getAccount } from './web3'
 
 export const ORGAN_CONTRACT_SIGNATURES: string[] = OrganContract.ast
     .nodes.find(n => n.name === "")
@@ -43,8 +44,8 @@ export class Organ {
         if (!multihash)
             throw new Error("Wrong CID.")
         const { ipfsHash, hashFunction, hashSize } = multihash
-        return await contract.methods.updateMetadata(ipfsHash, hashFunction, hashSize)
-        .send({ from: web3.eth.defaultAccount })
+        const from = await getAccount()
+        return from && contract.methods.updateMetadata(ipfsHash, hashFunction, hashSize).send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while updating metadata.", this.address, error.message)
@@ -64,8 +65,8 @@ export class Organ {
             const { ipfsHash, hashFunction, hashSize } = multihash
             return { addr: e.address, ipfsHash, hashFunction, hashSize }
         })
-        return await contract.methods.addEntries(_entries)
-        .send({ from: web3.eth.defaultAccount })
+        const from = await getAccount()
+        return from && contract.methods.addEntries(_entries).send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while adding entries to organ.", this.address, error.message)
@@ -76,8 +77,8 @@ export class Organ {
     public removeEntries = async (indexes: string[]):Promise<boolean> => {
         // @ts-ignore
         const contract = new web3.eth.Contract(OrganContract.abi, this.address)
-        return await contract.methods.removeEntries(indexes)
-        .send({ from: web3.eth.defaultAccount })
+        const from = await getAccount()
+        return from && contract.methods.removeEntries(indexes).send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while removing entries in organ.", this.address, error.message)
@@ -92,8 +93,8 @@ export class Organ {
         if (!multihash)
             throw new Error("Wrong CID.")
         const { ipfsHash, hashFunction, hashSize } = multihash
-        return await contract.methods.replaceEntry(index, entry.address, ipfsHash, hashFunction, hashSize)
-        .send({ from: web3.eth.defaultAccount })
+        const from = await getAccount()
+        return from && contract.methods.replaceEntry(index, entry.address, ipfsHash, hashFunction, hashSize).send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while replacing entry in organ.", this.address, error.message)
@@ -104,8 +105,8 @@ export class Organ {
     public addProcedure = async (procedure: OrganProcedure): Promise<Organ> => {
         // @ts-ignore
         const contract = new web3.eth.Contract(OrganContract.abi, this.address)
-        return await contract.methods.addProcedure(procedure.address, procedure.permissions)
-        .send({ from: web3.eth.defaultAccount })
+        const from = await getAccount()
+        return from && contract.methods.addProcedure(procedure.address, procedure.permissions).send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while adding procedures in organ.", this.address, error.message)
@@ -116,8 +117,8 @@ export class Organ {
     public removeProcedure = async (procedure: Address): Promise<Organ> => {
         // @ts-ignore
         const contract = new web3.eth.Contract(OrganContract.abi, this.address)
-        return await contract.methods.removeProcedure(procedure)
-        .send({ from: web3.eth.defaultAccount })
+        const from = await getAccount()
+        return from && contract.methods.removeProcedure(procedure).send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while removing procedure in organ.", this.address, error.message)
@@ -129,8 +130,8 @@ export class Organ {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
         const { address, permissions } = newOrganProcedure
-        return await contract.methods.moveReplaceProcedure(oldProcedure, address, permissions)
-        .send({ from: web3.eth.defaultAccount })
+        const from = await getAccount()
+        return from && contract.methods.moveReplaceProcedure(oldProcedure, address, permissions).send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while replacing procedure in organ.", this.address, error.message)

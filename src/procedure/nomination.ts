@@ -1,5 +1,6 @@
 import { web3 } from '../web3'
 import ProcedureNominationContract from '@organigram/contracts/build/contracts/SimpleNominationProcedure.json'
+import { getAccount } from '../web3'
 
 export const INTERFACE = `0xc5f28e49` // nominate signature.
 
@@ -30,8 +31,8 @@ export class ProcedureNomination {
     public nominate = async (moveKey: string):Promise<boolean> => {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureNominationContract.abi, this.address)
-        return await contract.methods.nominate(moveKey)
-        .send({ from: web3.eth.defaultAccount })
+        const from = await getAccount()
+        return from && contract.methods.nominate(moveKey).send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while adding special call in move.", this.address, moveKey, error.message)

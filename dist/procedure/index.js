@@ -26,6 +26,7 @@ const src_1 = require("ipfs-core/src");
 const Procedure_json_1 = __importDefault(require("@organigram/contracts/build/contracts/Procedure.json"));
 const web3_1 = require("../web3");
 const ipfs_1 = require("../ipfs");
+const web3_2 = require("../web3");
 exports.INTERFACE = `0x71dbd330`;
 class Procedure {
     constructor({ address, type, ProcedureClass, metadata, data, moves }) {
@@ -41,12 +42,13 @@ class Procedure {
             if (!multihash)
                 throw new Error("Wrong CID.");
             const { ipfsHash, hashFunction, hashSize } = multihash;
-            return yield contract.methods.createMove(ipfsHash, hashFunction, hashSize).send({ from: web3_1.web3.eth.defaultAccount });
+            const from = yield web3_2.getAccount();
+            return from && contract.methods.createMove(ipfsHash, hashFunction, hashSize).send({ from });
         });
         this.lockMove = (moveKey) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
-            return yield contract.methods.lockMove(moveKey)
-                .send({ from: web3_1.web3.eth.defaultAccount })
+            const from = yield web3_2.getAccount();
+            return from && contract.methods.lockMove(moveKey).send({ from })
                 .then(() => true)
                 .catch((error) => {
                 console.error("Error while locking move.", this.address, moveKey, error.message);
@@ -59,8 +61,8 @@ class Procedure {
             if (!multihash)
                 throw new Error("Wrong CID.");
             const { ipfsHash, hashFunction, hashSize } = multihash;
-            return yield contract.methods.updateMetadata(ipfsHash, hashFunction, hashSize)
-                .send({ from: web3_1.web3.eth.defaultAccount })
+            const from = yield web3_2.getAccount();
+            return from && contract.methods.updateMetadata(ipfsHash, hashFunction, hashSize).send({ from })
                 .then(() => true)
                 .catch((error) => {
                 console.error("Error while updating metadata.", this.address, error.message);
@@ -69,8 +71,8 @@ class Procedure {
         });
         this.updateAdmin = (address) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
-            return yield contract.methods.updateAdmin(address)
-                .send({ from: web3_1.web3.eth.defaultAccount })
+            const from = yield web3_2.getAccount();
+            return from && contract.methods.updateAdmin(address).send({ from })
                 .then(() => true)
                 .catch((error) => {
                 console.error("Error while updating admin.", this.address, error.message);
@@ -79,8 +81,8 @@ class Procedure {
         });
         this.moveAddEntries = (moveKey, organ, entries, lock = false) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
-            return yield contract.methods.moveAddEntries(moveKey, organ, entries, lock)
-                .send({ from: web3_1.web3.eth.defaultAccount })
+            const from = yield web3_2.getAccount();
+            return from && contract.methods.moveAddEntries(moveKey, organ, entries, lock).send({ from })
                 .then(() => true)
                 .catch((error) => {
                 console.error("Error while adding entries in move.", this.address, moveKey, error.message);
@@ -89,8 +91,8 @@ class Procedure {
         });
         this.moveRemoveEntry = (moveKey, organ, indexes, lock = false) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
-            return yield contract.methods.moveRemoveEntry(moveKey, organ, indexes, lock)
-                .send({ from: web3_1.web3.eth.defaultAccount })
+            const from = yield web3_2.getAccount();
+            return from && contract.methods.moveRemoveEntry(moveKey, organ, indexes, lock).send({ from })
                 .then(() => true)
                 .catch((error) => {
                 console.error("Error while removing entry in move.", this.address, moveKey, error.message);
@@ -113,8 +115,8 @@ class Procedure {
         });
         this.moveAddProcedure = (moveKey, organ, procedure, lock = false) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
-            return yield contract.methods.moveAddProcedure(moveKey, organ, procedure.address, procedure.permissions, lock)
-                .send({ from: web3_1.web3.eth.defaultAccount })
+            const from = yield web3_2.getAccount();
+            return from && contract.methods.moveAddProcedure(moveKey, organ, procedure.address, procedure.permissions, lock).send({ from })
                 .then(() => true)
                 .catch((error) => {
                 console.error("Error while adding procedures in move.", this.address, moveKey, error.message);
@@ -123,8 +125,8 @@ class Procedure {
         });
         this.moveRemoveProcedure = (moveKey, organ, procedure, lock = false) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
-            return yield contract.methods.moveRemoveProcedure(moveKey, organ, procedure.address, lock)
-                .send({ from: web3_1.web3.eth.defaultAccount })
+            const from = yield web3_2.getAccount();
+            return from && contract.methods.moveRemoveProcedure(moveKey, organ, procedure.address, lock).send({ from })
                 .then(() => true)
                 .catch((error) => {
                 console.error("Error while removing procedure in move.", this.address, moveKey, error.message);
@@ -133,8 +135,8 @@ class Procedure {
         });
         this.moveReplaceProcedure = (moveKey, organ, oldProcedure, newProcedure, lock = false) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
-            return yield contract.methods.moveReplaceProcedure(moveKey, organ, oldProcedure, newProcedure.address, newProcedure.permissions, lock)
-                .send({ from: web3_1.web3.eth.defaultAccount })
+            const from = yield web3_2.getAccount();
+            return from && contract.methods.moveReplaceProcedure(moveKey, organ, oldProcedure, newProcedure.address, newProcedure.permissions, lock).send({ from })
                 .then(() => true)
                 .catch((error) => {
                 console.error("Error while replacing procedure in move.", this.address, moveKey, error.message);
@@ -143,8 +145,8 @@ class Procedure {
         });
         this.moveCall = (moveKey, _call, lock = false) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
-            return yield contract.methods.moveCall(moveKey, _call, lock)
-                .send({ from: web3_1.web3.eth.defaultAccount })
+            const from = yield web3_2.getAccount();
+            return from && contract.methods.moveCall(moveKey, _call, lock).send({ from })
                 .then(() => true)
                 .catch((error) => {
                 console.error("Error while adding special call in move.", this.address, moveKey, error.message);

@@ -1,5 +1,6 @@
 import { web3 } from '../web3'
 import ProcedureVoteContract from '@organigram/contracts/build/contracts/VoteProcedure.json'
+import { getAccount } from '../web3'
 
 export const INTERFACE = `0xc9d27afe` // vote signature.
 

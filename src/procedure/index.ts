@@ -4,7 +4,7 @@ import { CID } from 'ipfs-core/src'
 import ProcedureContract from '@organigram/contracts/build/contracts/Procedure.json'
 import { web3 } from '../web3'
 import { cidToMultihash, ipfsNode, multihashToCid } from '../ipfs'
-import Organ from '../organ'
+import { getAccount } from '../web3'
 
 export const INTERFACE = `0x71dbd330` // getMove signature.
 
@@ -190,14 +190,15 @@ export class Procedure {
         if (!multihash)
             throw new Error("Wrong CID.")
         const { ipfsHash, hashFunction, hashSize } = multihash
-        return await contract.methods.createMove(ipfsHash, hashFunction, hashSize).send({ from: web3.eth.defaultAccount })
+        const from = await getAccount()
+        return from && contract.methods.createMove(ipfsHash, hashFunction, hashSize).send({ from })
     }
     
     lockMove = async (moveKey: string):Promise<boolean> => {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
-        return await contract.methods.lockMove(moveKey)
-        .send({ from: web3.eth.defaultAccount })
+        const from = await getAccount()
+        return from && contract.methods.lockMove(moveKey).send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while locking move.", this.address, moveKey, error.message)
@@ -212,8 +213,8 @@ export class Procedure {
         if (!multihash)
             throw new Error("Wrong CID.")
         const { ipfsHash, hashFunction, hashSize } = multihash
-        return await contract.methods.updateMetadata(ipfsHash, hashFunction, hashSize)
-        .send({ from: web3.eth.defaultAccount })
+        const from = await getAccount()
+        return from && contract.methods.updateMetadata(ipfsHash, hashFunction, hashSize).send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while updating metadata.", this.address, error.message)
@@ -224,8 +225,8 @@ export class Procedure {
     updateAdmin = async(address: Address) => {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
-        return await contract.methods.updateAdmin(address)
-        .send({ from: web3.eth.defaultAccount })
+        const from = await getAccount()
+        return from && contract.methods.updateAdmin(address).send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while updating admin.", this.address, error.message)
@@ -242,8 +243,8 @@ export class Procedure {
     ):Promise<boolean> => {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
-        return await contract.methods.moveAddEntries(moveKey, organ, entries, lock)
-        .send({ from: web3.eth.defaultAccount })
+        const from = await getAccount()
+        return from && contract.methods.moveAddEntries(moveKey, organ, entries, lock).send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while adding entries in move.", this.address, moveKey, error.message)
@@ -259,8 +260,8 @@ export class Procedure {
     ):Promise<boolean> => {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
-        return await contract.methods.moveRemoveEntry(moveKey, organ, indexes, lock)
-        .send({ from: web3.eth.defaultAccount })
+        const from = await getAccount()
+        return from && contract.methods.moveRemoveEntry(moveKey, organ, indexes, lock).send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while removing entry in move.", this.address, moveKey, error.message)
@@ -300,8 +301,8 @@ export class Procedure {
     ): Promise<boolean> => {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
-        return await contract.methods.moveAddProcedure(moveKey, organ, procedure.address, procedure.permissions, lock)
-        .send({ from: web3.eth.defaultAccount })
+        const from = await getAccount()
+        return from && contract.methods.moveAddProcedure(moveKey, organ, procedure.address, procedure.permissions, lock).send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while adding procedures in move.", this.address, moveKey, error.message)
@@ -317,8 +318,8 @@ export class Procedure {
     ):Promise<boolean> => {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
-        return await contract.methods.moveRemoveProcedure(moveKey, organ, procedure.address, lock)
-        .send({ from: web3.eth.defaultAccount })
+        const from = await getAccount()
+        return from && contract.methods.moveRemoveProcedure(moveKey, organ, procedure.address, lock).send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while removing procedure in move.", this.address, moveKey, error.message)
@@ -335,8 +336,8 @@ export class Procedure {
     ):Promise<boolean> => {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
-        return await contract.methods.moveReplaceProcedure(moveKey, organ, oldProcedure, newProcedure.address, newProcedure.permissions, lock)
-        .send({ from: web3.eth.defaultAccount })
+        const from = await getAccount()
+        return from && contract.methods.moveReplaceProcedure(moveKey, organ, oldProcedure, newProcedure.address, newProcedure.permissions, lock).send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while replacing procedure in move.", this.address, moveKey, error.message)
@@ -352,8 +353,8 @@ export class Procedure {
     ):Promise<boolean> => {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
-        return await contract.methods.moveCall(moveKey, _call, lock)
-        .send({ from: web3.eth.defaultAccount })
+        const from = await getAccount()
+        return from && contract.methods.moveCall(moveKey, _call, lock).send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while adding special call in move.", this.address, moveKey, error.message)
