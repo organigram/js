@@ -3,16 +3,14 @@ import ProcedureNominationContract from '@organigram/contracts/build/contracts/S
 
 export const INTERFACE = `0xc5f28e49` // nominate signature.
 
-export interface ProcedureNominationData  {
-    address: Address
-    nominatersOrgan: Address
-}
-
 export class ProcedureNomination {
     public address: Address = ""
     public nominatersOrgan: Address = ""
 
-    constructor ({ address, nominatersOrgan }: ProcedureNominationData) {
+    constructor ({ address, nominatersOrgan }: {
+        address: Address
+        nominatersOrgan: Address
+    }) {
         this.address = address
         this.nominatersOrgan = nominatersOrgan
     }

@@ -19,10 +19,10 @@ export interface OrganData {
 }
 
 export class Organ {
-    private address: string = ""
-    private procedures: OrganProcedure[] = []
-    private metadata: Metadata = {}
-    private entries: OrganEntry[] = []
+    address: string = ""
+    procedures: OrganProcedure[] = []
+    metadata: Metadata = {}
+    entries: OrganEntry[] = []
 
     public constructor({ address, procedures, metadata, entries }: OrganData) {
         this.address = address

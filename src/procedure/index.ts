@@ -18,15 +18,15 @@ export interface ProcedureData {
 }
 
 export class Procedure {
-    private address: Address = ""
-    private type: ProcedureType = ""
-    private ProcedureClass: any = ""
-    private metadata: Metadata = {}
-    private data: any = null
-    private movesLength: Number = 0
-    private moves: ProcedureMove[] = []
+    address: Address = ""
+    type: ProcedureType = ""
+    ProcedureClass: any = ""
+    metadata: Metadata = {}
+    data: any = null
+    movesLength: Number = 0
+    moves: ProcedureMove[] = []
 
-    public constructor({ address, type, ProcedureClass, metadata, data, movesLength, moves }: ProcedureData) {
+    constructor({ address, type, ProcedureClass, metadata, data, movesLength, moves }: ProcedureData) {
         this.address = address
         this.type = type
         this.ProcedureClass = ProcedureClass
@@ -36,7 +36,7 @@ export class Procedure {
         this.moves = moves
     }
 
-    public static load = async (address: Address): Promise<Procedure> => {
+    static load = async (address: Address): Promise<Procedure> => {
         const isProcedure: boolean = await Procedure.isProcedure(address).catch(() => false)
         if (!isProcedure)
             throw new Error("Contract at address is not a Procedure.")
@@ -87,7 +87,7 @@ export class Procedure {
         return new Procedure({ address, type, ProcedureClass, metadata, movesLength, moves, data })
     }
 
-    public static async isProcedure(address: Address):Promise<boolean> {
+    static async isProcedure(address: Address):Promise<boolean> {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, address)
         const isERC165 = await contract.methods.supportsInterface("0x01ffc9a7").call()
@@ -98,7 +98,7 @@ export class Procedure {
         return isProcedure
     }
 
-    public static async getType(address: Address):Promise<ProcedureType> {
+    static async getType(address: Address):Promise<ProcedureType> {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, address)
         const procedureType = Promise.all([
@@ -118,7 +118,7 @@ export class Procedure {
         return procedureType
     }
 
-    public static async getClass(type:ProcedureType):Promise<any|null> {
+    static async getClass(type:ProcedureType):Promise<any|null> {
         // @TODO : Automate finding load function.
         const ProcedureClass = Promise.all([
             require('./nomination'),
@@ -137,7 +137,7 @@ export class Procedure {
         return ProcedureClass
     }
 
-    public static loadMetadata = async (address: Address): Promise<Metadata> => {
+    static loadMetadata = async (address: Address): Promise<Metadata> => {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, address)
         const ipfs = await ipfsNode
@@ -172,7 +172,7 @@ export class Procedure {
      * Procedure API.
      */
 
-    public createMove = async (cid:CID = new CID("QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH")):Promise<string> => {
+    createMove = async (cid:CID = new CID("QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH")):Promise<string> => {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
         const multihash:Multihash|null = cidToMultihash(cid)
@@ -182,7 +182,7 @@ export class Procedure {
         return await contract.methods.createMove(ipfsHash, hashFunction, hashSize).send({ from: web3.eth.defaultAccount })
     }
     
-    public lockMove = async (moveKey: string):Promise<boolean> => {
+    lockMove = async (moveKey: string):Promise<boolean> => {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
         return await contract.methods.lockMove(moveKey)
@@ -194,7 +194,7 @@ export class Procedure {
         })
     }
 
-    public updateMetadata = async(cid:CID = new CID("QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH")) => {
+    updateMetadata = async(cid:CID = new CID("QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH")) => {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
         const multihash:Multihash|null = cidToMultihash(cid)
@@ -210,7 +210,7 @@ export class Procedure {
         })
     }
 
-    public updateAdmin = async(address: Address) => {
+    updateAdmin = async(address: Address) => {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
         return await contract.methods.updateAdmin(address)
@@ -223,7 +223,7 @@ export class Procedure {
         
     }
 
-    public moveAddEntries = async (
+    moveAddEntries = async (
         moveKey: string,
         organ: Address,
         entries: OrganEntry[],
@@ -240,7 +240,7 @@ export class Procedure {
         })
     }
 
-    public moveRemoveEntry = async (
+    moveRemoveEntry = async (
         moveKey: string,
         organ: Address,
         indexes: string[],
@@ -257,7 +257,7 @@ export class Procedure {
         })
     }
 
-    public moveReplaceEntry = async (
+    moveReplaceEntry = async (
         moveKey: string,
         organ: Address,
         entry: OrganEntry,
@@ -281,7 +281,7 @@ export class Procedure {
         })
     }
 
-    public moveAddProcedure = async (
+    moveAddProcedure = async (
         moveKey: string,
         organ: Address,
         procedure: Address,
@@ -299,7 +299,7 @@ export class Procedure {
         })
     }
 
-    public moveRemoveProcedure = async (
+    moveRemoveProcedure = async (
         moveKey: string,
         organ: Address,
         procedure: Address,
@@ -316,7 +316,7 @@ export class Procedure {
         })
     }
 
-    public moveReplaceProcedure = async (
+    moveReplaceProcedure = async (
         moveKey: string,
         organ: Address,
         oldProcedure: Address,
@@ -336,7 +336,7 @@ export class Procedure {
     }
     
     // @todo : Secure _call data.
-    public moveCall = async (
+    moveCall = async (
         moveKey: string,
         _call: string,
         lock: boolean = false
