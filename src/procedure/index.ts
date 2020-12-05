@@ -3,7 +3,7 @@ import all from 'it-all'
 import { CID } from 'ipfs-core/src'
 import ProcedureContract from '@organigram/contracts/build/contracts/Procedure.json'
 import { web3 } from '../web3'
-import { cidToMultihash, ipfsNode, multihashToCid } from '../ipfs'
+import { cidToMultihash, EMPTY_CID, ipfsNode, multihashToCid } from '../ipfs'
 import { getAccount } from '../web3'
 
 export const INTERFACE = `0x71dbd330` // getMove signature.
@@ -244,7 +244,13 @@ export class Procedure {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
         const from = await getAccount()
-        return from && contract.methods.moveAddEntries(moveKey, organ, entries, lock).send({ from })
+        const _entries = entries.map(e => {
+            const multihash:Multihash|null = cidToMultihash(new CID(e.cid)) || cidToMultihash(new CID(EMPTY_CID))
+            if (!multihash)
+                throw new Error("Unable to find a CID for an entry.")
+            return { addr: e.address, ...multihash }
+        }).filter(e => !!e)
+        return from && contract.methods.moveAddEntries(moveKey, organ, _entries, lock).send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while adding entries in move.", this.address, moveKey, error.message)
@@ -277,7 +283,7 @@ export class Procedure {
     ):Promise<boolean> => {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
-        const multihash:Multihash|null = cidToMultihash(entry.cid)
+        const multihash:Multihash|null = cidToMultihash(entry.cid) || cidToMultihash(EMPTY_CID)
         if (!multihash)
             throw new Error("Wrong CID.")
         const { ipfsHash, hashFunction, hashSize } = multihash

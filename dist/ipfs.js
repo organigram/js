@@ -28,7 +28,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.cidToMultihash = exports.multihashToCid = exports.ipfsNode = exports.IPFS = void 0;
+exports.EMPTY_MULTIHASH = exports.EMPTY_CID = exports.cidToMultihash = exports.multihashToCid = exports.ipfsNode = exports.IPFS = void 0;
 const IPFS = __importStar(require("ipfs-core"));
 exports.IPFS = IPFS;
 const ipfs_provider_1 = require("ipfs-provider");
@@ -73,3 +73,7 @@ const cidToMultihash = (cid) => {
     };
 };
 exports.cidToMultihash = cidToMultihash;
+const EMPTY_CID = `QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH`;
+exports.EMPTY_CID = EMPTY_CID;
+const EMPTY_MULTIHASH = cidToMultihash(EMPTY_CID);
+exports.EMPTY_MULTIHASH = EMPTY_MULTIHASH;

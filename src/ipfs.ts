@@ -50,9 +50,14 @@ const cidToMultihash = (cid: CID): Multihash | null => {
     }
 }
 
+const EMPTY_CID:string = `QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH`
+const EMPTY_MULTIHASH:Multihash|null = cidToMultihash(EMPTY_CID)
+
 export {
     IPFS,
     ipfsNode,
     multihashToCid,
-    cidToMultihash
+    cidToMultihash,
+    EMPTY_CID,
+    EMPTY_MULTIHASH
 }
