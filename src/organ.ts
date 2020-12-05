@@ -1,4 +1,4 @@
-import { web3 } from './web3'
+import { EMPTY_ADDRESS, web3 } from './web3'
 import all from 'it-all'
 import uint8ArrayConcat from 'uint8arrays/concat'
 import { CID } from 'ipfs-core'
@@ -258,6 +258,8 @@ export class Organ {
                     addr: Address,
                     ipfsHash: string, hashFunction: string, hashSize: string
                 }) => {
+                    if (addr === EMPTY_ADDRESS && (!parseInt(hashFunction, 16) || !parseInt(hashSize)))
+                        return null
                     let entry:OrganEntry = { index, address: addr, cid: null }
                     try {
                         entry.cid = multihashToCid({ ipfsHash, hashSize, hashFunction })
@@ -280,7 +282,7 @@ export class Organ {
             )
         }
 
-        return Promise.all(promises)
+        return Promise.all(promises).then(entries => entries.filter(e => !!e))
     }
 
     /* Sync API */

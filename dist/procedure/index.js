@@ -95,10 +95,10 @@ class Procedure {
                 return false;
             });
         });
-        this.moveRemoveEntry = (moveKey, organ, indexes, lock = false) => __awaiter(this, void 0, void 0, function* () {
+        this.moveRemoveEntries = (moveKey, organ, indexes, lock = false) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
             const from = yield web3_2.getAccount();
-            return from && contract.methods.moveRemoveEntry(moveKey, organ, indexes, lock).send({ from })
+            return from && contract.methods.moveRemoveEntries(moveKey, organ, indexes, lock).send({ from })
                 .then(() => true)
                 .catch((error) => {
                 console.error("Error while removing entry in move.", this.address, moveKey, error.message);

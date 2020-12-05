@@ -15,6 +15,8 @@ export const web3 = new Web3(
     : Web3.givenProvider
 )
 
+export const EMPTY_ADDRESS: Address = "0x0000000000000000000000000000000000000000"
+
 // @ts-ignore
 export const enable = async (): Promise<void> => "enable" in web3.currentProvider && web3.currentProvider.enable()
 

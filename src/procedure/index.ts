@@ -258,7 +258,7 @@ export class Procedure {
         })
     }
 
-    moveRemoveEntry = async (
+    moveRemoveEntries = async (
         moveKey: string,
         organ: Address,
         indexes: string[],
@@ -267,7 +267,7 @@ export class Procedure {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
         const from = await getAccount()
-        return from && contract.methods.moveRemoveEntry(moveKey, organ, indexes, lock).send({ from })
+        return from && contract.methods.moveRemoveEntries(moveKey, organ, indexes, lock).send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while removing entry in move.", this.address, moveKey, error.message)

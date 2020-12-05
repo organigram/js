@@ -258,6 +258,8 @@ Organ.loadEntries = (address) => __awaiter(void 0, void 0, void 0, function* () 
         const index = String(i);
         promises.push(contract.methods.getEntry(index).call()
             .then(({ addr, ipfsHash, hashFunction, hashSize }) => __awaiter(void 0, void 0, void 0, function* () {
+            if (addr === web3_1.EMPTY_ADDRESS && (!parseInt(hashFunction, 16) || !parseInt(hashSize)))
+                return null;
             let entry = { index, address: addr, cid: null };
             try {
                 entry.cid = ipfs_1.multihashToCid({ ipfsHash, hashSize, hashFunction });
@@ -277,6 +279,6 @@ Organ.loadEntries = (address) => __awaiter(void 0, void 0, void 0, function* () 
         }))
             .catch((e) => console.error("Error", e.message)));
     }
-    return Promise.all(promises);
+    return Promise.all(promises).then(entries => entries.filter(e => !!e));
 });
 exports.default = Organ;
