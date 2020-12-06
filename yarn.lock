@@ -462,7 +462,7 @@
 
 "@organigram/contracts@git+https://alxmhe:ETwr5WUv3DJEjjJegRG6@bitbucket.org/organigram/contracts.git#develop":
   version "0.1.2"
-  resolved "git+https://alxmhe:ETwr5WUv3DJEjjJegRG6@bitbucket.org/organigram/contracts.git#eb307028abd2dc3b3039cfff37863edb5d3fc802"
+  resolved "git+https://alxmhe:ETwr5WUv3DJEjjJegRG6@bitbucket.org/organigram/contracts.git#3e0ff3a8ab981a95e7a54ce659890d1b0aba6fde"
   dependencies:
     "@openzeppelin/contracts" "^3.2.0"
 
