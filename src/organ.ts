@@ -59,7 +59,7 @@ export class Organ {
         const _entries: {
             addr: Address, ipfsHash: string, hashFunction: string, hashSize: string
         }[] = entries.map(e => {
-            let multihash:Multihash|null = cidToMultihash(e.cid)
+            let multihash:Multihash|null = cidToMultihash(new CID(e.cid))
             if (!multihash)
                 throw new Error(`Wrong IPFS Content ID '${e.cid}' for entry.`)
             const { ipfsHash, hashFunction, hashSize } = multihash
@@ -128,10 +128,10 @@ export class Organ {
 
     public replaceProcedure = async (oldProcedure: Address, newOrganProcedure: OrganProcedure): Promise<Organ> => {
         // @ts-ignore
-        const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
+        const contract = new web3.eth.Contract(OrganContract.abi, this.address)
         const { address, permissions } = newOrganProcedure
         const from = await getAccount()
-        return from && contract.methods.moveReplaceProcedure(oldProcedure, address, permissions).send({ from })
+        return from && contract.methods.replaceProcedure(oldProcedure, address, permissions).send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while replacing procedure in organ.", this.address, error.message)
@@ -249,7 +249,7 @@ export class Organ {
         .catch(() => "0")
         if (length === "0") return []
 
-        var i = 1, promises = []
+        var i = 0, promises = []
         for (i ; String(i) !== length ; i++) {
             const index = String(i)
             promises.push(

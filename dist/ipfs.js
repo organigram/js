@@ -28,7 +28,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.EMPTY_MULTIHASH = exports.EMPTY_CID = exports.cidToMultihash = exports.multihashToCid = exports.ipfsNode = exports.IPFS = void 0;
+exports.CID = exports.EMPTY_MULTIHASH = exports.EMPTY_CID = exports.cidToMultihash = exports.multihashToCid = exports.ipfsNode = exports.IPFS = void 0;
 const IPFS = __importStar(require("ipfs-core"));
 exports.IPFS = IPFS;
 const ipfs_provider_1 = require("ipfs-provider");
@@ -53,14 +53,24 @@ const ipfsNode = ipfs_provider_1.getIpfs({
 }));
 exports.ipfsNode = ipfsNode;
 const multihashToCid = ({ ipfsHash, hashFunction, hashSize }) => {
+    if (!parseInt(hashFunction) || !parseInt(hashSize))
+        return null;
     const multihash = Buffer.from(parseInt(hashFunction).toString(16).padStart(2, "0") +
         parseInt(hashSize).toString(16).padStart(2, "0") +
         ipfsHash.substring(2), 'hex');
-    return new IPFS.CID(multihash);
+    try {
+        return new IPFS.CID(multihash);
+    }
+    catch (e) {
+        console.warn("Error computing IPFS CID from given multihash.");
+        return null;
+    }
 };
 exports.multihashToCid = multihashToCid;
 const cidToMultihash = (cid) => {
     var _a;
+    if (typeof cid === "string")
+        cid = new IPFS.CID(cid);
     const multihash = ((_a = cid === null || cid === void 0 ? void 0 : cid.hash) === null || _a === void 0 ? void 0 : _a.data) ?
         Buffer.from(cid.hash.data)
         : (cid === null || cid === void 0 ? void 0 : cid.multihash) ?
@@ -77,3 +87,5 @@ const EMPTY_CID = `QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH`;
 exports.EMPTY_CID = EMPTY_CID;
 const EMPTY_MULTIHASH = cidToMultihash(EMPTY_CID);
 exports.EMPTY_MULTIHASH = EMPTY_MULTIHASH;
+const CID = IPFS.CID;
+exports.CID = CID;

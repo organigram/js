@@ -43,6 +43,8 @@ type OrganEntry = {
 type Procedure = {
     address: Address
     metadata: Metadata
+    moves: ProcedureMove[]
+    data?: any
 }
 
 type ProcedureMoveOperation = {

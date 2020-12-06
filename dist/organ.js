@@ -47,7 +47,7 @@ class Organ {
         this.addEntries = (entries) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi, this.address);
             const _entries = entries.map(e => {
-                let multihash = ipfs_1.cidToMultihash(e.cid);
+                let multihash = ipfs_1.cidToMultihash(new ipfs_core_1.CID(e.cid));
                 if (!multihash)
                     throw new Error(`Wrong IPFS Content ID '${e.cid}' for entry.`);
                 const { ipfsHash, hashFunction, hashSize } = multihash;
@@ -106,10 +106,10 @@ class Organ {
             });
         });
         this.replaceProcedure = (oldProcedure, newOrganProcedure) => __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_1.web3.eth.Contract(ProcedureContract.abi, this.address);
+            const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi, this.address);
             const { address, permissions } = newOrganProcedure;
             const from = yield web3_2.getAccount();
-            return from && contract.methods.moveReplaceProcedure(oldProcedure, address, permissions).send({ from })
+            return from && contract.methods.replaceProcedure(oldProcedure, address, permissions).send({ from })
                 .then(() => true)
                 .catch((error) => {
                 console.error("Error while replacing procedure in organ.", this.address, error.message);
@@ -253,7 +253,7 @@ Organ.loadEntries = (address) => __awaiter(void 0, void 0, void 0, function* () 
         .catch(() => "0");
     if (length === "0")
         return [];
-    var i = 1, promises = [];
+    var i = 0, promises = [];
     for (i; String(i) !== length; i++) {
         const index = String(i);
         promises.push(contract.methods.getEntry(index).call()

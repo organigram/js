@@ -19,19 +19,18 @@ const web3_2 = require("../web3");
 exports.INTERFACE = `0xc5f28e49`;
 class ProcedureNomination {
     constructor({ address, nominatersOrgan }) {
-        this.address = "";
         this.nominatersOrgan = "";
         this.nominate = (moveKey) => __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_1.web3.eth.Contract(SimpleNominationProcedure_json_1.default.abi, this.address);
+            const contract = new web3_1.web3.eth.Contract(SimpleNominationProcedure_json_1.default.abi, this._address);
             const from = yield web3_2.getAccount();
             return from && contract.methods.nominate(moveKey).send({ from })
                 .then(() => true)
                 .catch((error) => {
-                console.error("Error while nominating.", this.address, moveKey, error.message);
+                console.error("Error while nominating.", this._address, moveKey, error.message);
                 return false;
             });
         });
-        this.address = address;
+        this._address = address;
         this.nominatersOrgan = nominatersOrgan;
     }
 }

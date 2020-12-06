@@ -263,7 +263,6 @@ Procedure.load = (address) => __awaiter(void 0, void 0, void 0, function* () {
     const isProcedure = yield Procedure.isProcedure(address).catch(() => false);
     if (!isProcedure)
         throw new Error("Contract at address is not a Procedure.");
-    const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, address);
     const type = yield Procedure.getType(address);
     const ProcedureClass = yield Procedure.getClass(type);
     const metadata = yield Procedure.loadMetadata(address)
@@ -275,7 +274,7 @@ Procedure.load = (address) => __awaiter(void 0, void 0, void 0, function* () {
     const data = ProcedureClass && "load" in ProcedureClass ? yield ProcedureClass.load(address)
         .catch((error) => {
         console.warn("Error while loading procedure data.", address, error.message);
-        return {};
+        return null;
     }) : null;
     return new Procedure({ address, type, ProcedureClass, metadata, moves, data });
 });

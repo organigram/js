@@ -22,7 +22,7 @@ exports.web3 = new web3_1.default(typeof window !== "undefined"
             : web3_1.default.givenProvider)
     : web3_1.default.givenProvider);
 exports.EMPTY_ADDRESS = "0x0000000000000000000000000000000000000000";
-const enable = () => __awaiter(void 0, void 0, void 0, function* () { return typeof exports.web3 !== "undefined" && "currentProvider" in exports.web3 && "enable" in exports.web3.currentProvider && exports.web3.currentProvider.enable(); });
+const enable = () => __awaiter(void 0, void 0, void 0, function* () { return typeof exports.web3 !== "undefined" && typeof exports.web3.currentProvider !== "undefined" && typeof exports.web3.currentProvider === "function" && exports.web3.currentProvider.enable(); });
 exports.enable = enable;
 exports.enable();
 const getAccount = () => __awaiter(void 0, void 0, void 0, function* () { return exports.web3.eth.getAccounts().then(accs => accs && accs[0]).catch(() => ""); });

@@ -8,24 +8,23 @@ import { getAccount } from '../web3'
 
 export const INTERFACE = `0x71dbd330` // getMove signature.
 
-export interface ProcedureData {
-    address: Address
-    type: ProcedureType
-    ProcedureClass: any // Store real Procedure Class.
-    metadata: Metadata
-    data: any
-    moves: any[]
-}
-
 export class Procedure {
     address: Address = ""
     type: ProcedureType = ""
+    // Store real Procedure Class.
     ProcedureClass: any = ""
     metadata: Metadata = {}
     data: any = null
     moves: ProcedureMove[] = []
 
-    constructor({ address, type, ProcedureClass, metadata, data, moves }: ProcedureData) {
+    constructor({ address, type, ProcedureClass, metadata, data, moves }: {
+        address: Address
+        type: ProcedureType
+        ProcedureClass: any
+        metadata: Metadata
+        data: any
+        moves: any[]
+    }) {
         this.address = address
         this.type = type
         this.ProcedureClass = ProcedureClass
@@ -38,8 +37,6 @@ export class Procedure {
         const isProcedure: boolean = await Procedure.isProcedure(address).catch(() => false)
         if (!isProcedure)
             throw new Error("Contract at address is not a Procedure.")
-        // @ts-ignore
-        const contract = new web3.eth.Contract(ProcedureContract.abi, address)
         const type:ProcedureType = await Procedure.getType(address)
         const ProcedureClass: any = await Procedure.getClass(type)
         const metadata = await Procedure.loadMetadata(address)
@@ -51,7 +48,7 @@ export class Procedure {
         const data = ProcedureClass && "load" in ProcedureClass ? await ProcedureClass.load(address)
             .catch((error: Error) => {
                 console.warn("Error while loading procedure data.", address, error.message)
-                return {}
+                return null
             }) : null
         return new Procedure({ address, type, ProcedureClass, metadata, moves, data })
     }

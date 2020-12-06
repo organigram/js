@@ -27,17 +27,27 @@ const ipfsNode:Promise<any> = getIpfs({
     return res.ipfs
 })
 
-const multihashToCid = ({ ipfsHash, hashFunction, hashSize }: Multihash): CID => {
+const multihashToCid = ({ ipfsHash, hashFunction, hashSize }: Multihash): CID|null => {
+    if (!parseInt(hashFunction) || !parseInt(hashSize))
+        return null
     const multihash = Buffer.from(
         parseInt(hashFunction).toString(16).padStart(2, "0") +
         parseInt(hashSize).toString(16).padStart(2, "0") +
         ipfsHash.substring(2),
         'hex'
     )
-    return new IPFS.CID(multihash)
+    try {
+        return new IPFS.CID(multihash)
+    }
+    catch(e) {
+        console.warn("Error computing IPFS CID from given multihash.")
+        return null
+    }
 }
 
-const cidToMultihash = (cid: CID): Multihash | null => {
+const cidToMultihash = (cid: CID|string): Multihash | null => {
+    if (typeof cid === "string")
+        cid = new IPFS.CID(cid)
     const multihash = cid?.hash?.data ?
         Buffer.from(cid.hash.data)
         : cid?.multihash ?
@@ -53,11 +63,14 @@ const cidToMultihash = (cid: CID): Multihash | null => {
 const EMPTY_CID:string = `QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH`
 const EMPTY_MULTIHASH:Multihash|null = cidToMultihash(EMPTY_CID)
 
+const CID = IPFS.CID
+
 export {
     IPFS,
     ipfsNode,
     multihashToCid,
     cidToMultihash,
     EMPTY_CID,
-    EMPTY_MULTIHASH
+    EMPTY_MULTIHASH,
+    CID
 }

@@ -5,14 +5,14 @@ import { getAccount } from '../web3'
 export const INTERFACE = `0xc5f28e49` // nominate signature.
 
 export class ProcedureNomination {
-    public address: Address = ""
+    private _address: Address
     public nominatersOrgan: Address = ""
 
     constructor ({ address, nominatersOrgan }: {
         address: Address
         nominatersOrgan: Address
     }) {
-        this.address = address
+        this._address = address
         this.nominatersOrgan = nominatersOrgan
     }
 
@@ -30,12 +30,12 @@ export class ProcedureNomination {
     
     public nominate = async (moveKey: string):Promise<boolean> => {
         // @ts-ignore
-        const contract = new web3.eth.Contract(ProcedureNominationContract.abi, this.address)
+        const contract = new web3.eth.Contract(ProcedureNominationContract.abi, this._address)
         const from = await getAccount()
         return from && contract.methods.nominate(moveKey).send({ from })
         .then(() => true)
         .catch((error:Error) => {
-            console.error("Error while nominating.", this.address, moveKey, error.message)
+            console.error("Error while nominating.", this._address, moveKey, error.message)
             return false
         })
     }
