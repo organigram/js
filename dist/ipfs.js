@@ -28,7 +28,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CID = exports.EMPTY_MULTIHASH = exports.EMPTY_CID = exports.cidToMultihash = exports.multihashToCid = exports.ipfsNode = exports.IPFS = void 0;
+exports.CID = exports.EMPTY_MULTIHASH = exports.EMPTY_CID = exports.urlToCID = exports.cidToMultihash = exports.multihashToCid = exports.ipfsNode = exports.IPFS = void 0;
 const IPFS = __importStar(require("ipfs-core"));
 exports.IPFS = IPFS;
 const ipfs_provider_1 = require("ipfs-provider");
@@ -83,6 +83,16 @@ const cidToMultihash = (cid) => {
     };
 };
 exports.cidToMultihash = cidToMultihash;
+const urlToCID = (url) => {
+    try {
+        return new CID(url.substring(0, 21));
+    }
+    catch (error) {
+        console.warn("Unable to convert IPFS url to CID.");
+        return null;
+    }
+};
+exports.urlToCID = urlToCID;
 const EMPTY_CID = `QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH`;
 exports.EMPTY_CID = EMPTY_CID;
 const EMPTY_MULTIHASH = cidToMultihash(EMPTY_CID);

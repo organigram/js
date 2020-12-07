@@ -14,16 +14,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getAccount = exports.enable = exports.EMPTY_ADDRESS = exports.web3 = void 0;
 const web3_1 = __importDefault(require("web3"));
-exports.web3 = new web3_1.default(typeof window !== "undefined"
+const web3 = new web3_1.default(typeof window !== "undefined"
     ? ("ethereum" in window
         ? window.ethereum
         : "Web3" in window
             ? window.Web3.currentProvider
             : web3_1.default.givenProvider)
     : web3_1.default.givenProvider);
-exports.EMPTY_ADDRESS = "0x0000000000000000000000000000000000000000";
-const enable = () => __awaiter(void 0, void 0, void 0, function* () { return typeof exports.web3 !== "undefined" && typeof exports.web3.currentProvider !== "undefined" && typeof exports.web3.currentProvider === "function" && exports.web3.currentProvider.enable(); });
+exports.web3 = web3;
+const enable = () => __awaiter(void 0, void 0, void 0, function* () { return typeof web3 !== "undefined" && typeof web3.currentProvider !== "undefined" && typeof web3.currentProvider === "function" && web3.currentProvider.enable(); });
 exports.enable = enable;
-exports.enable();
-const getAccount = () => __awaiter(void 0, void 0, void 0, function* () { return exports.web3.eth.getAccounts().then(accs => accs && accs[0]).catch(() => ""); });
+enable();
+const getAccount = () => __awaiter(void 0, void 0, void 0, function* () { return web3.eth.getAccounts().then(accs => accs && accs[0]).catch(() => ""); });
 exports.getAccount = getAccount;
+const EMPTY_ADDRESS = "0x0000000000000000000000000000000000000000";
+exports.EMPTY_ADDRESS = EMPTY_ADDRESS;

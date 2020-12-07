@@ -1,6 +1,6 @@
 import Web3 from 'web3'
 
-export const web3 = new Web3(
+const web3 = new Web3(
     typeof window !== "undefined"
     ? (
         "ethereum" in window
@@ -15,12 +15,19 @@ export const web3 = new Web3(
     : Web3.givenProvider
 )
 
-export const EMPTY_ADDRESS: Address = "0x0000000000000000000000000000000000000000"
-
 // @ts-ignore
-export const enable = async (): Promise<void> => typeof web3 !== "undefined" && typeof web3.currentProvider !== "undefined" && typeof web3.currentProvider === "function" && web3.currentProvider.enable()
+const enable = async (): Promise<void> => typeof web3 !== "undefined" && typeof web3.currentProvider !== "undefined" && typeof web3.currentProvider === "function" && web3.currentProvider.enable()
 
 // Initial enable.
 enable()
 
-export const getAccount = async (): Promise<string> => web3.eth.getAccounts().then(accs => accs && accs[0]).catch(() => "")
+const getAccount = async (): Promise<string> => web3.eth.getAccounts().then(accs => accs && accs[0]).catch(() => "")
+
+const EMPTY_ADDRESS: Address = "0x0000000000000000000000000000000000000000"
+
+export {
+    web3,
+    EMPTY_ADDRESS,
+    enable,
+    getAccount
+}

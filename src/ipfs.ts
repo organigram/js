@@ -45,7 +45,7 @@ const multihashToCid = ({ ipfsHash, hashFunction, hashSize }: Multihash): CID|nu
     }
 }
 
-const cidToMultihash = (cid: CID|string): Multihash | null => {
+const cidToMultihash = (cid: CID|string): Multihash|null => {
     if (typeof cid === "string")
         cid = new IPFS.CID(cid)
     const multihash = cid?.hash?.data ?
@@ -60,6 +60,17 @@ const cidToMultihash = (cid: CID|string): Multihash | null => {
     }
 }
 
+const urlToCID = (url: string):CID|null => {
+    try {
+        // Remove https://ipfs.io/ipfs/
+        return new CID(url.substring(0, 21))
+    }
+    catch (error) {
+        console.warn("Unable to convert IPFS url to CID.")
+        return null
+    }
+}
+
 const EMPTY_CID:string = `QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH`
 const EMPTY_MULTIHASH:Multihash|null = cidToMultihash(EMPTY_CID)
 
@@ -70,6 +81,7 @@ export {
     ipfsNode,
     multihashToCid,
     cidToMultihash,
+    urlToCID,
     EMPTY_CID,
     EMPTY_MULTIHASH,
     CID
