@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PROCEDURE_INTERFACE = exports.Procedure = exports.Organ = exports.Graph = exports.CID = exports.EMPTY_MULTIHASH = exports.EMPTY_CID = exports.urlToCID = exports.cidToMultihash = exports.multihashToCid = exports.ipfsNode = exports.IPFS = exports.hasLibraries = exports.deployMissingLibraries = exports.getLibraryArtefact = exports.getLibraries = exports.getLocalLibraries = exports.getNetwork = exports.getAccount = exports.web3enable = exports.EMPTY_ADDRESS = exports.web3 = void 0;
+exports.PROCEDURE_INTERFACE = exports.Procedure = exports.Organ = exports.Graph = exports.CID = exports.EMPTY_MULTIHASH = exports.EMPTY_CID = exports.urlToCID = exports.parseCid = exports.uint8ArrayToString = exports.cidToMultihash = exports.multihashToCid = exports.ipfsNode = exports.IPFS = exports.hasLibraries = exports.deployMissingLibraries = exports.getLibraryArtefact = exports.getLibraries = exports.getLocalLibraries = exports.getNetwork = exports.getAccount = exports.web3enable = exports.EMPTY_ADDRESS = exports.web3 = void 0;
 var web3_1 = require("./web3");
 Object.defineProperty(exports, "web3", { enumerable: true, get: function () { return web3_1.web3; } });
 Object.defineProperty(exports, "EMPTY_ADDRESS", { enumerable: true, get: function () { return web3_1.EMPTY_ADDRESS; } });
@@ -17,6 +17,8 @@ Object.defineProperty(exports, "IPFS", { enumerable: true, get: function () { re
 Object.defineProperty(exports, "ipfsNode", { enumerable: true, get: function () { return ipfs_1.ipfsNode; } });
 Object.defineProperty(exports, "multihashToCid", { enumerable: true, get: function () { return ipfs_1.multihashToCid; } });
 Object.defineProperty(exports, "cidToMultihash", { enumerable: true, get: function () { return ipfs_1.cidToMultihash; } });
+Object.defineProperty(exports, "uint8ArrayToString", { enumerable: true, get: function () { return ipfs_1.uint8ArrayToString; } });
+Object.defineProperty(exports, "parseCid", { enumerable: true, get: function () { return ipfs_1.parseCid; } });
 Object.defineProperty(exports, "urlToCID", { enumerable: true, get: function () { return ipfs_1.urlToCID; } });
 Object.defineProperty(exports, "EMPTY_CID", { enumerable: true, get: function () { return ipfs_1.EMPTY_CID; } });
 Object.defineProperty(exports, "EMPTY_MULTIHASH", { enumerable: true, get: function () { return ipfs_1.EMPTY_MULTIHASH; } });

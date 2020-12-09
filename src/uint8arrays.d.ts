@@ -6,3 +6,7 @@ declare module 'uint8arrays' {
 declare module 'uint8arrays/concat' {
     export default Function
 }
+
+declare module 'uint8arrays/to-string' {
+    export default String
+}

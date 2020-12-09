@@ -15,6 +15,8 @@ export {
     ipfsNode,
     multihashToCid,
     cidToMultihash,
+    uint8ArrayToString,
+    parseCid,
     urlToCID,
     EMPTY_CID,
     EMPTY_MULTIHASH,
