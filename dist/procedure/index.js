@@ -20,8 +20,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Procedure = exports.INTERFACE = void 0;
-const concat_1 = __importDefault(require("uint8arrays/concat"));
-const it_all_1 = __importDefault(require("it-all"));
 const src_1 = require("ipfs-core/src");
 const Procedure_json_1 = __importDefault(require("@organigram/contracts/build/contracts/Procedure.json"));
 const web3_1 = require("../web3");
@@ -356,7 +354,7 @@ Procedure.loadMetadata = (address) => __awaiter(void 0, void 0, void 0, function
     }
     if (metadata.cid) {
         try {
-            metadata.data = concat_1.default(yield it_all_1.default(ipfs.cat(metadata.cid)));
+            metadata.data = yield ipfs_1.parseJSON(metadata.cid);
         }
         catch (error) {
             console.warn("Error while fetching metadata content for procedure.", address, error.message);

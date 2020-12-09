@@ -3,7 +3,7 @@ import all from 'it-all'
 import uint8ArrayConcat from 'uint8arrays/concat'
 import { CID } from 'ipfs-core'
 import OrganContract from '@organigram/contracts/build/contracts/Organ.json'
-import { ipfsNode, multihashToCid, cidToMultihash } from './ipfs'
+import { ipfsNode, multihashToCid, cidToMultihash, parseJSON } from './ipfs'
 import { getAccount } from './web3'
 
 export const ORGAN_CONTRACT_SIGNATURES: string[] = OrganContract.ast
@@ -226,8 +226,7 @@ export class Organ {
         }
         if (metadata.cid) {
             try {
-                // @ts-ignore
-                metadata.data = uint8ArrayConcat(await all(ipfs.cat(metadata.cid)))
+                metadata.data = await parseJSON(metadata.cid)
             }
             catch(error) {
                 console.warn("Error while loading metadata for organ.", address, error.message)

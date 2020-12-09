@@ -239,7 +239,7 @@ Organ.loadMetadata = (address) => __awaiter(void 0, void 0, void 0, function* ()
     }
     if (metadata.cid) {
         try {
-            metadata.data = concat_1.default(yield it_all_1.default(ipfs.cat(metadata.cid)));
+            metadata.data = yield ipfs_1.parseJSON(metadata.cid);
         }
         catch (error) {
             console.warn("Error while loading metadata for organ.", address, error.message);

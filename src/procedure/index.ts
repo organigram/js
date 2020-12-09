@@ -3,7 +3,7 @@ import all from 'it-all'
 import { CID } from 'ipfs-core/src'
 import ProcedureContract from '@organigram/contracts/build/contracts/Procedure.json'
 import { web3 } from '../web3'
-import { cidToMultihash, EMPTY_CID, ipfsNode, multihashToCid } from '../ipfs'
+import { cidToMultihash, EMPTY_CID, ipfsNode, multihashToCid, parseJSON } from '../ipfs'
 import { getAccount } from '../web3'
 
 export const INTERFACE = `0x71dbd330` // getMove signature.
@@ -181,8 +181,7 @@ export class Procedure {
         }
         if (metadata.cid) {
             try {
-                // @ts-ignore
-                metadata.data = uint8ArrayConcat(await all(ipfs.cat(metadata.cid)))
+                metadata.data = await parseJSON(metadata.cid)
             }
             catch(error) {
                 console.warn("Error while fetching metadata content for procedure.", address, error.message)
