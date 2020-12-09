@@ -70,10 +70,20 @@ type ProcedureMove = {
     operations: ProcedureMoveOperation[]
 }
 
+type LibraryKey = "organ"|"procedure"|"voteProposition"
+type Network = "mainnet"|"morden"|"ropsten"|"rinkeby"|"kovan"|"dev"|"organigr.am"|"private"
+
+type Libraries = {
+    organ: { network: string, address: Address }[],
+    procedure: { network: string, address: Address }[],
+    voteProposition: { network: string, address: Address }[]
+}
+
 interface LoadGraphOptions {
     contracts: Address[] | undefined
     organigram: any | undefined
 }
+
 // export declare const web3: any
 // export declare const loadGraph: (options: Organigram.LoadGraphOptions) => Promise<Organigram.Graph>
 // export declare const loadOrgan: (address: Organigram.Address) => Promise<Organigram.Organ>

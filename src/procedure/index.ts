@@ -33,6 +33,21 @@ export class Procedure {
         this.moves = moves
     }
 
+    static deploy = async (type: ProcedureType, cid: CID, args: any[]) => {
+        let ProcedureClass = null
+        switch (type) {
+            case 'nomination':
+                ProcedureClass = (await require('./nomination')).default
+                break
+            case 'vote':
+                ProcedureClass = (await require('./vote')).default
+                break
+            default:
+                throw new Error("Unknown procedure type.")
+        }
+        return ProcedureClass && ProcedureClass.deploy(cid, ...args)
+    }
+
     static load = async (address: Address): Promise<Procedure> => {
         const isProcedure: boolean = await Procedure.isProcedure(address).catch(() => false)
         if (!isProcedure)

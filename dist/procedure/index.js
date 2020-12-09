@@ -259,6 +259,20 @@ class Procedure {
     }
 }
 exports.Procedure = Procedure;
+Procedure.deploy = (type, cid, args) => __awaiter(void 0, void 0, void 0, function* () {
+    let ProcedureClass = null;
+    switch (type) {
+        case 'nomination':
+            ProcedureClass = (yield require('./nomination')).default;
+            break;
+        case 'vote':
+            ProcedureClass = (yield require('./vote')).default;
+            break;
+        default:
+            throw new Error("Unknown procedure type.");
+    }
+    return ProcedureClass && ProcedureClass.deploy(cid, ...args);
+});
 Procedure.load = (address) => __awaiter(void 0, void 0, void 0, function* () {
     const isProcedure = yield Procedure.isProcedure(address).catch(() => false);
     if (!isProcedure)

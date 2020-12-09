@@ -1,6 +1,7 @@
-import { web3, getAccount, EMPTY_ADDRESS } from '../web3'
+import { web3, getAccount, EMPTY_ADDRESS, _linkBytecode, getNetwork, getLibraries } from '../web3'
 import ProcedureVoteContract from '@organigram/contracts/build/contracts/VoteProcedure.json'
 import { multihashToCid, cidToMultihash } from '../ipfs'
+import Procedure from '.'
 
 export const INTERFACE = `0xc9d27afe` // vote signature.
 
@@ -36,6 +37,35 @@ export class ProcedureVote {
         this.vetoersOrgan = vetoersOrgan
         this.enactorsOrgan = enactorsOrgan
         this.propositions = propositions
+    }
+
+    public static async deploy(cid:CID, voters: Address, vetoers: Address, enactors: Address): Promise<Procedure> {
+        const multihash:Multihash|null = cidToMultihash(cid)
+        if (!multihash)
+            throw new Error("Wrong CID.")
+        const { ipfsHash, hashFunction, hashSize } = multihash
+        const network = await getNetwork()
+        const libraries = await getLibraries(network)
+        if (!libraries.procedure[0] || !libraries.procedure[0].address)
+            throw new Error("Procedure library not found.")
+        if (!libraries.voteProposition[0] || !libraries.voteProposition[0].address)
+            throw new Error("VoteProposition library not found.")
+        const links = [
+            { ...libraries.procedure[0], library: "ProcedureLibrary" },
+            { ...libraries.voteProposition[0], library: "VotePropositionLibrary" }
+        ]
+        const from = await getAccount()
+        // @ts-ignore
+        const contract = new web3.eth.Contract(ProcedureVoteContract.abi)
+        // @ts-ignore
+        return contract.deploy({
+            data: await _linkBytecode(ProcedureVoteContract.bytecode, links),
+            arguments: [ipfsHash, hashFunction, hashSize, voters, vetoers, enactors]
+        })
+        .send({ from })
+        .then(contract => {
+            return Procedure.load(contract.options.address)
+        })
     }
 
     public static load = async (address: Address): Promise<ProcedureVote> => {

@@ -23,6 +23,7 @@ exports.ProcedureVote = exports.INTERFACE = void 0;
 const web3_1 = require("../web3");
 const VoteProcedure_json_1 = __importDefault(require("@organigram/contracts/build/contracts/VoteProcedure.json"));
 const ipfs_1 = require("../ipfs");
+const _1 = __importDefault(require("."));
 exports.INTERFACE = `0xc9d27afe`;
 class ProcedureVote {
     constructor({ address, votersOrgan, vetoersOrgan, enactorsOrgan, propositions }) {
@@ -68,6 +69,34 @@ class ProcedureVote {
         this.vetoersOrgan = vetoersOrgan;
         this.enactorsOrgan = enactorsOrgan;
         this.propositions = propositions;
+    }
+    static deploy(cid, voters, vetoers, enactors) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const multihash = ipfs_1.cidToMultihash(cid);
+            if (!multihash)
+                throw new Error("Wrong CID.");
+            const { ipfsHash, hashFunction, hashSize } = multihash;
+            const network = yield web3_1.getNetwork();
+            const libraries = yield web3_1.getLibraries(network);
+            if (!libraries.procedure[0] || !libraries.procedure[0].address)
+                throw new Error("Procedure library not found.");
+            if (!libraries.voteProposition[0] || !libraries.voteProposition[0].address)
+                throw new Error("VoteProposition library not found.");
+            const links = [
+                Object.assign(Object.assign({}, libraries.procedure[0]), { library: "ProcedureLibrary" }),
+                Object.assign(Object.assign({}, libraries.voteProposition[0]), { library: "VotePropositionLibrary" })
+            ];
+            const from = yield web3_1.getAccount();
+            const contract = new web3_1.web3.eth.Contract(VoteProcedure_json_1.default.abi);
+            return contract.deploy({
+                data: yield web3_1._linkBytecode(VoteProcedure_json_1.default.bytecode, links),
+                arguments: [ipfsHash, hashFunction, hashSize, voters, vetoers, enactors]
+            })
+                .send({ from })
+                .then(contract => {
+                return _1.default.load(contract.options.address);
+            });
+        });
     }
 }
 exports.ProcedureVote = ProcedureVote;

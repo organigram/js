@@ -16,6 +16,8 @@ exports.ProcedureNomination = exports.INTERFACE = void 0;
 const web3_1 = require("../web3");
 const SimpleNominationProcedure_json_1 = __importDefault(require("@organigram/contracts/build/contracts/SimpleNominationProcedure.json"));
 const web3_2 = require("../web3");
+const ipfs_1 = require("../ipfs");
+const _1 = __importDefault(require("."));
 exports.INTERFACE = `0xc5f28e49`;
 class ProcedureNomination {
     constructor({ address, nominatersOrgan }) {
@@ -32,6 +34,29 @@ class ProcedureNomination {
         });
         this._address = address;
         this.nominatersOrgan = nominatersOrgan;
+    }
+    static deploy(cid, nominators) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const multihash = ipfs_1.cidToMultihash(cid);
+            if (!multihash)
+                throw new Error("Wrong CID.");
+            const { ipfsHash, hashFunction, hashSize } = multihash;
+            const network = yield web3_1.getNetwork();
+            const libraries = yield web3_1.getLibraries(network);
+            if (!libraries.procedure[0] || !libraries.procedure[0].address)
+                throw new Error("Procedure library not found.");
+            const links = [Object.assign(Object.assign({}, libraries.procedure[0]), { library: "ProcedureLibrary" })];
+            const from = yield web3_2.getAccount();
+            const contract = new web3_1.web3.eth.Contract(SimpleNominationProcedure_json_1.default.abi);
+            return contract.deploy({
+                data: yield web3_1._linkBytecode(SimpleNominationProcedure_json_1.default.bytecode, links),
+                arguments: [ipfsHash, hashFunction, hashSize, nominators]
+            })
+                .send({ from })
+                .then(contract => {
+                return _1.default.load(contract.options.address);
+            });
+        });
     }
 }
 exports.ProcedureNomination = ProcedureNomination;

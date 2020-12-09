@@ -153,6 +153,29 @@ class Organ {
         this.metadata = metadata;
         this.entries = entries;
     }
+    static deploy(cid) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const multihash = ipfs_1.cidToMultihash(cid);
+            if (!multihash)
+                throw new Error("Wrong CID.");
+            const { ipfsHash, hashFunction, hashSize } = multihash;
+            const network = yield web3_1.getNetwork();
+            const libraries = yield web3_1.getLibraries(network);
+            if (!libraries.organ[0] || !libraries.organ[0].address)
+                throw new Error("Organ library not found.");
+            const links = [Object.assign(Object.assign({}, libraries.organ[0]), { library: "OrganLibrary" })];
+            const from = yield web3_2.getAccount();
+            const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi);
+            return contract.deploy({
+                data: yield web3_1._linkBytecode(Organ_json_1.default.bytecode, links),
+                arguments: [from, ipfsHash, hashFunction, hashSize]
+            })
+                .send({ from })
+                .then(contract => {
+                return Organ.load(contract.options.address);
+            });
+        });
+    }
     static load(address) {
         return __awaiter(this, void 0, void 0, function* () {
             const isOrgan = yield Organ.isOrgan(address).catch(() => false);

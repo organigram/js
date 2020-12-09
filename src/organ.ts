@@ -1,4 +1,4 @@
-import { EMPTY_ADDRESS, web3 } from './web3'
+import { EMPTY_ADDRESS, getLibraries, getNetwork, web3, _linkBytecode } from './web3'
 import all from 'it-all'
 import uint8ArrayConcat from 'uint8arrays/concat'
 import { CID } from 'ipfs-core'
@@ -140,6 +140,30 @@ export class Organ {
     }
 
     /* Static API */
+
+    public static async deploy(cid:CID): Promise<Organ> {
+        const multihash:Multihash|null = cidToMultihash(cid)
+        if (!multihash)
+            throw new Error("Wrong CID.")
+        const { ipfsHash, hashFunction, hashSize } = multihash
+        const network = await getNetwork()
+        const libraries = await getLibraries(network)
+        if (!libraries.organ[0] || !libraries.organ[0].address)
+            throw new Error("Organ library not found.")
+        const links = [{ ...libraries.organ[0], library: "OrganLibrary" }]
+        const from = await getAccount()
+        // @ts-ignore
+        const contract = new web3.eth.Contract(OrganContract.abi)
+        // @ts-ignore
+        return contract.deploy({
+            data: await _linkBytecode(OrganContract.bytecode, links),
+            arguments: [from, ipfsHash, hashFunction, hashSize]
+        })
+        .send({ from })
+        .then(contract => {
+            return Organ.load(contract.options.address)
+        })
+    }
 
     public static async load(address: string): Promise<Organ> {
         const isOrgan: boolean = await Organ.isOrgan(address).catch(() => false)

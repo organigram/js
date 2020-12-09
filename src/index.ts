@@ -1,4 +1,15 @@
-export { web3 } from './web3'
+export {
+    web3,
+    EMPTY_ADDRESS,
+    enable as web3enable,
+    getAccount,
+    getNetwork,
+    getLocalLibraries,
+    getLibraries,
+    getLibraryArtefact,
+    deployMissingLibraries,
+    hasLibraries
+} from './web3'
 export {
     IPFS,
     ipfsNode,
