@@ -27,14 +27,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __asyncValues = (this && this.__asyncValues) || function (o) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator], i;
+    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CID = exports.EMPTY_MULTIHASH = exports.EMPTY_CID = exports.parseCid = exports.uint8ArrayToString = exports.urlToCID = exports.cidToMultihash = exports.multihashToCid = exports.ipfsNode = exports.IPFS = void 0;
+exports.CID = exports.EMPTY_MULTIHASH = exports.EMPTY_CID = exports.parseJSON = exports.uint8ArrayToString = exports.urlToCID = exports.cidToMultihash = exports.multihashToCid = exports.ipfsNode = exports.IPFS = void 0;
 const IPFS = __importStar(require("ipfs-core"));
 exports.IPFS = IPFS;
 const to_string_1 = __importDefault(require("uint8arrays/to-string"));
+const concat_1 = __importDefault(require("uint8arrays/concat"));
 const ipfs_provider_1 = require("ipfs-provider");
 const ipfsNode = ipfs_provider_1.getIpfs({
     providers: [
@@ -99,12 +107,26 @@ const urlToCID = (url) => {
 exports.urlToCID = urlToCID;
 const uint8ArrayToString = (uint8Array) => to_string_1.default(uint8Array);
 exports.uint8ArrayToString = uint8ArrayToString;
-const parseCid = (cid) => __awaiter(void 0, void 0, void 0, function* () {
-    const provider = yield Promise.resolve(ipfsNode);
-    const uint8Array = yield provider.cat(cid).next();
-    return JSON.parse(to_string_1.default(uint8Array.value));
+const parseJSON = (cid) => __awaiter(void 0, void 0, void 0, function* () {
+    var e_1, _b;
+    const ipfs = yield Promise.resolve(ipfsNode);
+    const chunks = [];
+    try {
+        for (var _c = __asyncValues(ipfs.cat(cid)), _d; _d = yield _c.next(), !_d.done;) {
+            const chunk = _d.value;
+            chunks.push(chunk);
+        }
+    }
+    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+    finally {
+        try {
+            if (_d && !_d.done && (_b = _c.return)) yield _b.call(_c);
+        }
+        finally { if (e_1) throw e_1.error; }
+    }
+    return JSON.parse(to_string_1.default(concat_1.default(chunks)));
 });
-exports.parseCid = parseCid;
+exports.parseJSON = parseJSON;
 const EMPTY_CID = `QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH`;
 exports.EMPTY_CID = EMPTY_CID;
 const EMPTY_MULTIHASH = cidToMultihash(EMPTY_CID);

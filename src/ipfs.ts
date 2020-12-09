@@ -1,5 +1,6 @@
 import * as IPFS from 'ipfs-core'
 import toString from 'uint8arrays/to-string'
+import concat from 'uint8arrays/concat'
 // @ts-ignore
 import { getIpfs, providers } from 'ipfs-provider'
 
@@ -74,10 +75,14 @@ const urlToCID = (url: string):CID|null => {
 
 const uint8ArrayToString = (uint8Array:Uint8Array) => toString(uint8Array)
 
-const parseCid = async (cid:CID) => {
-    const provider = await Promise.resolve(ipfsNode)
-    const uint8Array = await provider.cat(cid).next()
-    return JSON.parse(toString(uint8Array.value))
+const parseJSON = async (cid:CID|string): Promise<object|any[]> => {
+    const ipfs = await Promise.resolve(ipfsNode)
+    const chunks: Uint8Array[] = []
+    for await (const chunk of ipfs.cat(cid)) {
+        chunks.push(chunk)
+    }
+    // @ts-ignore
+    return JSON.parse(toString(concat(chunks)))
 }
 
 const EMPTY_CID:string = `QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH`
@@ -92,7 +97,7 @@ export {
     cidToMultihash,
     urlToCID,
     uint8ArrayToString,
-    parseCid,
+    parseJSON,
     EMPTY_CID,
     EMPTY_MULTIHASH,
     CID

@@ -16,7 +16,7 @@ export {
     multihashToCid,
     cidToMultihash,
     uint8ArrayToString,
-    parseCid,
+    parseJSON,
     urlToCID,
     EMPTY_CID,
     EMPTY_MULTIHASH,
