@@ -256,7 +256,8 @@ export class Procedure {
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
         const from = await getAccount()
         const _entries = entries.map(e => {
-            const multihash:Multihash|null = cidToMultihash(new CID(e.cid)) || cidToMultihash(new CID(EMPTY_CID))
+            let multihash:Multihash|null
+            if (e.cid) multihash = cidToMultihash(new CID(e.cid)); else multihash = cidToMultihash(new CID(EMPTY_CID))
             if (!multihash)
                 throw new Error("Unable to find a CID for an entry.")
             return { addr: e.address, ...multihash }
@@ -294,7 +295,8 @@ export class Procedure {
     ):Promise<boolean> => {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
-        const multihash:Multihash|null = cidToMultihash(entry.cid) || cidToMultihash(EMPTY_CID)
+        let multihash:Multihash|null
+        if (entry.cid) multihash = cidToMultihash(new CID(entry.cid)); else multihash = cidToMultihash(new CID(EMPTY_CID))
         if (!multihash)
             throw new Error("Wrong CID.")
         const { ipfsHash, hashFunction, hashSize } = multihash

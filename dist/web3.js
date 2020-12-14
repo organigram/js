@@ -50,6 +50,7 @@ const web3 = new web3_1.default(typeof window !== "undefined"
 exports.web3 = web3;
 const enable = () => __awaiter(void 0, void 0, void 0, function* () {
     return typeof web3 !== "undefined"
+        && web3.currentProvider
         && typeof web3.currentProvider !== "undefined"
         && typeof web3.currentProvider.enable === "function"
         && web3.currentProvider.enable();

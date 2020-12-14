@@ -65,7 +65,7 @@ const cidToMultihash = (cid: CID|string): Multihash|null => {
 const urlToCID = (url: string):CID|null => {
     try {
         // Remove https://ipfs.io/ipfs/
-        return new CID(url.substring(0, 21))
+        return new CID(url.substring(21))
     }
     catch (error) {
         console.warn("Unable to convert IPFS url to CID.")

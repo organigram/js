@@ -97,7 +97,7 @@ const cidToMultihash = (cid) => {
 exports.cidToMultihash = cidToMultihash;
 const urlToCID = (url) => {
     try {
-        return new CID(url.substring(0, 21));
+        return new CID(url.substring(21));
     }
     catch (error) {
         console.warn("Unable to convert IPFS url to CID.");

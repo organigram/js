@@ -81,7 +81,11 @@ class Procedure {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
             const from = yield web3_2.getAccount();
             const _entries = entries.map(e => {
-                const multihash = ipfs_1.cidToMultihash(new src_1.CID(e.cid)) || ipfs_1.cidToMultihash(new src_1.CID(ipfs_1.EMPTY_CID));
+                let multihash;
+                if (e.cid)
+                    multihash = ipfs_1.cidToMultihash(new src_1.CID(e.cid));
+                else
+                    multihash = ipfs_1.cidToMultihash(new src_1.CID(ipfs_1.EMPTY_CID));
                 if (!multihash)
                     throw new Error("Unable to find a CID for an entry.");
                 return Object.assign({ addr: e.address }, multihash);
@@ -105,7 +109,11 @@ class Procedure {
         });
         this.moveReplaceEntry = (moveKey, organ, entry, lock = false) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
-            const multihash = ipfs_1.cidToMultihash(entry.cid) || ipfs_1.cidToMultihash(ipfs_1.EMPTY_CID);
+            let multihash;
+            if (entry.cid)
+                multihash = ipfs_1.cidToMultihash(new src_1.CID(entry.cid));
+            else
+                multihash = ipfs_1.cidToMultihash(new src_1.CID(ipfs_1.EMPTY_CID));
             if (!multihash)
                 throw new Error("Wrong CID.");
             const { ipfsHash, hashFunction, hashSize } = multihash;

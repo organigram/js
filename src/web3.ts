@@ -18,6 +18,7 @@ const web3 = new Web3(
 // @ts-ignore
 const enable = async (): Promise<void> =>
     typeof web3 !== "undefined"
+    && web3.currentProvider
     && typeof web3.currentProvider !== "undefined"
     // @ts-ignore
     && typeof web3.currentProvider.enable === "function"
