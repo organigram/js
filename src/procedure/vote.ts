@@ -40,7 +40,7 @@ export class ProcedureVote {
     }
 
     public static async deploy(cid:CID, voters: Address, vetoers: Address, enactors: Address): Promise<Procedure> {
-        const multihash:Multihash|null = cidToMultihash(cid)
+        const multihash:Multihash|null = cidToMultihash(`${cid}`)
         if (!multihash)
             throw new Error("Wrong CID.")
         const { ipfsHash, hashFunction, hashSize } = multihash

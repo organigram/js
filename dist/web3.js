@@ -38,7 +38,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports._linkBytecode = exports._saveLocalLibrary = exports.hasLibraries = exports.deployMissingLibraries = exports.getLibraryArtefact = exports.getLibraries = exports.getLocalLibraries = exports.getNetwork = exports.getAccount = exports.enable = exports.EMPTY_ADDRESS = exports.web3 = void 0;
+exports._linkBytecode = exports._saveLocalLibrary = exports.hasLibraries = exports.deployMissingLibraries = exports.getLibraryArtefact = exports.getLibraries = exports.getLocalLibraries = exports.getNetwork = exports.getAccount = exports.enable = exports.ecRecover = exports.sign = exports.EMPTY_ADDRESS = exports.web3 = void 0;
 const web3_1 = __importDefault(require("web3"));
 const web3 = new web3_1.default(typeof window !== "undefined"
     ? ("ethereum" in window
@@ -205,3 +205,16 @@ const hasLibraries = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.hasLibraries = hasLibraries;
+const sign = (message, password = "") => __awaiter(void 0, void 0, void 0, function* () {
+    const account = yield getAccount();
+    return account && web3 && web3.eth && web3.eth.personal && web3.eth.personal.sign
+        ? web3.eth.personal.sign(message, account, password)
+        : null;
+});
+exports.sign = sign;
+const ecRecover = (message, signature) => __awaiter(void 0, void 0, void 0, function* () {
+    return web3 && web3.eth && web3.eth.personal && web3.eth.personal.ecRecover
+        ? web3.eth.personal.ecRecover(message, signature)
+        : null;
+});
+exports.ecRecover = ecRecover;

@@ -81,8 +81,10 @@ const multihashToCid = ({ ipfsHash, hashFunction, hashSize }) => {
 exports.multihashToCid = multihashToCid;
 const cidToMultihash = (cid) => {
     var _a;
+    if (!cid)
+        cid = EMPTY_CID;
     if (typeof cid === "string")
-        cid = new IPFS.CID(cid);
+        cid = new IPFS.CID(`${cid}`);
     const multihash = ((_a = cid === null || cid === void 0 ? void 0 : cid.hash) === null || _a === void 0 ? void 0 : _a.data) ?
         Buffer.from(cid.hash.data)
         : (cid === null || cid === void 0 ? void 0 : cid.multihash) ?

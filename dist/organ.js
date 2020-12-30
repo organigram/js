@@ -155,7 +155,7 @@ class Organ {
     }
     static deploy(cid) {
         return __awaiter(this, void 0, void 0, function* () {
-            const multihash = ipfs_1.cidToMultihash(cid);
+            const multihash = ipfs_1.cidToMultihash(`${cid}`);
             if (!multihash)
                 throw new Error("Wrong CID.");
             const { ipfsHash, hashFunction, hashSize } = multihash;
@@ -227,7 +227,11 @@ Organ.loadMetadata = (address) => __awaiter(void 0, void 0, void 0, function* ()
         console.info("IPFS was not started. Starting IPFS.");
         yield ipfs.start();
     }
-    let metadata = {};
+    let metadata = {
+        data: {
+            name: ""
+        }
+    };
     try {
         metadata.cid = yield contract.methods.getMetadata().call()
             .then((multihash) => {
@@ -242,10 +246,37 @@ Organ.loadMetadata = (address) => __awaiter(void 0, void 0, void 0, function* ()
             metadata.data = yield ipfs_1.parseJSON(metadata.cid);
         }
         catch (error) {
-            console.warn("Error while loading metadata for organ.", address, error.message);
+            console.warn("Warning while parsing metadata of organ.", address, error.message);
         }
     }
     return metadata;
+});
+Organ.getEntryForAccount = (address, account) => __awaiter(void 0, void 0, void 0, function* () {
+    const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi, address);
+    const index = yield contract.methods.getEntryIndexForAddress(account).call();
+    const ipfs = yield ipfs_1.ipfsNode;
+    return contract.methods.getEntry(index).call()
+        .then(({ addr, ipfsHash, hashFunction, hashSize }) => __awaiter(void 0, void 0, void 0, function* () {
+        if (addr === web3_1.EMPTY_ADDRESS && (!parseInt(hashFunction, 16) || !parseInt(hashSize)))
+            return null;
+        let entry = { index, address: addr, cid: null };
+        try {
+            entry.cid = ipfs_1.multihashToCid({ ipfsHash, hashSize, hashFunction });
+        }
+        catch (error) {
+            console.warn("Error while computing IPFS Content ID for entry.", account, index, error.message);
+        }
+        if (entry.cid) {
+            try {
+                entry.data = concat_1.default(yield it_all_1.default(ipfs.cat(entry.cid)));
+            }
+            catch (error) {
+                console.warn("Error while loading data hash for entry.", account, index, error.message);
+            }
+        }
+        return entry;
+    }))
+        .catch((e) => console.error("Error", e.message));
 });
 Organ.loadProcedures = (address) => __awaiter(void 0, void 0, void 0, function* () {
     const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi, address);

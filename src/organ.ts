@@ -142,7 +142,7 @@ export class Organ {
     /* Static API */
 
     public static async deploy(cid:CID): Promise<Organ> {
-        const multihash:Multihash|null = cidToMultihash(cid)
+        const multihash:Multihash|null = cidToMultihash(`${cid}`)
         if (!multihash)
             throw new Error("Wrong CID.")
         const { ipfsHash, hashFunction, hashSize } = multihash
@@ -214,7 +214,11 @@ export class Organ {
             console.info("IPFS was not started. Starting IPFS.")
             await ipfs.start()
         }
-        let metadata: { cid?: CID, data?: any } = {}
+        let metadata: { cid?: CID, data?: any } = {
+            data: {
+                name: ""
+            }
+        }
         try {
             metadata.cid = await contract.methods.getMetadata().call()
             .then((multihash: Multihash):CID => {
@@ -229,10 +233,44 @@ export class Organ {
                 metadata.data = await parseJSON(metadata.cid)
             }
             catch(error) {
-                console.warn("Error while loading metadata for organ.", address, error.message)
+                console.warn("Warning while parsing metadata of organ.", address, error.message)
             }
         }
         return metadata
+    }
+
+    public static getEntryForAccount = async (address: Address, account:Address) => {
+        // @ts-ignore
+        const contract = new web3.eth.Contract(OrganContract.abi, address)
+        const index = await contract.methods.getEntryIndexForAddress(account).call()
+        const ipfs = await ipfsNode
+        // @todo : Add internal method parseEntry to avoid duplicating code.
+        return contract.methods.getEntry(index).call()
+        .then(async ({ addr, ipfsHash, hashFunction, hashSize }: {
+            addr: Address,
+            ipfsHash: string, hashFunction: string, hashSize: string
+        }) => {
+            if (addr === EMPTY_ADDRESS && (!parseInt(hashFunction, 16) || !parseInt(hashSize)))
+                return null
+            let entry:OrganEntry = { index, address: addr, cid: null }
+            try {
+                entry.cid = multihashToCid({ ipfsHash, hashSize, hashFunction })
+            }
+            catch(error) {
+                console.warn("Error while computing IPFS Content ID for entry.", account, index, error.message)
+            }
+            if (entry.cid) {
+                try {
+                    // @ts-ignore
+                    entry.data = uint8ArrayConcat(await all(ipfs.cat(entry.cid)))
+                }
+                catch(error) {
+                    console.warn("Error while loading data hash for entry.", account, index, error.message)
+                }
+            }
+            return entry
+        })
+        .catch((e: Error) => console.error("Error", e.message))
     }
 
     public static loadProcedures = async (address: Address): Promise<OrganProcedure[]> => {

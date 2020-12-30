@@ -81,13 +81,17 @@ class Procedure {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
             const from = yield web3_2.getAccount();
             const _entries = entries.map(e => {
-                let multihash;
-                if (e.cid)
-                    multihash = ipfs_1.cidToMultihash(new src_1.CID(e.cid));
-                else
-                    multihash = ipfs_1.cidToMultihash(new src_1.CID(ipfs_1.EMPTY_CID));
+                let multihash = null;
+                if (e.cid) {
+                    try {
+                        multihash = ipfs_1.cidToMultihash(new src_1.CID(e.cid));
+                    }
+                    catch (error) {
+                        console.error("Unable to find a CID for this entry.", error.message);
+                    }
+                }
                 if (!multihash)
-                    throw new Error("Unable to find a CID for an entry.");
+                    multihash = ipfs_1.cidToMultihash(new src_1.CID(ipfs_1.EMPTY_CID));
                 return Object.assign({ addr: e.address }, multihash);
             }).filter(e => !!e);
             return from && contract.methods.moveAddEntries(moveKey, organ, _entries, lock).send({ from })
@@ -266,6 +270,7 @@ class Procedure {
 }
 exports.Procedure = Procedure;
 Procedure.deploy = (type, cid, args) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("deploying procedure: cid", `${cid}`, cid);
     let ProcedureClass = null;
     switch (type) {
         case 'nomination':

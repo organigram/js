@@ -37,7 +37,7 @@ class ProcedureNomination {
     }
     static deploy(cid, nominators) {
         return __awaiter(this, void 0, void 0, function* () {
-            const multihash = ipfs_1.cidToMultihash(cid);
+            const multihash = ipfs_1.cidToMultihash(`${cid}`);
             if (!multihash)
                 throw new Error("Wrong CID.");
             const { ipfsHash, hashFunction, hashSize } = multihash;

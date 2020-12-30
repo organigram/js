@@ -19,7 +19,7 @@ export class ProcedureNomination {
     }
 
     public static async deploy(cid:CID, nominators: Address): Promise<Procedure> {
-        const multihash:Multihash|null = cidToMultihash(cid)
+        const multihash:Multihash|null = cidToMultihash(`${cid}`)
         if (!multihash)
             throw new Error("Wrong CID.")
         const { ipfsHash, hashFunction, hashSize } = multihash

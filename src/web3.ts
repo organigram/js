@@ -174,9 +174,24 @@ const hasLibraries = async (): Promise<boolean> => {
     }
 }
 
+const sign = async (message: string, password: string = ""): Promise<string|null> => {
+    const account = await getAccount()
+    return account && web3 && web3.eth && web3.eth.personal && web3.eth.personal.sign
+        ? web3.eth.personal.sign(message, account, password)
+        : null
+}
+
+const ecRecover = async (message: string, signature: string): Promise<string|null> => {
+    return web3 && web3.eth && web3.eth.personal && web3.eth.personal.ecRecover
+        ? web3.eth.personal.ecRecover(message, signature)
+        : null
+}
+
 export {
     web3,
     EMPTY_ADDRESS,
+    sign,
+    ecRecover,
     enable,
     getAccount,
     getNetwork,

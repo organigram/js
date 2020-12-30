@@ -34,6 +34,7 @@ export class Procedure {
     }
 
     static deploy = async (type: ProcedureType, cid: CID, args: any[]) => {
+        console.log("deploying procedure: cid", `${cid}`, cid)
         let ProcedureClass = null
         switch (type) {
             case 'nomination':
@@ -256,10 +257,15 @@ export class Procedure {
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
         const from = await getAccount()
         const _entries = entries.map(e => {
-            let multihash:Multihash|null
-            if (e.cid) multihash = cidToMultihash(new CID(e.cid)); else multihash = cidToMultihash(new CID(EMPTY_CID))
-            if (!multihash)
-                throw new Error("Unable to find a CID for an entry.")
+            let multihash:Multihash|null = null
+            if (e.cid) {
+                try {
+                    multihash = cidToMultihash(new CID(e.cid))
+                } catch (error) {
+                    console.error("Unable to find a CID for this entry.", error.message)
+                }
+            }
+            if (!multihash) multihash = cidToMultihash(new CID(EMPTY_CID))
             return { addr: e.address, ...multihash }
         }).filter(e => !!e)
         return from && contract.methods.moveAddEntries(moveKey, organ, _entries, lock).send({ from })
