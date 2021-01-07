@@ -3,7 +3,7 @@ export {
     EMPTY_ADDRESS,
     sign as web3sign,
     ecRecover as web3ecRecover,
-    enable as web3enable,
+    connect as web3connect,
     getAccount,
     getNetwork,
     getLocalLibraries,

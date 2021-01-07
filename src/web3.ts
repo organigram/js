@@ -1,5 +1,7 @@
 import Web3 from 'web3'
 
+const EMPTY_ADDRESS: Address = "0x0000000000000000000000000000000000000000"
+
 const web3 = new Web3(
     typeof window !== "undefined"
     ? (
@@ -15,38 +17,30 @@ const web3 = new Web3(
     : Web3.givenProvider
 )
 
-// @ts-ignore
-const enable = async (): Promise<void> =>
-    typeof web3 !== "undefined"
-    && web3.currentProvider
-    && typeof web3.currentProvider !== "undefined"
-    // @ts-ignore
-    && typeof web3.currentProvider.enable === "function"
-    // @ts-ignore
-    && web3.currentProvider.enable()
+const getAccount = async (): Promise<Address> => web3.eth.getAccounts().then(accs => accs && accs[0] && accs[0].toLowerCase())
+
+const connect = async (): Promise<Address> =>
+    typeof web3.eth.requestAccounts === "function"
+        ? web3.eth.requestAccounts().catch(() => ['']).then(accs => accs && accs[0] && accs[0].toLowerCase())
+        : getAccount()
 
 // Initial enable.
-enable()
-
-const EMPTY_ADDRESS: Address = "0x0000000000000000000000000000000000000000"
-
-const getAccount = async (): Promise<Address> => web3.eth.getAccounts().then(accs => accs && accs[0])
+connect()
 
 const getNetwork = async (): Promise<Network> => {
     if (!web3 || !web3.currentProvider)
         throw new Error("Web3 is missing.")
-    // @ts-ignore
-    if (typeof web3.currentProvider.networkVersion === "undefined")
-        throw new Error("Missing networkVersion web3 API.")
-    // @ts-ignore
-    switch (web3.currentProvider.networkVersion) {
-        case "1":   return 'mainnet'
-        case "2":   return 'morden'
-        case "3":   return 'ropsten'
-        case "4":   return 'rinkeby'
-        case "42":  return 'kovan'
-        case "1337":return 'dev'
-        case "1001":return 'organigr.am'
+    const chainId = await web3.eth.getChainId()
+    if (!chainId)
+        throw new Error("Web3 network not found.")
+    switch (chainId) {
+        case 1:     return 'mainnet'
+        case 2:     return 'morden'
+        case 3:     return 'ropsten'
+        case 4:     return 'rinkeby'
+        case 42:    return 'kovan'
+        case 1337:  return 'dev'
+        case 1001:  return 'organigr.am'
         default:    return 'private'
     }
 }
@@ -192,7 +186,7 @@ export {
     EMPTY_ADDRESS,
     sign,
     ecRecover,
-    enable,
+    connect,
     getAccount,
     getNetwork,
     getLocalLibraries,

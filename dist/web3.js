@@ -38,8 +38,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports._linkBytecode = exports._saveLocalLibrary = exports.hasLibraries = exports.deployMissingLibraries = exports.getLibraryArtefact = exports.getLibraries = exports.getLocalLibraries = exports.getNetwork = exports.getAccount = exports.enable = exports.ecRecover = exports.sign = exports.EMPTY_ADDRESS = exports.web3 = void 0;
+exports._linkBytecode = exports._saveLocalLibrary = exports.hasLibraries = exports.deployMissingLibraries = exports.getLibraryArtefact = exports.getLibraries = exports.getLocalLibraries = exports.getNetwork = exports.getAccount = exports.connect = exports.ecRecover = exports.sign = exports.EMPTY_ADDRESS = exports.web3 = void 0;
 const web3_1 = __importDefault(require("web3"));
+const EMPTY_ADDRESS = "0x0000000000000000000000000000000000000000";
+exports.EMPTY_ADDRESS = EMPTY_ADDRESS;
 const web3 = new web3_1.default(typeof window !== "undefined"
     ? ("ethereum" in window
         ? window.ethereum
@@ -48,32 +50,29 @@ const web3 = new web3_1.default(typeof window !== "undefined"
             : web3_1.default.givenProvider)
     : web3_1.default.givenProvider);
 exports.web3 = web3;
-const enable = () => __awaiter(void 0, void 0, void 0, function* () {
-    return typeof web3 !== "undefined"
-        && web3.currentProvider
-        && typeof web3.currentProvider !== "undefined"
-        && typeof web3.currentProvider.enable === "function"
-        && web3.currentProvider.enable();
-});
-exports.enable = enable;
-enable();
-const EMPTY_ADDRESS = "0x0000000000000000000000000000000000000000";
-exports.EMPTY_ADDRESS = EMPTY_ADDRESS;
-const getAccount = () => __awaiter(void 0, void 0, void 0, function* () { return web3.eth.getAccounts().then(accs => accs && accs[0]); });
+const getAccount = () => __awaiter(void 0, void 0, void 0, function* () { return web3.eth.getAccounts().then(accs => accs && accs[0] && accs[0].toLowerCase()); });
 exports.getAccount = getAccount;
+const connect = () => __awaiter(void 0, void 0, void 0, function* () {
+    return typeof web3.eth.requestAccounts === "function"
+        ? web3.eth.requestAccounts().catch(() => ['']).then(accs => accs && accs[0] && accs[0].toLowerCase())
+        : getAccount();
+});
+exports.connect = connect;
+connect();
 const getNetwork = () => __awaiter(void 0, void 0, void 0, function* () {
     if (!web3 || !web3.currentProvider)
         throw new Error("Web3 is missing.");
-    if (typeof web3.currentProvider.networkVersion === "undefined")
-        throw new Error("Missing networkVersion web3 API.");
-    switch (web3.currentProvider.networkVersion) {
-        case "1": return 'mainnet';
-        case "2": return 'morden';
-        case "3": return 'ropsten';
-        case "4": return 'rinkeby';
-        case "42": return 'kovan';
-        case "1337": return 'dev';
-        case "1001": return 'organigr.am';
+    const chainId = yield web3.eth.getChainId();
+    if (!chainId)
+        throw new Error("Web3 network not found.");
+    switch (chainId) {
+        case 1: return 'mainnet';
+        case 2: return 'morden';
+        case 3: return 'ropsten';
+        case 4: return 'rinkeby';
+        case 42: return 'kovan';
+        case 1337: return 'dev';
+        case 1001: return 'organigr.am';
         default: return 'private';
     }
 });

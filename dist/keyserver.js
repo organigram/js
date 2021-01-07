@@ -27,16 +27,39 @@ const web3_1 = require("./web3");
 class Keyserver extends organ_1.default {
     static detect() {
         return __awaiter(this, void 0, void 0, function* () {
-            if (!process.env.REACT_APP_KEYSERVER_ADDRESS)
-                throw new Error("Detection not implemented.");
-            return organ_1.default.load(process.env.REACT_APP_KEYSERVER_ADDRESS)
-                .then(organ => new Keyserver(organ));
+            const network = yield web3_1.getNetwork().catch(error => {
+                throw new Error("Not connected to Ethereum.");
+            });
+            const cache = localStorage.getItem("organigram-keyservers");
+            const keyservers = cache ? JSON.parse(cache) : [];
+            const matches = keyservers.filter((n) => n.network === network);
+            if (matches[0] && matches[0].address)
+                return organ_1.default.load(matches[0].address)
+                    .then(organ => new Keyserver(organ));
+            if (process.env.REACT_APP_KEYSERVER_ORGAN && network === "rinkeby")
+                return organ_1.default.load(process.env.REACT_APP_KEYSERVER_ORGAN)
+                    .then(organ => new Keyserver(organ));
+            throw new Error("Detection not implemented.");
         });
     }
     static deploy() {
         return __awaiter(this, void 0, void 0, function* () {
             const organ = yield organ_1.default.deploy(ipfs_1.EMPTY_CID);
             return new Keyserver(organ);
+        });
+    }
+    save() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const networksCache = localStorage.getItem("organigram-keyservers");
+            const networks = networksCache ? JSON.parse(networksCache) : [];
+            let match = networks.find((n) => n.network === this.network && n.address === this.address);
+            if (!match) {
+                networks.push({
+                    network: this.network,
+                    address: this.address
+                });
+                localStorage.setItem("organigram-keyservers", JSON.stringify(networks));
+            }
         });
     }
     hasKey(account = null) {

@@ -2,22 +2,43 @@ import { concat } from 'uint8arrays'
 import { EMPTY_CID, ipfsNode } from './ipfs'
 import Organ from './organ'
 import { Key } from './vault'
-import { getAccount } from './web3'
+import { getAccount, getNetwork } from './web3'
 
-// @todo : Move to client-js, detect keyserver address.
 export class Keyserver extends Organ {
     static async detect():Promise<Keyserver> {
-        // @todo : Detect keyserver.
-        if (!process.env.REACT_APP_KEYSERVER_ADDRESS)
-            throw new Error("Detection not implemented.")
-        return Organ.load(process.env.REACT_APP_KEYSERVER_ADDRESS)
-        .then(organ => new Keyserver(organ))
+        const network = await getNetwork().catch(error => {
+            throw new Error("Not connected to Ethereum.")
+        })
+        const cache = localStorage.getItem("organigram-keyservers")
+        const keyservers = cache ? JSON.parse(cache) : []
+        const matches = keyservers.filter((n: { network: string, address: Address }) => n.network === network)
+        // @todo : Allow multiple keyservers.
+        if (matches[0] && matches[0].address)
+            return Organ.load(matches[0].address)
+            .then(organ => new Keyserver(organ))
+        if (process.env.REACT_APP_KEYSERVER_ORGAN && network === "rinkeby")
+            return Organ.load(process.env.REACT_APP_KEYSERVER_ORGAN)
+            .then(organ => new Keyserver(organ))
+        throw new Error("Detection not implemented.")
     }
 
     static async deploy():Promise<Keyserver> {
         // @todo : Save deployed keyserver address in localStorage per network.
         const organ = await Organ.deploy(EMPTY_CID)
         return new Keyserver(organ)
+    }
+
+    async save():Promise<void> {
+        const networksCache = localStorage.getItem("organigram-keyservers")
+        const networks = networksCache ? JSON.parse(networksCache) : []
+        let match = networks.find((n:{network:string,address:Address}) => n.network === this.network && n.address === this.address)
+        if (!match) {
+            networks.push({
+                network: this.network,
+                address: this.address
+            })
+            localStorage.setItem("organigram-keyservers", JSON.stringify(networks))
+        }
     }
 
     async hasKey(account:Address|null = null):Promise<boolean> {

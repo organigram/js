@@ -24,8 +24,9 @@ const web3_2 = require("./web3");
 exports.ORGAN_CONTRACT_SIGNATURES = ((_b = (_a = Organ_json_1.default.ast
     .nodes.find(n => n.name === "")) === null || _a === void 0 ? void 0 : _a.nodes) === null || _b === void 0 ? void 0 : _b.map(n => (n === null || n === void 0 ? void 0 : n.functionSelector) || "").filter(i => i !== "")) || [];
 class Organ {
-    constructor({ address, balance, procedures, metadata, entries }) {
+    constructor({ address, network, balance, procedures, metadata, entries }) {
         this.address = "";
+        this.network = "mainnet";
         this.balance = "n/a";
         this.procedures = [];
         this.metadata = {};
@@ -148,6 +149,7 @@ class Organ {
             return this;
         });
         this.address = address;
+        this.network = network;
         this.balance = balance;
         this.procedures = procedures;
         this.metadata = metadata;
@@ -159,7 +161,7 @@ class Organ {
             if (!multihash)
                 throw new Error("Wrong CID.");
             const { ipfsHash, hashFunction, hashSize } = multihash;
-            const network = yield web3_1.getNetwork();
+            const network = yield web3_2.getNetwork();
             const libraries = yield web3_1.getLibraries(network);
             if (!libraries.organ[0] || !libraries.organ[0].address)
                 throw new Error("Organ library not found.");
@@ -178,6 +180,9 @@ class Organ {
     }
     static load(address) {
         return __awaiter(this, void 0, void 0, function* () {
+            const network = yield web3_2.getNetwork();
+            if (!network)
+                throw new Error("Not connected to a valid network.");
             const isOrgan = yield Organ.isOrgan(address).catch(() => false);
             if (!isOrgan)
                 throw new Error("Contract at address is not an Organ.");
@@ -198,7 +203,7 @@ class Organ {
                 console.warn("Error while loading organ's entries", address, error.message);
                 return [];
             });
-            return new Organ({ address, balance, procedures, metadata, entries });
+            return new Organ({ address, network, balance, procedures, metadata, entries });
         });
     }
     static isOrgan(address) {

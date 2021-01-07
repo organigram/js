@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PROCEDURE_INTERFACE = exports.Procedure = exports.Keyserver = exports.Organ = exports.Graph = exports._decryptMessagePGP = exports._encryptMessagePGP = exports.decrypt = exports.encrypt = exports.verify = exports.sign = exports.generateKey = exports.verifySignature = exports.generatePassword = exports.generateSignature = exports.deployKey = exports.openpgp = exports.CID = exports.EMPTY_MULTIHASH = exports.EMPTY_CID = exports.urlToCID = exports.parseJSON = exports.uint8ArrayToString = exports.cidToMultihash = exports.multihashToCid = exports.ipfsNode = exports.IPFS = exports.hasLibraries = exports.deployMissingLibraries = exports.getLibraryArtefact = exports.getLibraries = exports.getLocalLibraries = exports.getNetwork = exports.getAccount = exports.web3enable = exports.web3ecRecover = exports.web3sign = exports.EMPTY_ADDRESS = exports.web3 = void 0;
+exports.PROCEDURE_INTERFACE = exports.Procedure = exports.Keyserver = exports.Organ = exports.Graph = exports._decryptMessagePGP = exports._encryptMessagePGP = exports.decrypt = exports.encrypt = exports.verify = exports.sign = exports.generateKey = exports.verifySignature = exports.generatePassword = exports.generateSignature = exports.deployKey = exports.openpgp = exports.CID = exports.EMPTY_MULTIHASH = exports.EMPTY_CID = exports.urlToCID = exports.parseJSON = exports.uint8ArrayToString = exports.cidToMultihash = exports.multihashToCid = exports.ipfsNode = exports.IPFS = exports.hasLibraries = exports.deployMissingLibraries = exports.getLibraryArtefact = exports.getLibraries = exports.getLocalLibraries = exports.getNetwork = exports.getAccount = exports.web3connect = exports.web3ecRecover = exports.web3sign = exports.EMPTY_ADDRESS = exports.web3 = void 0;
 var web3_1 = require("./web3");
 Object.defineProperty(exports, "web3", { enumerable: true, get: function () { return web3_1.web3; } });
 Object.defineProperty(exports, "EMPTY_ADDRESS", { enumerable: true, get: function () { return web3_1.EMPTY_ADDRESS; } });
 Object.defineProperty(exports, "web3sign", { enumerable: true, get: function () { return web3_1.sign; } });
 Object.defineProperty(exports, "web3ecRecover", { enumerable: true, get: function () { return web3_1.ecRecover; } });
-Object.defineProperty(exports, "web3enable", { enumerable: true, get: function () { return web3_1.enable; } });
+Object.defineProperty(exports, "web3connect", { enumerable: true, get: function () { return web3_1.connect; } });
 Object.defineProperty(exports, "getAccount", { enumerable: true, get: function () { return web3_1.getAccount; } });
 Object.defineProperty(exports, "getNetwork", { enumerable: true, get: function () { return web3_1.getNetwork; } });
 Object.defineProperty(exports, "getLocalLibraries", { enumerable: true, get: function () { return web3_1.getLocalLibraries; } });

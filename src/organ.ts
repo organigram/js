@@ -1,10 +1,10 @@
-import { EMPTY_ADDRESS, getLibraries, getNetwork, web3, _linkBytecode } from './web3'
+import { EMPTY_ADDRESS, getLibraries, web3, _linkBytecode } from './web3'
 import all from 'it-all'
 import uint8ArrayConcat from 'uint8arrays/concat'
 import { CID } from 'ipfs-core'
 import OrganContract from '@organigram/contracts/build/contracts/Organ.json'
 import { ipfsNode, multihashToCid, cidToMultihash, parseJSON } from './ipfs'
-import { getAccount } from './web3'
+import { getAccount, getNetwork } from './web3'
 
 export const ORGAN_CONTRACT_SIGNATURES: string[] = OrganContract.ast
     .nodes.find(n => n.name === "")
@@ -14,6 +14,7 @@ export const ORGAN_CONTRACT_SIGNATURES: string[] = OrganContract.ast
 
 export interface OrganData {
     address: string
+    network: Network
     balance: string
     metadata: Metadata
     procedures: OrganProcedure[]
@@ -22,13 +23,15 @@ export interface OrganData {
 
 export class Organ {
     address: string = ""
+    network: Network = "mainnet"
     balance: string = "n/a"
     procedures: OrganProcedure[] = []
     metadata: Metadata = {}
     entries: OrganEntry[] = []
 
-    public constructor({ address, balance, procedures, metadata, entries }: OrganData) {
+    public constructor({ address, network, balance, procedures, metadata, entries }: OrganData) {
         this.address = address
+        this.network = network
         this.balance = balance
         this.procedures = procedures
         this.metadata = metadata
@@ -166,6 +169,9 @@ export class Organ {
     }
 
     public static async load(address: string): Promise<Organ> {
+        const network = await getNetwork()
+        if (!network)
+            throw new Error("Not connected to a valid network.")
         const isOrgan: boolean = await Organ.isOrgan(address).catch(() => false)
         if (!isOrgan)
             throw new Error("Contract at address is not an Organ.")
@@ -186,7 +192,7 @@ export class Organ {
             console.warn("Error while loading organ's entries", address, error.message)
             return []
         })
-        return new Organ({ address, balance, procedures, metadata, entries })
+        return new Organ({ address, network, balance, procedures, metadata, entries })
     }
 
     public static async isOrgan(address: Address):Promise<boolean> {
