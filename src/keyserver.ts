@@ -88,10 +88,6 @@ export class Keyserver extends Organ {
             address: account,
             cid: cid || EMPTY_CID
         }])
-        .then(data => {
-            console.log("keyserver addEntries result", data)
-            return data
-        })
     }
 }
 

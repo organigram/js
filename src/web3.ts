@@ -38,7 +38,9 @@ const getNetwork = async (): Promise<Network> => {
         case 2:     return 'morden'
         case 3:     return 'ropsten'
         case 4:     return 'rinkeby'
+        case 5:     return 'goerli'
         case 42:    return 'kovan'
+        case 100:   return 'xdai'
         case 1337:  return 'dev'
         case 1001:  return 'organigr.am'
         default:    return 'private'
@@ -122,12 +124,10 @@ const deployMissingLibraries = async (): Promise<Libraries> => {
     let libraries: Libraries = await getLibraries(network)
     const keys: LibraryKey[] = ["organ", "procedure", "voteProposition"]
     for await (var key of keys) {
-        console.log("Deploying", key)
         if (!libraries[key].find(l => l.network === network && !!l.address)) {
             // If library not found, deploy it.
             const libraryArtefact = await getLibraryArtefact(key)
             const libraryContract = new web3.eth.Contract(libraryArtefact.abi)
-            console.log("libraryContract", libraryContract)
             const libraryInstance = await libraryContract.deploy({ data: libraryArtefact.bytecode })
             .send({ from })
             .catch(error => {
@@ -136,7 +136,6 @@ const deployMissingLibraries = async (): Promise<Libraries> => {
             if (libraryInstance && libraryInstance.options && libraryInstance.options.address) {
                 // Save deployment info for re-use.
                 await _saveLocalLibrary(key, network, libraryInstance.options.address)
-                .then(console.log)
             }
         }
     }
@@ -175,9 +174,9 @@ const sign = async (message: string, password: string = ""): Promise<string|null
         : null
 }
 
-const ecRecover = async (message: string, signature: string): Promise<string|null> => {
+const ecRecover = async (message: string, signature: string): Promise<Address|null> => {
     return web3 && web3.eth && web3.eth.personal && web3.eth.personal.ecRecover
-        ? web3.eth.personal.ecRecover(message, signature)
+        ? web3.eth.personal.ecRecover(message, signature).then(a => a.toLowerCase())
         : null
 }
 

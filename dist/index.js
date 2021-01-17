@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PROCEDURE_INTERFACE = exports.Procedure = exports.Keyserver = exports.Organ = exports.Graph = exports._decryptMessagePGP = exports._encryptMessagePGP = exports.decrypt = exports.encrypt = exports.verify = exports.sign = exports.generateKey = exports.verifySignature = exports.generatePassword = exports.generateSignature = exports.deployKey = exports.openpgp = exports.CID = exports.EMPTY_MULTIHASH = exports.EMPTY_CID = exports.urlToCID = exports.parseJSON = exports.uint8ArrayToString = exports.cidToMultihash = exports.multihashToCid = exports.ipfsNode = exports.IPFS = exports.hasLibraries = exports.deployMissingLibraries = exports.getLibraryArtefact = exports.getLibraries = exports.getLocalLibraries = exports.getNetwork = exports.getAccount = exports.web3connect = exports.web3ecRecover = exports.web3sign = exports.EMPTY_ADDRESS = exports.web3 = void 0;
+exports.PROCEDURE_INTERFACE = exports.Procedure = exports.Keyserver = exports.Organ = exports.Graph = exports._decryptMessagePGP = exports._encryptMessagePGP = exports.decryptFile = exports.decrypt = exports.encrypt = exports.verify = exports.sign = exports.generateKey = exports.generatePassword = exports.generateSignature = exports.deployKey = exports.openpgp = exports.CID = exports.EMPTY_MULTIHASH = exports.EMPTY_CID = exports.urlToCID = exports.parseJSON = exports.uint8ArrayToString = exports.cidToMultihash = exports.multihashToCid = exports.ipfsNode = exports.IPFS = exports.hasLibraries = exports.deployMissingLibraries = exports.getLibraryArtefact = exports.getLibraries = exports.getLocalLibraries = exports.getNetwork = exports.getAccount = exports.web3connect = exports.web3ecRecover = exports.web3sign = exports.EMPTY_ADDRESS = exports.web3 = void 0;
 var web3_1 = require("./web3");
 Object.defineProperty(exports, "web3", { enumerable: true, get: function () { return web3_1.web3; } });
 Object.defineProperty(exports, "EMPTY_ADDRESS", { enumerable: true, get: function () { return web3_1.EMPTY_ADDRESS; } });
@@ -30,12 +30,12 @@ Object.defineProperty(exports, "openpgp", { enumerable: true, get: function () {
 Object.defineProperty(exports, "deployKey", { enumerable: true, get: function () { return vault_1.deployKey; } });
 Object.defineProperty(exports, "generateSignature", { enumerable: true, get: function () { return vault_1.generateSignature; } });
 Object.defineProperty(exports, "generatePassword", { enumerable: true, get: function () { return vault_1.generatePassword; } });
-Object.defineProperty(exports, "verifySignature", { enumerable: true, get: function () { return vault_1.verifySignature; } });
 Object.defineProperty(exports, "generateKey", { enumerable: true, get: function () { return vault_1.generateKey; } });
 Object.defineProperty(exports, "sign", { enumerable: true, get: function () { return vault_1.sign; } });
 Object.defineProperty(exports, "verify", { enumerable: true, get: function () { return vault_1.verify; } });
 Object.defineProperty(exports, "encrypt", { enumerable: true, get: function () { return vault_1.encrypt; } });
 Object.defineProperty(exports, "decrypt", { enumerable: true, get: function () { return vault_1.decrypt; } });
+Object.defineProperty(exports, "decryptFile", { enumerable: true, get: function () { return vault_1.decryptFile; } });
 Object.defineProperty(exports, "_encryptMessagePGP", { enumerable: true, get: function () { return vault_1._encryptMessagePGP; } });
 Object.defineProperty(exports, "_decryptMessagePGP", { enumerable: true, get: function () { return vault_1._decryptMessagePGP; } });
 var graph_1 = require("./graph");

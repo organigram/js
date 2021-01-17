@@ -121,11 +121,7 @@ class Keyserver extends organ_1.default {
                     index: "0",
                     address: account,
                     cid: cid || ipfs_1.EMPTY_CID
-                }])
-                .then(data => {
-                console.log("keyserver addEntries result", data);
-                return data;
-            });
+                }]);
         });
     }
 }

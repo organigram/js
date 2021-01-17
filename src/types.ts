@@ -71,7 +71,7 @@ type ProcedureMove = {
 }
 
 type LibraryKey = "organ"|"procedure"|"voteProposition"
-type Network = "mainnet"|"morden"|"ropsten"|"rinkeby"|"kovan"|"dev"|"organigr.am"|"private"
+type Network = "mainnet"|"morden"|"ropsten"|"rinkeby"|"kovan"|"goerli"|"xdai"|"dev"|"organigr.am"|"private"
 
 type Libraries = {
     organ: { network: string, address: Address }[],

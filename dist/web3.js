@@ -70,7 +70,9 @@ const getNetwork = () => __awaiter(void 0, void 0, void 0, function* () {
         case 2: return 'morden';
         case 3: return 'ropsten';
         case 4: return 'rinkeby';
+        case 5: return 'goerli';
         case 42: return 'kovan';
+        case 100: return 'xdai';
         case 1337: return 'dev';
         case 1001: return 'organigr.am';
         default: return 'private';
@@ -154,19 +156,16 @@ const deployMissingLibraries = () => __awaiter(void 0, void 0, void 0, function*
     try {
         for (var keys_1 = __asyncValues(keys), keys_1_1; keys_1_1 = yield keys_1.next(), !keys_1_1.done;) {
             var key = keys_1_1.value;
-            console.log("Deploying", key);
             if (!libraries[key].find(l => l.network === network && !!l.address)) {
                 const libraryArtefact = yield getLibraryArtefact(key);
                 const libraryContract = new web3.eth.Contract(libraryArtefact.abi);
-                console.log("libraryContract", libraryContract);
                 const libraryInstance = yield libraryContract.deploy({ data: libraryArtefact.bytecode })
                     .send({ from })
                     .catch(error => {
                     console.error("Error while deploying missing library.", key, error.message);
                 });
                 if (libraryInstance && libraryInstance.options && libraryInstance.options.address) {
-                    yield _saveLocalLibrary(key, network, libraryInstance.options.address)
-                        .then(console.log);
+                    yield _saveLocalLibrary(key, network, libraryInstance.options.address);
                 }
             }
         }
@@ -213,7 +212,7 @@ const sign = (message, password = "") => __awaiter(void 0, void 0, void 0, funct
 exports.sign = sign;
 const ecRecover = (message, signature) => __awaiter(void 0, void 0, void 0, function* () {
     return web3 && web3.eth && web3.eth.personal && web3.eth.personal.ecRecover
-        ? web3.eth.personal.ecRecover(message, signature)
+        ? web3.eth.personal.ecRecover(message, signature).then(a => a.toLowerCase())
         : null;
 });
 exports.ecRecover = ecRecover;

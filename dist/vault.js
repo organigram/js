@@ -28,7 +28,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports._decryptMessagePGP = exports._encryptMessagePGP = exports.decrypt = exports.encrypt = exports.verify = exports.sign = exports.generateKey = exports.verifySignature = exports.generatePassword = exports.generateSignature = exports.deployKey = exports.openpgp = void 0;
+exports._decryptMessagePGP = exports._encryptMessagePGP = exports.decryptFile = exports.decrypt = exports.encrypt = exports.verify = exports.sign = exports.generateKey = exports.generatePassword = exports.generateSignature = exports.deployKey = exports.openpgp = void 0;
 const web3_1 = require("./web3");
 const openpgp = __importStar(require("openpgp"));
 exports.openpgp = openpgp;
@@ -43,9 +43,14 @@ const sign = (message) => __awaiter(void 0, void 0, void 0, function* () {
     return web3_1.web3.eth.personal.sign(message, account, "");
 });
 exports.sign = sign;
-const verify = (message, signature) => {
-    return Promise.reject(new Error("Not implemented"));
-};
+const verify = (message, signature, account) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!account)
+        throw new Error("No wallet found.");
+    account = account.toLowerCase();
+    return web3_1.ecRecover(message, signature)
+        .then(a => Boolean(a && a === account))
+        .catch(() => false);
+});
 exports.verify = verify;
 const encrypt = (data) => {
     return Promise.reject(new Error("Not implemented"));
@@ -55,9 +60,10 @@ const decrypt = (data) => {
     return Promise.reject(new Error("Not implemented"));
 };
 exports.decrypt = decrypt;
-const pin = (data) => {
+const decryptFile = (cipherdata, passphrase) => {
     return Promise.reject(new Error("Not implemented"));
 };
+exports.decryptFile = decryptFile;
 const generateSignature = () => __awaiter(void 0, void 0, void 0, function* () {
     const account = yield web3_1.getAccount();
     if (!account)
@@ -68,23 +74,6 @@ const generateSignature = () => __awaiter(void 0, void 0, void 0, function* () {
 exports.generateSignature = generateSignature;
 const generatePassword = () => __awaiter(void 0, void 0, void 0, function* () { return Buffer.from(yield openpgp.crypto.random.getRandomBytes(44)).toString('hex'); });
 exports.generatePassword = generatePassword;
-const verifySignature = (signature, account) => __awaiter(void 0, void 0, void 0, function* () {
-    return web3_1.web3.eth.personal.ecRecover(`Generating Organigr.am Vault keys for ${account}...`, signature)
-        .then(_account => _account.toLowerCase() === account.toLowerCase())
-        .catch(error => {
-        console.warn("Signature supplied for verification is not valid for the current account.", error.message);
-        return false;
-    });
-});
-exports.verifySignature = verifySignature;
-const loadKeys = () => __awaiter(void 0, void 0, void 0, function* () {
-    const account = web3_1.getAccount();
-    if (!account)
-        throw new Error("No wallet found.");
-    let signature = sessionStorage.getItem(`organigram-signature-${account}`);
-    if (!signature)
-        signature = yield Promise.resolve("");
-});
 const generateKey = (passphrase) => __awaiter(void 0, void 0, void 0, function* () {
     const account = yield web3_1.getAccount();
     const { privateKeyArmored, publicKeyArmored } = yield openpgp.generateKey({

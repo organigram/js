@@ -30,12 +30,12 @@ export {
     deployKey,
     generateSignature,
     generatePassword,
-    verifySignature,
     generateKey,
     sign,
     verify,
     encrypt,
     decrypt,
+    decryptFile,
     _encryptMessagePGP,
     _decryptMessagePGP
 } from './vault'

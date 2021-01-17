@@ -270,7 +270,6 @@ class Procedure {
 }
 exports.Procedure = Procedure;
 Procedure.deploy = (type, cid, args) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("deploying procedure: cid", `${cid}`, cid);
     let ProcedureClass = null;
     switch (type) {
         case 'nomination':
@@ -296,11 +295,13 @@ Procedure.load = (address) => __awaiter(void 0, void 0, void 0, function* () {
         return {};
     });
     const moves = yield Procedure.loadMoves(address);
-    const data = ProcedureClass && "load" in ProcedureClass ? yield ProcedureClass.load(address)
-        .catch((error) => {
-        console.warn("Error while loading procedure data.", address, error.message);
-        return null;
-    }) : null;
+    const data = ProcedureClass && "load" in ProcedureClass
+        ? yield ProcedureClass.load(address)
+            .catch((error) => {
+            console.warn("Error while loading procedure data.", address, error.message);
+            return null;
+        })
+        : null;
     return new Procedure({ address, type, ProcedureClass, metadata, moves, data });
 });
 Procedure.loadMoves = (address) => __awaiter(void 0, void 0, void 0, function* () {

@@ -251,7 +251,7 @@ Organ.loadMetadata = (address) => __awaiter(void 0, void 0, void 0, function* ()
             metadata.data = yield ipfs_1.parseJSON(metadata.cid);
         }
         catch (error) {
-            console.warn("Warning while parsing metadata of organ.", address, error.message);
+            metadata.data = {};
         }
     }
     return metadata;

@@ -1,4 +1,4 @@
-import { getAccount, web3 } from './web3'
+import { getAccount, web3, ecRecover } from './web3'
 import * as openpgp from 'openpgp'
 
 type Key = {
@@ -17,8 +17,13 @@ const sign = async (message: string) => {
     return web3.eth.personal.sign(message, account, "")
 }
 
-const verify = (message: Uint8Array, signature: string) => {
-    return Promise.reject(new Error("Not implemented"))
+const verify = async (message: string, signature: string, account: Address): Promise<boolean> => {
+    if (!account)
+        throw new Error("No wallet found.")
+    account = account.toLowerCase()
+    return ecRecover(message, signature)
+    .then(a => Boolean(a && a === account))
+    .catch(() => false)
 }
 
 const encrypt = (data: Uint8Array): Promise<Uint8Array> => {
@@ -30,7 +35,7 @@ const decrypt = (data: Uint8Array): Promise<Uint8Array> => {
     return Promise.reject(new Error("Not implemented"))
 }
 
-const pin = (data: Uint8Array): Promise<any> => {
+const decryptFile = (cipherdata: Uint8Array, passphrase: string): Promise<Uint8Array> => {
     return Promise.reject(new Error("Not implemented"))
 }
 
@@ -42,29 +47,8 @@ const generateSignature = async (): Promise<string> => {
     return sign(message)
 }
 
-const generatePassword = async (): Promise<string> => Buffer.from(await openpgp.crypto.random.getRandomBytes(44)).toString('hex')
-
-const verifySignature = async (signature: string, account: Address): Promise<boolean> => {
-    return web3.eth.personal.ecRecover(
-        `Generating Organigr.am Vault keys for ${account}...`,
-        signature
-    )
-    .then(_account => _account.toLowerCase() === account.toLowerCase())
-    .catch(error => {
-        console.warn("Signature supplied for verification is not valid for the current account.", error.message)
-        return false
-    })
-}
-
-const loadKeys = async () => {
-    const account = getAccount()
-    if (!account)
-        throw new Error("No wallet found.")
-    let signature = sessionStorage.getItem(`organigram-signature-${account}`)
-    if (!signature)
-        signature = await Promise.resolve("")
-    
-}
+const generatePassword = async (): Promise<string> =>
+    Buffer.from(await openpgp.crypto.random.getRandomBytes(44)).toString('hex')
 
 const generateKey = async (passphrase: string): Promise<Key> => {
     const account = await getAccount()
@@ -113,12 +97,12 @@ export  {
     deployKey,
     generateSignature,
     generatePassword,
-    verifySignature,
     generateKey,
     sign,
     verify,
     encrypt,
     decrypt,
+    decryptFile,
     _encryptMessagePGP,
     _decryptMessagePGP
 }

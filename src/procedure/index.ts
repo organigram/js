@@ -34,7 +34,6 @@ export class Procedure {
     }
 
     static deploy = async (type: ProcedureType, cid: CID, args: any[]) => {
-        console.log("deploying procedure: cid", `${cid}`, cid)
         let ProcedureClass = null
         switch (type) {
             case 'nomination':
@@ -61,11 +60,13 @@ export class Procedure {
             return {}
         })
         const moves = await Procedure.loadMoves(address)
-        const data = ProcedureClass && "load" in ProcedureClass ? await ProcedureClass.load(address)
-            .catch((error: Error) => {
-                console.warn("Error while loading procedure data.", address, error.message)
-                return null
-            }) : null
+        const data = ProcedureClass && "load" in ProcedureClass
+            ? await ProcedureClass.load(address)
+                .catch((error: Error) => {
+                    console.warn("Error while loading procedure data.", address, error.message)
+                    return null
+                })
+            : null
         return new Procedure({ address, type, ProcedureClass, metadata, moves, data })
     }
 

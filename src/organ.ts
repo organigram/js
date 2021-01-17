@@ -239,7 +239,7 @@ export class Organ {
                 metadata.data = await parseJSON(metadata.cid)
             }
             catch(error) {
-                console.warn("Warning while parsing metadata of organ.", address, error.message)
+                metadata.data = {}
             }
         }
         return metadata
