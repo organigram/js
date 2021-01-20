@@ -40,7 +40,7 @@ const decryptFile = (cipherdata: Uint8Array, passphrase: string): Promise<Uint8A
 }
 
 const generateSignature = async (): Promise<string> => {
-    const account = await getAccount()
+    const account = await getAccount().then(a => a.toLowerCase())
     if (!account)
         throw new Error("No wallet found.")
     const message = `Generating Organigr.am Vault keys for ${account}...`
@@ -51,7 +51,7 @@ const generatePassword = async (): Promise<string> =>
     Buffer.from(await openpgp.crypto.random.getRandomBytes(44)).toString('hex')
 
 const generateKey = async (passphrase: string): Promise<Key> => {
-    const account = await getAccount()
+    const account = await getAccount().then(a => a.toLowerCase())
     const { privateKeyArmored, publicKeyArmored } = await openpgp.generateKey({
         userIds: [{ name: account }],
         curve: 'ed25519', // ECDH for encryption and EdDSA for signature.

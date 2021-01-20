@@ -1,8 +1,6 @@
-import uint8ArrayConcat from 'uint8arrays/concat'
-import all from 'it-all'
-import { CID } from 'ipfs-core/src'
+import { CID } from 'ipfs-core'
 import ProcedureContract from '@organigram/contracts/build/contracts/Procedure.json'
-import { web3 } from '../web3'
+import { EMPTY_ADDRESS, web3 } from '../web3'
 import { cidToMultihash, EMPTY_CID, ipfsNode, multihashToCid, parseJSON } from '../ipfs'
 import { getAccount } from '../web3'
 
@@ -54,11 +52,7 @@ export class Procedure {
             throw new Error("Contract at address is not a Procedure.")
         const type:ProcedureType = await Procedure.getType(address)
         const ProcedureClass: any = await Procedure.getClass(type)
-        const metadata = await Procedure.loadMetadata(address)
-        .catch(error => {
-            console.warn("Error while loading procedure metadata.", address, error.message)
-            return {}
-        })
+        const metadata = await Procedure.loadMetadata(address).catch(() => ({}))
         const moves = await Procedure.loadMoves(address)
         const data = ProcedureClass && "load" in ProcedureClass
             ? await ProcedureClass.load(address)
@@ -302,13 +296,15 @@ export class Procedure {
     ):Promise<boolean> => {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
-        let multihash:Multihash|null
-        if (entry.cid) multihash = cidToMultihash(new CID(entry.cid)); else multihash = cidToMultihash(new CID(EMPTY_CID))
+        let multihash:Multihash|null = entry.cid && CID.isCID(entry.cid)
+            ? cidToMultihash(new CID(entry.cid))
+            : cidToMultihash(new CID(EMPTY_CID))
         if (!multihash)
             throw new Error("Wrong CID.")
         const { ipfsHash, hashFunction, hashSize } = multihash
+        const address = entry.address || EMPTY_ADDRESS
         return await contract.methods.moveReplaceEntry(
-            moveKey, organ, entry.index, entry.address,
+            moveKey, organ, entry.index, address,
             ipfsHash, hashFunction, hashSize, lock
         )
         .send({ from: web3.eth.defaultAccount })

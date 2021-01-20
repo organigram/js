@@ -65,7 +65,7 @@ const decryptFile = (cipherdata, passphrase) => {
 };
 exports.decryptFile = decryptFile;
 const generateSignature = () => __awaiter(void 0, void 0, void 0, function* () {
-    const account = yield web3_1.getAccount();
+    const account = yield web3_1.getAccount().then(a => a.toLowerCase());
     if (!account)
         throw new Error("No wallet found.");
     const message = `Generating Organigr.am Vault keys for ${account}...`;
@@ -75,7 +75,7 @@ exports.generateSignature = generateSignature;
 const generatePassword = () => __awaiter(void 0, void 0, void 0, function* () { return Buffer.from(yield openpgp.crypto.random.getRandomBytes(44)).toString('hex'); });
 exports.generatePassword = generatePassword;
 const generateKey = (passphrase) => __awaiter(void 0, void 0, void 0, function* () {
-    const account = yield web3_1.getAccount();
+    const account = yield web3_1.getAccount().then(a => a.toLowerCase());
     const { privateKeyArmored, publicKeyArmored } = yield openpgp.generateKey({
         userIds: [{ name: account }],
         curve: 'ed25519',

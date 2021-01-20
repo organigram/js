@@ -69,7 +69,9 @@ class Keyserver extends organ_1.default {
             if (!account)
                 throw new Error("No account selected.");
             return organ_1.default.getEntryForAccount(this.address, account)
-                .then(({ cid }) => __awaiter(this, void 0, void 0, function* () { return !!cid; }))
+                .then((value) => __awaiter(this, void 0, void 0, function* () {
+                return !!(value === null || value === void 0 ? void 0 : value.cid);
+            }))
                 .catch(() => false);
         });
     }
@@ -81,11 +83,13 @@ class Keyserver extends organ_1.default {
                 throw new Error("No account selected.");
             const ipfs = yield ipfs_1.ipfsNode;
             return organ_1.default.getEntryForAccount(this.address, account)
-                .then(({ cid }) => __awaiter(this, void 0, void 0, function* () {
+                .then((value) => __awaiter(this, void 0, void 0, function* () {
                 var e_1, _a;
+                if (!value || !value.cid)
+                    throw new Error("Key not found.");
                 const chunks = [];
                 try {
-                    for (var _b = __asyncValues(ipfs.cat(cid)), _c; _c = yield _b.next(), !_c.done;) {
+                    for (var _b = __asyncValues(ipfs.cat(value.cid)), _c; _c = yield _b.next(), !_c.done;) {
                         const chunk = _c.value;
                         chunks.push(chunk);
                     }

@@ -177,11 +177,7 @@ export class Organ {
             throw new Error("Contract at address is not an Organ.")
         const balance:string = await Organ.getBalance(address)
         .catch(() => "n/a")
-        const metadata: Metadata = await Organ.loadMetadata(address)
-        .catch(error => {
-            console.warn("Error while loading organ's metadata", address, error.message)
-            return {}
-        })
+        const metadata: Metadata = await Organ.loadMetadata(address).catch(() => ({}))
         const procedures: OrganProcedure[] = await Organ.loadProcedures(address)
         .catch(error => {
             console.warn("Error while loading organ's procedures", address, error.message)
@@ -227,9 +223,7 @@ export class Organ {
         }
         try {
             metadata.cid = await contract.methods.getMetadata().call()
-            .then((multihash: Multihash):CID => {
-                return multihashToCid(multihash)
-            })
+            .then((multihash: Multihash):CID => multihashToCid(multihash))
         }
         catch (error) {
             console.warn("Error while computing IPFS Content ID for organ metadata.", address, error.message)
@@ -245,7 +239,7 @@ export class Organ {
         return metadata
     }
 
-    public static getEntryForAccount = async (address: Address, account:Address) => {
+    public static getEntryForAccount = async (address: Address, account:Address):Promise<OrganEntry|null> => {
         // @ts-ignore
         const contract = new web3.eth.Contract(OrganContract.abi, address)
         const index = await contract.methods.getEntryIndexForAddress(account).call()

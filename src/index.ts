@@ -6,6 +6,7 @@ export {
     connect as web3connect,
     getAccount,
     getNetwork,
+    getNetworkName,
     getLocalLibraries,
     getLibraries,
     getLibraryArtefact,

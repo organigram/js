@@ -188,11 +188,7 @@ class Organ {
                 throw new Error("Contract at address is not an Organ.");
             const balance = yield Organ.getBalance(address)
                 .catch(() => "n/a");
-            const metadata = yield Organ.loadMetadata(address)
-                .catch(error => {
-                console.warn("Error while loading organ's metadata", address, error.message);
-                return {};
-            });
+            const metadata = yield Organ.loadMetadata(address).catch(() => ({}));
             const procedures = yield Organ.loadProcedures(address)
                 .catch(error => {
                 console.warn("Error while loading organ's procedures", address, error.message);
@@ -239,9 +235,7 @@ Organ.loadMetadata = (address) => __awaiter(void 0, void 0, void 0, function* ()
     };
     try {
         metadata.cid = yield contract.methods.getMetadata().call()
-            .then((multihash) => {
-            return ipfs_1.multihashToCid(multihash);
-        });
+            .then((multihash) => ipfs_1.multihashToCid(multihash));
     }
     catch (error) {
         console.warn("Error while computing IPFS Content ID for organ metadata.", address, error.message);

@@ -38,7 +38,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports._linkBytecode = exports._saveLocalLibrary = exports.hasLibraries = exports.deployMissingLibraries = exports.getLibraryArtefact = exports.getLibraries = exports.getLocalLibraries = exports.getNetwork = exports.getAccount = exports.connect = exports.ecRecover = exports.sign = exports.EMPTY_ADDRESS = exports.web3 = void 0;
+exports._linkBytecode = exports._saveLocalLibrary = exports.hasLibraries = exports.deployMissingLibraries = exports.getLibraryArtefact = exports.getLibraries = exports.getLocalLibraries = exports.getNetworkName = exports.getNetwork = exports.getAccount = exports.connect = exports.ecRecover = exports.sign = exports.EMPTY_ADDRESS = exports.web3 = void 0;
 const web3_1 = __importDefault(require("web3"));
 const EMPTY_ADDRESS = "0x0000000000000000000000000000000000000000";
 exports.EMPTY_ADDRESS = EMPTY_ADDRESS;
@@ -79,6 +79,21 @@ const getNetwork = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.getNetwork = getNetwork;
+const getNetworkName = (network) => {
+    switch (network) {
+        case 'rinkeby': return "Rinkeby Ethereum Test Network";
+        case 'mainnet': return "Ethereum Main Network";
+        case 'morden': return "Morden Ethereum Test Network";
+        case 'ropsten': return "Ropsten Ethereum Test Network";
+        case 'kovan': return "Kovan Ethereum Test Network";
+        case 'goerli': return "Görli Ethereum Test Network";
+        case 'organigr.am': return "Organigr.am Network";
+        case 'dev': return "Dev Network";
+        case 'private': return "a private Ethereum Network";
+        default: return "a blockchain";
+    }
+};
+exports.getNetworkName = getNetworkName;
 const getLocalLibraries = () => __awaiter(void 0, void 0, void 0, function* () {
     if (typeof window === "undefined" || !window.localStorage)
         throw new Error("Cannot query local libraries outside a browser.");

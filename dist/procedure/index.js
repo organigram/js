@@ -20,7 +20,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Procedure = exports.INTERFACE = void 0;
-const src_1 = require("ipfs-core/src");
+const ipfs_core_1 = require("ipfs-core");
 const Procedure_json_1 = __importDefault(require("@organigram/contracts/build/contracts/Procedure.json"));
 const web3_1 = require("../web3");
 const ipfs_1 = require("../ipfs");
@@ -34,7 +34,7 @@ class Procedure {
         this.metadata = {};
         this.data = null;
         this.moves = [];
-        this.createMove = (cid = new src_1.CID("QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH")) => __awaiter(this, void 0, void 0, function* () {
+        this.createMove = (cid = new ipfs_core_1.CID("QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH")) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
             const multihash = ipfs_1.cidToMultihash(cid);
             if (!multihash)
@@ -53,7 +53,7 @@ class Procedure {
                 return false;
             });
         });
-        this.updateMetadata = (cid = new src_1.CID("QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH")) => __awaiter(this, void 0, void 0, function* () {
+        this.updateMetadata = (cid = new ipfs_core_1.CID("QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH")) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
             const multihash = ipfs_1.cidToMultihash(cid);
             if (!multihash)
@@ -84,14 +84,14 @@ class Procedure {
                 let multihash = null;
                 if (e.cid) {
                     try {
-                        multihash = ipfs_1.cidToMultihash(new src_1.CID(e.cid));
+                        multihash = ipfs_1.cidToMultihash(new ipfs_core_1.CID(e.cid));
                     }
                     catch (error) {
                         console.error("Unable to find a CID for this entry.", error.message);
                     }
                 }
                 if (!multihash)
-                    multihash = ipfs_1.cidToMultihash(new src_1.CID(ipfs_1.EMPTY_CID));
+                    multihash = ipfs_1.cidToMultihash(new ipfs_core_1.CID(ipfs_1.EMPTY_CID));
                 return Object.assign({ addr: e.address }, multihash);
             }).filter(e => !!e);
             return from && contract.methods.moveAddEntries(moveKey, organ, _entries, lock).send({ from })
@@ -113,15 +113,14 @@ class Procedure {
         });
         this.moveReplaceEntry = (moveKey, organ, entry, lock = false) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
-            let multihash;
-            if (entry.cid)
-                multihash = ipfs_1.cidToMultihash(new src_1.CID(entry.cid));
-            else
-                multihash = ipfs_1.cidToMultihash(new src_1.CID(ipfs_1.EMPTY_CID));
+            let multihash = entry.cid && ipfs_core_1.CID.isCID(entry.cid)
+                ? ipfs_1.cidToMultihash(new ipfs_core_1.CID(entry.cid))
+                : ipfs_1.cidToMultihash(new ipfs_core_1.CID(ipfs_1.EMPTY_CID));
             if (!multihash)
                 throw new Error("Wrong CID.");
             const { ipfsHash, hashFunction, hashSize } = multihash;
-            return yield contract.methods.moveReplaceEntry(moveKey, organ, entry.index, entry.address, ipfsHash, hashFunction, hashSize, lock)
+            const address = entry.address || web3_1.EMPTY_ADDRESS;
+            return yield contract.methods.moveReplaceEntry(moveKey, organ, entry.index, address, ipfsHash, hashFunction, hashSize, lock)
                 .send({ from: web3_1.web3.eth.defaultAccount })
                 .then(() => true)
                 .catch((error) => {
@@ -289,11 +288,7 @@ Procedure.load = (address) => __awaiter(void 0, void 0, void 0, function* () {
         throw new Error("Contract at address is not a Procedure.");
     const type = yield Procedure.getType(address);
     const ProcedureClass = yield Procedure.getClass(type);
-    const metadata = yield Procedure.loadMetadata(address)
-        .catch(error => {
-        console.warn("Error while loading procedure metadata.", address, error.message);
-        return {};
-    });
+    const metadata = yield Procedure.loadMetadata(address).catch(() => ({}));
     const moves = yield Procedure.loadMoves(address);
     const data = ProcedureClass && "load" in ProcedureClass
         ? yield ProcedureClass.load(address)

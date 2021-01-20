@@ -47,7 +47,9 @@ export class Keyserver extends Organ {
         if (!account)
             throw new Error("No account selected.")
         return Organ.getEntryForAccount(this.address, account)
-        .then(async ({ cid }: OrganEntry) => !!cid)
+        .then(async (value: OrganEntry|null) => {
+            return !!value?.cid
+        })
         .catch(() => false)
     }
 
@@ -58,9 +60,11 @@ export class Keyserver extends Organ {
             throw new Error("No account selected.")
         const ipfs = await ipfsNode
         return Organ.getEntryForAccount(this.address, account)
-        .then(async ({ cid }: OrganEntry) => {
+        .then(async (value: OrganEntry|null) => {
+            if (!value || !value.cid)
+                throw new Error("Key not found.")
             const chunks = []
-            for await (const chunk of ipfs.cat(cid)) {
+            for await (const chunk of ipfs.cat(value.cid)) {
                 chunks.push(chunk)
             }
             const data: Uint8Array = await concat(chunks)

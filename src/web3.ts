@@ -47,6 +47,22 @@ const getNetwork = async (): Promise<Network> => {
     }
 }
 
+// @todo : Merge with Network object.
+const getNetworkName = (network: Network) => {
+    switch (network) {
+        case 'rinkeby': return "Rinkeby Ethereum Test Network"
+        case 'mainnet': return "Ethereum Main Network"
+        case 'morden':  return "Morden Ethereum Test Network"
+        case 'ropsten': return "Ropsten Ethereum Test Network"
+        case 'kovan':   return "Kovan Ethereum Test Network"
+        case 'goerli':  return "Görli Ethereum Test Network"
+        case 'organigr.am': return "Organigr.am Network"
+        case 'dev':     return "Dev Network"
+        case 'private': return "a private Ethereum Network"
+        default:        return "a blockchain"
+    }
+}
+
 const getLocalLibraries = async (): Promise<Libraries> => {
     if (typeof window === "undefined" || !window.localStorage)
         throw new Error("Cannot query local libraries outside a browser.")
@@ -188,6 +204,7 @@ export {
     connect,
     getAccount,
     getNetwork,
+    getNetworkName,
     getLocalLibraries,
     getLibraries,
     getLibraryArtefact,
