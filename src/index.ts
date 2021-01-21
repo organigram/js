@@ -41,7 +41,7 @@ export {
     _decryptMessagePGP
 } from './vault'
 export { Graph } from './graph'
-export { Organ } from './organ'
+export { Organ, ORGAN_CONTRACT_SIGNATURES } from './organ'
 export { Keyserver } from './keyserver'
 export { Procedure, INTERFACE as PROCEDURE_INTERFACE } from './procedure'
 

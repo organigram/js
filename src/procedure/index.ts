@@ -152,7 +152,35 @@ export class Procedure {
             metadata: {
                 cid: metadata && metadata.ipfsHash && multihashToCid(metadata)
             },
-            operations
+            operations: operations.map((operation, i) => {
+                const [index, organ, value, _operationType, callData, processed] = operation
+                const funcSignature = callData.slice(0, 10)
+                let op: string|null = null
+                // @todo : Parse params from callData.
+                let params: any[] = []
+                switch (funcSignature) {
+                    case "0x981d5e7b":
+                        op = "addEntries"
+                        break
+                    case "0x7615eb81":
+                        op = "removeEntries"
+                        break
+                    case "0x981d5e7b":
+                        op = "replaceEntry"
+                        break
+                    case "0x7f0a4e27":
+                        op = "addProcedure"
+                        break
+                    case "0x19b9404c":
+                        op = "removeProcedure"
+                        break
+                    case "0xd0922d4a":
+                        op = "replaceProcedure"
+                        break
+                    default:
+                }
+                return { index, organ, value, callData, processed, funcSignature, op, params, _operationType }
+            })
         }))
     }
 
@@ -251,7 +279,9 @@ export class Procedure {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
         const from = await getAccount()
+        console.log(from, entries)
         const _entries = entries.map(e => {
+            console.log("e", e)
             let multihash:Multihash|null = null
             if (e.cid) {
                 try {

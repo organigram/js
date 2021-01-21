@@ -80,7 +80,9 @@ class Procedure {
         this.moveAddEntries = (moveKey, organ, entries, lock = false) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
             const from = yield web3_2.getAccount();
+            console.log(from, entries);
             const _entries = entries.map(e => {
+                console.log("e", e);
                 let multihash = null;
                 if (e.cid) {
                     try {
@@ -343,7 +345,34 @@ Procedure.loadMove = (address, moveKey) => __awaiter(void 0, void 0, void 0, fun
         metadata: {
             cid: metadata && metadata.ipfsHash && ipfs_1.multihashToCid(metadata)
         },
-        operations
+        operations: operations.map((operation, i) => {
+            const [index, organ, value, _operationType, callData, processed] = operation;
+            const funcSignature = callData.slice(0, 10);
+            let op = null;
+            let params = [];
+            switch (funcSignature) {
+                case "0x981d5e7b":
+                    op = "addEntries";
+                    break;
+                case "0x7615eb81":
+                    op = "removeEntries";
+                    break;
+                case "0x981d5e7b":
+                    op = "replaceEntry";
+                    break;
+                case "0x7f0a4e27":
+                    op = "addProcedure";
+                    break;
+                case "0x19b9404c":
+                    op = "removeProcedure";
+                    break;
+                case "0xd0922d4a":
+                    op = "replaceProcedure";
+                    break;
+                default:
+            }
+            return { index, organ, value, callData, processed, funcSignature, op, params, _operationType };
+        })
     }));
 });
 Procedure.loadMetadata = (address) => __awaiter(void 0, void 0, void 0, function* () {
