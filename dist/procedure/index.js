@@ -41,7 +41,9 @@ class Procedure {
                 throw new Error("Wrong CID.");
             const { ipfsHash, hashFunction, hashSize } = multihash;
             const from = yield web3_2.getAccount();
-            return from && contract.methods.createMove(ipfsHash, hashFunction, hashSize).send({ from });
+            if (!from)
+                throw new Error("No account selected.");
+            return contract.methods.createMove(ipfsHash, hashFunction, hashSize).send({ from });
         });
         this.lockMove = (moveKey) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
@@ -80,9 +82,11 @@ class Procedure {
         this.moveAddEntries = (moveKey, organ, entries, lock = false) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, this.address);
             const from = yield web3_2.getAccount();
+            if (!from)
+                throw new Error("No account selected.");
             console.log(from, entries);
-            const _entries = entries.map(e => {
-                console.log("e", e);
+            const _entries = entries
+                .map(e => {
                 let multihash = null;
                 if (e.cid) {
                     try {
@@ -94,13 +98,24 @@ class Procedure {
                 }
                 if (!multihash)
                     multihash = ipfs_1.cidToMultihash(new ipfs_core_1.CID(ipfs_1.EMPTY_CID));
-                return Object.assign({ addr: e.address }, multihash);
-            }).filter(e => !!e);
-            return from && contract.methods.moveAddEntries(moveKey, organ, _entries, lock).send({ from })
+                return {
+                    addr: e.address,
+                    ipfsHash: multihash === null || multihash === void 0 ? void 0 : multihash.ipfsHash,
+                    hashFunction: multihash === null || multihash === void 0 ? void 0 : multihash.hashFunction,
+                    hashSize: multihash === null || multihash === void 0 ? void 0 : multihash.hashSize
+                };
+            })
+                .filter(e => !!e);
+            console.log('_entries', _entries);
+            return contract.methods.moveAddEntries(moveKey, organ, _entries, lock).send({ from })
                 .then(() => true)
                 .catch((error) => {
                 console.error("Error while adding entries in move.", this.address, moveKey, error.message);
                 return false;
+            })
+                .then((data) => {
+                console.log("data", data);
+                return data;
             });
         });
         this.moveRemoveEntries = (moveKey, organ, indexes, lock = false) => __awaiter(this, void 0, void 0, function* () {
@@ -169,6 +184,9 @@ class Procedure {
                 console.error("Error while adding special call in move.", this.address, moveKey, error.message);
                 return false;
             });
+        });
+        this.getMovesLength = () => __awaiter(this, void 0, void 0, function* () {
+            return Procedure.getMovesLength(this.address);
         });
         this.reloadMoves = () => __awaiter(this, void 0, void 0, function* () {
             const moves = yield Procedure.loadMoves(this.address);
@@ -301,10 +319,13 @@ Procedure.load = (address) => __awaiter(void 0, void 0, void 0, function* () {
         : null;
     return new Procedure({ address, type, ProcedureClass, metadata, moves, data });
 });
+Procedure.getMovesLength = (address) => {
+    const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, address);
+    return contract.methods.getMovesLength().call().then(parseInt);
+};
 Procedure.loadMoves = (address) => __awaiter(void 0, void 0, void 0, function* () {
     var e_2, _a;
-    const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, address);
-    const movesLength = yield contract.methods.getMovesLength().call().then(parseInt)
+    const movesLength = yield Procedure.getMovesLength(address)
         .catch((error) => {
         console.warn("Error while loading moves length in procedure.", address, error.message);
         return 0;

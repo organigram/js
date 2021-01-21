@@ -114,10 +114,15 @@ export class Procedure {
         return ProcedureClass
     }
 
-    static loadMoves = async (address: Address): Promise<ProcedureMove[]> => {
+    static getMovesLength = (address: Address): Promise<number> => {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, address)
-        const movesLength: number = await contract.methods.getMovesLength().call().then(parseInt)
+        // @todo : Use BigNumbers
+        return contract.methods.getMovesLength().call().then(parseInt)
+    }
+
+    static loadMoves = async (address: Address): Promise<ProcedureMove[]> => {
+        const movesLength: number = await Procedure.getMovesLength(address)
         .catch((error: Error) => {
             console.warn("Error while loading moves length in procedure.", address, error.message)
             return 0
@@ -226,7 +231,9 @@ export class Procedure {
             throw new Error("Wrong CID.")
         const { ipfsHash, hashFunction, hashSize } = multihash
         const from = await getAccount()
-        return from && contract.methods.createMove(ipfsHash, hashFunction, hashSize).send({ from })
+        if (!from)
+            throw new Error("No account selected.")
+        return contract.methods.createMove(ipfsHash, hashFunction, hashSize).send({ from })
     }
     
     lockMove = async (moveKey: string):Promise<boolean> => {
@@ -279,9 +286,11 @@ export class Procedure {
         // @ts-ignore
         const contract = new web3.eth.Contract(ProcedureContract.abi, this.address)
         const from = await getAccount()
+        if (!from)
+            throw new Error("No account selected.")
         console.log(from, entries)
-        const _entries = entries.map(e => {
-            console.log("e", e)
+        const _entries = entries
+        .map(e => {
             let multihash:Multihash|null = null
             if (e.cid) {
                 try {
@@ -291,13 +300,24 @@ export class Procedure {
                 }
             }
             if (!multihash) multihash = cidToMultihash(new CID(EMPTY_CID))
-            return { addr: e.address, ...multihash }
-        }).filter(e => !!e)
-        return from && contract.methods.moveAddEntries(moveKey, organ, _entries, lock).send({ from })
+            return {
+                addr: e.address,
+                ipfsHash: multihash?.ipfsHash,
+                hashFunction: multihash?.hashFunction,
+                hashSize: multihash?.hashSize
+            }
+        })
+        .filter(e => !!e)
+        console.log('_entries', _entries)
+        return contract.methods.moveAddEntries(moveKey, organ, _entries, lock).send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while adding entries in move.", this.address, moveKey, error.message)
             return false
+        })
+        .then((data: boolean) => {
+            console.log("data", data)
+            return data
         })
     }
 
@@ -412,6 +432,10 @@ export class Procedure {
             console.error("Error while adding special call in move.", this.address, moveKey, error.message)
             return false
         })
+    }
+
+    getMovesLength = async () => {
+        return Procedure.getMovesLength(this.address)
     }
 
     /**
