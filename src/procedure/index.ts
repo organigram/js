@@ -288,7 +288,6 @@ export class Procedure {
         const from = await getAccount()
         if (!from)
             throw new Error("No account selected.")
-        console.log(from, entries)
         const _entries = entries
         .map(e => {
             let multihash:Multihash|null = null
@@ -308,16 +307,11 @@ export class Procedure {
             }
         })
         .filter(e => !!e)
-        console.log('_entries', _entries)
         return contract.methods.moveAddEntries(moveKey, organ, _entries, lock).send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while adding entries in move.", this.address, moveKey, error.message)
             return false
-        })
-        .then((data: boolean) => {
-            console.log("data", data)
-            return data
         })
     }
 

@@ -84,7 +84,6 @@ class Procedure {
             const from = yield web3_2.getAccount();
             if (!from)
                 throw new Error("No account selected.");
-            console.log(from, entries);
             const _entries = entries
                 .map(e => {
                 let multihash = null;
@@ -106,16 +105,11 @@ class Procedure {
                 };
             })
                 .filter(e => !!e);
-            console.log('_entries', _entries);
             return contract.methods.moveAddEntries(moveKey, organ, _entries, lock).send({ from })
                 .then(() => true)
                 .catch((error) => {
                 console.error("Error while adding entries in move.", this.address, moveKey, error.message);
                 return false;
-            })
-                .then((data) => {
-                console.log("data", data);
-                return data;
             });
         });
         this.moveRemoveEntries = (moveKey, organ, indexes, lock = false) => __awaiter(this, void 0, void 0, function* () {
