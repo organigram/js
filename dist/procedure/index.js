@@ -98,7 +98,7 @@ class Procedure {
                 if (!multihash)
                     multihash = ipfs_1.cidToMultihash(new ipfs_core_1.CID(ipfs_1.EMPTY_CID));
                 return {
-                    addr: e.address,
+                    addr: e.address || web3_1.EMPTY_ADDRESS,
                     ipfsHash: multihash === null || multihash === void 0 ? void 0 : multihash.ipfsHash,
                     hashFunction: multihash === null || multihash === void 0 ? void 0 : multihash.hashFunction,
                     hashSize: multihash === null || multihash === void 0 ? void 0 : multihash.hashSize
@@ -131,8 +131,9 @@ class Procedure {
                 throw new Error("Wrong CID.");
             const { ipfsHash, hashFunction, hashSize } = multihash;
             const address = entry.address || web3_1.EMPTY_ADDRESS;
-            return yield contract.methods.moveReplaceEntry(moveKey, organ, entry.index, address, ipfsHash, hashFunction, hashSize, lock)
-                .send({ from: web3_1.web3.eth.defaultAccount })
+            const from = yield web3_2.getAccount();
+            return from && contract.methods.moveReplaceEntry(moveKey, organ, entry.index, address, ipfsHash, hashFunction, hashSize, lock)
+                .send({ from })
                 .then(() => true)
                 .catch((error) => {
                 console.error("Error while replacing entry in move.", this.address, moveKey, error.message);
@@ -372,7 +373,7 @@ Procedure.loadMove = (address, moveKey) => __awaiter(void 0, void 0, void 0, fun
                 case "0x7615eb81":
                     op = "removeEntries";
                     break;
-                case "0x981d5e7b":
+                case "0x91bdfe63":
                     op = "replaceEntry";
                     break;
                 case "0x7f0a4e27":

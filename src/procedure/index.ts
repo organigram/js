@@ -170,7 +170,7 @@ export class Procedure {
                     case "0x7615eb81":
                         op = "removeEntries"
                         break
-                    case "0x981d5e7b":
+                    case "0x91bdfe63":
                         op = "replaceEntry"
                         break
                     case "0x7f0a4e27":
@@ -300,7 +300,7 @@ export class Procedure {
             }
             if (!multihash) multihash = cidToMultihash(new CID(EMPTY_CID))
             return {
-                addr: e.address,
+                addr: e.address || EMPTY_ADDRESS,
                 ipfsHash: multihash?.ipfsHash,
                 hashFunction: multihash?.hashFunction,
                 hashSize: multihash?.hashSize
@@ -347,11 +347,12 @@ export class Procedure {
             throw new Error("Wrong CID.")
         const { ipfsHash, hashFunction, hashSize } = multihash
         const address = entry.address || EMPTY_ADDRESS
-        return await contract.methods.moveReplaceEntry(
+        const from = await getAccount()
+        return from && contract.methods.moveReplaceEntry(
             moveKey, organ, entry.index, address,
             ipfsHash, hashFunction, hashSize, lock
         )
-        .send({ from: web3.eth.defaultAccount })
+        .send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while replacing entry in move.", this.address, moveKey, error.message)
