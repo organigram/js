@@ -299,8 +299,6 @@ Procedure.deploy = (type, cid, args) => __awaiter(void 0, void 0, void 0, functi
 });
 Procedure.load = (address) => __awaiter(void 0, void 0, void 0, function* () {
     const isProcedure = yield Procedure.isProcedure(address).catch(() => false);
-    if (!isProcedure)
-        throw new Error("Contract at address is not a Procedure.");
     const type = yield Procedure.getType(address);
     const ProcedureClass = yield Procedure.getClass(type);
     const metadata = yield Procedure.loadMetadata(address).catch(() => ({}));

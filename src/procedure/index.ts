@@ -48,8 +48,8 @@ export class Procedure {
 
     static load = async (address: Address): Promise<Procedure> => {
         const isProcedure: boolean = await Procedure.isProcedure(address).catch(() => false)
-        if (!isProcedure)
-            throw new Error("Contract at address is not a Procedure.")
+        // if (!isProcedure)
+        //     throw new Error("Contract at address is not a Procedure.")
         const type:ProcedureType = await Procedure.getType(address)
         const ProcedureClass: any = await Procedure.getClass(type)
         const metadata = await Procedure.loadMetadata(address).catch(() => ({}))
