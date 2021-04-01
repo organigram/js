@@ -22,7 +22,8 @@ const Organ_json_1 = __importDefault(require("@organigram/contracts/build/contra
 const ipfs_1 = require("./ipfs");
 const web3_2 = require("./web3");
 exports.ORGAN_CONTRACT_SIGNATURES = ((_b = (_a = Organ_json_1.default.ast
-    .nodes.find(n => n.name === "")) === null || _a === void 0 ? void 0 : _a.nodes) === null || _b === void 0 ? void 0 : _b.map(n => (n === null || n === void 0 ? void 0 : n.functionSelector) || "").filter(i => i !== "")) || [];
+    .nodes.find(n => n.name === "")) === null || _a === void 0 ? void 0 : _a.nodes) === null || _b === void 0 ? void 0 : _b.map(n => (n === null || n === void 0 ? void 0 : n.functionSelector) || "").filter(i => i !== ""))
+    || [];
 class Organ {
     constructor({ address, network, balance, procedures, metadata, entries }) {
         this.address = "";
@@ -184,8 +185,6 @@ class Organ {
             if (!network)
                 throw new Error("Not connected to a valid network.");
             const isOrgan = yield Organ.isOrgan(address).catch(() => false);
-            if (!isOrgan)
-                throw new Error("Contract at address is not an Organ.");
             const balance = yield Organ.getBalance(address)
                 .catch(() => "n/a");
             const metadata = yield Organ.loadMetadata(address).catch(() => ({}));

@@ -74,7 +74,7 @@ const _encryptMessagePGP = async (message: string, recipientsKeys: Key[], signat
         message: openpgp.message.fromText(message),
         publicKeys,
         privateKeys
-    }).then(m => m.data)
+    }).then((m: any) => m.data)
 }
 
 // Decrypt message with PGP symmetric keys.
@@ -88,7 +88,7 @@ const _decryptMessagePGP = async (ciphertext: string, key: Key, passphrase: stri
         message: await openpgp.message.readArmored(ciphertext),
         privateKeys: [privateKeyObj],
     })
-    .then(m => m.data)
+    .then((m: any) => m.data)
 }
 
 export  {

@@ -94,7 +94,7 @@ const _encryptMessagePGP = (message, recipientsKeys, signatureKeys) => __awaiter
         message: openpgp.message.fromText(message),
         publicKeys,
         privateKeys
-    }).then(m => m.data);
+    }).then((m) => m.data);
 });
 exports._encryptMessagePGP = _encryptMessagePGP;
 const _decryptMessagePGP = (ciphertext, key, passphrase) => __awaiter(void 0, void 0, void 0, function* () {
@@ -107,6 +107,6 @@ const _decryptMessagePGP = (ciphertext, key, passphrase) => __awaiter(void 0, vo
         message: yield openpgp.message.readArmored(ciphertext),
         privateKeys: [privateKeyObj],
     })
-        .then(m => m.data);
+        .then((m) => m.data);
 });
 exports._decryptMessagePGP = _decryptMessagePGP;
