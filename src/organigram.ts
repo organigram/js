@@ -1,0 +1,200 @@
+import OrganigramContract from '@organigram/contracts/build/contracts/Organigram.json'
+import { web3, getAccount, getNetwork } from './web3'
+import Organ from './organ'
+import Procedure from './procedure'
+import ProcedureVote from './procedures/vote'
+import ProcedureNomination from './procedures/nomination'
+import { cidToMultihash } from './ipfs'
+
+export type ProcedureType = {
+    label:string,
+    address:Address,
+    metadata:Metadata,
+    Class:any   // @dev : class should inherit from Procedure.
+}
+
+export type EnhancedProcedure = Procedure & {
+    type: ProcedureType
+}
+
+export class Organigram {
+    private _contract:any
+    address:Address
+    network:Network
+    proceduresRegistry:Organ
+    procedureTypes:ProcedureType[]
+    organs:Organ[]
+    procedures:EnhancedProcedure[]
+    graphs:Graph[]
+
+    constructor(
+        address:Address,
+        network:Network,
+        proceduresRegistry:Organ,
+        procedureTypes:ProcedureType[]
+    ) {
+        // @ts-ignore
+        this._contract = new web3.eth.Contract(OrganigramContract.abi, address)
+        this.address = address
+        this.network = network
+        this.proceduresRegistry = proceduresRegistry
+        this.procedureTypes = procedureTypes
+        this.organs = []
+        this.procedures = []
+        this.graphs = []
+    }
+
+    // Load a procedure type from the registry.
+    static async loadProcedureType({ addr, doc }:{ addr:Address, doc?:CID }):Promise<ProcedureType> {
+        // @todo : Parse doc for custom parser.
+        // @ts-ignore
+        const contract = new web3.eth.Contract(ProcedureContract.abi, addr)
+        let Class = null, label = ""
+        // @todo : Leverage interfaces or metadata in registry to detect procedure class.
+        if(!(await contract.methods.supportsInterface("0x01ffc9a7").call().catch(() => false)))
+            throw new Error("Contract does not support interfaces.")
+        if(!(await contract.methods.supportsInterface(Procedure.INTERFACE).call().catch(() => false)))
+            throw new Error("Contract is not a procedure.")
+        if (await contract.methods.supportsInterface(ProcedureVote.INTERFACE).call().catch(() => false)) {
+            Class = ProcedureVote
+            label = "Vote"
+        }
+        else if (await contract.methods.supportsInterface(ProcedureNomination.INTERFACE).call().catch(() => false)) {
+            Class = ProcedureNomination
+            label = "Nomination"
+        }
+        else
+            throw new Error("Contract was not recognized as a valid procedure.")
+        return {
+            label,
+            address: addr,
+            metadata: doc,
+            Class
+        }
+    }
+
+    static async loadProcedureTypes(address:Address):Promise<ProcedureType[]> {
+        // @ts-ignore
+        const contract = new web3.eth.Contract(OrganigramContract.abi, address)
+        const proceduresRegistry = await contract.methods.procedures().call()
+        const procedures: OrganEntry[] = await Organ.loadEntries(proceduresRegistry)
+        const procedureTypes: ProcedureType[] = await Promise.all(
+            procedures.map((procedure) => Organigram.loadProcedureType({
+                addr: procedure.address,
+                doc: procedure.cid
+            }))
+        )
+        return procedureTypes
+    }
+
+    static async load(address:Address):Promise<Organigram> {
+        // @ts-ignore
+        const contract = new web3.eth.Contract(OrganigramContract.abi, address)
+        const network = await getNetwork()
+        const proceduresRegistryAddress = await contract.methods.procedures().call()
+        const proceduresRegistry = await Organ.load(proceduresRegistryAddress)
+        const procedureTypes: ProcedureType[] = await Organigram.loadProcedureTypes(address)
+        return new Organigram(address, network, proceduresRegistry, procedureTypes)
+    }
+
+    // // @todo : Identify contract from on-chain function. 
+    // public static async checkInterface(address:Address) {
+    //     // @ts-ignore
+    //     const contract = new web3.eth.Contract(Organigram.abi, address)
+    //     return contract.checkInterface(interface, interface)
+    // }
+
+    /**
+     * Instance API.
+     */
+
+    // Get master procedure data.
+    async getProcedureType(address:Address):Promise<ProcedureType|null> {
+        const code = await web3.eth.getCode(address)
+        const type:Address = `0x${code.substr(22, 40)}`.toLowerCase()
+        const procedureType = this.procedureTypes.find((pt:ProcedureType) => pt.address.toLowerCase() === type)
+        return procedureType || null
+    }
+
+    // Get or load organ data.
+    async getOrgan(address:Address, cached:boolean = true):Promise<Organ> {
+        let organ = cached && this.organs.find(c => c.address === address)
+        if (!organ)
+            organ = await Organ.load(address)
+        if (!organ)
+            throw new Error("Organ not found.")
+        this.organs.push(organ)
+        return organ
+    }
+
+    // Get or load procedure data.
+    async getProcedure(address:Address, cached:boolean = true):Promise<EnhancedProcedure> {
+        const procedureType:ProcedureType|null = await this.getProcedureType(address)
+        if (!procedureType)
+            throw new Error("Procedure not supported.")
+        let procedure = cached && this.procedures.find(c => c.address === address)
+        if (!procedure)
+            procedure = await procedureType.Class.load(address)
+        if (!procedure)
+            throw new Error("Procedure not found.")
+        procedure.type = procedureType
+        this.procedures.push(procedure)
+        return procedure
+    }
+
+    // Get or load a contract.
+    async getContract(address:Address, cached:boolean = true):Promise<Organ|EnhancedProcedure|null> {
+        return (await Organ.isOrgan(address))
+            ? this.getOrgan(address, cached)
+            : (await Procedure.isProcedure(address))
+                ? this.getProcedure(address, cached)
+                : null
+    }
+
+    // Create and load an organ.
+    async createOrgan(metadata:CID, admin?:Address):Promise<Organ> {
+        const from = await getAccount()
+        if (!admin) admin = from
+        const multihash = cidToMultihash(metadata)
+        const address = await this._contract.methods.createOrgan(multihash, admin).call({ from })
+        return this.getOrgan(address)
+    }
+
+    // Create and load a procedure.
+    async createProcedure(
+        type:Address,
+        metadata:Metadata,
+        proposers:Address,
+        moderators:Address,
+        deciders:Address,
+        withModeration:boolean,
+        ...args:any[]
+    ):Promise<EnhancedProcedure> {
+        const from = await getAccount()
+        const procedureType:ProcedureType|null = await this.getProcedureType(type)
+        if (!procedureType || !procedureType.address || !procedureType.Class)
+            throw new Error("Procedure type not found.")
+        const address = await this._contract.methods.createProcedure(procedureType.address).call({ from })
+        await procedureType.Class.initialize(
+            address,
+            metadata,
+            proposers,
+            moderators,
+            deciders,
+            withModeration,
+            // @ts-ignore
+            ...args
+        )
+        return this.getProcedure(address, false)
+    }
+
+    // Deploy a graph.
+    public async deployGraph(graph: Graph):Promise<Graph> {
+        // @todo : Return a reactive graph undergoing deployment.
+        throw new Error("Not implemented.")
+    }
+
+    
+}
+
+export default Organigram

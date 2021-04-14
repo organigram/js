@@ -1,72 +1,69 @@
+import Organigram from './organigram'
 import Organ from './organ'
 import Procedure from './procedure'
 
-interface GraphData {
-    organs: Organ[]
-    procedures: Procedure[]
+export interface GraphConstructor {
+    organigram: Organigram
 }
-
-interface GraphAddresses {
-    organs: Address[]
-    procedures: Address[]
-}
-
 export class Graph {
-    organs: Organ[] = []
-    procedures: Procedure[] = []
+    private _organigram:Organigram
+    organs:Organ[] = []
+    procedures:Procedure[] = []
 
-    constructor({ organs, procedures }: GraphData) {
-        this.organs = organs
-        this.procedures = procedures
+    constructor({ organigram }:GraphConstructor) {
+        this._organigram = organigram
+    }
+
+    async addContracts(contracts: Address[]):Promise<Graph> {
+        if (!this._organigram)
+            throw new Error("Organigram not loaded.")
+        // Remove existing contracts from the new array.
+        contracts = contracts.filter((c:Address) => {
+            c = c.toLowerCase()
+            return !this.organs.find(o => o.address.toLowerCase() === c)
+                && !this.procedures.find(p => p.address.toLowerCase() === c)
+        })
+        const instances = await Promise.all(contracts.map((c:Address) => this._organigram.getContract(c).catch(() => null)))
+        .catch(error => {
+            console.error("Error loading new contracts", error.message)
+            return []
+        })
+        instances.forEach((i) => {
+            if (i) {
+                if (i instanceof Organ)
+                    this.organs.push(i)
+                if (i instanceof Procedure)
+                    this.procedures.push(i)
+            }
+        })
+        return this
+    }
+
+    async removeContracts(contracts: Address[]):Promise<Graph> {
+        this.organs = this.organs.filter(o => contracts.indexOf(o.address) < 0)
+        this.procedures = this.procedures.filter(p => contracts.indexOf(p.address) < 0)
+        return this
+    }
+
+    toString():string {
+        return JSON.stringify({
+            organs: this.organs.map(o => o.toString()),
+            procedures: this.procedures.map(o => o.toString())
+        }, null, 2)
+    }
+
+    toJSON():any {
+        return {
+            organs: this.organs, // .map(o => o.toJSON()),
+            procedures: this.procedures, // .map(p => p.toJSON())
+        }
     }
     
-    // Sort graph contracts but do not load them.
-    static sort = async (contracts: Address[]): Promise<GraphAddresses> => {
-        let organs: Address[] = [], procedures: Address[] = []
-        for await (var address of contracts) {
-            const isOrgan = await Organ.isOrgan(address)
-            const isProcedure = await Procedure.isProcedure(address)
-            if (isOrgan)
-                organs.push(address)
-            if (isProcedure)
-                procedures.push(address)
-        }
-        return { organs, procedures }
+    parseJSON(json:any):Graph {
+        this.organs = json.organs
+        this.procedures = json.procedures
+        return this
     }
-
-    static load = async (contracts: Address[]): Promise<Graph> => {
-        const { organs, procedures } = await Graph.sort(contracts)
-        const graph = new Graph({
-            organs: await Promise.all(organs.map(a => Organ.load(a))),
-            procedures: await Promise.all(procedures.map(a => Procedure.load(a)))
-        })
-        return graph
-    }
-
-    addContracts = async (contracts: Address[]): Promise<Graph> => {
-        const { organs, procedures } = await Graph.sort(contracts)
-        const newOrgans: Organ[] = await Promise.all(organs
-            .filter(a => !this.organs.find(to => to.address === a))
-            .map(a => Organ.load(a)))
-        const newProcedures: Procedure[] = await Promise.all(procedures
-            .filter(a => !this.procedures.find(to => to.address === a))
-            .map(a => Procedure.load(a)))
-        return new Graph({
-            organs: [...this.organs, ...newOrgans],
-            procedures: [...this.procedures, ...newProcedures]
-        })
-    }
-
-    removeContracts = async (contracts: Address[]): Promise<Graph> => {
-        const organs: Organ[] = this.organs.filter(o => contracts.indexOf(o.address) < 0)
-        const procedures: Procedure[] = this.procedures.filter(p => contracts.indexOf(p.address) < 0)
-        return new Graph({ organs, procedures })
-    }
-
-    toString = (): string => JSON.stringify({
-        organs: this.organs.map(o => o.toString()),
-        procedures: this.procedures.map(o => o.toString())
-    }, null, 2)
 }
 
 export default Graph

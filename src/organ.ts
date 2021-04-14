@@ -1,10 +1,10 @@
-import { EMPTY_ADDRESS, getLibraries, web3, _linkBytecode } from './web3'
+import { EMPTY_ADDRESS, web3, _linkBytecode, getAccount, getNetwork } from './web3'
 import all from 'it-all'
 import uint8ArrayConcat from 'uint8arrays/concat'
 import { CID } from 'ipfs-core'
 import OrganContract from '@organigram/contracts/build/contracts/Organ.json'
-import { ipfsNode, multihashToCid, cidToMultihash, parseJSON } from './ipfs'
-import { getAccount, getNetwork } from './web3'
+import { ipfsNode, multihashToCid, cidToMultihash } from './ipfs'
+import Web3 from 'web3'
 
 export const ORGAN_CONTRACT_SIGNATURES: string[] = OrganContract.ast
     .nodes.find(n => n.name === "")
@@ -22,12 +22,12 @@ export interface OrganData {
 }
 
 export class Organ {
-    address: string = ""
-    network: Network = "mainnet"
-    balance: string = "n/a"
-    procedures: OrganProcedure[] = []
-    metadata: Metadata = {}
-    entries: OrganEntry[] = []
+    address:string = ""
+    network:Network = "mainnet"
+    balance:string = "n/a"
+    procedures:OrganProcedure[] = []
+    metadata:Metadata = {}
+    entries:OrganEntry[] = []
 
     public constructor({ address, network, balance, procedures, metadata, entries }: OrganData) {
         this.address = address
@@ -48,7 +48,7 @@ export class Organ {
             throw new Error("Wrong CID.")
         const { ipfsHash, hashFunction, hashSize } = multihash
         const from = await getAccount()
-        return from && contract.methods.updateMetadata(ipfsHash, hashFunction, hashSize).send({ from })
+        return from && contract.methods.updateMetadata({ ipfsHash, hashFunction, hashSize }).send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while updating metadata.", this.address, error.message)
@@ -60,13 +60,13 @@ export class Organ {
         // @ts-ignore
         const contract = new web3.eth.Contract(OrganContract.abi, this.address)
         const _entries: {
-            addr: Address, ipfsHash: string, hashFunction: string, hashSize: string
+            addr: Address, doc: { ipfsHash: string, hashFunction: string, hashSize: string }
         }[] = entries.map(e => {
             let multihash:Multihash|null = cidToMultihash(new CID(e.cid))
             if (!multihash)
                 throw new Error(`Wrong IPFS Content ID '${e.cid}' for entry.`)
             const { ipfsHash, hashFunction, hashSize } = multihash
-            return { addr: e.address, ipfsHash, hashFunction, hashSize }
+            return { addr: e.address, doc: { ipfsHash, hashFunction, hashSize } }
         })
         const from = await getAccount()
         return from && contract.methods.addEntries(_entries).send({ from })
@@ -97,7 +97,7 @@ export class Organ {
             throw new Error("Wrong CID.")
         const { ipfsHash, hashFunction, hashSize } = multihash
         const from = await getAccount()
-        return from && contract.methods.replaceEntry(index, entry.address, ipfsHash, hashFunction, hashSize).send({ from })
+        return from && contract.methods.replaceEntry(index, entry.address, { ipfsHash, hashFunction, hashSize }).send({ from })
         .then(() => true)
         .catch((error:Error) => {
             console.error("Error while replacing entry in organ.", this.address, error.message)
@@ -144,31 +144,31 @@ export class Organ {
 
     /* Static API */
 
-    public static async deploy(cid:CID): Promise<Organ> {
-        const multihash:Multihash|null = cidToMultihash(`${cid}`)
-        if (!multihash)
-            throw new Error("Wrong CID.")
-        const { ipfsHash, hashFunction, hashSize } = multihash
-        const network = await getNetwork()
-        const libraries = await getLibraries(network)
-        if (!libraries.organ[0] || !libraries.organ[0].address)
-            throw new Error("Organ library not found.")
-        const links = [{ ...libraries.organ[0], library: "OrganLibrary" }]
-        const from = await getAccount()
-        // @ts-ignore
-        const contract = new web3.eth.Contract(OrganContract.abi)
-        // @ts-ignore
-        return contract.deploy({
-            data: await _linkBytecode(OrganContract.bytecode, links),
-            arguments: [from, ipfsHash, hashFunction, hashSize]
-        })
-        .send({ from })
-        .then(contract => {
-            return Organ.load(contract.options.address)
-        })
-    }
+    // public static async deploy(cid:CID): Promise<Organ> {
+    //     const multihash:Multihash|null = cidToMultihash(`${cid}`)
+    //     if (!multihash)
+    //         throw new Error("Wrong CID.")
+    //     const { ipfsHash, hashFunction, hashSize } = multihash
+    //     const network = await getNetwork()
+    //     const libraries = await getLibraries(network)
+    //     if (!libraries.organ[0] || !libraries.organ[0].address)
+    //         throw new Error("Organ library not found.")
+    //     const links = [{ ...libraries.organ[0], library: "OrganLibrary" }]
+    //     const from = await getAccount()
+    //     // @ts-ignore
+    //     const contract = new web3.eth.Contract(OrganContract.abi)
+    //     // @ts-ignore
+    //     return contract.deploy({
+    //         data: await _linkBytecode(OrganContract.bytecode, links),
+    //         arguments: [from, ipfsHash, hashFunction, hashSize]
+    //     })
+    //     .send({ from })
+    //     .then(contract => {
+    //         return Organ.load(contract.options.address)
+    //     })
+    // }
 
-    public static async load(address: string): Promise<Organ> {
+    static async load(address:string):Promise<Organ> {
         const network = await getNetwork()
         if (!network)
             throw new Error("Not connected to a valid network.")
@@ -177,7 +177,7 @@ export class Organ {
         //     throw new Error("Contract at address is not an Organ.")
         const balance:string = await Organ.getBalance(address)
         .catch(() => "n/a")
-        const metadata: Metadata = await Organ.loadMetadata(address).catch(() => ({}))
+        const metadata:CID|null = await Organ.loadData(address).catch(() => null).then(d => d && d.metadata)
         const procedures: OrganProcedure[] = await Organ.loadProcedures(address)
         .catch(error => {
             console.warn("Error while loading organ's procedures", address, error.message)
@@ -191,113 +191,92 @@ export class Organ {
         return new Organ({ address, network, balance, procedures, metadata, entries })
     }
 
-    public static async isOrgan(address: Address):Promise<boolean> {
+    static async isOrgan(address:Address):Promise<boolean> {
         // @ts-ignore
         const contract = new web3.eth.Contract(OrganContract.abi, address)
         const isERC165 = await contract.methods.supportsInterface("0x01ffc9a7").call()
         .catch(() => false)
-        if (!isERC165) return false
+        if (!isERC165)
+            return false
         const ORGAN_INTERFACE = `0xbae78d7b`    // getEntry.
         const isOrgan = await contract.methods.supportsInterface(ORGAN_INTERFACE).call()
         .catch(() => false)
         return isOrgan
     }
 
-    public static getBalance = async (address: Address): Promise<string> => {
+    static async getBalance(address:Address):Promise<string> {
         const balance = await web3.eth.getBalance(address)
         return `${balance}`
     }
 
-    public static loadMetadata = async (address: Address): Promise<Metadata> => {
+    static async loadData(address:Address):Promise<{
+        metadata:CID|null,
+        proceduresLength:string,
+        entriesLength:string,
+        entriesCount:string
+    }> {
         // @ts-ignore
         const contract = new web3.eth.Contract(OrganContract.abi, address)
-        const ipfs = await ipfsNode
-        if (!ipfs) {
-            console.info("IPFS was not started. Starting IPFS.")
-            await ipfs.start()
+        const data = await contract.methods.getOrgan().call()
+        return {
+            metadata: multihashToCid(data.metadata),
+            proceduresLength: data.proceduresLength,
+            entriesLength: data.entriesLength,
+            entriesCount: data.entriesCount
         }
-        let metadata: { cid?: CID, data?: any } = {
-            data: {
-                name: ""
-            }
-        }
-        try {
-            metadata.cid = await contract.methods.getMetadata().call()
-            .then((multihash: Multihash):CID => multihashToCid(multihash))
-        }
-        catch (error) {
-            console.warn("Error while computing IPFS Content ID for organ metadata.", address, error.message)
-        }
-        if (metadata.cid) {
-            try {
-                metadata.data = await parseJSON(metadata.cid)
-            }
-            catch(error) {
-                metadata.data = {}
-            }
-        }
-        return metadata
     }
 
-    public static getEntryForAccount = async (address: Address, account:Address):Promise<OrganEntry|null> => {
+    static async loadEntryForAccount(address: Address, account:Address):Promise<OrganEntry|null> {
         // @ts-ignore
         const contract = new web3.eth.Contract(OrganContract.abi, address)
         const index = await contract.methods.getEntryIndexForAddress(account).call()
-        const ipfs = await ipfsNode
-        // @todo : Add internal method parseEntry to avoid duplicating code.
-        return contract.methods.getEntry(index).call()
-        .then(async ({ addr, ipfsHash, hashFunction, hashSize }: {
-            addr: Address,
-            ipfsHash: string, hashFunction: string, hashSize: string
-        }) => {
-            if (addr === EMPTY_ADDRESS && (!parseInt(hashFunction, 16) || !parseInt(hashSize)))
-                return null
-            let entry:OrganEntry = { index, address: addr, cid: null }
-            try {
-                entry.cid = multihashToCid({ ipfsHash, hashSize, hashFunction })
-            }
-            catch(error) {
-                console.warn("Error while computing IPFS Content ID for entry.", account, index, error.message)
-            }
-            if (entry.cid) {
-                try {
-                    // @ts-ignore
-                    entry.data = uint8ArrayConcat(await all(ipfs.cat(entry.cid)))
-                }
-                catch(error) {
-                    console.warn("Error while loading data hash for entry.", account, index, error.message)
-                }
-            }
-            return entry
-        })
-        .catch((e: Error) => console.error("Error", e.message))
+        return Organ.loadEntry(address, index)
     }
 
-    public static loadProcedures = async (address: Address): Promise<OrganProcedure[]> => {
+    static async loadPermissions(address:Address, procedure:Address):Promise<any> {
         // @ts-ignore
         const contract = new web3.eth.Contract(OrganContract.abi, address)
-
-        const length = await contract.methods.getProceduresLength().call()
-        .catch(() => "0")
-        if (length === "0") return []
-
-        let i = 0, promises = []
-        for (i ; String(i) !== length ; i++) {
-            const index = String(i)
-            promises.push(
-                contract.methods.getProcedure(i).call()
-                .catch((e: Error) => console.error("Error", e.message))
-                .then((data: any) => data && {
-                    address: data.procedure,
-                    permissions: data.permissions.toString()
-                })
-            )
-        }
-
-        return Promise.all(promises)
+        return contract.methods.getPermissions(procedure).call()
+        .catch((e: Error) => console.error("Error", e.message))
+        .then(({ perms }:any) => perms && perms.toString())
     }
 
-    public static loadEntries = async (address: Address): Promise<OrganEntry[]> => {
+    static async loadProcedure(address:Address, index:string):Promise<OrganProcedure> {
+        // @ts-ignore
+        const contract = new web3.eth.Contract(OrganContract.abi, address)
+        return contract.methods.getProcedure(index).call()
+        .catch((e: Error) => console.error("Error", e.message))
+        .then((data: any) => data && {
+            address: data.addr,
+            permissions: data.perms
+        })
+    }
+
+    static async loadProcedures(address:Address):Promise<OrganProcedure[]> {
+        const data = await Organ.loadData(address)
+        const length = Web3.utils.toBN(data.proceduresLength)
+        let procedures:OrganProcedure[] = []
+        const iGenerator = function* () {
+            let i = Web3.utils.toBN("0")
+            while (i.lt(length)) {
+                yield i
+                i = i.addn(1)
+            }
+        }
+        for await(let i of iGenerator()) {
+            const key:string = i.toString()
+            const procedure:OrganProcedure|null = await Organ.loadProcedure(address, key)
+            .catch((error: Error) => {
+                console.warn("Error while loading procedure in organ.", address, key, error.message)
+                return null
+            })
+            if (procedure)
+                procedures.push(procedure)
+        }
+        return procedures
+    }
+
+    static async loadEntry(address:Address, index:string):Promise<OrganEntry> {
         // @ts-ignore
         const contract = new web3.eth.Contract(OrganContract.abi, address)
         const ipfs = await ipfsNode
@@ -305,58 +284,61 @@ export class Organ {
             console.info("IPFS was not started. Starting IPFS.")
             await ipfs.start().catch((e:Error) => console.warn(e.message))
         }
+        return contract.methods.getEntry(index).call()
+        .then(async ({ addr, doc }: {
+            addr: Address,
+            doc: Multihash
+        }) => {
+            if (addr === EMPTY_ADDRESS && (!parseInt(doc.hashFunction, 16) || !parseInt(doc.hashSize)))
+                return null
+            let entry:OrganEntry = { index, address: addr, cid: multihashToCid(doc) }
+            if (entry.cid) {
+                try {
+                    // @ts-ignore
+                    entry.data = uint8ArrayConcat(await all(ipfs.cat(entry.cid)))
+                }
+                catch(error) {
+                    console.warn("Error while loading data hash for entry.", address, index, error.message)
+                }
+            }
+            return entry
+        })
+    }
 
-        const length = await contract.methods.getEntriesLength().call()
-        .catch(() => "0")
-        if (length === "0") return []
-
-        var i = 0, promises = []
-        for (i ; String(i) !== length ; i++) {
-            const index = String(i)
-            promises.push(
-                contract.methods.getEntry(index).call()
-                .then(async ({ addr, ipfsHash, hashFunction, hashSize }: {
-                    addr: Address,
-                    ipfsHash: string, hashFunction: string, hashSize: string
-                }) => {
-                    if (addr === EMPTY_ADDRESS && (!parseInt(hashFunction, 16) || !parseInt(hashSize)))
-                        return null
-                    let entry:OrganEntry = { index, address: addr, cid: null }
-                    try {
-                        entry.cid = multihashToCid({ ipfsHash, hashSize, hashFunction })
-                    }
-                    catch(error) {
-                        console.warn("Error while computing IPFS Content ID for entry.", address, index, error.message)
-                    }
-                    if (entry.cid) {
-                        try {
-                            // @ts-ignore
-                            entry.data = uint8ArrayConcat(await all(ipfs.cat(entry.cid)))
-                        }
-                        catch(error) {
-                            console.warn("Error while loading data hash for entry.", address, index, error.message)
-                        }
-                    }
-                    return entry
-                })
-                .catch((e: Error) => console.error("Error", e.message))
-            )
+    static async loadEntries(address:Address):Promise<OrganEntry[]> {
+        const length = Web3.utils.toBN((await Organ.loadData(address)).entriesLength)
+        let entries:OrganEntry[] = []
+        const iGenerator = function* () {
+            // Entries indexes start at 1.
+            let i = Web3.utils.toBN("1")
+            while (i.lt(length)) {
+                yield i
+                i = i.addn(1)
+            }
         }
-
-        return Promise.all(promises).then(entries => entries.filter(e => !!e))
+        for await(let index of iGenerator()) {
+            const key:string = index.toString()
+            const entry:OrganEntry|null = await Organ.loadEntry(address, key)
+            .catch((error: Error) => {
+                console.warn("Error while loading entry in organ.", address, key, error.message)
+                return null
+            })
+            if (entry)
+                entries.push(entry)
+        }
+        return entries
     }
 
     /* Sync API */
-
-    public reload = async(): Promise<Organ> => {
+    async reload():Promise<Organ> {
         const { procedures, metadata, entries } = await Organ.load(this.address)
-        this.procedures = procedures
         this.metadata = metadata
+        this.procedures = procedures
         this.entries = entries
         return this
     }
 
-    public reloadEntries = async (): Promise<Organ> => {
+    async reloadEntries():Promise<Organ> {
         this.entries = await Organ.loadEntries(this.address)
         .catch(error => {
             console.warn("Error while reloading organ's entries", this.address, error.message)
@@ -365,7 +347,7 @@ export class Organ {
         return this
     }
 
-    public reloadProcedures = async (): Promise<Organ> => {
+    async reloadProcedures():Promise<Organ> {
         this.procedures = await Organ.loadProcedures(this.address)
         .catch(error => {
             console.warn("Error while reloading organ's procedures", this.address, error.message)
@@ -374,12 +356,9 @@ export class Organ {
         return this
     }
 
-    public reloadMetadata = async (): Promise<Organ> => {
-        this.metadata = await Organ.loadMetadata(this.address)
-        .catch(error => {
-            console.warn("Error while reloading organ's metadata", this.address, error.message)
-            return this.metadata
-        })
+    async reloadData():Promise<Organ> {
+        const data = await Organ.loadData(this.address)
+        this.metadata = data.metadata
         return this
     }
 }

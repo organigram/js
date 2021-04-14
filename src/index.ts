@@ -6,12 +6,7 @@ export {
     connect as web3connect,
     getAccount,
     getNetwork,
-    getNetworkName,
-    getLocalLibraries,
-    getLibraries,
-    getLibraryArtefact,
-    deployMissingLibraries,
-    hasLibraries
+    getNetworkName
 } from './web3'
 export {
     IPFS,
@@ -41,8 +36,11 @@ export {
     _decryptMessagePGP
 } from './vault'
 export { Graph } from './graph'
-export { Organ, ORGAN_CONTRACT_SIGNATURES, PERMISSIONS } from './organ'
-export { Keyserver } from './keyserver'
-export { Procedure, INTERFACE as PROCEDURE_INTERFACE, NOMINATION_INTERFACE, VOTE_INTERFACE } from './procedure'
+export { default as Organ, ORGAN_CONTRACT_SIGNATURES } from './organ'
+export { default as Keyserver } from './keyserver'
+export { default as Procedure } from './procedure'
+export { default as Organigram, ProcedureType } from './organigram'
+export { default as ProcedureNomination} from './procedures/nomination'
+export { default as ProcedureVote } from './procedures/vote'
 
 import "./types"

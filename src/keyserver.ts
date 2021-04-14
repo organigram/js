@@ -4,8 +4,8 @@ import Organ from './organ'
 import { Key } from './vault'
 import { getAccount, getNetwork } from './web3'
 
-export class Keyserver extends Organ {
-    static async detect(): Promise<Keyserver> {
+export default class Keyserver extends Organ {
+    static async detect():Promise<Keyserver> {
         const network = await getNetwork().catch(error => {
             throw new Error("Not connected to Ethereum.")
         })
@@ -22,13 +22,7 @@ export class Keyserver extends Organ {
         throw new Error("Detection not implemented.")
     }
 
-    static async deploy(): Promise<Keyserver> {
-        // @todo : Save deployed keyserver address in localStorage per network.
-        const organ = await Organ.deploy(new CID(EMPTY_CID))
-        return new Keyserver(organ)
-    }
-
-    async save(): Promise<void> {
+    async save():Promise<void> {
         const networksCache = localStorage.getItem("organigram-keyservers")
         const networks = networksCache ? JSON.parse(networksCache) : []
         let match = networks.find((n: { network: string, address: Address }) => n.network === this.network && n.address === this.address)
@@ -46,11 +40,11 @@ export class Keyserver extends Organ {
             account = await getAccount()
         if (!account)
             throw new Error("No account selected.")
-        return Organ.getEntryForAccount(this.address, account)
-            .then(async (value: OrganEntry | null) => {
-                return !!value?.cid
-            })
-            .catch(() => false)
+        return Organ.loadEntryForAccount(this.address, account)
+        .then(async (value: OrganEntry|null) => {
+            return !!value?.cid
+        })
+        .catch(() => false)
     }
 
     async loadKey(account: Address | null = null): Promise<Key> {
@@ -59,19 +53,19 @@ export class Keyserver extends Organ {
         if (!account)
             throw new Error("No account selected.")
         const ipfs = await ipfsNode
-        return Organ.getEntryForAccount(this.address, account)
-            .then(async (value: OrganEntry | null) => {
-                if (!value || !value.cid)
-                    throw new Error("Key not found.")
-                const chunks = []
-                for await (const chunk of ipfs.cat(value.cid)) {
-                    chunks.push(chunk)
-                }
-                const data: Uint8Array = await concat(chunks)
-                const key = JSON.parse(Buffer.from(data).toString())
-                return key
-            })
-            .catch(_error => null)
+        return Organ.loadEntryForAccount(this.address, account)
+        .then(async (value: OrganEntry|null) => {
+            if (!value || !value.cid)
+                throw new Error("Key not found.")
+            const chunks = []
+            for await (const chunk of ipfs.cat(value.cid)) {
+                chunks.push(chunk)
+            }
+            const data: Uint8Array = await concat(chunks)
+            const key = JSON.parse(Buffer.from(data).toString())
+            return key
+        })
+        .catch(_error => null)
     }
 
     async uploadKey(key: Key, account: Address | null = null): Promise<Organ> {
@@ -94,5 +88,3 @@ export class Keyserver extends Organ {
         }])
     }
 }
-
-export default Keyserver

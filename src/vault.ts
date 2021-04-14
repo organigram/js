@@ -72,12 +72,13 @@ const _encryptMessagePGP = async (message: string, recipientsKeys: Key[], signat
         throw new Error("No recipients keys set for encryption.")
     // @todo : Use signature keys, if unlockable.
     const privateKeys: any[] = []
+    // Returns cipherdata in a PGP Message.
     return openpgp.encrypt({
         // @ts-ignore
         message: openpgp.createMessage({ text: message }),
         publicKeys,
         privateKeys
-    }).then((m: any) => m.data)
+    })
 }
 
 // Decrypt message with PGP symmetric keys.
@@ -89,10 +90,13 @@ const _decryptMessagePGP = async (ciphertext: string, key: Key, passphrase: stri
     if (!privateKeyObj.isDecrypted())
         await privateKeyObj.decrypt(passphrase)
     return openpgp.decrypt({
-        message: await openpgp.readMessage({ armoredMessage: ciphertext }),
+        // @ts-ignore
+        message: await openpgp.readMessage({
+            armoredMessage: ciphertext
+        }),
         privateKeys: [privateKeyObj],
     })
-        .then((m: any) => m.data)
+    .then(({ data }) => data)
 }
 
 export {

@@ -6,8 +6,6 @@ type Multihash = {
     hashFunction: string
     hashSize: string
 }
-type ProcedureType = string
-type ProcedureData = object
 
 type Graph = {
     organs: Organ[]
@@ -26,13 +24,6 @@ type OrganProcedure = {
     permissions: OrganProcedurePermissions
 }
 
-type Organ = {
-    address: Address
-    metadata: Metadata
-    procedures: OrganProcedure[]
-    entries: OrganEntry[]
-}
-
 type OrganEntry = {
     index: string
     address: Address
@@ -40,43 +31,92 @@ type OrganEntry = {
     data?: any // @todo : Check if Uint8Array could serve the purpose.
 }
 
-type Procedure = {
+type Organ = {
     address: Address
     metadata: Metadata
-    moves: ProcedureMove[]
-    data?: any
+    procedures: OrganProcedure[]
+    entries: OrganEntry[]
 }
 
-type ProcedureMoveOperation = {
+type OperationTag = "metadata"
+    |"entries"
+    |"procedures"
+    |"coins"
+    |"collectibles"
+    |"funds"
+    |"add"
+    |"replace"
+    |"remove"
+    |"deposit"
+    |"withdraw"
+    |"transfer"
+
+type OperationParamType = "metadata"|"entry"|"entries"|"address"|"addresses"|"index"|"indexes"|"organ"|"procedure"|"permissions"|"proposal"|"proposals"
+type OperationParamAction = "select"|"create"|"update"|"delete"|"withdraw"|"deposit"|"transfer"|"block"
+
+type OperationParam = {
+    type: string
+    action?: OperationParamAction   // Used to generate form UI.
+    value?: any         // Used to display an operation
+    parser?: Function   // Used to parse a submitted form
+}
+
+type ProcedureProposalOperationFunction = {
+    funcSig: string,
+    key: string,
+    signature?: string,
+    label?: string,
+    tags?: OperationTag[]
+    params?: OperationParamType[]
+    abi?: any
+    target?: "organ"|"self"
+}
+
+type ProcedureProposalOperation = {
     index: string
-    operationType: Number
-    // uint8 with possible masks :
-    // 0: operation on procedure.
-    // 1/2/3: addEntry/removeEntry/replaceEntry.
-    // 4/5/6: addProcedure/removeProcedure/replaceProcedure.
-    // 7: withdraw funds.
-    // 8: withdraw tokens.
-    call: any
-    processed: boolean
+    functionSelector: string
+    organ?: Address
+    data: string
+    value?: string
+    processed?: boolean
+    function?: ProcedureProposalOperationFunction
+    params?: OperationParam[]
+    userIsInOrgan?: boolean
+    userIsInEntry?: boolean
+    // @todo : generate a text from operation params.
+    description?:any
 }
 
-type ProcedureMove = {
+type ProcedureProposal = {
     key: string
     creator: Address
-    metadata: Metadata
-    locked: boolean
+    metadata?: CID
+    blockReason?: CID
+    presented: boolean
+    blocked: boolean
+    adopted: boolean
     applied: boolean
-    processing: boolean
-    operations: ProcedureMoveOperation[]
+    operations: ProcedureProposalOperation[]
 }
 
-type LibraryKey = "organ"|"procedure"|"voteProposition"
+type Procedure = {
+    address: Address
+    type: Address
+    metadata: Metadata
+    moves: ProcedureProposal[]
+    data?: any
+    userIsProposer?: boolean
+    userIsModerator?: boolean
+    userIsDecider?: boolean
+}
+
+type LibraryKey = "organ"|"procedure"|"metadata"
 type Network = "mainnet"|"morden"|"ropsten"|"rinkeby"|"kovan"|"goerli"|"xdai"|"dev"|"organigr.am"|"private"
 
 type Libraries = {
     organ: { network: string, address: Address }[],
     procedure: { network: string, address: Address }[],
-    voteProposition: { network: string, address: Address }[]
+    metadata: { network: string, address: Address }[]
 }
 
 interface LoadGraphOptions {

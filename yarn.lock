@@ -794,6 +794,11 @@ async@^3.2.0:
   resolved "https://registry.yarnpkg.com/async/-/async-3.2.0.tgz#b3a2685c5ebb641d3de02d161002c60fc9f85720"
   integrity sha512-TR2mEZFVOj2pLStYxLht7TyfuRzaydfpxr3k9RpHIzMgw7A64dzsdqCxH1WJyQdoe8T10nDXd9wnEigmiuHIZw==
 
+async@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/async/-/async-3.2.0.tgz#b3a2685c5ebb641d3de02d161002c60fc9f85720"
+  integrity sha512-TR2mEZFVOj2pLStYxLht7TyfuRzaydfpxr3k9RpHIzMgw7A64dzsdqCxH1WJyQdoe8T10nDXd9wnEigmiuHIZw==
+
 asynckit@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
@@ -884,6 +889,15 @@ bintrees@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/bintrees/-/bintrees-1.0.1.tgz#0e655c9b9c2435eaab68bf4027226d2b55a34524"
   integrity sha1-DmVcm5wkNeqraL9AJyJtK1WjRSQ=
+
+bl@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/bl/-/bl-5.0.0.tgz#6928804a41e9da9034868e1c50ca88f21f57aea2"
+  integrity sha512-8vxFNZ0pflFfi0WXA3WQXlj6CaMEwsmh63I1CNp0q+wWv8sD0ARx1KovSQd0l2GkwrMIOyedq0EF1FxI+RCZLQ==
+  dependencies:
+    buffer "^6.0.3"
+    inherits "^2.0.4"
+    readable-stream "^3.4.0"
 
 bl@^5.0.0:
   version "5.0.0"
@@ -1692,6 +1706,22 @@ engine.io-client@~4.1.0:
     parseuri "0.0.6"
     ws "~7.4.2"
     xmlhttprequest-ssl "~1.6.2"
+    yeast "0.1.2"
+
+engine.io-client@~4.1.0:
+  version "4.1.3"
+  resolved "https://registry.yarnpkg.com/engine.io-client/-/engine.io-client-4.1.3.tgz#e0ea88aefe76a14cf4375513b194438be3c5e238"
+  integrity sha512-C3JYYyvna0FvSKOWGWpo0/EQ6MayO8uEKam1oedLZRpxLego9Fk6K3UH/Phieu1xPHauM7YqAygJ+6SraVc0Qg==
+  dependencies:
+    base64-arraybuffer "0.1.4"
+    component-emitter "~1.3.0"
+    debug "~4.3.1"
+    engine.io-parser "~4.0.1"
+    has-cors "1.1.0"
+    parseqs "0.0.6"
+    parseuri "0.0.6"
+    ws "~7.4.2"
+    xmlhttprequest-ssl "~1.5.4"
     yeast "0.1.2"
 
 engine.io-parser@~2.2.0:
@@ -3632,6 +3662,19 @@ libp2p-utils@^0.3.0, libp2p-utils@^0.3.1:
     multiaddr "^9.0.1"
     private-ip "^2.1.1"
 
+libp2p-utils@^0.3.0:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/libp2p-utils/-/libp2p-utils-0.3.1.tgz#de68f7d0f443624d4067a18687b0359a11fc7cb8"
+  integrity sha512-LOVfww7a6Rhtoupl3z1ABuTEli5whY3VLTB9QntsOIwbOcX9GfmjuhqYbEDht9lVPAQl+rCUWbfDMvK121ryUg==
+  dependencies:
+    abortable-iterator "^3.0.0"
+    debug "^4.3.0"
+    err-code "^3.0.1"
+    ip-address "^7.1.0"
+    is-loopback-addr "^1.0.0"
+    multiaddr "^9.0.1"
+    private-ip "^2.1.1"
+
 libp2p-webrtc-peer@^10.0.1:
   version "10.0.1"
   resolved "https://registry.yarnpkg.com/libp2p-webrtc-peer/-/libp2p-webrtc-peer-10.0.1.tgz#ca28a16e4992e922307badf8f64d71bf9584b0ec"
@@ -3788,6 +3831,13 @@ ltgt@^2.1.2:
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/ltgt/-/ltgt-2.2.1.tgz#f35ca91c493f7b73da0e07495304f17b31f87ee5"
   integrity sha1-81ypHEk/e3PaDgdJUwTxezH4fuU=
+
+mafmt@^9.0.0:
+  version "9.0.0"
+  resolved "https://registry.yarnpkg.com/mafmt/-/mafmt-9.0.0.tgz#6174f654ce25f45715cf7480ed3331c4c32924cc"
+  integrity sha512-BwKL6FJxc6R85K6gFE/pX7MVyCp0NkM2DJHg0RatxVgDlK4g9kqtfXQUt2iReSmTcgZss/Q/Bdfa2KTg4KyC+g==
+  dependencies:
+    multiaddr "^9.0.1"
 
 mafmt@^9.0.0:
   version "9.0.0"
@@ -3992,6 +4042,19 @@ multiaddr@^9.0.0, multiaddr@^9.0.1:
     uint8arrays "^2.1.3"
     varint "^6.0.0"
 
+multiaddr@^9.0.1:
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/multiaddr/-/multiaddr-9.0.1.tgz#4a3b5a21b37e4df5b443f2ca957304ea5bfd4604"
+  integrity sha512-fubxMjVoRPcz3GYBb63Z6ADCY6BoqezbnL2o8owDcfYqhwW61oFtIlsZGiNKIVC2Fk1Od5rf/3z34QSGJFT/uA==
+  dependencies:
+    cids "^1.0.0"
+    dns-over-http-resolver "^1.0.0"
+    err-code "^3.0.1"
+    is-ip "^3.1.0"
+    multibase "^4.0.2"
+    uint8arrays "^2.1.3"
+    varint "^6.0.0"
+
 multibase@^0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/multibase/-/multibase-0.7.0.tgz#1adfc1c50abe05eefeb5091ac0c2728d6b84581b"
@@ -3999,6 +4062,13 @@ multibase@^0.7.0:
   dependencies:
     base-x "^3.0.8"
     buffer "^5.5.0"
+
+multibase@^4.0.1, multibase@^4.0.2, multibase@^4.0.3:
+  version "4.0.4"
+  resolved "https://registry.yarnpkg.com/multibase/-/multibase-4.0.4.tgz#55ef53e6acce223c5a09341a8a3a3d973871a577"
+  integrity sha512-8/JmrdSGzlw6KTgAJCOqUBSGd1V6186i/X8dDCGy/lbCKrQ+1QB6f3HE+wPr7Tpdj4U3gutaj9jG2rNX6UpiJg==
+  dependencies:
+    "@multiformats/base-x" "^4.0.1"
 
 multibase@^4.0.1, multibase@^4.0.2, multibase@^4.0.3:
   version "4.0.4"
@@ -4037,6 +4107,14 @@ multicodec@^1.0.0:
   dependencies:
     buffer "^5.6.0"
     varint "^5.0.0"
+
+multicodec@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/multicodec/-/multicodec-3.0.1.tgz#94e043847ee11fcce92487609ac9010429a95e31"
+  integrity sha512-Y6j3wiPojvkF/z6KFIGt84KdJdP2oILEdzc/3YbD3qQ3EerhqtYlfsZTPPNVoCCxNZZdzIpCKrdYFSav17sIrQ==
+  dependencies:
+    uint8arrays "^2.1.3"
+    varint "^5.0.2"
 
 multicodec@^3.0.1:
   version "3.0.1"
@@ -4132,6 +4210,11 @@ native-fetch@^3.0.0:
   resolved "https://registry.yarnpkg.com/native-fetch/-/native-fetch-3.0.0.tgz#06ccdd70e79e171c365c75117959cf4fe14a09bb"
   integrity sha512-G3Z7vx0IFb/FQ4JxvtqGABsOTIqRWvgQz6e+erkB+JJD6LrszQtMozEHI4EkmgZQvnGHrpLVzUWk7t4sJCIkVw==
 
+native-fetch@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/native-fetch/-/native-fetch-3.0.0.tgz#06ccdd70e79e171c365c75117959cf4fe14a09bb"
+  integrity sha512-G3Z7vx0IFb/FQ4JxvtqGABsOTIqRWvgQz6e+erkB+JJD6LrszQtMozEHI4EkmgZQvnGHrpLVzUWk7t4sJCIkVw==
+
 negotiator@0.6.2:
   version "0.6.2"
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.2.tgz#feacf7ccf525a77ae9634436a64883ffeca346fb"
@@ -4182,6 +4265,13 @@ normalize-url@^4.1.0:
   version "4.5.1"
   resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-4.5.1.tgz#0dd90cf1288ee1d1313b87081c9a5932ee48518a"
   integrity sha512-9UZCFRHQdNrfTpGg8+1INIg93B6zE0aXMVFkw1WFwvO4SlZywU6aLg5Of0Ap/PgcbSw4LNxvMWXMeugwMCX0AA==
+
+npm-run-path@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/npm-run-path/-/npm-run-path-4.0.1.tgz#b7ecd1e5ed53da8e37a55e1c2269e0b97ed748ea"
+  integrity sha512-S48WzZW777zhNIrn7gxOlISNAqi9ZC/uQFnRdbeIHhZhCA6UqpkOT8T1G7BvfdgP4Er8gF4sUbaS0i7QvIfCWw==
+  dependencies:
+    path-key "^3.0.0"
 
 npm-run-path@^4.0.1:
   version "4.0.1"
