@@ -2,37 +2,11 @@ import { concat } from 'uint8arrays'
 import { CID, EMPTY_CID, ipfsNode } from './ipfs'
 import Organ from './organ'
 import { Key } from './vault'
-import { getAccount, getNetwork } from './web3'
+import { getAccount } from './web3'
 
 export default class Keyserver extends Organ {
-    static async detect():Promise<Keyserver> {
-        const network = await getNetwork().catch(error => {
-            throw new Error("Not connected to Ethereum.")
-        })
-        const cache = localStorage.getItem("organigram-keyservers")
-        const keyservers = cache ? JSON.parse(cache) : []
-        const matches = keyservers.filter((n: { network: string, address: Address }) => n.network === network)
-        // @todo : Allow multiple keyservers.
-        if (matches[0] && matches[0].address)
-            return Organ.load(matches[0].address)
-                .then(organ => new Keyserver(organ))
-        if (process.env.REACT_APP_KEYSERVER_ORGAN && network === "rinkeby")
-            return Organ.load(process.env.REACT_APP_KEYSERVER_ORGAN)
-                .then(organ => new Keyserver(organ))
-        throw new Error("Detection not implemented.")
-    }
-
-    async save():Promise<void> {
-        const networksCache = localStorage.getItem("organigram-keyservers")
-        const networks = networksCache ? JSON.parse(networksCache) : []
-        let match = networks.find((n: { network: string, address: Address }) => n.network === this.network && n.address === this.address)
-        if (!match) {
-            networks.push({
-                network: this.network,
-                address: this.address
-            })
-            localStorage.setItem("organigram-keyservers", JSON.stringify(networks))
-        }
+    static async load(address:Address):Promise<Keyserver> {
+        return Organ.load(address).then(o => new Keyserver(o))
     }
 
     async hasKey(account: Address | null = null): Promise<boolean> {

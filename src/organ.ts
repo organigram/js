@@ -22,6 +22,7 @@ export interface OrganData {
 }
 
 export class Organ {
+    static INTERFACE = `0xf81b1307` // Organ.INTERFACE_ID.
     address:string = ""
     network:Network = "mainnet"
     balance:string = "n/a"
@@ -198,8 +199,7 @@ export class Organ {
         .catch(() => false)
         if (!isERC165)
             return false
-        const ORGAN_INTERFACE = `0xbae78d7b`    // getEntry.
-        const isOrgan = await contract.methods.supportsInterface(ORGAN_INTERFACE).call()
+        const isOrgan = await contract.methods.supportsInterface(Organ.INTERFACE).call()
         .catch(() => false)
         return isOrgan
     }

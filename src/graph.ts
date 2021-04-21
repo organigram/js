@@ -39,6 +39,20 @@ export class Graph {
         return this
     }
 
+    async addOrgan(organ:Organ):Promise<Graph> {
+        const _isOrgan = await Organ.isOrgan(organ.address)
+        if (_isOrgan)
+            this.organs.push(organ)
+        return this
+    }
+
+    async addProcedure(procedure:Procedure):Promise<Graph> {
+        const _isProcedure = await Organ.isOrgan(procedure.address)
+        if (_isProcedure)
+            this.procedures.push(procedure)
+        return this
+    }
+
     async removeContracts(contracts: Address[]):Promise<Graph> {
         this.organs = this.organs.filter(o => contracts.indexOf(o.address) < 0)
         this.procedures = this.procedures.filter(p => contracts.indexOf(p.address) < 0)

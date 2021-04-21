@@ -1,4 +1,5 @@
 import OrganigramContract from '@organigram/contracts/build/contracts/Organigram.json'
+import ProcedureContract from '@organigram/contracts/build/contracts/Procedure.json'
 import { web3, getAccount, getNetwork } from './web3'
 import Organ from './organ'
 import Procedure from './procedure'
@@ -193,8 +194,6 @@ export class Organigram {
         // @todo : Return a reactive graph undergoing deployment.
         throw new Error("Not implemented.")
     }
-
-    
 }
 
 export default Organigram

@@ -4,7 +4,7 @@ import { cidToMultihash, multihashToCid } from './ipfs'
 import Web3 from 'web3'
 
 export default class Procedure {
-    static INTERFACE = `0x71dbd330` // getProcedure signature.
+    static INTERFACE = `0x71dbd330` // Procedure.INTERFACE_ID
     static OPERATIONS_PARAMS_TYPES = [
         "metadata",
         "index",
@@ -85,7 +85,7 @@ export default class Procedure {
             target: 'organ'
         }
     ]
-    private _contract:any
+    _contract:any
     address:Address
     metadata:CID|null
     proposers:Address
@@ -353,7 +353,6 @@ export default class Procedure {
                 processed: false
             }
         })
-        console.log("Creating proposal", this, metadata, operations)
         const proposalKey = await this._contract.methods.propose(multihash, ops).send({from})
         if (!proposalKey)
             throw new Error("Proposal not created.")
@@ -364,7 +363,6 @@ export default class Procedure {
         return proposal
     }
 
-    // @todo : Return updated proposal.
     async blockProposal(
         proposalKey:string,
         reason:CID
@@ -373,16 +371,18 @@ export default class Procedure {
         const multihash = cidToMultihash(reason)
         if (!multihash)
             throw new Error("Wrong CID.")
-        return this._contract.methods.propose(proposalKey, multihash).send({ from })
+        return this._contract.methods.blockProposal(proposalKey, multihash).send({ from })
     }
 
-    // @todo : Return updated proposal.
     async presentProposal(proposalKey:string):Promise<any> {
         const from = await getAccount()
-        return this._contract.methods.presentProposal(proposalKey).send({ from })
+        return from && this._contract.methods.presentProposal(proposalKey).send({ from })
+        .catch((error:Error) => {
+            console.error("Error while presenting proposal.", this.address, proposalKey, error.message)
+            return false
+        })
     }
 
-    // @todo : Return updated proposal.
     async applyProposal(proposalKey:string):Promise<any> {
         const from = await getAccount()
         return this._contract.methods.presentProposal(proposalKey).send({ from })
