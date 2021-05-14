@@ -44,7 +44,7 @@ class Keyserver extends organ_1.default {
     }
     static deploy() {
         return __awaiter(this, void 0, void 0, function* () {
-            const organ = yield organ_1.default.deploy(ipfs_1.EMPTY_CID);
+            const organ = yield organ_1.default.deploy(new ipfs_1.CID(ipfs_1.EMPTY_CID));
             return new Keyserver(organ);
         });
     }

@@ -72,12 +72,12 @@ const generateSignature = () => __awaiter(void 0, void 0, void 0, function* () {
     return sign(message);
 });
 exports.generateSignature = generateSignature;
-const generatePassword = () => __awaiter(void 0, void 0, void 0, function* () { return Buffer.from(yield openpgp.crypto.random.getRandomBytes(44)).toString('hex'); });
+const generatePassword = () => __awaiter(void 0, void 0, void 0, function* () { return Buffer.from(yield openpgp.RandomBuffer.getRandomBytes(44)).toString('hex'); });
 exports.generatePassword = generatePassword;
 const generateKey = (passphrase) => __awaiter(void 0, void 0, void 0, function* () {
     const account = yield web3_1.getAccount().then(a => a.toLowerCase());
     const { privateKeyArmored, publicKeyArmored } = yield openpgp.generateKey({
-        userIds: [{ name: account }],
+        userIDs: [{ name: account }],
         curve: 'ed25519',
         passphrase
     });
@@ -86,12 +86,12 @@ const generateKey = (passphrase) => __awaiter(void 0, void 0, void 0, function* 
 exports.generateKey = generateKey;
 const _encryptMessagePGP = (message, recipientsKeys, signatureKeys) => __awaiter(void 0, void 0, void 0, function* () {
     const armoredPublicKeys = recipientsKeys.map(k => k.publicKeyArmored);
-    const publicKeys = yield Promise.all(armoredPublicKeys.map((key) => __awaiter(void 0, void 0, void 0, function* () { return (yield openpgp.key.readArmored(key)).keys[0]; }))).then(res => res.filter(k => !!k));
+    const publicKeys = yield Promise.all(armoredPublicKeys.map((key) => __awaiter(void 0, void 0, void 0, function* () { return (yield openpgp.readKey({ armoredKey: key })).keys[0]; }))).then(res => res.filter(k => !!k));
     if (publicKeys.length === 0)
         throw new Error("No recipients keys set for encryption.");
     const privateKeys = [];
     return openpgp.encrypt({
-        message: openpgp.message.fromText(message),
+        message: openpgp.createMessage({ text: message }),
         publicKeys,
         privateKeys
     }).then((m) => m.data);
@@ -100,11 +100,11 @@ exports._encryptMessagePGP = _encryptMessagePGP;
 const _decryptMessagePGP = (ciphertext, key, passphrase) => __awaiter(void 0, void 0, void 0, function* () {
     if (!key || !key.privateKeyArmored)
         throw new Error("PGP Key not set.");
-    const privateKeyObj = (yield openpgp.key.readArmored(key.privateKeyArmored)).keys[0];
+    const privateKeyObj = (yield openpgp.readKey({ armoredKey: key.privateKeyArmored })).keys[0];
     if (!privateKeyObj.isDecrypted())
         yield privateKeyObj.decrypt(passphrase);
     return openpgp.decrypt({
-        message: yield openpgp.message.readArmored(ciphertext),
+        message: yield openpgp.readMessage({ armoredMessage: ciphertext }),
         privateKeys: [privateKeyObj],
     })
         .then((m) => m.data);

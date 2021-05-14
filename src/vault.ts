@@ -22,8 +22,8 @@ const verify = async (message: string, signature: string, account: Address): Pro
         throw new Error("No wallet found.")
     account = account.toLowerCase()
     return ecRecover(message, signature)
-    .then(a => Boolean(a && a === account))
-    .catch(() => false)
+        .then(a => Boolean(a && a === account))
+        .catch(() => false)
 }
 
 const encrypt = (data: Uint8Array): Promise<Uint8Array> => {
@@ -48,12 +48,13 @@ const generateSignature = async (): Promise<string> => {
 }
 
 const generatePassword = async (): Promise<string> =>
-    Buffer.from(await openpgp.crypto.random.getRandomBytes(44)).toString('hex')
+    // @ts-ignore
+    Buffer.from(await openpgp.RandomBuffer.getRandomBytes(44)).toString('hex')
 
 const generateKey = async (passphrase: string): Promise<Key> => {
     const account = await getAccount().then(a => a.toLowerCase())
     const { privateKeyArmored, publicKeyArmored } = await openpgp.generateKey({
-        userIds: [{ name: account }],
+        userIDs: [{ name: account }],
         curve: 'ed25519', // ECDH for encryption and EdDSA for signature.
         passphrase
     })
@@ -61,17 +62,19 @@ const generateKey = async (passphrase: string): Promise<Key> => {
 }
 
 // Encrypt message with PGP symmetric keys.
-const _encryptMessagePGP = async (message: string, recipientsKeys: Key[], signatureKeys?:Key[]) => {
+const _encryptMessagePGP = async (message: string, recipientsKeys: Key[], signatureKeys?: Key[]) => {
     const armoredPublicKeys = recipientsKeys.map(k => k.publicKeyArmored)
     const publicKeys = await Promise.all(armoredPublicKeys.map(async key =>
-        (await openpgp.key.readArmored(key)).keys[0]
+        // @ts-ignore
+        (await openpgp.readKey({ armoredKey: key })).keys[0]
     )).then(res => res.filter(k => !!k))
     if (publicKeys.length === 0)
         throw new Error("No recipients keys set for encryption.")
     // @todo : Use signature keys, if unlockable.
     const privateKeys: any[] = []
     return openpgp.encrypt({
-        message: openpgp.message.fromText(message),
+        // @ts-ignore
+        message: openpgp.createMessage({ text: message }),
         publicKeys,
         privateKeys
     }).then((m: any) => m.data)
@@ -81,17 +84,18 @@ const _encryptMessagePGP = async (message: string, recipientsKeys: Key[], signat
 const _decryptMessagePGP = async (ciphertext: string, key: Key, passphrase: string) => {
     if (!key || !key.privateKeyArmored)
         throw new Error("PGP Key not set.")
-    const privateKeyObj = (await openpgp.key.readArmored(key.privateKeyArmored)).keys[0]
+    // @ts-ignore
+    const privateKeyObj = (await openpgp.readKey({ armoredKey: key.privateKeyArmored })).keys[0]
     if (!privateKeyObj.isDecrypted())
         await privateKeyObj.decrypt(passphrase)
     return openpgp.decrypt({
-        message: await openpgp.message.readArmored(ciphertext),
+        message: await openpgp.readMessage({ armoredMessage: ciphertext }),
         privateKeys: [privateKeyObj],
     })
-    .then((m: any) => m.data)
+        .then((m: any) => m.data)
 }
 
-export  {
+export {
     openpgp,
     Key,
     deployKey,

@@ -9,18 +9,18 @@
   "types": "./dist/index.d.ts",
   "devDependencies": {
     "@tsconfig/recommended": "^1.0.1",
-    "@types/openpgp": "^4.4.15",
-    "typescript": "^4.0.3"
+    "@types/openpgp": "^4.4.16",
+    "typescript": "^4.2.4"
   },
   "dependencies": {
     "@metamask/detect-provider": "^1.2.0",
     "@organigram/contracts": "git+https://alxmhe:ETwr5WUv3DJEjjJegRG6@bitbucket.org/organigram/contracts.git#develop",
-    "ipfs-core": "^0.4.0",
-    "ipfs-provider": "^1.1.0",
+    "ipfs-core": "^0.6.1",
+    "ipfs-provider": "^2.0.1",
     "it-all": "^1.0.4",
-    "openpgp": "^4.10.8",
-    "uint8arrays": "^2.0.5",
-    "web3": "^1.3.0"
+    "openpgp": "^5.0.0-2",
+    "uint8arrays": "^2.1.5",
+    "web3": "^1.3.6"
   },
   "scripts": {
     "build": "tsc",
