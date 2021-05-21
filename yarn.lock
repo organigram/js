@@ -2614,13 +2614,13 @@ ipfs-core@^0.6.1:
     streaming-iterables "^5.0.2"
     uint8arrays "^2.1.3"
 
-ipfs-provider@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/ipfs-provider/-/ipfs-provider-2.0.1.tgz#57491f4a825f3e885530eec7987f44fb3a5033c1"
-  integrity sha512-O57K/7XSPYp0sil2X5yK6+P38WdrRZ1pyAesDiXly/6DfuEkn3ozFcjdcIuFy19HFwVH02mNfY1oSxQRODkIFA==
+ipfs-provider@^1.0.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/ipfs-provider/-/ipfs-provider-1.1.0.tgz#4f37debc1325b189ee068e38631906c8e6af3229"
+  integrity sha512-1X8Efz4WW8v5wcXAr9u5G3zZ1qqcETbys2QZn6xi1ls469FktHvuJT3ZqlM6jPhpLxRcuz79LSGVirWMBygQLQ==
   dependencies:
-    iso-url "^1.1.5"
-    merge-options "^3.0.4"
+    iso-url "~0.4.7"
+    merge-options "^3.0.1"
 
 ipfs-repo-migrations@^8.0.0:
   version "8.0.0"
@@ -3811,7 +3811,7 @@ merge-descriptors@1.0.1:
   resolved "https://registry.yarnpkg.com/merge-descriptors/-/merge-descriptors-1.0.1.tgz#b00aaa556dd8b44568150ec9d1b953f3f90cbb61"
   integrity sha1-sAqqVW3YtEVoFQ7J0blT8/kMu2E=
 
-merge-options@^3.0.4:
+merge-options@^3.0.1, merge-options@^3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/merge-options/-/merge-options-3.0.4.tgz#84709c2aa2a4b24c1981f66c179fe5565cc6dbb7"
   integrity sha512-2Sug1+knBjkaMsMgf1ctR1Ujx+Ayku4EdJN4Z+C2+JzoeF7A3OZ9KM2GY0CpQS51NR61LTurMJrRKPhSs3ZRTQ==

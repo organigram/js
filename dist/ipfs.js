@@ -44,24 +44,22 @@ exports.IPFS = IPFS;
 const to_string_1 = __importDefault(require("uint8arrays/to-string"));
 const concat_1 = __importDefault(require("uint8arrays/concat"));
 const ipfs_provider_1 = require("ipfs-provider");
+const { httpClient, jsIpfs } = ipfs_provider_1.providers;
 const ipfsNode = ipfs_provider_1.getIpfs({
     providers: [
-        ipfs_provider_1.providers.windowIpfs({
-            permissions: { commands: ['add', 'cat', 'get'] }
-        }),
-        ipfs_provider_1.providers.jsIpfs({
-            loadJsIpfsModule: () => require('ipfs-core'),
+        httpClient(),
+        jsIpfs({
+            loadJsIpfsModule: () => require('ipfs'),
             options: {}
         })
     ]
 })
-    .then((res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    if ((_a = res.ipfs) === null || _a === void 0 ? void 0 : _a.enable) {
-        yield res.ipfs.enable({ commands: ['id', 'add', 'cat', 'get'] });
+    .then(({ ipfs }) => __awaiter(void 0, void 0, void 0, function* () {
+    if (ipfs === null || ipfs === void 0 ? void 0 : ipfs.enable) {
+        yield ipfs.enable({ commands: ['id', 'add', 'cat', 'get'] });
         console.info('IPFS enabled.');
     }
-    return res.ipfs;
+    return ipfs;
 }));
 exports.ipfsNode = ipfsNode;
 const multihashToCid = ({ ipfsHash, hashFunction, hashSize }) => {
@@ -110,19 +108,19 @@ exports.urlToCID = urlToCID;
 const uint8ArrayToString = (uint8Array) => to_string_1.default(uint8Array);
 exports.uint8ArrayToString = uint8ArrayToString;
 const parseJSON = (cid) => __awaiter(void 0, void 0, void 0, function* () {
-    var e_1, _b;
+    var e_1, _a;
     const ipfs = yield Promise.resolve(ipfsNode);
     const chunks = [];
     try {
-        for (var _c = __asyncValues(ipfs.cat(cid)), _d; _d = yield _c.next(), !_d.done;) {
-            const chunk = _d.value;
+        for (var _b = __asyncValues(ipfs.cat(cid)), _c; _c = yield _b.next(), !_c.done;) {
+            const chunk = _c.value;
             chunks.push(chunk);
         }
     }
     catch (e_1_1) { e_1 = { error: e_1_1 }; }
     finally {
         try {
-            if (_d && !_d.done && (_b = _c.return)) yield _b.call(_c);
+            if (_c && !_c.done && (_a = _b.return)) yield _a.call(_b);
         }
         finally { if (e_1) throw e_1.error; }
     }

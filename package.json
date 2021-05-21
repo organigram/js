@@ -16,7 +16,7 @@
     "@metamask/detect-provider": "^1.2.0",
     "@organigram/contracts": "git+https://alxmhe:ETwr5WUv3DJEjjJegRG6@bitbucket.org/organigram/contracts.git#develop",
     "ipfs-core": "^0.6.1",
-    "ipfs-provider": "^2.0.1",
+    "ipfs-provider": "^1.0.0",
     "it-all": "^1.0.4",
     "openpgp": "^5.0.0-2",
     "uint8arrays": "^2.1.5",
