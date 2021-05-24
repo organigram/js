@@ -49,7 +49,7 @@ const ipfsNode = ipfs_provider_1.getIpfs({
     providers: [
         httpClient(),
         jsIpfs({
-            loadJsIpfsModule: () => require('ipfs'),
+            loadJsIpfsModule: () => require('ipfs-core'),
             options: {}
         })
     ]

@@ -10,7 +10,7 @@ const ipfsNode: Promise<any> = getIpfs({
     providers: [
         httpClient(),
         jsIpfs({
-            loadJsIpfsModule: () => require('ipfs'),
+            loadJsIpfsModule: () => require('ipfs-core'),
             options: {}
         })
     ]
