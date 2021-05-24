@@ -25,7 +25,7 @@ const connect = async (): Promise<Address> =>
         : getAccount()
 
 // Initial enable.
-connect()
+// connect()
 
 const getNetwork = async (): Promise<Network> => {
     if (!web3 || !web3.currentProvider)

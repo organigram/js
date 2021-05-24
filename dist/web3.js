@@ -58,7 +58,6 @@ const connect = () => __awaiter(void 0, void 0, void 0, function* () {
         : getAccount();
 });
 exports.connect = connect;
-connect();
 const getNetwork = () => __awaiter(void 0, void 0, void 0, function* () {
     if (!web3 || !web3.currentProvider)
         throw new Error("Web3 is missing.");
