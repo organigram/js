@@ -19,13 +19,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Procedure = exports.INTERFACE = void 0;
+exports.Procedure = exports.VOTE_INTERFACE = exports.NOMINATION_INTERFACE = exports.INTERFACE = void 0;
 const ipfs_core_1 = require("ipfs-core");
 const Procedure_json_1 = __importDefault(require("@organigram/contracts/build/contracts/Procedure.json"));
 const web3_1 = require("../web3");
 const ipfs_1 = require("../ipfs");
 const web3_2 = require("../web3");
 exports.INTERFACE = `0x71dbd330`;
+var nomination_1 = require("./nomination");
+Object.defineProperty(exports, "NOMINATION_INTERFACE", { enumerable: true, get: function () { return nomination_1.INTERFACE; } });
+var vote_1 = require("./vote");
+Object.defineProperty(exports, "VOTE_INTERFACE", { enumerable: true, get: function () { return vote_1.INTERFACE; } });
 class Procedure {
     constructor({ address, type, ProcedureClass, metadata, data, moves }) {
         this.address = "";

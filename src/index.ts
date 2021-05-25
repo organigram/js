@@ -41,8 +41,8 @@ export {
     _decryptMessagePGP
 } from './vault'
 export { Graph } from './graph'
-export { Organ, ORGAN_CONTRACT_SIGNATURES } from './organ'
+export { Organ, ORGAN_CONTRACT_SIGNATURES, PERMISSIONS } from './organ'
 export { Keyserver } from './keyserver'
-export { Procedure, INTERFACE as PROCEDURE_INTERFACE } from './procedure'
+export { Procedure, INTERFACE as PROCEDURE_INTERFACE, NOMINATION_INTERFACE, VOTE_INTERFACE } from './procedure'
 
 import "./types"

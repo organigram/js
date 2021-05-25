@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 var _a, _b;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Organ = exports.ORGAN_CONTRACT_SIGNATURES = void 0;
+exports.PERMISSIONS = exports.Organ = exports.ORGAN_CONTRACT_SIGNATURES = void 0;
 const web3_1 = require("./web3");
 const it_all_1 = __importDefault(require("it-all"));
 const concat_1 = __importDefault(require("uint8arrays/concat"));
@@ -333,4 +333,21 @@ Organ.loadEntries = (address) => __awaiter(void 0, void 0, void 0, function* () 
     }
     return Promise.all(promises).then(entries => entries.filter(e => !!e));
 });
+exports.PERMISSIONS = {
+    ADMIN: '0xffff',
+    ALL: '0x07ff',
+    ALL_PROCEDURES: '0x0003',
+    ALL_ENTRIES: '0x000c',
+    ADD_PROCEDURES: '0x0001',
+    REMOVE_PROCEDURES: '0x0002',
+    ADD_ENTRIES: '0x0004',
+    REMOVE_ENTRIES: '0x0008',
+    UPDATE_METADATA: '0x0010',
+    DEPOSIT_ETHER: '0x0020',
+    WITHDRAW_ETHER: '0x0040',
+    DEPOSIT_COINS: '0x0080',
+    WITHDRAW_COINS: '0x0100',
+    DEPOSIT_COLLECTIBLES: '0x0200',
+    WITHDRAW_COLLECTIBLES: '0x0400'
+};
 exports.default = Organ;

@@ -6,6 +6,9 @@ import { getAccount } from '../web3'
 
 export const INTERFACE = `0x71dbd330` // getMove signature.
 
+export {INTERFACE as NOMINATION_INTERFACE } from './nomination'
+export {INTERFACE as VOTE_INTERFACE } from './vote'
+
 export class Procedure {
     address: Address = ""
     type: ProcedureType = ""
