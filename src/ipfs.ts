@@ -3,12 +3,13 @@ import toString from 'uint8arrays/to-string'
 import concat from 'uint8arrays/concat'
 // @ts-ignore
 import { getIpfs, providers } from 'ipfs-provider'
-const { httpClient, jsIpfs } = providers
+const { jsIpfs } = providers
 
 const ipfsNode: Promise<any> = getIpfs({
-    // loadHttpClientModule: () => require('ipfs-http-client'),
     providers: [
-        httpClient(),
+        // httpClient({
+        //     loadHttpClientModule: () => require('ipfs-http-client'),
+        // }),
         jsIpfs({
             loadJsIpfsModule: () => require('ipfs-core'),
             options: {}

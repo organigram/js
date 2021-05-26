@@ -44,10 +44,9 @@ exports.IPFS = IPFS;
 const to_string_1 = __importDefault(require("uint8arrays/to-string"));
 const concat_1 = __importDefault(require("uint8arrays/concat"));
 const ipfs_provider_1 = require("ipfs-provider");
-const { httpClient, jsIpfs } = ipfs_provider_1.providers;
+const { jsIpfs } = ipfs_provider_1.providers;
 const ipfsNode = ipfs_provider_1.getIpfs({
     providers: [
-        httpClient(),
         jsIpfs({
             loadJsIpfsModule: () => require('ipfs-core'),
             options: {}
