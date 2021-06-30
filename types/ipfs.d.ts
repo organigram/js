@@ -1,0 +1,11 @@
+import IPFS, { CID } from 'ipfs-core';
+import { Multihash } from './types';
+declare const ipfsNode: Promise<any>;
+declare const multihashToCid: ({ ipfsHash, hashFunction, hashSize }: Multihash) => CID | undefined;
+declare const cidToMultihash: (cid: CID | string) => Multihash | undefined;
+declare const urlToCID: (url: string) => CID | null;
+declare const uint8ArrayToString: (uint8Array: Uint8Array) => string;
+declare const parseJSON: (cid: CID | string) => Promise<object | any[]>;
+declare const EMPTY_CID: string;
+declare const EMPTY_MULTIHASH: Multihash | undefined;
+export { IPFS, ipfsNode, multihashToCid, cidToMultihash, urlToCID, uint8ArrayToString, parseJSON, EMPTY_CID, EMPTY_MULTIHASH, CID };

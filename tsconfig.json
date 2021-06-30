@@ -6,8 +6,10 @@
       "resolveJsonModule": true,
       "preserveConstEnums": true,
       "outDir": "dist",
-      "sourceMap": false
+      "sourceMap": false,
+      "declaration": true,
+      "declarationDir": "./types"
     },
-    "include": ["src/**/*", "src/index.d.ts"],
+    "include": ["src/**/*"],
     "exclude": ["node_modules", "**/*.spec.ts"]
 }

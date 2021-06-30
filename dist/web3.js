@@ -12,8 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports._linkBytecode = exports.getNetworkName = exports.getNetwork = exports.getAccount = exports.connect = exports.ecRecover = exports.sign = exports.EMPTY_ADDRESS = exports.web3 = void 0;
+exports._linkBytecode = exports.getNetworkName = exports.getNetwork = exports.getAccount = exports.connect = exports.ecRecover = exports.sign = exports.EMPTY_ADDRESS = exports.web3 = exports.Web3 = void 0;
 const web3_1 = __importDefault(require("web3"));
+exports.Web3 = web3_1.default;
 const EMPTY_ADDRESS = "0x0000000000000000000000000000000000000000";
 exports.EMPTY_ADDRESS = EMPTY_ADDRESS;
 const web3 = new web3_1.default(typeof window !== "undefined"

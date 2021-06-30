@@ -21,15 +21,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 var _a, _b;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PERMISSIONS = exports.Organ = exports.ORGAN_CONTRACT_SIGNATURES = void 0;
-const web3_1 = require("./web3");
+const web3_1 = __importDefault(require("web3"));
 const it_all_1 = __importDefault(require("it-all"));
 const concat_1 = __importDefault(require("uint8arrays/concat"));
-const ipfs_core_1 = require("ipfs-core");
 const Organ_json_1 = __importDefault(require("@organigram/contracts/build/contracts/Organ.json"));
+const web3_2 = require("./web3");
 const ipfs_1 = require("./ipfs");
-const web3_2 = __importDefault(require("web3"));
-exports.ORGAN_CONTRACT_SIGNATURES = ((_b = (_a = Organ_json_1.default.ast
-    .nodes.find(n => n.name === "")) === null || _a === void 0 ? void 0 : _a.nodes) === null || _b === void 0 ? void 0 : _b.map(n => (n === null || n === void 0 ? void 0 : n.functionSelector) || "").filter(i => i !== ""))
+exports.ORGAN_CONTRACT_SIGNATURES = ((_b = (_a = Organ_json_1.default
+    .ast.nodes.find(n => n.name === "")) === null || _a === void 0 ? void 0 : _a.nodes) === null || _b === void 0 ? void 0 : _b.map(n => (n === null || n === void 0 ? void 0 : n.functionSelector) || "").filter(i => i !== ""))
     || [];
 class Organ {
     constructor({ address, network, balance, procedures, metadata, entries }) {
@@ -39,13 +38,13 @@ class Organ {
         this.procedures = [];
         this.metadata = {};
         this.entries = [];
-        this.updateMetadata = (cid = new ipfs_core_1.CID("QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH")) => __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi, this.address);
+        this.updateMetadata = (cid = new ipfs_1.CID("QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH")) => __awaiter(this, void 0, void 0, function* () {
+            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
             const multihash = ipfs_1.cidToMultihash(cid);
             if (!multihash)
                 throw new Error("Wrong CID.");
             const { ipfsHash, hashFunction, hashSize } = multihash;
-            const from = yield web3_1.getAccount();
+            const from = yield web3_2.getAccount();
             return from && contract.methods.updateMetadata({ ipfsHash, hashFunction, hashSize }).send({ from })
                 .then(() => true)
                 .catch((error) => {
@@ -54,15 +53,15 @@ class Organ {
             });
         });
         this.addEntries = (entries) => __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi, this.address);
+            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
             const _entries = entries.map(e => {
-                let multihash = ipfs_1.cidToMultihash(new ipfs_core_1.CID(e.cid));
+                let multihash = e.cid && ipfs_1.cidToMultihash(new ipfs_1.CID(e.cid));
                 if (!multihash)
                     throw new Error(`Wrong IPFS Content ID '${e.cid}' for entry.`);
                 const { ipfsHash, hashFunction, hashSize } = multihash;
                 return { addr: e.address, doc: { ipfsHash, hashFunction, hashSize } };
             });
-            const from = yield web3_1.getAccount();
+            const from = yield web3_2.getAccount();
             return from && contract.methods.addEntries(_entries).send({ from })
                 .then(() => true)
                 .catch((error) => {
@@ -71,8 +70,8 @@ class Organ {
             });
         });
         this.removeEntries = (indexes) => __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi, this.address);
-            const from = yield web3_1.getAccount();
+            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
+            const from = yield web3_2.getAccount();
             return from && contract.methods.removeEntries(indexes).send({ from })
                 .then(() => true)
                 .catch((error) => {
@@ -81,12 +80,12 @@ class Organ {
             });
         });
         this.replaceEntry = (index, entry) => __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi, this.address);
-            const multihash = ipfs_1.cidToMultihash(entry.cid);
+            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
+            const multihash = entry.cid && ipfs_1.cidToMultihash(entry.cid);
             if (!multihash)
                 throw new Error("Wrong CID.");
             const { ipfsHash, hashFunction, hashSize } = multihash;
-            const from = yield web3_1.getAccount();
+            const from = yield web3_2.getAccount();
             return from && contract.methods.replaceEntry(index, entry.address, { ipfsHash, hashFunction, hashSize }).send({ from })
                 .then(() => true)
                 .catch((error) => {
@@ -95,8 +94,8 @@ class Organ {
             });
         });
         this.addProcedure = (procedure) => __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi, this.address);
-            const from = yield web3_1.getAccount();
+            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
+            const from = yield web3_2.getAccount();
             return from && contract.methods.addProcedure(procedure.address, procedure.permissions).send({ from })
                 .then(() => true)
                 .catch((error) => {
@@ -105,8 +104,8 @@ class Organ {
             });
         });
         this.removeProcedure = (procedure) => __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi, this.address);
-            const from = yield web3_1.getAccount();
+            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
+            const from = yield web3_2.getAccount();
             return from && contract.methods.removeProcedure(procedure).send({ from })
                 .then(() => true)
                 .catch((error) => {
@@ -115,9 +114,9 @@ class Organ {
             });
         });
         this.replaceProcedure = (oldProcedure, newOrganProcedure) => __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi, this.address);
+            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
             const { address, permissions } = newOrganProcedure;
-            const from = yield web3_1.getAccount();
+            const from = yield web3_2.getAccount();
             return from && contract.methods.replaceProcedure(oldProcedure, address, permissions).send({ from })
                 .then(() => true)
                 .catch((error) => {
@@ -134,13 +133,13 @@ class Organ {
     }
     static load(address) {
         return __awaiter(this, void 0, void 0, function* () {
-            const network = yield web3_1.getNetwork();
+            const network = yield web3_2.getNetwork();
             if (!network)
                 throw new Error("Not connected to a valid network.");
             const isOrgan = yield Organ.isOrgan(address).catch(() => false);
             const balance = yield Organ.getBalance(address)
                 .catch(() => "n/a");
-            const metadata = yield Organ.loadData(address).catch(() => null).then(d => d && d.metadata);
+            const metadata = (yield Organ.loadData(address).catch(() => null).then(d => d === null || d === void 0 ? void 0 : d.metadata)) || null;
             const procedures = yield Organ.loadProcedures(address)
                 .catch(error => {
                 console.warn("Error while loading organ's procedures", address, error.message);
@@ -156,7 +155,7 @@ class Organ {
     }
     static isOrgan(address) {
         return __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi, address);
+            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, address);
             const isERC165 = yield contract.methods.supportsInterface("0x01ffc9a7").call()
                 .catch(() => false);
             if (!isERC165)
@@ -168,16 +167,16 @@ class Organ {
     }
     static getBalance(address) {
         return __awaiter(this, void 0, void 0, function* () {
-            const balance = yield web3_1.web3.eth.getBalance(address);
+            const balance = yield web3_2.web3.eth.getBalance(address);
             return `${balance}`;
         });
     }
     static loadData(address) {
         return __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi, address);
+            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, address);
             const data = yield contract.methods.getOrgan().call();
             return {
-                metadata: ipfs_1.multihashToCid(data.metadata),
+                metadata: { cid: ipfs_1.multihashToCid(data.metadata) },
                 proceduresLength: data.proceduresLength,
                 entriesLength: data.entriesLength,
                 entriesCount: data.entriesCount
@@ -186,14 +185,14 @@ class Organ {
     }
     static loadEntryForAccount(address, account) {
         return __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi, address);
+            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, address);
             const index = yield contract.methods.getEntryIndexForAddress(account).call();
             return Organ.loadEntry(address, index);
         });
     }
     static loadPermissions(address, procedure) {
         return __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi, address);
+            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, address);
             return contract.methods.getPermissions(procedure).call()
                 .catch((e) => console.error("Error", e.message))
                 .then(({ perms }) => perms && perms.toString());
@@ -201,7 +200,7 @@ class Organ {
     }
     static loadProcedure(address, index) {
         return __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi, address);
+            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, address);
             return contract.methods.getProcedure(index).call()
                 .catch((e) => console.error("Error", e.message))
                 .then((data) => data && {
@@ -214,10 +213,10 @@ class Organ {
         var e_1, _a;
         return __awaiter(this, void 0, void 0, function* () {
             const data = yield Organ.loadData(address);
-            const length = web3_2.default.utils.toBN(data.proceduresLength);
+            const length = web3_1.default.utils.toBN(data.proceduresLength);
             let procedures = [];
             const iGenerator = function* () {
-                let i = web3_2.default.utils.toBN("0");
+                let i = web3_1.default.utils.toBN("0");
                 while (i.lt(length)) {
                     yield i;
                     i = i.addn(1);
@@ -248,7 +247,7 @@ class Organ {
     }
     static loadEntry(address, index) {
         return __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_1.web3.eth.Contract(Organ_json_1.default.abi, address);
+            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, address);
             const ipfs = yield ipfs_1.ipfsNode;
             if (!ipfs) {
                 console.info("IPFS was not started. Starting IPFS.");
@@ -256,7 +255,7 @@ class Organ {
             }
             return contract.methods.getEntry(index).call()
                 .then(({ addr, doc }) => __awaiter(this, void 0, void 0, function* () {
-                if (addr === web3_1.EMPTY_ADDRESS && (!parseInt(doc.hashFunction, 16) || !parseInt(doc.hashSize)))
+                if (addr === web3_2.EMPTY_ADDRESS && (!parseInt(doc.hashFunction, 16) || !parseInt(doc.hashSize)))
                     return null;
                 let entry = { index, address: addr, cid: ipfs_1.multihashToCid(doc) };
                 if (entry.cid) {
@@ -274,10 +273,10 @@ class Organ {
     static loadEntries(address) {
         var e_2, _a;
         return __awaiter(this, void 0, void 0, function* () {
-            const length = web3_2.default.utils.toBN((yield Organ.loadData(address)).entriesLength);
+            const length = web3_1.default.utils.toBN((yield Organ.loadData(address)).entriesLength);
             let entries = [];
             const iGenerator = function* () {
-                let i = web3_2.default.utils.toBN("1");
+                let i = web3_1.default.utils.toBN("1");
                 while (i.lt(length)) {
                     yield i;
                     i = i.addn(1);

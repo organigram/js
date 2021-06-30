@@ -18,8 +18,6 @@ const Procedure_json_1 = __importDefault(require("@organigram/contracts/build/co
 const web3_1 = require("./web3");
 const organ_1 = __importDefault(require("./organ"));
 const procedure_1 = __importDefault(require("./procedure"));
-const vote_1 = __importDefault(require("./procedures/vote"));
-const nomination_1 = __importDefault(require("./procedures/nomination"));
 const ipfs_1 = require("./ipfs");
 class Organigram {
     constructor(address, network, proceduresRegistry, procedureTypes) {
@@ -40,20 +38,10 @@ class Organigram {
                 throw new Error("Contract does not support interfaces.");
             if (!(yield contract.methods.supportsInterface(procedure_1.default.INTERFACE).call().catch(() => false)))
                 throw new Error("Contract is not a procedure.");
-            if (yield contract.methods.supportsInterface(vote_1.default.INTERFACE).call().catch(() => false)) {
-                Class = vote_1.default;
-                label = "Vote";
-            }
-            else if (yield contract.methods.supportsInterface(nomination_1.default.INTERFACE).call().catch(() => false)) {
-                Class = nomination_1.default;
-                label = "Nomination";
-            }
-            else
-                throw new Error("Contract was not recognized as a valid procedure.");
             return {
                 label,
                 address: addr,
-                metadata: doc,
+                metadata: { cid: doc },
                 Class
             };
         });
@@ -129,7 +117,7 @@ class Organigram {
             if (!admin)
                 admin = from;
             const multihash = ipfs_1.cidToMultihash(metadata);
-            const address = yield this._contract.methods.createOrgan(multihash, admin).call({ from });
+            const address = yield this._contract.methods.createOrgan(admin, multihash).call({ from });
             return this.getOrgan(address);
         });
     }
@@ -137,7 +125,7 @@ class Organigram {
         return __awaiter(this, void 0, void 0, function* () {
             const from = yield web3_1.getAccount();
             const procedureType = yield this.getProcedureType(type);
-            if (!procedureType || !procedureType.address || !procedureType.Class)
+            if (!(procedureType === null || procedureType === void 0 ? void 0 : procedureType.address) || !procedureType.Class)
                 throw new Error("Procedure type not found.");
             const address = yield this._contract.methods.createProcedure(procedureType.address).call({ from });
             yield procedureType.Class.initialize(address, metadata, proposers, moderators, deciders, withModeration, ...args);
