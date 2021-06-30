@@ -480,7 +480,7 @@
 
 "@organigram/procedures@git+https://alxmhe:ETwr5WUv3DJEjjJegRG6@bitbucket.org/organigram/procedures.git#master":
   version "1.0.0"
-  resolved "git+https://alxmhe:ETwr5WUv3DJEjjJegRG6@bitbucket.org/organigram/procedures.git#178f693bfc30b93cfe7e97ef08e920fca1b58036"
+  resolved "git+https://alxmhe:ETwr5WUv3DJEjjJegRG6@bitbucket.org/organigram/procedures.git#38bba72d1418e21c5b1de80a04962d29457d2949"
 
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
   version "1.1.2"
