@@ -78,8 +78,12 @@ const parseJSON = async (cid: CID | string): Promise<object | any[]> => {
   for await (const chunk of ipfs.cat(cid)) {
     chunks.push(chunk)
   }
-  // @ts-ignore
-  return JSON.parse(toString(concat(chunks)))
+  try {
+    // @ts-ignore
+    return JSON.parse(toString(concat(chunks)))
+  } catch (error) {
+    throw new Error(error.message)
+  }
 }
 
 const EMPTY_CID: string = `QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH`

@@ -122,7 +122,12 @@ const parseJSON = (cid) => __awaiter(void 0, void 0, void 0, function* () {
         }
         finally { if (e_1) throw e_1.error; }
     }
-    return JSON.parse(to_string_1.default(concat_1.default(chunks)));
+    try {
+        return JSON.parse(to_string_1.default(concat_1.default(chunks)));
+    }
+    catch (error) {
+        throw new Error(error.message);
+    }
 });
 exports.parseJSON = parseJSON;
 const EMPTY_CID = `QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH`;

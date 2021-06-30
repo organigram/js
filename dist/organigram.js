@@ -33,12 +33,19 @@ class Organigram {
     static loadProcedureType({ addr, doc }) {
         return __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, addr);
-            let Class = null, label = "", key = "";
+            let Class = null, label = "", key = "", metadata = {};
             if (!(yield contract.methods.supportsInterface("0x01ffc9a7").call().catch(() => false)))
                 throw new Error("Contract does not support interfaces.");
             if (!(yield contract.methods.supportsInterface(procedure_1.default.INTERFACE).call().catch(() => false)))
                 throw new Error("Contract is not a procedure.");
-            const metadata = doc ? yield ipfs_1.parseJSON(doc) : {};
+            if (doc) {
+                try {
+                    metadata = yield ipfs_1.parseJSON(doc);
+                }
+                catch (error) {
+                    console.warn(error.message, doc);
+                }
+            }
             if (metadata === null || metadata === void 0 ? void 0 : metadata.type) {
                 switch (metadata.type) {
                     case 'nomination':

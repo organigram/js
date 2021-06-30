@@ -51,13 +51,19 @@ export class Organigram {
     // @todo : Parse doc for custom parser.
     // @ts-ignore
     const contract = new web3.eth.Contract(ProcedureContract.abi, addr)
-    let Class = null, label = "", key = ""
+    let Class = null, label = "", key = "", metadata:any = {}
     // @todo : Leverage interfaces or metadata in registry to detect procedure class.
     if (!(await contract.methods.supportsInterface("0x01ffc9a7").call().catch(() => false)))
       throw new Error("Contract does not support interfaces.")
     if (!(await contract.methods.supportsInterface(Procedure.INTERFACE).call().catch(() => false)))
       throw new Error("Contract is not a procedure.")
-    const metadata:any = doc ? await cidToJSON(doc) : {}
+    if (doc) {
+      try {
+        metadata = await cidToJSON(doc)
+      } catch (error) {
+        console.warn(error.message, doc)
+      }
+    }
     if (metadata?.type) {
       // @todo : Fix detection of built-in procedures types.
       switch (metadata.type) {
