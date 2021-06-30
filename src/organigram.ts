@@ -8,6 +8,7 @@ import { parseJSON as cidToJSON, cidToMultihash, CID } from './ipfs'
 import type { Address, Metadata, Network } from './types'
 
 export type ProcedureType = {
+  key: string,
   label: string,
   address: Address,
   metadata: Metadata,
@@ -50,7 +51,7 @@ export class Organigram {
     // @todo : Parse doc for custom parser.
     // @ts-ignore
     const contract = new web3.eth.Contract(ProcedureContract.abi, addr)
-    let Class = null, label = ""
+    let Class = null, label = "", key = ""
     // @todo : Leverage interfaces or metadata in registry to detect procedure class.
     if (!(await contract.methods.supportsInterface("0x01ffc9a7").call().catch(() => false)))
       throw new Error("Contract does not support interfaces.")
@@ -63,6 +64,7 @@ export class Organigram {
         case 'nomination':
         case 'vote':
         case 'erc20vote':
+          key = metadata.type
           label = metadata.name || label
           Class = await require(`@organigram/procedures/dist/${metadata.type}/class`)
           break
@@ -72,6 +74,7 @@ export class Organigram {
     // @todo : If Class is set, test if addr supports the procedure's interface.
     return {
       label,
+      key,
       address: addr,
       metadata: {
         ...metadata,

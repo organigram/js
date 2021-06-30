@@ -33,7 +33,7 @@ class Organigram {
     static loadProcedureType({ addr, doc }) {
         return __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, addr);
-            let Class = null, label = "";
+            let Class = null, label = "", key = "";
             if (!(yield contract.methods.supportsInterface("0x01ffc9a7").call().catch(() => false)))
                 throw new Error("Contract does not support interfaces.");
             if (!(yield contract.methods.supportsInterface(procedure_1.default.INTERFACE).call().catch(() => false)))
@@ -44,6 +44,7 @@ class Organigram {
                     case 'nomination':
                     case 'vote':
                     case 'erc20vote':
+                        key = metadata.type;
                         label = metadata.name || label;
                         Class = yield require(`@organigram/procedures/dist/${metadata.type}/class`);
                         break;
@@ -52,6 +53,7 @@ class Organigram {
             }
             return {
                 label,
+                key,
                 address: addr,
                 metadata: Object.assign(Object.assign({}, metadata), { cid: doc }),
                 Class

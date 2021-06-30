@@ -4,6 +4,7 @@ import Procedure from './procedure';
 import { CID } from './ipfs';
 import type { Address, Metadata, Network } from './types';
 export declare type ProcedureType = {
+    key: string;
     label: string;
     address: Address;
     metadata: Metadata;
