@@ -4,7 +4,7 @@ import { web3, getAccount, getNetwork } from './web3'
 import Graph from './graph'
 import Organ, { OrganEntry } from './organ'
 import Procedure from './procedure'
-import { cidToMultihash, CID } from './ipfs'
+import { parseJSON as cidToJSON, cidToMultihash, CID } from './ipfs'
 import type { Address, Metadata, Network } from './types'
 
 export type ProcedureType = {
@@ -56,21 +56,27 @@ export class Organigram {
       throw new Error("Contract does not support interfaces.")
     if (!(await contract.methods.supportsInterface(Procedure.INTERFACE).call().catch(() => false)))
       throw new Error("Contract is not a procedure.")
-    // @todo : Check interface from instance directly.
-    // if (await contract.methods.supportsInterface(ProcedureVote.INTERFACE).call().catch(() => false)) {
-    //     Class = ProcedureVote
-    //     label = "Vote"
-    // }
-    // else if (await contract.methods.supportsInterface(ProcedureNomination.INTERFACE).call().catch(() => false)) {
-    //     Class = ProcedureNomination
-    //     label = "Nomination"
-    // }
-    // else
-    //     throw new Error("Contract was not recognized as a valid procedure.")
+    const metadata:any = doc ? await cidToJSON(doc) : {}
+    if (metadata?.type) {
+      // @todo : Fix detection of built-in procedures types.
+      switch (metadata.type) {
+        case 'nomination':
+        case 'vote':
+        case 'erc20vote':
+          label = metadata.name || label
+          Class = await require(`@organigram/procedures/dist/${metadata.type}/class`)
+          break
+        default:
+      }
+    }
+    // @todo : If Class is set, test if addr supports the procedure's interface.
     return {
       label,
       address: addr,
-      metadata: { cid: doc },
+      metadata: {
+        ...metadata,
+        cid: doc
+      },
       Class
     }
   }

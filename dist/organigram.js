@@ -38,10 +38,22 @@ class Organigram {
                 throw new Error("Contract does not support interfaces.");
             if (!(yield contract.methods.supportsInterface(procedure_1.default.INTERFACE).call().catch(() => false)))
                 throw new Error("Contract is not a procedure.");
+            const metadata = doc ? yield ipfs_1.parseJSON(doc) : {};
+            if (metadata === null || metadata === void 0 ? void 0 : metadata.type) {
+                switch (metadata.type) {
+                    case 'nomination':
+                    case 'vote':
+                    case 'erc20vote':
+                        label = metadata.name || label;
+                        Class = yield require(`@organigram/procedures/dist/${metadata.type}/class`);
+                        break;
+                    default:
+                }
+            }
             return {
                 label,
                 address: addr,
-                metadata: { cid: doc },
+                metadata: Object.assign(Object.assign({}, metadata), { cid: doc }),
                 Class
             };
         });

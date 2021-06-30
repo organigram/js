@@ -45,18 +45,18 @@ const multihashToCid = ({ ipfsHash, hashFunction, hashSize }: Multihash): CID | 
 }
 
 const cidToMultihash = (cid: CID | string): Multihash | undefined => {
-    if (!cid) {
-      cid = EMPTY_CID
-    }
-    if (typeof cid === "string") {
-      cid = new CID(`${cid}`)
-    }
-    const multihash = cid?.multihash && Buffer.from(cid.multihash)
-    return multihash && {
-      ipfsHash: `0x${multihash.slice(2).toString('hex')}`,
-      hashSize: `0x${multihash.slice(1, 2).toString('hex')}`,
-      hashFunction: `0x${multihash.slice(0, 1).toString('hex')}`
-    }
+  if (!cid) {
+    cid = EMPTY_CID
+  }
+  if (typeof cid === "string") {
+    cid = new CID(`${cid}`)
+  }
+  const multihash = cid?.multihash && Buffer.from(cid.multihash)
+  return multihash && {
+    ipfsHash: `0x${multihash.slice(2).toString('hex')}`,
+    hashSize: `0x${multihash.slice(1, 2).toString('hex')}`,
+    hashFunction: `0x${multihash.slice(0, 1).toString('hex')}`
+  }
 }
 
 const urlToCID = (url: string): CID | null => {
