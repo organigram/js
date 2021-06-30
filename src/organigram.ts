@@ -158,7 +158,7 @@ export class Organigram {
     const from = await getAccount()
     if (!admin) admin = from
     const multihash = cidToMultihash(metadata)
-    const address = await this._contract.methods.createOrgan(admin, multihash).call({ from })
+    const address = await this._contract.methods.createOrgan(admin, multihash).send({ from })
     return this.getOrgan(address)
   }
 
@@ -176,7 +176,7 @@ export class Organigram {
     const procedureType: ProcedureType | null = await this.getProcedureType(type)
     if (!procedureType?.address || !procedureType.Class)
       throw new Error("Procedure type not found.")
-    const address = await this._contract.methods.createProcedure(procedureType.address).call({ from })
+    const address = await this._contract.methods.createProcedure(procedureType.address).send({ from })
     await procedureType.Class.initialize(
       address,
       metadata,

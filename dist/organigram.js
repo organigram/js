@@ -117,7 +117,7 @@ class Organigram {
             if (!admin)
                 admin = from;
             const multihash = ipfs_1.cidToMultihash(metadata);
-            const address = yield this._contract.methods.createOrgan(admin, multihash).call({ from });
+            const address = yield this._contract.methods.createOrgan(admin, multihash).send({ from });
             return this.getOrgan(address);
         });
     }
@@ -127,7 +127,7 @@ class Organigram {
             const procedureType = yield this.getProcedureType(type);
             if (!(procedureType === null || procedureType === void 0 ? void 0 : procedureType.address) || !procedureType.Class)
                 throw new Error("Procedure type not found.");
-            const address = yield this._contract.methods.createProcedure(procedureType.address).call({ from });
+            const address = yield this._contract.methods.createProcedure(procedureType.address).send({ from });
             yield procedureType.Class.initialize(address, metadata, proposers, moderators, deciders, withModeration, ...args);
             return this.getProcedure(address, false);
         });
