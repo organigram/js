@@ -112,22 +112,26 @@ class Organigram {
         });
     }
     createOrgan(metadata, admin) {
+        var _a, _b, _c;
         return __awaiter(this, void 0, void 0, function* () {
             const from = yield web3_1.getAccount();
             if (!admin)
                 admin = from;
             const multihash = ipfs_1.cidToMultihash(metadata);
-            const address = yield this._contract.methods.createOrgan(admin, multihash).send({ from });
+            const receipt = yield this._contract.methods.createOrgan(admin, multihash).send({ from });
+            const address = (_c = (_b = (_a = receipt === null || receipt === void 0 ? void 0 : receipt.events) === null || _a === void 0 ? void 0 : _a.organCreated) === null || _b === void 0 ? void 0 : _b.returnValues) === null || _c === void 0 ? void 0 : _c.organ;
             return this.getOrgan(address);
         });
     }
     createProcedure(type, metadata, proposers, moderators, deciders, withModeration, ...args) {
+        var _a, _b, _c;
         return __awaiter(this, void 0, void 0, function* () {
             const from = yield web3_1.getAccount();
             const procedureType = yield this.getProcedureType(type);
             if (!(procedureType === null || procedureType === void 0 ? void 0 : procedureType.address) || !procedureType.Class)
                 throw new Error("Procedure type not found.");
-            const address = yield this._contract.methods.createProcedure(procedureType.address).send({ from });
+            const receipt = yield this._contract.methods.createProcedure(procedureType.address).send({ from });
+            const address = (_c = (_b = (_a = receipt === null || receipt === void 0 ? void 0 : receipt.events) === null || _a === void 0 ? void 0 : _a.procedureCreated) === null || _b === void 0 ? void 0 : _b.returnValues) === null || _c === void 0 ? void 0 : _c.procedure;
             yield procedureType.Class.initialize(address, metadata, proposers, moderators, deciders, withModeration, ...args);
             return this.getProcedure(address, false);
         });
