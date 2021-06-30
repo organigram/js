@@ -72,7 +72,7 @@ export class Organigram {
         case 'erc20vote':
           key = metadata.type
           label = metadata.name || label
-          Class = await require(`@organigram/procedures/dist/${metadata.type}/class`)
+          Class = require(`@organigram/procedures/dist/${metadata.type}/class`)?.default
           break
         default:
       }

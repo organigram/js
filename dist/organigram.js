@@ -31,6 +31,7 @@ class Organigram {
         this.graphs = [];
     }
     static loadProcedureType({ addr, doc }) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, addr);
             let Class = null, label = "", key = "", metadata = {};
@@ -53,7 +54,7 @@ class Organigram {
                     case 'erc20vote':
                         key = metadata.type;
                         label = metadata.name || label;
-                        Class = yield require(`@organigram/procedures/dist/${metadata.type}/class`);
+                        Class = (_a = require(`@organigram/procedures/dist/${metadata.type}/class`)) === null || _a === void 0 ? void 0 : _a.default;
                         break;
                     default:
                 }
