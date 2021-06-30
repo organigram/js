@@ -189,7 +189,7 @@ export class Organigram {
     ...args: any[]
   ): Promise<EnhancedProcedure> {
     const from = await getAccount()
-    const procedureType = this.procedureTypes.find((pt: ProcedureType) => pt.address.toLowerCase() === type)
+    const procedureType = this.procedureTypes.find((pt: ProcedureType) => pt.address.toLowerCase() === type.toLowerCase())
     if (!procedureType?.address || !procedureType.Class)
       throw new Error("Procedure type not found.")
     const receipt = await this._contract.methods.createProcedure(procedureType.address).send({ from })

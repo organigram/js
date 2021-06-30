@@ -149,7 +149,7 @@ class Organigram {
         var _a, _b, _c;
         return __awaiter(this, void 0, void 0, function* () {
             const from = yield web3_1.getAccount();
-            const procedureType = this.procedureTypes.find((pt) => pt.address.toLowerCase() === type);
+            const procedureType = this.procedureTypes.find((pt) => pt.address.toLowerCase() === type.toLowerCase());
             if (!(procedureType === null || procedureType === void 0 ? void 0 : procedureType.address) || !procedureType.Class)
                 throw new Error("Procedure type not found.");
             const receipt = yield this._contract.methods.createProcedure(procedureType.address).send({ from });
