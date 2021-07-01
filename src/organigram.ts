@@ -147,14 +147,17 @@ export class Organigram {
   // Get or load procedure data.
   async getProcedure(address: Address, cached: boolean = true): Promise<EnhancedProcedure> {
     const procedureType: ProcedureType | null = await this.getProcedureType(address)
-    if (!procedureType)
+    if (!procedureType) {
       throw new Error("Procedure not supported.")
+    }
     let procedure = cached && this.procedures.find(c => c.address === address)
-    if (!procedure)
+    if (!procedure) {
       procedure = await procedureType.Class.load(address)
         .catch((error:Error) => console.error(error.message))
-    if (!procedure)
+    }
+    if (!procedure) {
       throw new Error("Procedure not found.")
+    }
     procedure.type = procedureType
     this.procedures.push(procedure)
     return procedure
@@ -195,17 +198,21 @@ export class Organigram {
       throw new Error("Procedure type not found.")
     const receipt = await this._contract.methods.createProcedure(procedureType.address).send({ from })
     const address = receipt?.events?.procedureCreated?.returnValues?.procedure
-    await procedureType.Class.initialize(
-      address,
-      metadata,
-      proposers,
-      moderators,
-      deciders,
-      withModeration,
-      // @ts-ignore
-      ...args
-    )
-    .catch((error:Error) => console.error(error.message))
+    try {
+      await procedureType.Class.initialize(
+        address,
+        metadata,
+        proposers,
+        moderators,
+        deciders,
+        withModeration,
+        // @ts-ignore
+        ...args
+      )
+    } catch (error) {
+      console.error(error.message)
+      throw error
+    }
     return this.getProcedure(address, false)
   }
 

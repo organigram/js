@@ -112,14 +112,17 @@ class Organigram {
     getProcedure(address, cached = true) {
         return __awaiter(this, void 0, void 0, function* () {
             const procedureType = yield this.getProcedureType(address);
-            if (!procedureType)
+            if (!procedureType) {
                 throw new Error("Procedure not supported.");
+            }
             let procedure = cached && this.procedures.find(c => c.address === address);
-            if (!procedure)
+            if (!procedure) {
                 procedure = yield procedureType.Class.load(address)
                     .catch((error) => console.error(error.message));
-            if (!procedure)
+            }
+            if (!procedure) {
                 throw new Error("Procedure not found.");
+            }
             procedure.type = procedureType;
             this.procedures.push(procedure);
             return procedure;
@@ -155,8 +158,13 @@ class Organigram {
                 throw new Error("Procedure type not found.");
             const receipt = yield this._contract.methods.createProcedure(procedureType.address).send({ from });
             const address = (_c = (_b = (_a = receipt === null || receipt === void 0 ? void 0 : receipt.events) === null || _a === void 0 ? void 0 : _a.procedureCreated) === null || _b === void 0 ? void 0 : _b.returnValues) === null || _c === void 0 ? void 0 : _c.procedure;
-            yield procedureType.Class.initialize(address, metadata, proposers, moderators, deciders, withModeration, ...args)
-                .catch((error) => console.error(error.message));
+            try {
+                yield procedureType.Class.initialize(address, metadata, proposers, moderators, deciders, withModeration, ...args);
+            }
+            catch (error) {
+                console.error(error.message);
+                throw error;
+            }
             return this.getProcedure(address, false);
         });
     }
