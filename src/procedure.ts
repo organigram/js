@@ -413,7 +413,6 @@ export default class Procedure {
         console.error("Error while updating admin.", this.address, error.message)
         return false
       })
-
   }
 
   async propose(

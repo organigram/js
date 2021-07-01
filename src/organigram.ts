@@ -152,6 +152,7 @@ export class Organigram {
     let procedure = cached && this.procedures.find(c => c.address === address)
     if (!procedure)
       procedure = await procedureType.Class.load(address)
+        .catch((error:Error) => console.error(error.message))
     if (!procedure)
       throw new Error("Procedure not found.")
     procedure.type = procedureType
@@ -204,6 +205,7 @@ export class Organigram {
       // @ts-ignore
       ...args
     )
+    .catch((error:Error) => console.error(error.message))
     return this.getProcedure(address, false)
   }
 
