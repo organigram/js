@@ -9,7 +9,7 @@ export interface OrganEntry {
 }
 export interface OrganProcedure {
     address: Address;
-    permissions: string | number;
+    permissions: number;
 }
 export interface OrganData {
     address: string;
@@ -31,7 +31,7 @@ export declare class Organ {
     updateMetadata: (cid?: CID) => Promise<any>;
     addEntries: (entries: OrganEntry[]) => Promise<Organ>;
     removeEntries: (indexes: string[]) => Promise<boolean>;
-    replaceEntry: (index: Number, entry: OrganEntry) => Promise<Organ>;
+    replaceEntry: (index: number, entry: OrganEntry) => Promise<Organ>;
     addProcedure: (procedure: OrganProcedure) => Promise<Organ>;
     removeProcedure: (procedure: Address) => Promise<Organ>;
     replaceProcedure: (oldProcedure: Address, newOrganProcedure: OrganProcedure) => Promise<Organ>;
@@ -56,20 +56,20 @@ export declare class Organ {
     reloadData(): Promise<Organ>;
 }
 export declare const PERMISSIONS: {
-    ADMIN: string;
-    ALL: string;
-    ALL_PROCEDURES: string;
-    ALL_ENTRIES: string;
-    ADD_PROCEDURES: string;
-    REMOVE_PROCEDURES: string;
-    ADD_ENTRIES: string;
-    REMOVE_ENTRIES: string;
-    UPDATE_METADATA: string;
-    DEPOSIT_ETHER: string;
-    WITHDRAW_ETHER: string;
-    DEPOSIT_COINS: string;
-    WITHDRAW_COINS: string;
-    DEPOSIT_COLLECTIBLES: string;
-    WITHDRAW_COLLECTIBLES: string;
+    ADMIN: number;
+    ALL: number;
+    ALL_PROCEDURES: number;
+    ALL_ENTRIES: number;
+    ADD_PROCEDURES: number;
+    REMOVE_PROCEDURES: number;
+    ADD_ENTRIES: number;
+    REMOVE_ENTRIES: number;
+    UPDATE_METADATA: number;
+    DEPOSIT_ETHER: number;
+    WITHDRAW_ETHER: number;
+    DEPOSIT_COINS: number;
+    WITHDRAW_COINS: number;
+    DEPOSIT_COLLECTIBLES: number;
+    WITHDRAW_COLLECTIBLES: number;
 };
 export default Organ;

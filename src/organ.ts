@@ -20,7 +20,7 @@ export interface OrganEntry {
 
 export interface OrganProcedure {
   address: Address
-  permissions: string | number
+  permissions: number
 }
 
 export interface OrganData {
@@ -101,7 +101,7 @@ export class Organ {
       })
   }
 
-  public replaceEntry = async (index: Number, entry: OrganEntry): Promise<Organ> => {
+  public replaceEntry = async (index: number, entry: OrganEntry): Promise<Organ> => {
     // @ts-ignore
     const contract = new web3.eth.Contract(OrganContract.abi, this.address)
     const multihash = entry.cid && cidToMultihash(entry.cid)
@@ -121,7 +121,8 @@ export class Organ {
     // @ts-ignore
     const contract = new web3.eth.Contract(OrganContract.abi, this.address)
     const from = await getAccount()
-    return from && contract.methods.addProcedure(procedure.address, procedure.permissions).send({ from })
+    const permissions = `0x${(procedure.permissions || 0).toString(16).padStart(4, '0')}`
+    return from && contract.methods.addProcedure(procedure.address, permissions).send({ from })
       .then(() => true)
       .catch((error: Error) => {
         console.error("Error while adding procedures in organ.", this.address, error.message)
@@ -144,9 +145,9 @@ export class Organ {
   public replaceProcedure = async (oldProcedure: Address, newOrganProcedure: OrganProcedure): Promise<Organ> => {
     // @ts-ignore
     const contract = new web3.eth.Contract(OrganContract.abi, this.address)
-    const { address, permissions } = newOrganProcedure
+    const permissions = `0x${(newOrganProcedure.permissions || 0).toString(16).padStart(4, '0')}`
     const from = await getAccount()
-    return from && contract.methods.replaceProcedure(oldProcedure, address, permissions).send({ from })
+    return from && contract.methods.replaceProcedure(oldProcedure, newOrganProcedure.address, permissions).send({ from })
       .then(() => true)
       .catch((error: Error) => {
         console.error("Error while replacing procedure in organ.", this.address, error.message)
@@ -224,7 +225,7 @@ export class Organ {
     const contract = new web3.eth.Contract(OrganContract.abi, address)
     return contract.methods.getPermissions(procedure).call()
       .catch((e: Error) => console.error("Error", e.message))
-      .then(({ perms }: any) => perms && perms.toString())
+      .then(({ perms }: any) => perms)
   }
 
   static async loadProcedure(address: Address, index: string): Promise<OrganProcedure> {
@@ -351,21 +352,21 @@ export class Organ {
 
 // Organ permissions granted to procedures
 export const PERMISSIONS = {
-  ADMIN: '0xffff',
-  ALL: '0x07ff',
-  ALL_PROCEDURES: '0x0003',
-  ALL_ENTRIES: '0x000c',
-  ADD_PROCEDURES: '0x0001',
-  REMOVE_PROCEDURES: '0x0002',
-  ADD_ENTRIES: '0x0004',
-  REMOVE_ENTRIES: '0x0008',
-  UPDATE_METADATA: '0x0010',
-  DEPOSIT_ETHER: '0x0020',
-  WITHDRAW_ETHER: '0x0040',
-  DEPOSIT_COINS: '0x0080',
-  WITHDRAW_COINS: '0x0100',
-  DEPOSIT_COLLECTIBLES: '0x0200',
-  WITHDRAW_COLLECTIBLES: '0x0400'
+  ADMIN: 0xffff,
+  ALL: 0x07ff,
+  ALL_PROCEDURES: 0x0003,
+  ALL_ENTRIES: 0x000c,
+  ADD_PROCEDURES: 0x0001,
+  REMOVE_PROCEDURES: 0x0002,
+  ADD_ENTRIES: 0x0004,
+  REMOVE_ENTRIES: 0x0008,
+  UPDATE_METADATA: 0x0010,
+  DEPOSIT_ETHER: 0x0020,
+  WITHDRAW_ETHER: 0x0040,
+  DEPOSIT_COINS: 0x0080,
+  WITHDRAW_COINS: 0x0100,
+  DEPOSIT_COLLECTIBLES: 0x0200,
+  WITHDRAW_COLLECTIBLES: 0x0400
 }
 
 export default Organ

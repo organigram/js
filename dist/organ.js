@@ -96,7 +96,8 @@ class Organ {
         this.addProcedure = (procedure) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
             const from = yield web3_2.getAccount();
-            return from && contract.methods.addProcedure(procedure.address, procedure.permissions).send({ from })
+            const permissions = `0x${(procedure.permissions || 0).toString(16).padStart(4, '0')}`;
+            return from && contract.methods.addProcedure(procedure.address, permissions).send({ from })
                 .then(() => true)
                 .catch((error) => {
                 console.error("Error while adding procedures in organ.", this.address, error.message);
@@ -115,9 +116,9 @@ class Organ {
         });
         this.replaceProcedure = (oldProcedure, newOrganProcedure) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
-            const { address, permissions } = newOrganProcedure;
+            const permissions = `0x${(newOrganProcedure.permissions || 0).toString(16).padStart(4, '0')}`;
             const from = yield web3_2.getAccount();
-            return from && contract.methods.replaceProcedure(oldProcedure, address, permissions).send({ from })
+            return from && contract.methods.replaceProcedure(oldProcedure, newOrganProcedure.address, permissions).send({ from })
                 .then(() => true)
                 .catch((error) => {
                 console.error("Error while replacing procedure in organ.", this.address, error.message);
@@ -195,7 +196,7 @@ class Organ {
             const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, address);
             return contract.methods.getPermissions(procedure).call()
                 .catch((e) => console.error("Error", e.message))
-                .then(({ perms }) => perms && perms.toString());
+                .then(({ perms }) => perms);
         });
     }
     static loadProcedure(address, index) {
@@ -345,20 +346,20 @@ class Organ {
 exports.Organ = Organ;
 Organ.INTERFACE = `0xf81b1307`;
 exports.PERMISSIONS = {
-    ADMIN: '0xffff',
-    ALL: '0x07ff',
-    ALL_PROCEDURES: '0x0003',
-    ALL_ENTRIES: '0x000c',
-    ADD_PROCEDURES: '0x0001',
-    REMOVE_PROCEDURES: '0x0002',
-    ADD_ENTRIES: '0x0004',
-    REMOVE_ENTRIES: '0x0008',
-    UPDATE_METADATA: '0x0010',
-    DEPOSIT_ETHER: '0x0020',
-    WITHDRAW_ETHER: '0x0040',
-    DEPOSIT_COINS: '0x0080',
-    WITHDRAW_COINS: '0x0100',
-    DEPOSIT_COLLECTIBLES: '0x0200',
-    WITHDRAW_COLLECTIBLES: '0x0400'
+    ADMIN: 0xffff,
+    ALL: 0x07ff,
+    ALL_PROCEDURES: 0x0003,
+    ALL_ENTRIES: 0x000c,
+    ADD_PROCEDURES: 0x0001,
+    REMOVE_PROCEDURES: 0x0002,
+    ADD_ENTRIES: 0x0004,
+    REMOVE_ENTRIES: 0x0008,
+    UPDATE_METADATA: 0x0010,
+    DEPOSIT_ETHER: 0x0020,
+    WITHDRAW_ETHER: 0x0040,
+    DEPOSIT_COINS: 0x0080,
+    WITHDRAW_COINS: 0x0100,
+    DEPOSIT_COLLECTIBLES: 0x0200,
+    WITHDRAW_COLLECTIBLES: 0x0400
 };
 exports.default = Organ;
