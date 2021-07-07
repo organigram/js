@@ -6,4 +6,4 @@ export declare type Multihash = {
     hashSize: string;
 };
 export declare type LibraryKey = "organ" | "procedure" | "metadata";
-export declare type Network = "mainnet" | "morden" | "ropsten" | "rinkeby" | "kovan" | "goerli" | "xdai" | "dev" | "organigr.am" | "private";
+export declare type Network = "mainnet" | "morden" | "ropsten" | "rinkeby" | "kovan" | "goerli" | "xdai" | "dev" | "truffle" | "organigr.am" | "private";

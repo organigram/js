@@ -5,7 +5,7 @@ declare const web3: Web3;
 declare const getAccount: () => Promise<Address>;
 declare const connect: () => Promise<Address>;
 declare const getNetwork: () => Promise<Network>;
-declare const getNetworkName: (network: Network) => "Rinkeby Ethereum Test Network" | "Ethereum Main Network" | "Morden Ethereum Test Network" | "Ropsten Ethereum Test Network" | "Kovan Ethereum Test Network" | "Görli Ethereum Test Network" | "Organigr.am Network" | "Dev Network" | "a private Ethereum Network" | "a blockchain";
+declare const getNetworkName: (network: Network) => "Rinkeby Ethereum Test Network" | "Ethereum Main Network" | "Morden Ethereum Test Network" | "Ropsten Ethereum Test Network" | "Kovan Ethereum Test Network" | "Görli Ethereum Test Network" | "Organigr.am Network" | "Dev Network" | "a local Ethereum Network" | "a private Ethereum Network" | "a blockchain";
 declare const _linkBytecode: (bytecode: string, links: {
     library: string;
     address: Address;

@@ -29,6 +29,7 @@ class Organigram {
         this.organs = [];
         this.procedures = [];
         this.graphs = [];
+        this.cids = [];
     }
     static loadProcedureType({ addr, doc }) {
         var _a;
@@ -101,11 +102,15 @@ class Organigram {
     getOrgan(address, cached = true) {
         return __awaiter(this, void 0, void 0, function* () {
             let organ = cached && this.organs.find(c => c.address === address);
-            if (!organ)
+            if (!organ) {
                 organ = yield organ_1.default.load(address);
-            if (!organ)
+                if (organ) {
+                    this.organs.push(organ);
+                }
+            }
+            if (!organ) {
                 throw new Error("Organ not found.");
-            this.organs.push(organ);
+            }
             return organ;
         });
     }
@@ -119,12 +124,15 @@ class Organigram {
             if (!procedure) {
                 procedure = yield procedureType.Class.load(address)
                     .catch((error) => console.error(error.message));
+                if (procedure) {
+                    procedure.type = procedureType;
+                    this.procedures.push(procedure);
+                }
             }
             if (!procedure) {
                 throw new Error("Procedure not found.");
             }
             procedure.type = procedureType;
-            this.procedures.push(procedure);
             return procedure;
         });
     }
@@ -166,6 +174,22 @@ class Organigram {
                 throw error;
             }
             return this.getProcedure(address, false);
+        });
+    }
+    cidToJson(cid, cached = true) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let data = cached ? this.cids.find(c => c.cid === cid) : undefined;
+            if (!data) {
+                data = yield ipfs_1.parseJSON(cid)
+                    .catch((error) => console.error(error.message));
+                if (data) {
+                    this.cids.push({ cid, data });
+                }
+            }
+            if (!data) {
+                throw new Error("Procedure not found.");
+            }
+            return data;
         });
     }
     deployGraph(graph) {

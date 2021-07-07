@@ -43,6 +43,7 @@ const getNetwork = async (): Promise<Network> => {
     case 42: return 'kovan'
     case 100: return 'xdai'
     case 1337: return 'dev'
+    case 5777: return 'truffle'
     case 1001: return 'organigr.am'
     default: return 'private'
   }
@@ -59,6 +60,7 @@ const getNetworkName = (network: Network) => {
     case 'goerli': return "Görli Ethereum Test Network"
     case 'organigr.am': return "Organigr.am Network"
     case 'dev': return "Dev Network"
+    case 'truffle': return "a local Ethereum Network"
     case 'private': return "a private Ethereum Network"
     default: return "a blockchain"
   }

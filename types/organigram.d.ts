@@ -3,6 +3,10 @@ import Organ from './organ';
 import Procedure from './procedure';
 import { CID } from './ipfs';
 import type { Address, Metadata, Network } from './types';
+export interface File {
+    cid: CID;
+    data: any;
+}
 export declare type ProcedureType = {
     key: string;
     label: string;
@@ -22,6 +26,7 @@ export declare class Organigram {
     organs: Organ[];
     procedures: EnhancedProcedure[];
     graphs: Graph[];
+    cids: File[];
     constructor(address: Address, network: Network, proceduresRegistry: Organ, procedureTypes: ProcedureType[]);
     static loadProcedureType({ addr, doc }: {
         addr: Address;
@@ -35,6 +40,7 @@ export declare class Organigram {
     getContract(address: Address, cached?: boolean): Promise<Organ | EnhancedProcedure | null>;
     createOrgan(metadata: CID, admin?: Address): Promise<Organ>;
     createProcedure(type: Address, metadata: Metadata, proposers: Address, moderators: Address, deciders: Address, withModeration: boolean, ...args: any[]): Promise<EnhancedProcedure>;
+    cidToJson(cid: CID, cached?: boolean): Promise<any>;
     deployGraph(graph: Graph): Promise<Graph>;
 }
 export default Organigram;

@@ -36,7 +36,6 @@ class Organ {
         this.network = "mainnet";
         this.balance = "n/a";
         this.procedures = [];
-        this.metadata = {};
         this.entries = [];
         this.updateMetadata = (cid = new ipfs_1.CID("QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH")) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
@@ -140,7 +139,7 @@ class Organ {
             const isOrgan = yield Organ.isOrgan(address).catch(() => false);
             const balance = yield Organ.getBalance(address)
                 .catch(() => "n/a");
-            const metadata = (yield Organ.loadData(address).catch(() => null).then(d => d === null || d === void 0 ? void 0 : d.metadata)) || null;
+            const metadata = (yield Organ.loadData(address).catch(() => null).then(d => d === null || d === void 0 ? void 0 : d.metadata));
             const procedures = yield Organ.loadProcedures(address)
                 .catch(error => {
                 console.warn("Error while loading organ's procedures", address, error.message);
@@ -177,10 +176,10 @@ class Organ {
             const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, address);
             const data = yield contract.methods.getOrgan().call();
             return {
-                metadata: { cid: ipfs_1.multihashToCid(data.metadata) },
-                proceduresLength: data.proceduresLength,
-                entriesLength: data.entriesLength,
-                entriesCount: data.entriesCount
+                metadata: (data === null || data === void 0 ? void 0 : data.metadata) && ipfs_1.multihashToCid(data.metadata),
+                proceduresLength: data === null || data === void 0 ? void 0 : data.proceduresLength,
+                entriesLength: data === null || data === void 0 ? void 0 : data.entriesLength,
+                entriesCount: data === null || data === void 0 ? void 0 : data.entriesCount
             };
         });
     }

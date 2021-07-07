@@ -6,4 +6,4 @@ export type Multihash = {
   hashSize: string
 }
 export type LibraryKey = "organ" | "procedure" | "metadata"
-export type Network = "mainnet" | "morden" | "ropsten" | "rinkeby" | "kovan" | "goerli" | "xdai" | "dev" | "organigr.am" | "private"
+export type Network = "mainnet" | "morden" | "ropsten" | "rinkeby" | "kovan" | "goerli" | "xdai" | "dev" | "truffle" | "organigr.am" | "private"

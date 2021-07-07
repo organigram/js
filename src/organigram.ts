@@ -4,8 +4,13 @@ import { web3, getAccount, getNetwork } from './web3'
 import Graph from './graph'
 import Organ, { OrganEntry } from './organ'
 import Procedure from './procedure'
-import { parseJSON as cidToJSON, cidToMultihash, CID } from './ipfs'
+import { parseJSON, cidToMultihash, CID } from './ipfs'
 import type { Address, Metadata, Network } from './types'
+
+export interface File {
+  cid: CID
+  data: any
+}
 
 export type ProcedureType = {
   key: string,
@@ -28,6 +33,7 @@ export class Organigram {
   organs: Organ[]
   procedures: EnhancedProcedure[]
   graphs: Graph[]
+  cids: File[]
 
   constructor(
     address: Address,
@@ -44,6 +50,7 @@ export class Organigram {
     this.organs = []
     this.procedures = []
     this.graphs = []
+    this.cids = []
   }
 
   // Load a procedure type from the registry.
@@ -59,7 +66,7 @@ export class Organigram {
       throw new Error("Contract is not a procedure.")
     if (doc) {
       try {
-        metadata = await cidToJSON(doc)
+        metadata = await parseJSON(doc)
       } catch (error) {
         console.warn(error.message, doc)
       }
@@ -136,11 +143,15 @@ export class Organigram {
   // Get or load organ data.
   async getOrgan(address: Address, cached: boolean = true): Promise<Organ> {
     let organ = cached && this.organs.find(c => c.address === address)
-    if (!organ)
+    if (!organ) {
       organ = await Organ.load(address)
-    if (!organ)
+      if (organ) {
+        this.organs.push(organ)
+      }
+    }
+    if (!organ) {
       throw new Error("Organ not found.")
-    this.organs.push(organ)
+    }
     return organ
   }
 
@@ -154,12 +165,15 @@ export class Organigram {
     if (!procedure) {
       procedure = await procedureType.Class.load(address)
         .catch((error:Error) => console.error(error.message))
+      if (procedure) {
+        procedure.type = procedureType
+        this.procedures.push(procedure)
+      }
     }
     if (!procedure) {
       throw new Error("Procedure not found.")
     }
     procedure.type = procedureType
-    this.procedures.push(procedure)
     return procedure
   }
 
@@ -214,6 +228,22 @@ export class Organigram {
       throw error
     }
     return this.getProcedure(address, false)
+  }
+
+  // Parse and cache a JSON file from IPFS.
+  public async cidToJson(cid: CID, cached: boolean = true) {
+    let data: any = cached ? this.cids.find(c => c.cid === cid) : undefined
+    if (!data) {
+      data = await parseJSON(cid)
+        .catch((error:Error) => console.error(error.message))
+      if (data) {
+        this.cids.push({ cid, data })
+      }
+    }
+    if (!data) {
+      throw new Error("Procedure not found.")
+    }
+    return data
   }
 
   // Deploy a graph.

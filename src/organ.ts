@@ -4,7 +4,7 @@ import uint8ArrayConcat from 'uint8arrays/concat'
 import OrganContract from '@organigram/contracts/build/contracts/Organ.json'
 import { EMPTY_ADDRESS, web3, _linkBytecode, getAccount, getNetwork } from './web3'
 import { ipfsNode, multihashToCid, cidToMultihash, CID } from './ipfs'
-import type { Network, Metadata, Address, Multihash } from './types'
+import type { Network, Address, Multihash } from './types'
 
 export const ORGAN_CONTRACT_SIGNATURES: string[] = OrganContract
   .ast.nodes.find(n => n.name === "")?.nodes?.map(n => n?.functionSelector || "")
@@ -27,7 +27,7 @@ export interface OrganData {
   address: string
   network: Network
   balance: string
-  metadata: Metadata
+  metadata: CID | undefined
   procedures: OrganProcedure[]
   entries: OrganEntry[]
 }
@@ -38,7 +38,7 @@ export class Organ {
   network: Network = "mainnet"
   balance: string = "n/a"
   procedures: OrganProcedure[] = []
-  metadata: Metadata = {}
+  metadata: CID | undefined
   entries: OrganEntry[] = []
 
   public constructor({ address, network, balance, procedures, metadata, entries }: OrganData) {
@@ -165,7 +165,7 @@ export class Organ {
     //     throw new Error("Contract at address is not an Organ.")
     const balance: string = await Organ.getBalance(address)
       .catch(() => "n/a")
-    const metadata = (await Organ.loadData(address).catch(() => null).then(d => d?.metadata)) || null
+    const metadata: CID | undefined = (await Organ.loadData(address).catch(() => null).then(d => d?.metadata))
     const procedures: OrganProcedure[] = await Organ.loadProcedures(address)
       .catch(error => {
         console.warn("Error while loading organ's procedures", address, error.message)
@@ -197,7 +197,7 @@ export class Organ {
   }
 
   static async loadData(address: Address): Promise<{
-    metadata: Metadata,
+    metadata: CID | undefined,
     proceduresLength: string,
     entriesLength: string,
     entriesCount: string
@@ -206,10 +206,10 @@ export class Organ {
     const contract = new web3.eth.Contract(OrganContract.abi, address)
     const data = await contract.methods.getOrgan().call()
     return {
-      metadata: { cid: multihashToCid(data.metadata) },
-      proceduresLength: data.proceduresLength,
-      entriesLength: data.entriesLength,
-      entriesCount: data.entriesCount
+      metadata: data?.metadata && multihashToCid(data.metadata),
+      proceduresLength: data?.proceduresLength,
+      entriesLength: data?.entriesLength,
+      entriesCount: data?.entriesCount
     }
   }
 
