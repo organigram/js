@@ -232,7 +232,7 @@ export class Organigram {
 
   // Parse and cache a JSON file from IPFS.
   public async cidToJson(cid: CID, cached: boolean = true) {
-    let data: any = cached ? this.cids.find(c => c.cid === cid) : undefined
+    let data: any = cached ? this.cids.find(c => c.cid === cid)?.data : undefined
     if (!data) {
       data = await parseJSON(cid)
         .catch((error:Error) => console.error(error.message))

@@ -177,8 +177,9 @@ class Organigram {
         });
     }
     cidToJson(cid, cached = true) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            let data = cached ? this.cids.find(c => c.cid === cid) : undefined;
+            let data = cached ? (_a = this.cids.find(c => c.cid === cid)) === null || _a === void 0 ? void 0 : _a.data : undefined;
             if (!data) {
                 data = yield ipfs_1.parseJSON(cid)
                     .catch((error) => console.error(error.message));
