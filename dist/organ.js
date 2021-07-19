@@ -305,6 +305,13 @@ class Organ {
             return entries;
         });
     }
+    static generateWeb3Request(address, functionName, ...args) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, address);
+            return (_a = contract === null || contract === void 0 ? void 0 : contract[functionName]) === null || _a === void 0 ? void 0 : _a.request(...args);
+        });
+    }
     reload() {
         return __awaiter(this, void 0, void 0, function* () {
             const { procedures, metadata, entries } = yield Organ.load(this.address);

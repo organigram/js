@@ -316,6 +316,21 @@ export class Organ {
     return entries
   }
 
+  /**
+   * Generate a request and returns an object with a data field one can use for building Operations.
+   * @todo: Update list of functionNames.
+   */
+  static async generateWeb3Request(
+    address: Address,
+    functionName: "addEntries" | "removeEntries" | "replaceEntry" | "addProcedure" | "removeProcedure" | "replaceProcedure",
+    ...args: any[]
+  ): Promise<Request> {
+    // @ts-ignore
+    const contract = new web3.eth.Contract(OrganContract.abi, address)
+    // @ts-ignore
+    return contract?.[functionName]?.request(...args)
+  }
+
   /* Sync API */
   async reload(): Promise<Organ> {
     const { procedures, metadata, entries } = await Organ.load(this.address)
