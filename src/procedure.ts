@@ -2,7 +2,7 @@ import ProcedureContract from '@organigram/contracts/build/contracts/Procedure.j
 import { web3, getAccount } from './web3'
 import { cidToMultihash, multihashToCid, CID } from './ipfs'
 import Web3 from 'web3'
-import type { Address, Multihash } from './types'
+import type { Address } from './types'
 
 export type OperationTag = "metadata"
   | "entries"

@@ -305,11 +305,11 @@ class Organ {
             return entries;
         });
     }
-    static generateWeb3Request(address, functionName, ...args) {
-        var _a;
+    static generateEncodedABI(address, functionName, ...args) {
+        var _a, _b, _c, _d;
         return __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, address);
-            return (_a = contract === null || contract === void 0 ? void 0 : contract[functionName]) === null || _a === void 0 ? void 0 : _a.request(...args);
+            return (_d = (_c = (_b = (_a = contract === null || contract === void 0 ? void 0 : contract.methods) === null || _a === void 0 ? void 0 : _a[functionName]) === null || _b === void 0 ? void 0 : _b.call(_a, ...args)) === null || _c === void 0 ? void 0 : _c.encodeABI) === null || _d === void 0 ? void 0 : _d.call(_c);
         });
     }
     reload() {

@@ -317,18 +317,17 @@ export class Organ {
   }
 
   /**
-   * Generate a request and returns an object with a data field one can use for building Operations.
+   * Generate the encoded ABI with arguments, used for building Operations.
    * @todo: Update list of functionNames.
    */
-  static async generateWeb3Request(
+  static async generateEncodedABI(
     address: Address,
     functionName: "addEntries" | "removeEntries" | "replaceEntry" | "addProcedure" | "removeProcedure" | "replaceProcedure",
     ...args: any[]
   ): Promise<Request> {
     // @ts-ignore
     const contract = new web3.eth.Contract(OrganContract.abi, address)
-    // @ts-ignore
-    return contract?.[functionName]?.request(...args)
+    return contract?.methods?.[functionName]?.(...args)?.encodeABI?.()
   }
 
   /* Sync API */

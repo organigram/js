@@ -50,7 +50,7 @@ export declare class Organ {
     static loadProcedures(address: Address): Promise<OrganProcedure[]>;
     static loadEntry(address: Address, index: string): Promise<OrganEntry>;
     static loadEntries(address: Address): Promise<OrganEntry[]>;
-    static generateWeb3Request(address: Address, functionName: "addEntries" | "removeEntries" | "replaceEntry" | "addProcedure" | "removeProcedure" | "replaceProcedure", ...args: any[]): Promise<Request>;
+    static generateEncodedABI(address: Address, functionName: "addEntries" | "removeEntries" | "replaceEntry" | "addProcedure" | "removeProcedure" | "replaceProcedure", ...args: any[]): Promise<Request>;
     reload(): Promise<Organ>;
     reloadEntries(): Promise<Organ>;
     reloadProcedures(): Promise<Organ>;
