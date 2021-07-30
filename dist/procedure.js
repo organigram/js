@@ -43,7 +43,7 @@ class Procedure {
         return __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, address);
             const data = yield contract.methods.getProcedure().call();
-            const metadata = ipfs_1.multihashToCid(data.metadata);
+            const metadata = { cid: ipfs_1.multihashToCid(data.metadata) };
             return {
                 metadata,
                 proposers: data.proposers,
@@ -58,8 +58,8 @@ class Procedure {
         return __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, address);
             const proposal = yield contract.methods.getProposal(proposalKey).call();
-            const metadata = ipfs_1.multihashToCid(proposal.metadata);
-            const blockReason = ipfs_1.multihashToCid(proposal.blockReason);
+            const metadata = { cid: ipfs_1.multihashToCid(proposal.metadata) };
+            const blockReason = { cid: ipfs_1.multihashToCid(proposal.blockReason) };
             const operations = proposal.operations.map((op) => Procedure.parseOperation(op));
             return {
                 key: proposalKey,

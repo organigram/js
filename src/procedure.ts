@@ -2,7 +2,7 @@ import ProcedureContract from '@organigram/contracts/build/contracts/Procedure.j
 import { web3, getAccount } from './web3'
 import { cidToMultihash, multihashToCid, CID } from './ipfs'
 import Web3 from 'web3'
-import type { Address } from './types'
+import type { Address, Metadata } from './types'
 
 export type OperationTag = "metadata"
   | "entries"
@@ -75,8 +75,8 @@ export interface ProcedureProposalOperation {
 export interface ProcedureProposal {
   key: string
   creator: Address
-  metadata: CID | undefined
-  blockReason: CID | undefined
+  metadata: Metadata
+  blockReason: Metadata
   presented: boolean
   blocked: boolean
   adopted: boolean
@@ -168,7 +168,7 @@ export default class Procedure {
   ]
   _contract: any
   address: Address
-  metadata: CID | undefined
+  metadata: Metadata
   proposers: Address
   moderators: Address
   deciders: Address
@@ -177,7 +177,7 @@ export default class Procedure {
 
   constructor(
     address: Address,
-    metadata: CID | undefined,
+    metadata: Metadata,
     proposers: Address,
     moderators: Address,
     deciders: Address,
@@ -209,7 +209,7 @@ export default class Procedure {
   }
 
   static async loadData(address: Address): Promise<{
-    metadata: CID | undefined,
+    metadata: Metadata,
     proposers: Address,
     moderators: Address,
     deciders: Address,
@@ -219,7 +219,7 @@ export default class Procedure {
     // @ts-ignore
     const contract = new web3.eth.Contract(ProcedureContract.abi, address)
     const data = await contract.methods.getProcedure().call()
-    const metadata: CID | undefined = multihashToCid(data.metadata)
+    const metadata: Metadata = { cid: multihashToCid(data.metadata) }
     return {
       metadata,
       proposers: data.proposers,
@@ -237,8 +237,8 @@ export default class Procedure {
     // @ts-ignore
     const contract = new web3.eth.Contract(ProcedureContract.abi, address)
     const proposal = await contract.methods.getProposal(proposalKey).call()
-    const metadata = multihashToCid(proposal.metadata)
-    const blockReason = multihashToCid(proposal.blockReason)
+    const metadata: Metadata = { cid: multihashToCid(proposal.metadata) }
+    const blockReason: Metadata = { cid: multihashToCid(proposal.blockReason) }
     const operations: ProcedureProposalOperation[] = proposal.operations.map(
       (op: any): ProcedureProposalOperation => Procedure.parseOperation(op)
     )

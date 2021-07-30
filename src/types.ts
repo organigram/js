@@ -1,5 +1,10 @@
+import { CID } from 'ipfs-core'
+
 export type Address = string
-export type Metadata = object | null
+export type Metadata = {
+  cid?: CID | undefined
+  data?: Object
+}
 export type Multihash = {
   ipfsHash: string
   hashFunction: string

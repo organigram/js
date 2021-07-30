@@ -1,5 +1,5 @@
 import { CID } from './ipfs';
-import type { Address } from './types';
+import type { Address, Metadata } from './types';
 export declare type OperationTag = "metadata" | "entries" | "procedures" | "coins" | "collectibles" | "funds" | "add" | "replace" | "remove" | "deposit" | "withdraw" | "transfer";
 export declare type OperationParamType = "metadata" | "entry" | "entries" | "address" | "addresses" | "index" | "indexes" | "organ" | "procedure" | "permissions" | "proposal" | "proposals";
 export declare type OperationParamAction = "select" | "create" | "update" | "delete" | "withdraw" | "deposit" | "transfer" | "block";
@@ -35,8 +35,8 @@ export interface ProcedureProposalOperation {
 export interface ProcedureProposal {
     key: string;
     creator: Address;
-    metadata: CID | undefined;
-    blockReason: CID | undefined;
+    metadata: Metadata;
+    blockReason: Metadata;
     presented: boolean;
     blocked: boolean;
     adopted: boolean;
@@ -49,16 +49,16 @@ export default class Procedure {
     static OPERATIONS_FUNCTIONS: ProcedureProposalOperationFunction[];
     _contract: any;
     address: Address;
-    metadata: CID | undefined;
+    metadata: Metadata;
     proposers: Address;
     moderators: Address;
     deciders: Address;
     withModeration: boolean;
     proposals: ProcedureProposal[];
-    constructor(address: Address, metadata: CID | undefined, proposers: Address, moderators: Address, deciders: Address, withModeration: boolean, proposals: ProcedureProposal[]);
+    constructor(address: Address, metadata: Metadata, proposers: Address, moderators: Address, deciders: Address, withModeration: boolean, proposals: ProcedureProposal[]);
     static initialize(_address: Address, _metadata: CID, _proposers: Address, _moderators: Address, _deciders: Address, _withModeration: boolean, ..._args: any[]): Promise<void>;
     static loadData(address: Address): Promise<{
-        metadata: CID | undefined;
+        metadata: Metadata;
         proposers: Address;
         moderators: Address;
         deciders: Address;

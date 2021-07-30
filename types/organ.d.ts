@@ -1,5 +1,5 @@
 import { CID } from './ipfs';
-import type { Network, Address } from './types';
+import type { Network, Address, Metadata } from './types';
 export declare const ORGAN_CONTRACT_SIGNATURES: string[];
 export interface OrganEntry {
     index: string;
@@ -15,7 +15,7 @@ export interface OrganData {
     address: string;
     network: Network;
     balance: string;
-    metadata: CID | undefined;
+    metadata: Metadata;
     procedures: OrganProcedure[];
     entries: OrganEntry[];
 }
@@ -25,7 +25,7 @@ export declare class Organ {
     network: Network;
     balance: string;
     procedures: OrganProcedure[];
-    metadata: CID | undefined;
+    metadata: Metadata;
     entries: OrganEntry[];
     constructor({ address, network, balance, procedures, metadata, entries }: OrganData);
     updateMetadata: (cid?: CID) => Promise<any>;
@@ -39,7 +39,7 @@ export declare class Organ {
     static isOrgan(address: Address): Promise<boolean>;
     static getBalance(address: Address): Promise<string>;
     static loadData(address: Address): Promise<{
-        metadata: CID | undefined;
+        metadata: Metadata;
         proceduresLength: string;
         entriesLength: string;
         entriesCount: string;

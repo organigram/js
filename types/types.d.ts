@@ -1,5 +1,9 @@
+import { CID } from 'ipfs-core';
 export declare type Address = string;
-export declare type Metadata = object | null;
+export declare type Metadata = {
+    cid?: CID | undefined;
+    data?: Object;
+};
 export declare type Multihash = {
     ipfsHash: string;
     hashFunction: string;

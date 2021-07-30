@@ -139,7 +139,7 @@ class Organ {
             const isOrgan = yield Organ.isOrgan(address).catch(() => false);
             const balance = yield Organ.getBalance(address)
                 .catch(() => "n/a");
-            const metadata = (yield Organ.loadData(address).catch(() => null).then(d => d === null || d === void 0 ? void 0 : d.metadata));
+            const metadata = (yield Organ.loadData(address).catch(() => null).then(d => (d === null || d === void 0 ? void 0 : d.metadata) || ({})));
             const procedures = yield Organ.loadProcedures(address)
                 .catch(error => {
                 console.warn("Error while loading organ's procedures", address, error.message);
@@ -175,8 +175,9 @@ class Organ {
         return __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, address);
             const data = yield contract.methods.getOrgan().call();
+            const cid = ipfs_1.multihashToCid(data.metadata);
             return {
-                metadata: (data === null || data === void 0 ? void 0 : data.metadata) && ipfs_1.multihashToCid(data.metadata),
+                metadata: { cid },
                 proceduresLength: data === null || data === void 0 ? void 0 : data.proceduresLength,
                 entriesLength: data === null || data === void 0 ? void 0 : data.entriesLength,
                 entriesCount: data === null || data === void 0 ? void 0 : data.entriesCount
