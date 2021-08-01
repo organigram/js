@@ -43,7 +43,7 @@ class Procedure {
         return __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_1.web3.eth.Contract(Procedure_json_1.default.abi, address);
             const data = yield contract.methods.getProcedure().call();
-            const metadata = { cid: ipfs_1.multihashToCid(data.metadata) };
+            const metadata = ipfs_1.multihashToCid(data.metadata);
             return {
                 metadata,
                 proposers: data.proposers,
@@ -116,8 +116,9 @@ class Procedure {
             if (!isProcedure)
                 throw new Error("Contract at address is not a Procedure.");
             const data = yield Procedure.loadData(address);
+            const metadata = { cid: data === null || data === void 0 ? void 0 : data.metadata };
             const proposals = yield Procedure.loadProposals(address);
-            return new Procedure(address, data.metadata, data.proposers, data.moderators, data.deciders, data.withModeration, proposals);
+            return new Procedure(address, metadata, data.proposers, data.moderators, data.deciders, data.withModeration, proposals);
         });
     }
     static _stringifyParamType(type) {
@@ -298,7 +299,7 @@ class Procedure {
     reloadData() {
         return __awaiter(this, void 0, void 0, function* () {
             const data = yield Procedure.loadData(this.address);
-            this.metadata = data.metadata;
+            this.metadata.cid = data.metadata;
             this.proposers = data.proposers;
             this.moderators = data.moderators;
             this.deciders = data.deciders;

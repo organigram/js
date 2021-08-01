@@ -39,7 +39,7 @@ export declare class Organ {
     static isOrgan(address: Address): Promise<boolean>;
     static getBalance(address: Address): Promise<string>;
     static loadData(address: Address): Promise<{
-        metadata: Metadata;
+        metadata: CID | undefined;
         proceduresLength: string;
         entriesLength: string;
         entriesCount: string;

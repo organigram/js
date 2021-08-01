@@ -209,7 +209,7 @@ export default class Procedure {
   }
 
   static async loadData(address: Address): Promise<{
-    metadata: Metadata,
+    metadata: CID | undefined,
     proposers: Address,
     moderators: Address,
     deciders: Address,
@@ -219,7 +219,7 @@ export default class Procedure {
     // @ts-ignore
     const contract = new web3.eth.Contract(ProcedureContract.abi, address)
     const data = await contract.methods.getProcedure().call()
-    const metadata: Metadata = { cid: multihashToCid(data.metadata) }
+    const metadata: CID | undefined = multihashToCid(data.metadata)
     return {
       metadata,
       proposers: data.proposers,
@@ -284,10 +284,11 @@ export default class Procedure {
     if (!isProcedure)
       throw new Error("Contract at address is not a Procedure.")
     const data = await Procedure.loadData(address)
+    const metadata: Metadata = { cid: data?.metadata }
     const proposals: ProcedureProposal[] = await Procedure.loadProposals(address)
     return new Procedure(
       address,
-      data.metadata,
+      metadata,
       data.proposers,
       data.moderators,
       data.deciders,
@@ -487,7 +488,7 @@ export default class Procedure {
 
   async reloadData(): Promise<Procedure> {
     const data = await Procedure.loadData(this.address)
-    this.metadata = data.metadata
+    this.metadata.cid = data.metadata
     this.proposers = data.proposers
     this.moderators = data.moderators
     this.deciders = data.deciders

@@ -165,7 +165,8 @@ export class Organ {
     //     throw new Error("Contract at address is not an Organ.")
     const balance: string = await Organ.getBalance(address)
       .catch(() => "n/a")
-    const metadata: Metadata = (await Organ.loadData(address).catch(() => null).then(d => d?.metadata || ({})))
+    const organData = await Organ.loadData(address)
+    const metadata: Metadata = { cid: organData?.metadata }
     const procedures: OrganProcedure[] = await Organ.loadProcedures(address)
       .catch(error => {
         console.warn("Error while loading organ's procedures", address, error.message)
@@ -197,7 +198,7 @@ export class Organ {
   }
 
   static async loadData(address: Address): Promise<{
-    metadata: Metadata,
+    metadata: CID | undefined,
     proceduresLength: string,
     entriesLength: string,
     entriesCount: string
@@ -207,7 +208,7 @@ export class Organ {
     const data = await contract.methods.getOrgan().call()
     const cid = multihashToCid(data.metadata)
     return {
-      metadata: { cid },
+      metadata: cid,
       proceduresLength: data?.proceduresLength,
       entriesLength: data?.entriesLength,
       entriesCount: data?.entriesCount
@@ -360,7 +361,7 @@ export class Organ {
 
   async reloadData(): Promise<Organ> {
     const data = await Organ.loadData(this.address)
-    this.metadata = data.metadata
+    this.metadata.cid = data?.metadata
     return this
   }
 }

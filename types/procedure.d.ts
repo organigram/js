@@ -58,7 +58,7 @@ export default class Procedure {
     constructor(address: Address, metadata: Metadata, proposers: Address, moderators: Address, deciders: Address, withModeration: boolean, proposals: ProcedureProposal[]);
     static initialize(_address: Address, _metadata: CID, _proposers: Address, _moderators: Address, _deciders: Address, _withModeration: boolean, ..._args: any[]): Promise<void>;
     static loadData(address: Address): Promise<{
-        metadata: Metadata;
+        metadata: CID | undefined;
         proposers: Address;
         moderators: Address;
         deciders: Address;
