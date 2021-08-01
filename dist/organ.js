@@ -37,7 +37,7 @@ class Organ {
         this.balance = "n/a";
         this.procedures = [];
         this.entries = [];
-        this.updateMetadata = (cid = new ipfs_1.CID("QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH")) => __awaiter(this, void 0, void 0, function* () {
+        this.updateMetadata = (cid = ipfs_1.CID.parse("QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH")) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
             const multihash = ipfs_1.cidToMultihash(cid);
             if (!multihash)
@@ -54,7 +54,7 @@ class Organ {
         this.addEntries = (entries) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
             const _entries = entries.map(e => {
-                let multihash = e.cid && ipfs_1.cidToMultihash(new ipfs_1.CID(e.cid));
+                let multihash = e.cid && ipfs_1.cidToMultihash(e.cid);
                 if (!multihash)
                     throw new Error(`Wrong IPFS Content ID '${e.cid}' for entry.`);
                 const { ipfsHash, hashFunction, hashSize } = multihash;

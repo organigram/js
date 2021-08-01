@@ -52,7 +52,7 @@ export class Organ {
 
   /* Organ API */
 
-  public updateMetadata = async (cid: CID = new CID("QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH")) => {
+  public updateMetadata = async (cid: CID = CID.parse("QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH")) => {
     // @ts-ignore
     const contract = new web3.eth.Contract(OrganContract.abi, this.address)
     const multihash = cidToMultihash(cid)
@@ -74,7 +74,7 @@ export class Organ {
     const _entries: {
       addr: Address, doc: { ipfsHash: string, hashFunction: string, hashSize: string }
     }[] = entries.map(e => {
-      let multihash = e.cid && cidToMultihash(new CID(e.cid))
+      let multihash = e.cid && cidToMultihash(e.cid)
       if (!multihash)
         throw new Error(`Wrong IPFS Content ID '${e.cid}' for entry.`)
       const { ipfsHash, hashFunction, hashSize } = multihash

@@ -3,8 +3,8 @@ import * as openpgp from 'openpgp'
 import type { Address } from './types'
 
 type Key = {
-  privateKeyArmored?: string
-  publicKeyArmored: string
+  privateKey?: string
+  publicKey: string
 }
 
 const deployKey = (key: Key, keyserver: Address) => {
@@ -54,17 +54,17 @@ const generatePassword = async (): Promise<string> =>
 
 const generateKey = async (passphrase: string): Promise<Key> => {
   const account = await getAccount().then(a => a.toLowerCase())
-  const { privateKeyArmored, publicKeyArmored } = await openpgp.generateKey({
+  const { privateKey, publicKey } = await openpgp.generateKey({
     userIDs: [{ name: account }],
     curve: 'ed25519', // ECDH for encryption and EdDSA for signature.
     passphrase
   })
-  return { privateKeyArmored, publicKeyArmored }
+  return { privateKey, publicKey }
 }
 
 // Encrypt message with PGP symmetric keys.
 const _encryptMessagePGP = async (message: string, recipientsKeys: Key[], signatureKeys?: Key[]) => {
-  const armoredPublicKeys = recipientsKeys.map(k => k.publicKeyArmored)
+  const armoredPublicKeys = recipientsKeys.map(k => k.publicKey)
   const encryptionKeys = await Promise.all(armoredPublicKeys.map(async key =>
     // @ts-ignore
     (await openpgp.readKey({ armoredKey: key })).keys[0]
@@ -84,10 +84,10 @@ const _encryptMessagePGP = async (message: string, recipientsKeys: Key[], signat
 
 // Decrypt message with PGP symmetric keys.
 const _decryptMessagePGP = async (ciphertext: string, key: Key, passphrase: string) => {
-  if (!key || !key.privateKeyArmored)
+  if (!key || !key.privateKey)
     throw new Error("PGP Key not set.")
   // @ts-ignore
-  const privateKeyObj = (await openpgp.readKey({ armoredKey: key.privateKeyArmored })).keys[0]
+  const privateKeyObj = (await openpgp.readKey({ armoredKey: key.privateKey })).keys[0]
   if (!privateKeyObj.isDecrypted())
     await privateKeyObj.decrypt(passphrase)
   return openpgp.decrypt({

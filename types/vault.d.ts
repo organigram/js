@@ -1,8 +1,8 @@
 import * as openpgp from 'openpgp';
 import type { Address } from './types';
 declare type Key = {
-    privateKeyArmored?: string;
-    publicKeyArmored: string;
+    privateKey?: string;
+    publicKey: string;
 };
 declare const deployKey: (key: Key, keyserver: Address) => Promise<never>;
 declare const sign: (message: string) => Promise<string>;
@@ -13,6 +13,6 @@ declare const decryptFile: (cipherdata: Uint8Array, passphrase: string) => Promi
 declare const generateSignature: () => Promise<string>;
 declare const generatePassword: () => Promise<string>;
 declare const generateKey: (passphrase: string) => Promise<Key>;
-declare const _encryptMessagePGP: (message: string, recipientsKeys: Key[], signatureKeys?: Key[] | undefined) => Promise<Uint8Array | openpgp.WebStream<Uint8Array> | openpgp.NodeStream<Uint8Array>>;
+declare const _encryptMessagePGP: (message: string, recipientsKeys: Key[], signatureKeys?: Key[] | undefined) => Promise<string | openpgp.WebStream<string> | openpgp.NodeStream<string>>;
 declare const _decryptMessagePGP: (ciphertext: string, key: Key, passphrase: string) => Promise<string | (Uint8Array & string) | (openpgp.WebStream<openpgp.Data> & string) | (openpgp.NodeStream<openpgp.Data> & string)>;
 export { openpgp, Key, deployKey, generateSignature, generatePassword, generateKey, sign, verify, encrypt, decrypt, decryptFile, _encryptMessagePGP, _decryptMessagePGP };
