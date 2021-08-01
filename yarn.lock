@@ -515,7 +515,7 @@
 
 "@organigram/contracts@git+https://alxmhe:ETwr5WUv3DJEjjJegRG6@bitbucket.org/organigram/contracts.git#refactoring":
   version "0.1.3"
-  resolved "git+https://alxmhe:ETwr5WUv3DJEjjJegRG6@bitbucket.org/organigram/contracts.git#396daf63ce801b102bfcedf87e75f427eb41b400"
+  resolved "git+https://alxmhe:ETwr5WUv3DJEjjJegRG6@bitbucket.org/organigram/contracts.git#63e8a2e86c94294212bf5560548852755e928a05"
   dependencies:
     "@openzeppelin/contracts" "^4.2.0"
 
@@ -3322,9 +3322,9 @@ level@^7.0.0:
     leveldown "^6.0.0"
 
 leveldown@^6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/leveldown/-/leveldown-6.0.0.tgz#3ec7f00463c45f8f7c8e68248d10ab299059c7ca"
-  integrity sha512-NEsyqpfdDhpFO49Zm9htNSsWixMa9Q9sUXgrBTaQNPyPo2Kx1wRctgIXMzc7tduXJqNff8QAwulv2eZDboghxQ==
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/leveldown/-/leveldown-6.0.1.tgz#d4758e4e91c1c5ff90d3e1cd29fb1bf5ce19ae22"
+  integrity sha512-D1fz5G58UrLBg5pXcN1pNxWtNLXwBiZsYt06XqjhD5zBHj/ws7xvZe3K0ZAhCbYuL9b4nbRCim8Z15HYWL2exQ==
   dependencies:
     abstract-leveldown "^7.0.0"
     napi-macros "~2.0.0"
