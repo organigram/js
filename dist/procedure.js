@@ -278,7 +278,7 @@ class Procedure {
     applyProposal(proposalKey) {
         return __awaiter(this, void 0, void 0, function* () {
             const from = yield web3_1.getAccount();
-            return this._contract.methods.presentProposal(proposalKey).send({ from });
+            return this._contract.methods.applyProposal(proposalKey).send({ from });
         });
     }
     reloadProposals() {

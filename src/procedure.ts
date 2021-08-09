@@ -466,7 +466,7 @@ export default class Procedure {
 
   async applyProposal(proposalKey: string): Promise<any> {
     const from = await getAccount()
-    return this._contract.methods.presentProposal(proposalKey).send({ from })
+    return this._contract.methods.applyProposal(proposalKey).send({ from })
   }
 
   /**
