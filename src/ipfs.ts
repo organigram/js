@@ -36,7 +36,7 @@ const multihashToCid = ({ ipfsHash, hashFunction, hashSize }: Multihash): CID | 
     'hex'
   )
   try {
-    return new CID(multihash)
+    return CID.decode(multihash)
   }
   catch (e) {
     console.warn("Error computing IPFS CID from given multihash.")
@@ -49,24 +49,13 @@ const cidToMultihash = (cid: CID | string): Multihash | undefined => {
     cid = EMPTY_CID
   }
   if (typeof cid === "string") {
-    cid = new CID(`${cid}`)
+    cid = CID.parse(cid)
   }
-  const multihash = cid?.multihash && Buffer.from(cid.multihash)
+  const multihash = cid?.bytes && Buffer.from(cid.bytes)
   return multihash && {
     ipfsHash: `0x${multihash.slice(2).toString('hex')}`,
     hashSize: `0x${multihash.slice(1, 2).toString('hex')}`,
     hashFunction: `0x${multihash.slice(0, 1).toString('hex')}`
-  }
-}
-
-const urlToCID = (url: string): CID | null => {
-  try {
-    // Remove https://ipfs.io/ipfs/
-    return new CID(url.substring(21))
-  }
-  catch (error) {
-    console.warn("Unable to convert IPFS url to CID.")
-    return null
   }
 }
 
@@ -94,7 +83,6 @@ export {
   ipfsNode,
   multihashToCid,
   cidToMultihash,
-  urlToCID,
   uint8ArrayToString,
   parseJSON,
   EMPTY_CID,
