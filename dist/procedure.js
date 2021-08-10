@@ -275,6 +275,12 @@ class Procedure {
             });
         });
     }
+    adoptProposal(proposalKey) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const from = yield web3_1.getAccount();
+            return this._contract.methods.adoptProposal(proposalKey).send({ from });
+        });
+    }
     applyProposal(proposalKey) {
         return __awaiter(this, void 0, void 0, function* () {
             const from = yield web3_1.getAccount();

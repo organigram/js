@@ -77,6 +77,7 @@ export default class Procedure {
     propose(metadata: CID, operations: ProcedureProposalOperation[]): Promise<ProcedureProposal>;
     blockProposal(proposalKey: string, reason: CID): Promise<any>;
     presentProposal(proposalKey: string): Promise<any>;
+    adoptProposal(proposalKey: string): Promise<any>;
     applyProposal(proposalKey: string): Promise<any>;
     reloadProposals(): Promise<Procedure>;
     reloadProposal(proposalKey: string): Promise<Procedure>;
