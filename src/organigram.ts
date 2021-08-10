@@ -8,7 +8,7 @@ import { parseJSON, cidToMultihash, CID } from './ipfs'
 import type { Address, Metadata, Network } from './types'
 
 export interface File {
-  cid: CID
+  cid: string
   data: any
 }
 
@@ -231,7 +231,9 @@ export class Organigram {
   }
 
   // Parse and cache a JSON file from IPFS.
-  public async cidToJson(cid: CID, cached: boolean = true) {
+  public async cidToJson(cid: CID | string, cached: boolean = true) {
+    // Normalize CID as a string.
+    cid = cid.toString()
     let data: any = cached ? this.cids.find(c => c.cid === cid)?.data : undefined
     if (!data) {
       data = await parseJSON(cid)

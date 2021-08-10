@@ -4,7 +4,7 @@ import Procedure from './procedure';
 import { CID } from './ipfs';
 import type { Address, Metadata, Network } from './types';
 export interface File {
-    cid: CID;
+    cid: string;
     data: any;
 }
 export declare type ProcedureType = {
@@ -40,7 +40,7 @@ export declare class Organigram {
     getContract(address: Address, cached?: boolean): Promise<Organ | EnhancedProcedure | null>;
     createOrgan(metadata: CID, admin?: Address): Promise<Organ>;
     createProcedure(type: Address, metadata: Metadata, proposers: Address, moderators: Address, deciders: Address, withModeration: boolean, ...args: any[]): Promise<EnhancedProcedure>;
-    cidToJson(cid: CID, cached?: boolean): Promise<any>;
+    cidToJson(cid: CID | string, cached?: boolean): Promise<any>;
     deployGraph(graph: Graph): Promise<Graph>;
 }
 export default Organigram;
