@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Organigram = exports.Procedure = exports.Keyserver = exports.PERMISSIONS = exports.ORGAN_CONTRACT_SIGNATURES = exports.Organ = exports.Graph = exports._decryptMessagePGP = exports._encryptMessagePGP = exports.decryptFile = exports.decrypt = exports.encrypt = exports.verify = exports.sign = exports.generateKey = exports.generatePassword = exports.generateSignature = exports.deployKey = exports.openpgp = exports.CID = exports.EMPTY_MULTIHASH = exports.EMPTY_CID = exports.parseJSON = exports.uint8ArrayToString = exports.cidToMultihash = exports.multihashToCid = exports.ipfsNode = exports.IPFS = exports.getNetworkName = exports.getNetwork = exports.getAccount = exports.web3connect = exports.web3ecRecover = exports.web3sign = exports.EMPTY_ADDRESS = exports.web3 = exports.Web3 = void 0;
+exports.Organigram = exports.Procedure = exports.Keyserver = exports.getPermissionsSet = exports.PERMISSIONS = exports.ORGAN_CONTRACT_SIGNATURES = exports.Organ = exports.Graph = exports._decryptMessagePGP = exports._encryptMessagePGP = exports.decryptFile = exports.decrypt = exports.encrypt = exports.verify = exports.sign = exports.generateKey = exports.generatePassword = exports.generateSignature = exports.deployKey = exports.openpgp = exports.CID = exports.EMPTY_MULTIHASH = exports.EMPTY_CID = exports.parseJSON = exports.uint8ArrayToString = exports.cidToMultihash = exports.multihashToCid = exports.ipfsNode = exports.IPFS = exports.getNetworkName = exports.getNetwork = exports.getAccount = exports.web3connect = exports.web3ecRecover = exports.web3sign = exports.EMPTY_ADDRESS = exports.web3 = exports.Web3 = void 0;
 var web3_1 = require("./web3");
 Object.defineProperty(exports, "Web3", { enumerable: true, get: function () { return web3_1.Web3; } });
 Object.defineProperty(exports, "web3", { enumerable: true, get: function () { return web3_1.web3; } });
@@ -43,6 +43,7 @@ var organ_1 = require("./organ");
 Object.defineProperty(exports, "Organ", { enumerable: true, get: function () { return __importDefault(organ_1).default; } });
 Object.defineProperty(exports, "ORGAN_CONTRACT_SIGNATURES", { enumerable: true, get: function () { return organ_1.ORGAN_CONTRACT_SIGNATURES; } });
 Object.defineProperty(exports, "PERMISSIONS", { enumerable: true, get: function () { return organ_1.PERMISSIONS; } });
+Object.defineProperty(exports, "getPermissionsSet", { enumerable: true, get: function () { return organ_1.getPermissionsSet; } });
 var keyserver_1 = require("./keyserver");
 Object.defineProperty(exports, "Keyserver", { enumerable: true, get: function () { return __importDefault(keyserver_1).default; } });
 var procedure_1 = require("./procedure");

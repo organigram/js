@@ -40,6 +40,7 @@ export {
   default as Organ,
   ORGAN_CONTRACT_SIGNATURES,
   PERMISSIONS,
+  getPermissionsSet,
   OrganData,
   OrganEntry,
   OrganProcedure

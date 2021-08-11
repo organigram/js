@@ -20,36 +20,38 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 var _a, _b;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PERMISSIONS = exports.Organ = exports.ORGAN_CONTRACT_SIGNATURES = void 0;
+exports.getPermissionsSet = exports.PERMISSIONS = exports.Organ = exports.ORGAN_CONTRACT_SIGNATURES = void 0;
 const web3_1 = __importDefault(require("web3"));
 const it_all_1 = __importDefault(require("it-all"));
 const concat_1 = __importDefault(require("uint8arrays/concat"));
 const Organ_json_1 = __importDefault(require("@organigram/contracts/build/contracts/Organ.json"));
 const web3_2 = require("./web3");
 const ipfs_1 = require("./ipfs");
-exports.ORGAN_CONTRACT_SIGNATURES = ((_b = (_a = Organ_json_1.default
-    .ast.nodes.find(n => n.name === "")) === null || _a === void 0 ? void 0 : _a.nodes) === null || _b === void 0 ? void 0 : _b.map(n => (n === null || n === void 0 ? void 0 : n.functionSelector) || "").filter(i => i !== ""))
-    || [];
+exports.ORGAN_CONTRACT_SIGNATURES = ((_b = (_a = Organ_json_1.default.ast.nodes
+    .find(n => n.name === '')) === null || _a === void 0 ? void 0 : _a.nodes) === null || _b === void 0 ? void 0 : _b.map(n => (n === null || n === void 0 ? void 0 : n.functionSelector) || '').filter(i => i !== '')) || [];
 class Organ {
     constructor({ address, network, balance, procedures, metadata, entries }) {
-        this.address = "";
-        this.network = "mainnet";
-        this.balance = "n/a";
+        this.address = '';
+        this.network = 'mainnet';
+        this.balance = 'n/a';
         this.procedures = [];
         this.entries = [];
-        this.updateMetadata = (cid = ipfs_1.CID.parse("QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH")) => __awaiter(this, void 0, void 0, function* () {
+        this.updateMetadata = (cid = ipfs_1.CID.parse('QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH')) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
             const multihash = ipfs_1.cidToMultihash(cid);
             if (!multihash)
-                throw new Error("Wrong CID.");
+                throw new Error('Wrong CID.');
             const { ipfsHash, hashFunction, hashSize } = multihash;
             const from = yield web3_2.getAccount();
-            return from && contract.methods.updateMetadata({ ipfsHash, hashFunction, hashSize }).send({ from })
-                .then(() => true)
-                .catch((error) => {
-                console.error("Error while updating metadata.", this.address, error.message);
-                return false;
-            });
+            return (from &&
+                contract.methods
+                    .updateMetadata({ ipfsHash, hashFunction, hashSize })
+                    .send({ from })
+                    .then(() => true)
+                    .catch((error) => {
+                    console.error('Error while updating metadata.', this.address, error.message);
+                    return false;
+                }));
         });
         this.addEntries = (entries) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
@@ -61,68 +63,94 @@ class Organ {
                 return { addr: e.address, doc: { ipfsHash, hashFunction, hashSize } };
             });
             const from = yield web3_2.getAccount();
-            return from && contract.methods.addEntries(_entries).send({ from })
-                .then(() => true)
-                .catch((error) => {
-                console.error("Error while adding entries to organ.", this.address, error.message);
-                return false;
-            });
+            return (from &&
+                contract.methods
+                    .addEntries(_entries)
+                    .send({ from })
+                    .then(() => true)
+                    .catch((error) => {
+                    console.error('Error while adding entries to organ.', this.address, error.message);
+                    return false;
+                }));
         });
         this.removeEntries = (indexes) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
             const from = yield web3_2.getAccount();
-            return from && contract.methods.removeEntries(indexes).send({ from })
-                .then(() => true)
-                .catch((error) => {
-                console.error("Error while removing entries in organ.", this.address, error.message);
-                return false;
-            });
+            return (from &&
+                contract.methods
+                    .removeEntries(indexes)
+                    .send({ from })
+                    .then(() => true)
+                    .catch((error) => {
+                    console.error('Error while removing entries in organ.', this.address, error.message);
+                    return false;
+                }));
         });
         this.replaceEntry = (index, entry) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
             const multihash = entry.cid && ipfs_1.cidToMultihash(entry.cid);
             if (!multihash)
-                throw new Error("Wrong CID.");
+                throw new Error('Wrong CID.');
             const { ipfsHash, hashFunction, hashSize } = multihash;
             const from = yield web3_2.getAccount();
-            return from && contract.methods.replaceEntry(index, entry.address, { ipfsHash, hashFunction, hashSize }).send({ from })
-                .then(() => true)
-                .catch((error) => {
-                console.error("Error while replacing entry in organ.", this.address, error.message);
-                return false;
-            });
+            return (from &&
+                contract.methods
+                    .replaceEntry(index, entry.address, {
+                    ipfsHash,
+                    hashFunction,
+                    hashSize
+                })
+                    .send({ from })
+                    .then(() => true)
+                    .catch((error) => {
+                    console.error('Error while replacing entry in organ.', this.address, error.message);
+                    return false;
+                }));
         });
         this.addProcedure = (procedure) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
             const from = yield web3_2.getAccount();
-            const permissions = `0x${(procedure.permissions || 0).toString(16).padStart(4, '0')}`;
-            return from && contract.methods.addProcedure(procedure.address, permissions).send({ from })
-                .then(() => true)
-                .catch((error) => {
-                console.error("Error while adding procedures in organ.", this.address, error.message);
-                return false;
-            });
+            const permissions = `0x${(procedure.permissions || 0)
+                .toString(16)
+                .padStart(4, '0')}`;
+            return (from &&
+                contract.methods
+                    .addProcedure(procedure.address, permissions)
+                    .send({ from })
+                    .then(() => true)
+                    .catch((error) => {
+                    console.error('Error while adding procedures in organ.', this.address, error.message);
+                    return false;
+                }));
         });
         this.removeProcedure = (procedure) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
             const from = yield web3_2.getAccount();
-            return from && contract.methods.removeProcedure(procedure).send({ from })
-                .then(() => true)
-                .catch((error) => {
-                console.error("Error while removing procedure in organ.", this.address, error.message);
-                return false;
-            });
+            return (from &&
+                contract.methods
+                    .removeProcedure(procedure)
+                    .send({ from })
+                    .then(() => true)
+                    .catch((error) => {
+                    console.error('Error while removing procedure in organ.', this.address, error.message);
+                    return false;
+                }));
         });
         this.replaceProcedure = (oldProcedure, newOrganProcedure) => __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
-            const permissions = `0x${(newOrganProcedure.permissions || 0).toString(16).padStart(4, '0')}`;
+            const permissions = `0x${(newOrganProcedure.permissions || 0)
+                .toString(16)
+                .padStart(4, '0')}`;
             const from = yield web3_2.getAccount();
-            return from && contract.methods.replaceProcedure(oldProcedure, newOrganProcedure.address, permissions).send({ from })
-                .then(() => true)
-                .catch((error) => {
-                console.error("Error while replacing procedure in organ.", this.address, error.message);
-                return false;
-            });
+            return (from &&
+                contract.methods
+                    .replaceProcedure(oldProcedure, newOrganProcedure.address, permissions)
+                    .send({ from })
+                    .then(() => true)
+                    .catch((error) => {
+                    console.error('Error while replacing procedure in organ.', this.address, error.message);
+                    return false;
+                }));
         });
         this.address = address;
         this.network = network;
@@ -135,33 +163,41 @@ class Organ {
         return __awaiter(this, void 0, void 0, function* () {
             const network = yield web3_2.getNetwork();
             if (!network)
-                throw new Error("Not connected to a valid network.");
+                throw new Error('Not connected to a valid network.');
             const isOrgan = yield Organ.isOrgan(address).catch(() => false);
-            const balance = yield Organ.getBalance(address)
-                .catch(() => "n/a");
+            const balance = yield Organ.getBalance(address).catch(() => 'n/a');
             const organData = yield Organ.loadData(address);
             const metadata = { cid: organData === null || organData === void 0 ? void 0 : organData.metadata };
-            const procedures = yield Organ.loadProcedures(address)
-                .catch(error => {
+            const procedures = yield Organ.loadProcedures(address).catch(error => {
                 console.warn("Error while loading organ's procedures", address, error.message);
                 return [];
             });
-            const entries = yield Organ.loadEntries(address)
-                .catch(error => {
+            const entries = yield Organ.loadEntries(address).catch(error => {
                 console.warn("Error while loading organ's entries", address, error.message);
                 return [];
             });
-            return new Organ({ address, network, balance, procedures, metadata, entries });
+            return new Organ({
+                address,
+                network,
+                balance,
+                procedures,
+                metadata,
+                entries
+            });
         });
     }
     static isOrgan(address) {
         return __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, address);
-            const isERC165 = yield contract.methods.supportsInterface("0x01ffc9a7").call()
+            const isERC165 = yield contract.methods
+                .supportsInterface('0x01ffc9a7')
+                .call()
                 .catch(() => false);
             if (!isERC165)
                 return false;
-            const isOrgan = yield contract.methods.supportsInterface(Organ.INTERFACE).call()
+            const isOrgan = yield contract.methods
+                .supportsInterface(Organ.INTERFACE)
+                .call()
                 .catch(() => false);
             return isOrgan;
         });
@@ -195,16 +231,20 @@ class Organ {
     static loadPermissions(address, procedure) {
         return __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, address);
-            return contract.methods.getPermissions(procedure).call()
-                .catch((e) => console.error("Error", e.message))
+            return contract.methods
+                .getPermissions(procedure)
+                .call()
+                .catch((e) => console.error('Error', e.message))
                 .then(({ perms }) => perms);
         });
     }
     static loadProcedure(address, index) {
         return __awaiter(this, void 0, void 0, function* () {
             const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, address);
-            return contract.methods.getProcedure(index).call()
-                .catch((e) => console.error("Error", e.message))
+            return contract.methods
+                .getProcedure(index)
+                .call()
+                .catch((e) => console.error('Error', e.message))
                 .then((data) => data && {
                 address: data.addr,
                 permissions: data.perms
@@ -218,7 +258,7 @@ class Organ {
             const length = web3_1.default.utils.toBN(data.proceduresLength);
             let procedures = [];
             const iGenerator = function* () {
-                let i = web3_1.default.utils.toBN("0");
+                let i = web3_1.default.utils.toBN('0');
                 while (i.lt(length)) {
                     yield i;
                     i = i.addn(1);
@@ -228,9 +268,8 @@ class Organ {
                 for (var _b = __asyncValues(iGenerator()), _c; _c = yield _b.next(), !_c.done;) {
                     let i = _c.value;
                     const key = i.toString();
-                    const procedure = yield Organ.loadProcedure(address, key)
-                        .catch((error) => {
-                        console.warn("Error while loading procedure in organ.", address, key, error.message);
+                    const procedure = yield Organ.loadProcedure(address, key).catch((error) => {
+                        console.warn('Error while loading procedure in organ.', address, key, error.message);
                         return null;
                     });
                     if (procedure)
@@ -252,20 +291,27 @@ class Organ {
             const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, address);
             const ipfs = yield ipfs_1.ipfsNode;
             if (!ipfs) {
-                console.info("IPFS was not started. Starting IPFS.");
+                console.info('IPFS was not started. Starting IPFS.');
                 yield ipfs.start().catch((e) => console.warn(e.message));
             }
-            return contract.methods.getEntry(index).call()
+            return contract.methods
+                .getEntry(index)
+                .call()
                 .then(({ addr, doc }) => __awaiter(this, void 0, void 0, function* () {
-                if (addr === web3_2.EMPTY_ADDRESS && (!parseInt(doc.hashFunction, 16) || !parseInt(doc.hashSize)))
+                if (addr === web3_2.EMPTY_ADDRESS &&
+                    (!parseInt(doc.hashFunction, 16) || !parseInt(doc.hashSize)))
                     return null;
-                let entry = { index, address: addr, cid: ipfs_1.multihashToCid(doc) };
+                let entry = {
+                    index,
+                    address: addr,
+                    cid: ipfs_1.multihashToCid(doc)
+                };
                 if (entry.cid) {
                     try {
                         entry.data = concat_1.default(yield it_all_1.default(ipfs.cat(entry.cid)));
                     }
                     catch (error) {
-                        console.warn("Error while loading data hash for entry.", address, index, error.message);
+                        console.warn('Error while loading data hash for entry.', address, index, error.message);
                     }
                 }
                 return entry;
@@ -278,7 +324,7 @@ class Organ {
             const length = web3_1.default.utils.toBN((yield Organ.loadData(address)).entriesLength);
             let entries = [];
             const iGenerator = function* () {
-                let i = web3_1.default.utils.toBN("1");
+                let i = web3_1.default.utils.toBN('1');
                 while (i.lt(length)) {
                     yield i;
                     i = i.addn(1);
@@ -288,9 +334,8 @@ class Organ {
                 for (var _b = __asyncValues(iGenerator()), _c; _c = yield _b.next(), !_c.done;) {
                     let index = _c.value;
                     const key = index.toString();
-                    const entry = yield Organ.loadEntry(address, key)
-                        .catch((error) => {
-                        console.warn("Error while loading entry in organ.", address, key, error.message);
+                    const entry = yield Organ.loadEntry(address, key).catch((error) => {
+                        console.warn('Error while loading entry in organ.', address, key, error.message);
                         return null;
                     });
                     if (entry)
@@ -325,8 +370,7 @@ class Organ {
     }
     reloadEntries() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.entries = yield Organ.loadEntries(this.address)
-                .catch(error => {
+            this.entries = yield Organ.loadEntries(this.address).catch(error => {
                 console.warn("Error while reloading organ's entries", this.address, error.message);
                 return this.entries;
             });
@@ -335,8 +379,7 @@ class Organ {
     }
     reloadProcedures() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.procedures = yield Organ.loadProcedures(this.address)
-                .catch(error => {
+            this.procedures = yield Organ.loadProcedures(this.address).catch(error => {
                 console.warn("Error while reloading organ's procedures", this.address, error.message);
                 return this.procedures;
             });
@@ -370,4 +413,8 @@ exports.PERMISSIONS = {
     DEPOSIT_COLLECTIBLES: 0x0200,
     WITHDRAW_COLLECTIBLES: 0x0400
 };
+const getPermissionsSet = (permissions) => Object.entries(exports.PERMISSIONS)
+    .filter(permission => (permissions & permission[1]) === permission[1])
+    .map(permission => permission[0]);
+exports.getPermissionsSet = getPermissionsSet;
 exports.default = Organ;

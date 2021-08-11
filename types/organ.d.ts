@@ -1,5 +1,5 @@
 import { CID } from './ipfs';
-import type { Network, Address, Metadata } from './types';
+import { Network, Address, Metadata } from './types';
 export declare const ORGAN_CONTRACT_SIGNATURES: string[];
 export interface OrganEntry {
     index: string;
@@ -50,7 +50,7 @@ export declare class Organ {
     static loadProcedures(address: Address): Promise<OrganProcedure[]>;
     static loadEntry(address: Address, index: string): Promise<OrganEntry>;
     static loadEntries(address: Address): Promise<OrganEntry[]>;
-    static generateEncodedABI(address: Address, functionName: "addEntries" | "removeEntries" | "replaceEntry" | "addProcedure" | "removeProcedure" | "replaceProcedure", ...args: any[]): Promise<Request>;
+    static generateEncodedABI(address: Address, functionName: 'addEntries' | 'removeEntries' | 'replaceEntry' | 'addProcedure' | 'removeProcedure' | 'replaceProcedure', ...args: any[]): Promise<Request>;
     reload(): Promise<Organ>;
     reloadEntries(): Promise<Organ>;
     reloadProcedures(): Promise<Organ>;
@@ -73,4 +73,5 @@ export declare const PERMISSIONS: {
     DEPOSIT_COLLECTIBLES: number;
     WITHDRAW_COLLECTIBLES: number;
 };
+export declare const getPermissionsSet: (permissions: number) => string[];
 export default Organ;
