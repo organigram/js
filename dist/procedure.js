@@ -359,7 +359,7 @@ Procedure.OPERATIONS_FUNCTIONS = [
         target: 'organ'
     },
     {
-        funcSig: "0x91bdfe63",
+        funcSig: "0x62f7f997",
         key: "replaceEntry",
         signature: "replaceEntry(uint256,CoreLibrary.Entry)",
         label: "Replace entry",
