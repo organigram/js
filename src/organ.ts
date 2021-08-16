@@ -551,7 +551,7 @@ export const PERMISSIONS = {
 }
 
 export const getPermissionsSet = (permissions: number): string[] =>
-  Object && Object.entries && Object.entries(PERMISSIONS)
+  Object.entries(PERMISSIONS)
     .filter((permission: [string, number]) => (permissions & permission[1]) === permission[1])
     .map((permission: [string, number]) => permission[0])
 
