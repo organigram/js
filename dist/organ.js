@@ -8,6 +8,33 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
 var __asyncValues = (this && this.__asyncValues) || function (o) {
     if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
     var m = o[Symbol.asyncIterator], i;
@@ -15,143 +42,208 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
 };
 var _a, _b;
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 exports.getPermissionsSet = exports.PERMISSIONS = exports.Organ = exports.ORGAN_CONTRACT_SIGNATURES = void 0;
-const web3_1 = __importDefault(require("web3"));
-const it_all_1 = __importDefault(require("it-all"));
-const concat_1 = __importDefault(require("uint8arrays/concat"));
-const Organ_json_1 = __importDefault(require("@organigram/contracts/build/contracts/Organ.json"));
-const web3_2 = require("./web3");
-const ipfs_1 = require("./ipfs");
-exports.ORGAN_CONTRACT_SIGNATURES = ((_b = (_a = Organ_json_1.default.ast.nodes
-    .find(n => n.name === '')) === null || _a === void 0 ? void 0 : _a.nodes) === null || _b === void 0 ? void 0 : _b.map(n => (n === null || n === void 0 ? void 0 : n.functionSelector) || '').filter(i => i !== '')) || [];
-class Organ {
-    constructor({ address, network, balance, procedures, metadata, entries }) {
+var web3_1 = require("web3");
+var it_all_1 = require("it-all");
+var concat_1 = require("uint8arrays/concat");
+var Organ_json_1 = require("@organigram/contracts/build/contracts/Organ.json");
+var web3_2 = require("./web3");
+var ipfs_1 = require("./ipfs");
+exports.ORGAN_CONTRACT_SIGNATURES = ((_b = (_a = Organ_json_1["default"].ast.nodes
+    .find(function (n) { return n.name === ''; })) === null || _a === void 0 ? void 0 : _a.nodes) === null || _b === void 0 ? void 0 : _b.map(function (n) { return (n === null || n === void 0 ? void 0 : n.functionSelector) || ''; }).filter(function (i) { return i !== ''; })) || [];
+var Organ = (function () {
+    function Organ(_a) {
+        var _this = this;
+        var address = _a.address, network = _a.network, balance = _a.balance, procedures = _a.procedures, metadata = _a.metadata, entries = _a.entries;
         this.address = '';
         this.network = 'mainnet';
         this.balance = 'n/a';
         this.procedures = [];
         this.entries = [];
-        this.updateMetadata = (cid = ipfs_1.CID.parse('QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH')) => __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
-            const multihash = ipfs_1.cidToMultihash(cid);
-            if (!multihash)
-                throw new Error('Wrong CID.');
-            const { ipfsHash, hashFunction, hashSize } = multihash;
-            const from = yield web3_2.getAccount();
-            return (from &&
-                contract.methods
-                    .updateMetadata({ ipfsHash, hashFunction, hashSize })
-                    .send({ from })
-                    .then(() => true)
-                    .catch((error) => {
-                    console.error('Error while updating metadata.', this.address, error.message);
-                    return false;
-                }));
-        });
-        this.addEntries = (entries) => __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
-            const _entries = entries.map(e => {
-                let multihash = e.cid && ipfs_1.cidToMultihash(e.cid);
-                if (!multihash)
-                    throw new Error(`Wrong IPFS Content ID '${e.cid}' for entry.`);
-                const { ipfsHash, hashFunction, hashSize } = multihash;
-                return { addr: e.address, doc: { ipfsHash, hashFunction, hashSize } };
+        this.updateMetadata = function (cid) {
+            if (cid === void 0) { cid = ipfs_1.CID.parse('QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH'); }
+            return __awaiter(_this, void 0, void 0, function () {
+                var contract, multihash, ipfsHash, hashFunction, hashSize, from;
+                var _this = this;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0:
+                            contract = new web3_2.web3.eth.Contract(Organ_json_1["default"].abi, this.address);
+                            multihash = ipfs_1.cidToMultihash(cid);
+                            if (!multihash)
+                                throw new Error('Wrong CID.');
+                            ipfsHash = multihash.ipfsHash, hashFunction = multihash.hashFunction, hashSize = multihash.hashSize;
+                            return [4, web3_2.getAccount()];
+                        case 1:
+                            from = _a.sent();
+                            return [2, (from &&
+                                    contract.methods
+                                        .updateMetadata({ ipfsHash: ipfsHash, hashFunction: hashFunction, hashSize: hashSize })
+                                        .send({ from: from })
+                                        .then(function () { return true; })["catch"](function (error) {
+                                        console.error('Error while updating metadata.', _this.address, error.message);
+                                        return false;
+                                    }))];
+                    }
+                });
             });
-            const from = yield web3_2.getAccount();
-            return (from &&
-                contract.methods
-                    .addEntries(_entries)
-                    .send({ from })
-                    .then(() => true)
-                    .catch((error) => {
-                    console.error('Error while adding entries to organ.', this.address, error.message);
-                    return false;
-                }));
-        });
-        this.removeEntries = (indexes) => __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
-            const from = yield web3_2.getAccount();
-            return (from &&
-                contract.methods
-                    .removeEntries(indexes)
-                    .send({ from })
-                    .then(() => true)
-                    .catch((error) => {
-                    console.error('Error while removing entries in organ.', this.address, error.message);
-                    return false;
-                }));
-        });
-        this.replaceEntry = (index, entry) => __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
-            const multihash = entry.cid && ipfs_1.cidToMultihash(entry.cid);
-            if (!multihash)
-                throw new Error('Wrong CID.');
-            const { ipfsHash, hashFunction, hashSize } = multihash;
-            const from = yield web3_2.getAccount();
-            return (from &&
-                contract.methods
-                    .replaceEntry(index, entry.address, {
-                    ipfsHash,
-                    hashFunction,
-                    hashSize
-                })
-                    .send({ from })
-                    .then(() => true)
-                    .catch((error) => {
-                    console.error('Error while replacing entry in organ.', this.address, error.message);
-                    return false;
-                }));
-        });
-        this.addProcedure = (procedure) => __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
-            const from = yield web3_2.getAccount();
-            const permissions = `0x${(procedure.permissions || 0)
-                .toString(16)
-                .padStart(4, '0')}`;
-            return (from &&
-                contract.methods
-                    .addProcedure(procedure.address, permissions)
-                    .send({ from })
-                    .then(() => true)
-                    .catch((error) => {
-                    console.error('Error while adding procedures in organ.', this.address, error.message);
-                    return false;
-                }));
-        });
-        this.removeProcedure = (procedure) => __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
-            const from = yield web3_2.getAccount();
-            return (from &&
-                contract.methods
-                    .removeProcedure(procedure)
-                    .send({ from })
-                    .then(() => true)
-                    .catch((error) => {
-                    console.error('Error while removing procedure in organ.', this.address, error.message);
-                    return false;
-                }));
-        });
-        this.replaceProcedure = (oldProcedure, newOrganProcedure) => __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, this.address);
-            const permissions = `0x${(newOrganProcedure.permissions || 0)
-                .toString(16)
-                .padStart(4, '0')}`;
-            const from = yield web3_2.getAccount();
-            return (from &&
-                contract.methods
-                    .replaceProcedure(oldProcedure, newOrganProcedure.address, permissions)
-                    .send({ from })
-                    .then(() => true)
-                    .catch((error) => {
-                    console.error('Error while replacing procedure in organ.', this.address, error.message);
-                    return false;
-                }));
-        });
+        };
+        this.addEntries = function (entries) { return __awaiter(_this, void 0, void 0, function () {
+            var contract, _entries, from;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        contract = new web3_2.web3.eth.Contract(Organ_json_1["default"].abi, this.address);
+                        _entries = entries.map(function (e) {
+                            var multihash = e.cid && ipfs_1.cidToMultihash(e.cid);
+                            if (!multihash)
+                                throw new Error("Wrong IPFS Content ID '" + e.cid + "' for entry.");
+                            var ipfsHash = multihash.ipfsHash, hashFunction = multihash.hashFunction, hashSize = multihash.hashSize;
+                            return { addr: e.address, doc: { ipfsHash: ipfsHash, hashFunction: hashFunction, hashSize: hashSize } };
+                        });
+                        return [4, web3_2.getAccount()];
+                    case 1:
+                        from = _a.sent();
+                        return [2, (from &&
+                                contract.methods
+                                    .addEntries(_entries)
+                                    .send({ from: from })
+                                    .then(function () { return true; })["catch"](function (error) {
+                                    console.error('Error while adding entries to organ.', _this.address, error.message);
+                                    return false;
+                                }))];
+                }
+            });
+        }); };
+        this.removeEntries = function (indexes) { return __awaiter(_this, void 0, void 0, function () {
+            var contract, from;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        contract = new web3_2.web3.eth.Contract(Organ_json_1["default"].abi, this.address);
+                        return [4, web3_2.getAccount()];
+                    case 1:
+                        from = _a.sent();
+                        return [2, (from &&
+                                contract.methods
+                                    .removeEntries(indexes)
+                                    .send({ from: from })
+                                    .then(function () { return true; })["catch"](function (error) {
+                                    console.error('Error while removing entries in organ.', _this.address, error.message);
+                                    return false;
+                                }))];
+                }
+            });
+        }); };
+        this.replaceEntry = function (index, entry) { return __awaiter(_this, void 0, void 0, function () {
+            var contract, multihash, ipfsHash, hashFunction, hashSize, from;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        contract = new web3_2.web3.eth.Contract(Organ_json_1["default"].abi, this.address);
+                        multihash = entry.cid && ipfs_1.cidToMultihash(entry.cid);
+                        if (!multihash)
+                            throw new Error('Wrong CID.');
+                        ipfsHash = multihash.ipfsHash, hashFunction = multihash.hashFunction, hashSize = multihash.hashSize;
+                        return [4, web3_2.getAccount()];
+                    case 1:
+                        from = _a.sent();
+                        return [2, (from &&
+                                contract.methods
+                                    .replaceEntry(index, entry.address, {
+                                    ipfsHash: ipfsHash,
+                                    hashFunction: hashFunction,
+                                    hashSize: hashSize
+                                })
+                                    .send({ from: from })
+                                    .then(function () { return true; })["catch"](function (error) {
+                                    console.error('Error while replacing entry in organ.', _this.address, error.message);
+                                    return false;
+                                }))];
+                }
+            });
+        }); };
+        this.addProcedure = function (procedure) { return __awaiter(_this, void 0, void 0, function () {
+            var contract, from, permissions;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        contract = new web3_2.web3.eth.Contract(Organ_json_1["default"].abi, this.address);
+                        return [4, web3_2.getAccount()];
+                    case 1:
+                        from = _a.sent();
+                        permissions = "0x" + (procedure.permissions || 0)
+                            .toString(16)
+                            .padStart(4, '0');
+                        return [2, (from &&
+                                contract.methods
+                                    .addProcedure(procedure.address, permissions)
+                                    .send({ from: from })
+                                    .then(function () { return true; })["catch"](function (error) {
+                                    console.error('Error while adding procedures in organ.', _this.address, error.message);
+                                    return false;
+                                }))];
+                }
+            });
+        }); };
+        this.removeProcedure = function (procedure) { return __awaiter(_this, void 0, void 0, function () {
+            var contract, from;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        contract = new web3_2.web3.eth.Contract(Organ_json_1["default"].abi, this.address);
+                        return [4, web3_2.getAccount()];
+                    case 1:
+                        from = _a.sent();
+                        return [2, (from &&
+                                contract.methods
+                                    .removeProcedure(procedure)
+                                    .send({ from: from })
+                                    .then(function () { return true; })["catch"](function (error) {
+                                    console.error('Error while removing procedure in organ.', _this.address, error.message);
+                                    return false;
+                                }))];
+                }
+            });
+        }); };
+        this.replaceProcedure = function (oldProcedure, newOrganProcedure) { return __awaiter(_this, void 0, void 0, function () {
+            var contract, permissions, from;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        contract = new web3_2.web3.eth.Contract(Organ_json_1["default"].abi, this.address);
+                        permissions = "0x" + (newOrganProcedure.permissions || 0)
+                            .toString(16)
+                            .padStart(4, '0');
+                        return [4, web3_2.getAccount()];
+                    case 1:
+                        from = _a.sent();
+                        return [2, (from &&
+                                contract.methods
+                                    .replaceProcedure(oldProcedure, newOrganProcedure.address, permissions)
+                                    .send({ from: from })
+                                    .then(function () { return true; })["catch"](function (error) {
+                                    console.error('Error while replacing procedure in organ.', _this.address, error.message);
+                                    return false;
+                                }))];
+                }
+            });
+        }); };
         this.address = address;
         this.network = network;
         this.balance = balance;
@@ -159,243 +251,442 @@ class Organ {
         this.metadata = metadata;
         this.entries = entries;
     }
-    static load(address) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const network = yield web3_2.getNetwork();
-            if (!network)
-                throw new Error('Not connected to a valid network.');
-            const isOrgan = yield Organ.isOrgan(address).catch(() => false);
-            const balance = yield Organ.getBalance(address).catch(() => 'n/a');
-            const organData = yield Organ.loadData(address);
-            const metadata = { cid: organData === null || organData === void 0 ? void 0 : organData.metadata };
-            const procedures = yield Organ.loadProcedures(address).catch(error => {
-                console.warn("Error while loading organ's procedures", address, error.message);
-                return [];
-            });
-            const entries = yield Organ.loadEntries(address).catch(error => {
-                console.warn("Error while loading organ's entries", address, error.message);
-                return [];
-            });
-            return new Organ({
-                address,
-                network,
-                balance,
-                procedures,
-                metadata,
-                entries
-            });
-        });
-    }
-    static isOrgan(address) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, address);
-            const isERC165 = yield contract.methods
-                .supportsInterface('0x01ffc9a7')
-                .call()
-                .catch(() => false);
-            if (!isERC165)
-                return false;
-            const isOrgan = yield contract.methods
-                .supportsInterface(Organ.INTERFACE)
-                .call()
-                .catch(() => false);
-            return isOrgan;
-        });
-    }
-    static getBalance(address) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const balance = yield web3_2.web3.eth.getBalance(address);
-            return `${balance}`;
-        });
-    }
-    static loadData(address) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, address);
-            const data = yield contract.methods.getOrgan().call();
-            const cid = ipfs_1.multihashToCid(data.metadata);
-            return {
-                metadata: cid,
-                proceduresLength: data === null || data === void 0 ? void 0 : data.proceduresLength,
-                entriesLength: data === null || data === void 0 ? void 0 : data.entriesLength,
-                entriesCount: data === null || data === void 0 ? void 0 : data.entriesCount
-            };
-        });
-    }
-    static loadEntryForAccount(address, account) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, address);
-            const index = yield contract.methods.getEntryIndexForAddress(account).call();
-            return Organ.loadEntry(address, index);
-        });
-    }
-    static loadPermissions(address, procedure) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, address);
-            return contract.methods
-                .getPermissions(procedure)
-                .call()
-                .catch((e) => console.error('Error', e.message))
-                .then(({ perms }) => perms);
-        });
-    }
-    static loadProcedure(address, index) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, address);
-            return contract.methods
-                .getProcedure(index)
-                .call()
-                .catch((e) => console.error('Error', e.message))
-                .then((data) => data && {
-                address: data.addr,
-                permissions: data.perms
+    Organ.load = function (address) {
+        return __awaiter(this, void 0, void 0, function () {
+            var network, isOrgan, balance, organData, metadata, procedures, entries;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4, web3_2.getNetwork()];
+                    case 1:
+                        network = _a.sent();
+                        if (!network)
+                            throw new Error('Not connected to a valid network.');
+                        return [4, Organ.isOrgan(address)["catch"](function () { return false; })];
+                    case 2:
+                        isOrgan = _a.sent();
+                        return [4, Organ.getBalance(address)["catch"](function () { return 'n/a'; })];
+                    case 3:
+                        balance = _a.sent();
+                        return [4, Organ.loadData(address)];
+                    case 4:
+                        organData = _a.sent();
+                        metadata = { cid: organData === null || organData === void 0 ? void 0 : organData.metadata };
+                        return [4, Organ.loadProcedures(address)["catch"](function (error) {
+                                console.warn("Error while loading organ's procedures", address, error.message);
+                                return [];
+                            })];
+                    case 5:
+                        procedures = _a.sent();
+                        return [4, Organ.loadEntries(address)["catch"](function (error) {
+                                console.warn("Error while loading organ's entries", address, error.message);
+                                return [];
+                            })];
+                    case 6:
+                        entries = _a.sent();
+                        return [2, new Organ({
+                                address: address,
+                                network: network,
+                                balance: balance,
+                                procedures: procedures,
+                                metadata: metadata,
+                                entries: entries
+                            })];
+                }
             });
         });
-    }
-    static loadProcedures(address) {
+    };
+    Organ.isOrgan = function (address) {
+        return __awaiter(this, void 0, void 0, function () {
+            var contract, isERC165, isOrgan;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        contract = new web3_2.web3.eth.Contract(Organ_json_1["default"].abi, address);
+                        return [4, contract.methods
+                                .supportsInterface('0x01ffc9a7')
+                                .call()["catch"](function () { return false; })];
+                    case 1:
+                        isERC165 = _a.sent();
+                        if (!isERC165)
+                            return [2, false];
+                        return [4, contract.methods
+                                .supportsInterface(Organ.INTERFACE)
+                                .call()["catch"](function () { return false; })];
+                    case 2:
+                        isOrgan = _a.sent();
+                        return [2, isOrgan];
+                }
+            });
+        });
+    };
+    Organ.getBalance = function (address) {
+        return __awaiter(this, void 0, void 0, function () {
+            var balance;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4, web3_2.web3.eth.getBalance(address)];
+                    case 1:
+                        balance = _a.sent();
+                        return [2, "" + balance];
+                }
+            });
+        });
+    };
+    Organ.loadData = function (address) {
+        return __awaiter(this, void 0, void 0, function () {
+            var contract, data, cid;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        contract = new web3_2.web3.eth.Contract(Organ_json_1["default"].abi, address);
+                        return [4, contract.methods.getOrgan().call()];
+                    case 1:
+                        data = _a.sent();
+                        cid = ipfs_1.multihashToCid(data.metadata);
+                        return [2, {
+                                metadata: cid,
+                                proceduresLength: data === null || data === void 0 ? void 0 : data.proceduresLength,
+                                entriesLength: data === null || data === void 0 ? void 0 : data.entriesLength,
+                                entriesCount: data === null || data === void 0 ? void 0 : data.entriesCount
+                            }];
+                }
+            });
+        });
+    };
+    Organ.loadEntryForAccount = function (address, account) {
+        return __awaiter(this, void 0, void 0, function () {
+            var contract, index;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        contract = new web3_2.web3.eth.Contract(Organ_json_1["default"].abi, address);
+                        return [4, contract.methods.getEntryIndexForAddress(account).call()];
+                    case 1:
+                        index = _a.sent();
+                        return [2, Organ.loadEntry(address, index)];
+                }
+            });
+        });
+    };
+    Organ.loadPermissions = function (address, procedure) {
+        return __awaiter(this, void 0, void 0, function () {
+            var contract;
+            return __generator(this, function (_a) {
+                contract = new web3_2.web3.eth.Contract(Organ_json_1["default"].abi, address);
+                return [2, contract.methods
+                        .getPermissions(procedure)
+                        .call()["catch"](function (e) { return console.error('Error', e.message); })
+                        .then(function (_a) {
+                        var perms = _a.perms;
+                        return perms;
+                    })];
+            });
+        });
+    };
+    Organ.loadProcedure = function (address, index) {
+        return __awaiter(this, void 0, void 0, function () {
+            var contract;
+            return __generator(this, function (_a) {
+                contract = new web3_2.web3.eth.Contract(Organ_json_1["default"].abi, address);
+                return [2, contract.methods
+                        .getProcedure(index)
+                        .call()["catch"](function (e) { return console.error('Error', e.message); })
+                        .then(function (data) {
+                        return data && {
+                            address: data.addr,
+                            permissions: data.perms
+                        };
+                    })];
+            });
+        });
+    };
+    Organ.loadProcedures = function (address) {
         var e_1, _a;
-        return __awaiter(this, void 0, void 0, function* () {
-            const data = yield Organ.loadData(address);
-            const length = web3_1.default.utils.toBN(data.proceduresLength);
-            let procedures = [];
-            const iGenerator = function* () {
-                let i = web3_1.default.utils.toBN('0');
-                while (i.lt(length)) {
-                    yield i;
-                    i = i.addn(1);
+        return __awaiter(this, void 0, void 0, function () {
+            var data, length, procedures, iGenerator, _b, _c, i, key, procedure, e_1_1;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
+                    case 0: return [4, Organ.loadData(address)];
+                    case 1:
+                        data = _d.sent();
+                        length = web3_1["default"].utils.toBN(data.proceduresLength);
+                        procedures = [];
+                        iGenerator = function () {
+                            var i;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        i = web3_1["default"].utils.toBN('0');
+                                        _a.label = 1;
+                                    case 1:
+                                        if (!i.lt(length)) return [3, 3];
+                                        return [4, i];
+                                    case 2:
+                                        _a.sent();
+                                        i = i.addn(1);
+                                        return [3, 1];
+                                    case 3: return [2];
+                                }
+                            });
+                        };
+                        _d.label = 2;
+                    case 2:
+                        _d.trys.push([2, 8, 9, 14]);
+                        _b = __asyncValues(iGenerator());
+                        _d.label = 3;
+                    case 3: return [4, _b.next()];
+                    case 4:
+                        if (!(_c = _d.sent(), !_c.done)) return [3, 7];
+                        i = _c.value;
+                        key = i.toString();
+                        return [4, Organ.loadProcedure(address, key)["catch"](function (error) {
+                                console.warn('Error while loading procedure in organ.', address, key, error.message);
+                                return null;
+                            })];
+                    case 5:
+                        procedure = _d.sent();
+                        if (procedure)
+                            procedures.push(procedure);
+                        _d.label = 6;
+                    case 6: return [3, 3];
+                    case 7: return [3, 14];
+                    case 8:
+                        e_1_1 = _d.sent();
+                        e_1 = { error: e_1_1 };
+                        return [3, 14];
+                    case 9:
+                        _d.trys.push([9, , 12, 13]);
+                        if (!(_c && !_c.done && (_a = _b["return"]))) return [3, 11];
+                        return [4, _a.call(_b)];
+                    case 10:
+                        _d.sent();
+                        _d.label = 11;
+                    case 11: return [3, 13];
+                    case 12:
+                        if (e_1) throw e_1.error;
+                        return [7];
+                    case 13: return [7];
+                    case 14: return [2, procedures];
                 }
-            };
-            try {
-                for (var _b = __asyncValues(iGenerator()), _c; _c = yield _b.next(), !_c.done;) {
-                    let i = _c.value;
-                    const key = i.toString();
-                    const procedure = yield Organ.loadProcedure(address, key).catch((error) => {
-                        console.warn('Error while loading procedure in organ.', address, key, error.message);
-                        return null;
-                    });
-                    if (procedure)
-                        procedures.push(procedure);
-                }
-            }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
-            finally {
-                try {
-                    if (_c && !_c.done && (_a = _b.return)) yield _a.call(_b);
-                }
-                finally { if (e_1) throw e_1.error; }
-            }
-            return procedures;
+            });
         });
-    }
-    static loadEntry(address, index) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, address);
-            const ipfs = yield ipfs_1.ipfsNode;
-            if (!ipfs) {
-                console.info('IPFS was not started. Starting IPFS.');
-                yield ipfs.start().catch((e) => console.warn(e.message));
-            }
-            return contract.methods
-                .getEntry(index)
-                .call()
-                .then(({ addr, doc }) => __awaiter(this, void 0, void 0, function* () {
-                if (addr === web3_2.EMPTY_ADDRESS &&
-                    (!parseInt(doc.hashFunction, 16) || !parseInt(doc.hashSize)))
-                    return null;
-                let entry = {
-                    index,
-                    address: addr,
-                    cid: ipfs_1.multihashToCid(doc)
-                };
-                if (entry.cid) {
-                    try {
-                        entry.data = concat_1.default(yield it_all_1.default(ipfs.cat(entry.cid)));
-                    }
-                    catch (error) {
-                        console.warn('Error while loading data hash for entry.', address, index, error.message);
-                    }
+    };
+    Organ.loadEntry = function (address, index) {
+        return __awaiter(this, void 0, void 0, function () {
+            var contract, ipfs;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        contract = new web3_2.web3.eth.Contract(Organ_json_1["default"].abi, address);
+                        return [4, ipfs_1.ipfsNode];
+                    case 1:
+                        ipfs = _a.sent();
+                        if (!!ipfs) return [3, 3];
+                        console.info('IPFS was not started. Starting IPFS.');
+                        return [4, ipfs.start()["catch"](function (e) { return console.warn(e.message); })];
+                    case 2:
+                        _a.sent();
+                        _a.label = 3;
+                    case 3: return [2, contract.methods
+                            .getEntry(index)
+                            .call()
+                            .then(function (_a) {
+                            var addr = _a.addr, doc = _a.doc;
+                            return __awaiter(_this, void 0, void 0, function () {
+                                var entry, _b, _c, error_1;
+                                return __generator(this, function (_d) {
+                                    switch (_d.label) {
+                                        case 0:
+                                            if (addr === web3_2.EMPTY_ADDRESS &&
+                                                (!parseInt(doc.hashFunction, 16) || !parseInt(doc.hashSize)))
+                                                return [2, null];
+                                            entry = {
+                                                index: index,
+                                                address: addr,
+                                                cid: ipfs_1.multihashToCid(doc)
+                                            };
+                                            if (!entry.cid) return [3, 4];
+                                            _d.label = 1;
+                                        case 1:
+                                            _d.trys.push([1, 3, , 4]);
+                                            _b = entry;
+                                            _c = concat_1["default"];
+                                            return [4, it_all_1["default"](ipfs.cat(entry.cid))];
+                                        case 2:
+                                            _b.data = _c.apply(void 0, [_d.sent()]);
+                                            return [3, 4];
+                                        case 3:
+                                            error_1 = _d.sent();
+                                            console.warn('Error while loading data hash for entry.', address, index, error_1.message);
+                                            return [3, 4];
+                                        case 4: return [2, entry];
+                                    }
+                                });
+                            });
+                        })];
                 }
-                return entry;
-            }));
+            });
         });
-    }
-    static loadEntries(address) {
+    };
+    Organ.loadEntries = function (address) {
         var e_2, _a;
-        return __awaiter(this, void 0, void 0, function* () {
-            const length = web3_1.default.utils.toBN((yield Organ.loadData(address)).entriesLength);
-            let entries = [];
-            const iGenerator = function* () {
-                let i = web3_1.default.utils.toBN('1');
-                while (i.lt(length)) {
-                    yield i;
-                    i = i.addn(1);
+        return __awaiter(this, void 0, void 0, function () {
+            var length, _b, _c, entries, iGenerator, _d, _e, index, key, entry, e_2_1;
+            return __generator(this, function (_f) {
+                switch (_f.label) {
+                    case 0:
+                        _c = (_b = web3_1["default"].utils).toBN;
+                        return [4, Organ.loadData(address)];
+                    case 1:
+                        length = _c.apply(_b, [(_f.sent()).entriesLength]);
+                        entries = [];
+                        iGenerator = function () {
+                            var i;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        i = web3_1["default"].utils.toBN('1');
+                                        _a.label = 1;
+                                    case 1:
+                                        if (!i.lt(length)) return [3, 3];
+                                        return [4, i];
+                                    case 2:
+                                        _a.sent();
+                                        i = i.addn(1);
+                                        return [3, 1];
+                                    case 3: return [2];
+                                }
+                            });
+                        };
+                        _f.label = 2;
+                    case 2:
+                        _f.trys.push([2, 8, 9, 14]);
+                        _d = __asyncValues(iGenerator());
+                        _f.label = 3;
+                    case 3: return [4, _d.next()];
+                    case 4:
+                        if (!(_e = _f.sent(), !_e.done)) return [3, 7];
+                        index = _e.value;
+                        key = index.toString();
+                        return [4, Organ.loadEntry(address, key)["catch"](function (error) {
+                                console.warn('Error while loading entry in organ.', address, key, error.message);
+                                return null;
+                            })];
+                    case 5:
+                        entry = _f.sent();
+                        if (entry)
+                            entries.push(entry);
+                        _f.label = 6;
+                    case 6: return [3, 3];
+                    case 7: return [3, 14];
+                    case 8:
+                        e_2_1 = _f.sent();
+                        e_2 = { error: e_2_1 };
+                        return [3, 14];
+                    case 9:
+                        _f.trys.push([9, , 12, 13]);
+                        if (!(_e && !_e.done && (_a = _d["return"]))) return [3, 11];
+                        return [4, _a.call(_d)];
+                    case 10:
+                        _f.sent();
+                        _f.label = 11;
+                    case 11: return [3, 13];
+                    case 12:
+                        if (e_2) throw e_2.error;
+                        return [7];
+                    case 13: return [7];
+                    case 14: return [2, entries];
                 }
-            };
-            try {
-                for (var _b = __asyncValues(iGenerator()), _c; _c = yield _b.next(), !_c.done;) {
-                    let index = _c.value;
-                    const key = index.toString();
-                    const entry = yield Organ.loadEntry(address, key).catch((error) => {
-                        console.warn('Error while loading entry in organ.', address, key, error.message);
-                        return null;
-                    });
-                    if (entry)
-                        entries.push(entry);
-                }
-            }
-            catch (e_2_1) { e_2 = { error: e_2_1 }; }
-            finally {
-                try {
-                    if (_c && !_c.done && (_a = _b.return)) yield _a.call(_b);
-                }
-                finally { if (e_2) throw e_2.error; }
-            }
-            return entries;
+            });
         });
-    }
-    static generateEncodedABI(address, functionName, ...args) {
+    };
+    Organ.generateEncodedABI = function (address, functionName) {
         var _a, _b, _c, _d;
-        return __awaiter(this, void 0, void 0, function* () {
-            const contract = new web3_2.web3.eth.Contract(Organ_json_1.default.abi, address);
-            return (_d = (_c = (_b = (_a = contract === null || contract === void 0 ? void 0 : contract.methods) === null || _a === void 0 ? void 0 : _a[functionName]) === null || _b === void 0 ? void 0 : _b.call(_a, ...args)) === null || _c === void 0 ? void 0 : _c.encodeABI) === null || _d === void 0 ? void 0 : _d.call(_c);
-        });
-    }
-    reload() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { procedures, metadata, entries } = yield Organ.load(this.address);
-            this.metadata = metadata;
-            this.procedures = procedures;
-            this.entries = entries;
-            return this;
-        });
-    }
-    reloadEntries() {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.entries = yield Organ.loadEntries(this.address).catch(error => {
-                console.warn("Error while reloading organ's entries", this.address, error.message);
-                return this.entries;
+        var args = [];
+        for (var _i = 2; _i < arguments.length; _i++) {
+            args[_i - 2] = arguments[_i];
+        }
+        return __awaiter(this, void 0, void 0, function () {
+            var contract;
+            return __generator(this, function (_e) {
+                contract = new web3_2.web3.eth.Contract(Organ_json_1["default"].abi, address);
+                return [2, (_d = (_c = (_b = (_a = contract === null || contract === void 0 ? void 0 : contract.methods) === null || _a === void 0 ? void 0 : _a[functionName]) === null || _b === void 0 ? void 0 : _b.call.apply(_b, __spreadArrays([_a], args))) === null || _c === void 0 ? void 0 : _c.encodeABI) === null || _d === void 0 ? void 0 : _d.call(_c)];
             });
-            return this;
         });
-    }
-    reloadProcedures() {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.procedures = yield Organ.loadProcedures(this.address).catch(error => {
-                console.warn("Error while reloading organ's procedures", this.address, error.message);
-                return this.procedures;
+    };
+    Organ.prototype.reload = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, procedures, metadata, entries;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0: return [4, Organ.load(this.address)];
+                    case 1:
+                        _a = _b.sent(), procedures = _a.procedures, metadata = _a.metadata, entries = _a.entries;
+                        this.metadata = metadata;
+                        this.procedures = procedures;
+                        this.entries = entries;
+                        return [2, this];
+                }
             });
-            return this;
         });
-    }
-    reloadData() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const data = yield Organ.loadData(this.address);
-            this.metadata.cid = data === null || data === void 0 ? void 0 : data.metadata;
-            return this;
+    };
+    Organ.prototype.reloadEntries = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a;
+            var _this = this;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = this;
+                        return [4, Organ.loadEntries(this.address)["catch"](function (error) {
+                                console.warn("Error while reloading organ's entries", _this.address, error.message);
+                                return _this.entries;
+                            })];
+                    case 1:
+                        _a.entries = _b.sent();
+                        return [2, this];
+                }
+            });
         });
-    }
-}
+    };
+    Organ.prototype.reloadProcedures = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a;
+            var _this = this;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = this;
+                        return [4, Organ.loadProcedures(this.address)["catch"](function (error) {
+                                console.warn("Error while reloading organ's procedures", _this.address, error.message);
+                                return _this.procedures;
+                            })];
+                    case 1:
+                        _a.procedures = _b.sent();
+                        return [2, this];
+                }
+            });
+        });
+    };
+    Organ.prototype.reloadData = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var data;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4, Organ.loadData(this.address)];
+                    case 1:
+                        data = _a.sent();
+                        this.metadata.cid = data === null || data === void 0 ? void 0 : data.metadata;
+                        return [2, this];
+                }
+            });
+        });
+    };
+    Organ.INTERFACE = "0xf81b1307";
+    return Organ;
+}());
 exports.Organ = Organ;
-Organ.INTERFACE = `0xf81b1307`;
 exports.PERMISSIONS = {
     ADMIN: 0xffff,
     ALL: 0x07ff,
@@ -413,8 +704,10 @@ exports.PERMISSIONS = {
     DEPOSIT_COLLECTIBLES: 0x0200,
     WITHDRAW_COLLECTIBLES: 0x0400
 };
-const getPermissionsSet = (permissions) => Object.entries(exports.PERMISSIONS)
-    .filter(permission => (permissions & permission[1]) === permission[1])
-    .map(permission => permission[0]);
+var getPermissionsSet = function (permissions) {
+    return Object && Object.entries && Object.entries(exports.PERMISSIONS)
+        .filter(function (permission) { return (permissions & permission[1]) === permission[1]; })
+        .map(function (permission) { return permission[0]; });
+};
 exports.getPermissionsSet = getPermissionsSet;
-exports.default = Organ;
+exports["default"] = Organ;

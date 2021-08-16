@@ -551,8 +551,8 @@ export const PERMISSIONS = {
 }
 
 export const getPermissionsSet = (permissions: number): string[] =>
-  Object.entries(PERMISSIONS)
-    .filter(permission => (permissions & permission[1]) === permission[1])
-    .map(permission => permission[0])
+  Object && Object.entries && Object.entries(PERMISSIONS)
+    .filter((permission: [string, number]) => (permissions & permission[1]) === permission[1])
+    .map((permission: [string, number]) => permission[0])
 
 export default Organ

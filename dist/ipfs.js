@@ -1,23 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -27,6 +8,33 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
 var __asyncValues = (this && this.__asyncValues) || function (o) {
     if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
     var m = o[Symbol.asyncIterator], i;
@@ -34,39 +42,47 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 exports.CID = exports.EMPTY_MULTIHASH = exports.EMPTY_CID = exports.parseJSON = exports.uint8ArrayToString = exports.cidToMultihash = exports.multihashToCid = exports.ipfsNode = exports.IPFS = void 0;
-const ipfs_core_1 = __importStar(require("ipfs-core"));
-exports.IPFS = ipfs_core_1.default;
-Object.defineProperty(exports, "CID", { enumerable: true, get: function () { return ipfs_core_1.CID; } });
-const to_string_1 = __importDefault(require("uint8arrays/to-string"));
-const concat_1 = __importDefault(require("uint8arrays/concat"));
-const ipfs_provider_1 = require("ipfs-provider");
-const { jsIpfs } = ipfs_provider_1.providers;
-const ipfsNode = ipfs_provider_1.getIpfs({
+var ipfs_core_1 = require("ipfs-core");
+exports.IPFS = ipfs_core_1["default"];
+exports.CID = ipfs_core_1.CID;
+var to_string_1 = require("uint8arrays/to-string");
+var concat_1 = require("uint8arrays/concat");
+var ipfs_provider_1 = require("ipfs-provider");
+var jsIpfs = ipfs_provider_1.providers.jsIpfs;
+var ipfsNode = ipfs_provider_1.getIpfs({
     providers: [
         jsIpfs({
-            loadJsIpfsModule: () => require('ipfs-core'),
+            loadJsIpfsModule: function () { return require('ipfs-core'); },
             options: {}
         })
     ]
 })
-    .then(({ ipfs }) => __awaiter(void 0, void 0, void 0, function* () {
-    if (ipfs === null || ipfs === void 0 ? void 0 : ipfs.enable) {
-        yield ipfs.enable({ commands: ['id', 'add', 'cat', 'get'] });
-        console.info('IPFS enabled.');
-    }
-    return ipfs;
-}));
+    .then(function (_a) {
+    var ipfs = _a.ipfs;
+    return __awaiter(void 0, void 0, void 0, function () {
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    if (!(ipfs === null || ipfs === void 0 ? void 0 : ipfs.enable)) return [3, 2];
+                    return [4, ipfs.enable({ commands: ['id', 'add', 'cat', 'get'] })];
+                case 1:
+                    _b.sent();
+                    console.info('IPFS enabled.');
+                    _b.label = 2;
+                case 2: return [2, ipfs];
+            }
+        });
+    });
+});
 exports.ipfsNode = ipfsNode;
-const multihashToCid = ({ ipfsHash, hashFunction, hashSize }) => {
+var multihashToCid = function (_a) {
+    var ipfsHash = _a.ipfsHash, hashFunction = _a.hashFunction, hashSize = _a.hashSize;
     if (!parseInt(hashFunction) || !parseInt(hashSize)) {
         return undefined;
     }
-    const multihash = Buffer.from(parseInt(hashFunction).toString(16).padStart(2, "0") +
+    var multihash = Buffer.from(parseInt(hashFunction).toString(16).padStart(2, "0") +
         parseInt(hashSize).toString(16).padStart(2, "0") +
         ipfsHash.substring(2), 'hex');
     try {
@@ -78,49 +94,74 @@ const multihashToCid = ({ ipfsHash, hashFunction, hashSize }) => {
     }
 };
 exports.multihashToCid = multihashToCid;
-const cidToMultihash = (cid) => {
+var cidToMultihash = function (cid) {
     if (!cid) {
         cid = EMPTY_CID;
     }
     if (typeof cid === "string") {
         cid = ipfs_core_1.CID.parse(cid);
     }
-    const multihash = (cid === null || cid === void 0 ? void 0 : cid.bytes) && Buffer.from(cid.bytes);
+    var multihash = (cid === null || cid === void 0 ? void 0 : cid.bytes) && Buffer.from(cid.bytes);
     return multihash && {
-        ipfsHash: `0x${multihash.slice(2).toString('hex')}`,
-        hashSize: `0x${multihash.slice(1, 2).toString('hex')}`,
-        hashFunction: `0x${multihash.slice(0, 1).toString('hex')}`
+        ipfsHash: "0x" + multihash.slice(2).toString('hex'),
+        hashSize: "0x" + multihash.slice(1, 2).toString('hex'),
+        hashFunction: "0x" + multihash.slice(0, 1).toString('hex')
     };
 };
 exports.cidToMultihash = cidToMultihash;
-const uint8ArrayToString = (uint8Array) => to_string_1.default(uint8Array);
+var uint8ArrayToString = function (uint8Array) { return to_string_1["default"](uint8Array); };
 exports.uint8ArrayToString = uint8ArrayToString;
-const parseJSON = (cid) => __awaiter(void 0, void 0, void 0, function* () {
-    var e_1, _a;
-    const ipfs = yield Promise.resolve(ipfsNode);
-    const chunks = [];
-    try {
-        for (var _b = __asyncValues(ipfs.cat(cid)), _c; _c = yield _b.next(), !_c.done;) {
-            const chunk = _c.value;
-            chunks.push(chunk);
+var parseJSON = function (cid) { return __awaiter(void 0, void 0, void 0, function () {
+    var ipfs, chunks, _a, _b, chunk, e_1_1;
+    var e_1, _c;
+    return __generator(this, function (_d) {
+        switch (_d.label) {
+            case 0: return [4, Promise.resolve(ipfsNode)];
+            case 1:
+                ipfs = _d.sent();
+                chunks = [];
+                _d.label = 2;
+            case 2:
+                _d.trys.push([2, 7, 8, 13]);
+                _a = __asyncValues(ipfs.cat(cid));
+                _d.label = 3;
+            case 3: return [4, _a.next()];
+            case 4:
+                if (!(_b = _d.sent(), !_b.done)) return [3, 6];
+                chunk = _b.value;
+                chunks.push(chunk);
+                _d.label = 5;
+            case 5: return [3, 3];
+            case 6: return [3, 13];
+            case 7:
+                e_1_1 = _d.sent();
+                e_1 = { error: e_1_1 };
+                return [3, 13];
+            case 8:
+                _d.trys.push([8, , 11, 12]);
+                if (!(_b && !_b.done && (_c = _a["return"]))) return [3, 10];
+                return [4, _c.call(_a)];
+            case 9:
+                _d.sent();
+                _d.label = 10;
+            case 10: return [3, 12];
+            case 11:
+                if (e_1) throw e_1.error;
+                return [7];
+            case 12: return [7];
+            case 13:
+                try {
+                    return [2, JSON.parse(to_string_1["default"](concat_1["default"](chunks)))];
+                }
+                catch (error) {
+                    throw new Error(error.message);
+                }
+                return [2];
         }
-    }
-    catch (e_1_1) { e_1 = { error: e_1_1 }; }
-    finally {
-        try {
-            if (_c && !_c.done && (_a = _b.return)) yield _a.call(_b);
-        }
-        finally { if (e_1) throw e_1.error; }
-    }
-    try {
-        return JSON.parse(to_string_1.default(concat_1.default(chunks)));
-    }
-    catch (error) {
-        throw new Error(error.message);
-    }
-});
+    });
+}); };
 exports.parseJSON = parseJSON;
-const EMPTY_CID = `QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH`;
+var EMPTY_CID = "QmbFMke1KXqnYyBBWxB74N4c5SBnJMVAiMNRcGu6x1AwQH";
 exports.EMPTY_CID = EMPTY_CID;
-const EMPTY_MULTIHASH = cidToMultihash(EMPTY_CID);
+var EMPTY_MULTIHASH = cidToMultihash(EMPTY_CID);
 exports.EMPTY_MULTIHASH = EMPTY_MULTIHASH;

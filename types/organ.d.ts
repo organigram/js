@@ -28,7 +28,7 @@ export declare class Organ {
     metadata: Metadata;
     entries: OrganEntry[];
     constructor({ address, network, balance, procedures, metadata, entries }: OrganData);
-    updateMetadata: (cid?: CID) => Promise<any>;
+    updateMetadata: (cid?: any) => Promise<any>;
     addEntries: (entries: OrganEntry[]) => Promise<Organ>;
     removeEntries: (indexes: string[]) => Promise<boolean>;
     replaceEntry: (index: number, entry: OrganEntry) => Promise<Organ>;

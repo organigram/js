@@ -6,5 +6,5 @@ declare const cidToMultihash: (cid: CID | string) => Multihash | undefined;
 declare const uint8ArrayToString: (uint8Array: Uint8Array) => string;
 declare const parseJSON: (cid: CID | string) => Promise<object | any[]>;
 declare const EMPTY_CID: string;
-declare const EMPTY_MULTIHASH: Multihash | undefined;
+declare const EMPTY_MULTIHASH: Multihash;
 export { IPFS, ipfsNode, multihashToCid, cidToMultihash, uint8ArrayToString, parseJSON, EMPTY_CID, EMPTY_MULTIHASH, CID };

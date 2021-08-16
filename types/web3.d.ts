@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import type { Address, Network } from './types';
 declare const EMPTY_ADDRESS: Address;
-declare const web3: Web3;
+declare const web3: any;
 declare const getAccount: () => Promise<Address>;
 declare const connect: () => Promise<Address>;
 declare const getNetwork: () => Promise<Network>;
