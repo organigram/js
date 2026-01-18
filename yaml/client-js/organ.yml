@@ -1,0 +1,625 @@
+### YamlMime:TSType
+name: Organ
+uid: '@organigram/client-js!Organ:class'
+package: '@organigram/client-js!'
+fullName: Organ
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: class
+constructors:
+  - name: '(constructor)({ address, network, signerOrProvider, balance, procedures, cid, entries })'
+    uid: '@organigram/client-js!Organ:constructor(1)'
+    package: '@organigram/client-js!'
+    fullName: '(constructor)({ address, network, signerOrProvider, balance, procedures, cid, entries })'
+    summary: Constructs a new instance of the `Organ` class
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'constructor({ address, network, signerOrProvider, balance, procedures, cid, entries }: OrganData);'
+      parameters:
+        - id: '{ address, network, signerOrProvider, balance, procedures, cid, entries }'
+          description: ''
+          type: '<xref uid="@organigram/client-js!OrganData:interface" />'
+properties:
+  - name: addEntries
+    uid: '@organigram/client-js!Organ#addEntries:member'
+    package: '@organigram/client-js!'
+    fullName: addEntries
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'addEntries: (entries: IOrganEntry[], options?: TransactionOptions) => Promise<ethers.ContractReceipt>;'
+      return:
+        type: >-
+          (entries: <xref uid="@organigram/client-js!~IOrganEntry:interface" />[], options?: <xref
+          uid="@organigram/client-js!~TransactionOptions:interface" />) =&gt; Promise&lt;<xref
+          uid="@ethersproject/contracts!ContractReceipt:interface" />&gt;
+  - name: addProcedure
+    uid: '@organigram/client-js!Organ#addProcedure:member'
+    package: '@organigram/client-js!'
+    fullName: addProcedure
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'addProcedure: (procedure: OrganProcedure, options?: TransactionOptions) => Promise<ethers.ContractReceipt>;'
+      return:
+        type: >-
+          (procedure: <xref uid="@organigram/client-js!OrganProcedure:interface" />, options?: <xref
+          uid="@organigram/client-js!~TransactionOptions:interface" />) =&gt; Promise&lt;<xref
+          uid="@ethersproject/contracts!ContractReceipt:interface" />&gt;
+  - name: address
+    uid: '@organigram/client-js!Organ#address:member'
+    package: '@organigram/client-js!'
+    fullName: address
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'address: string;'
+      return:
+        type: string
+  - name: balance
+    uid: '@organigram/client-js!Organ#balance:member'
+    package: '@organigram/client-js!'
+    fullName: balance
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'balance: bigint;'
+      return:
+        type: '<xref uid="@ethersproject/bignumber!BigNumber:class" />'
+  - name: cid
+    uid: '@organigram/client-js!Organ#cid:member'
+    package: '@organigram/client-js!'
+    fullName: cid
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'cid: string;'
+      return:
+        type: string
+  - name: contract
+    uid: '@organigram/client-js!Organ#contract:member'
+    package: '@organigram/client-js!'
+    fullName: contract
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'contract: ethers.Contract;'
+      return:
+        type: '<xref uid="@ethersproject/contracts!Contract:class" />'
+  - name: entries
+    uid: '@organigram/client-js!Organ#entries:member'
+    package: '@organigram/client-js!'
+    fullName: entries
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'entries: OrganEntry[];'
+      return:
+        type: '<xref uid="@organigram/client-js!OrganEntry:interface" />[]'
+  - name: INTERFACE
+    uid: '@organigram/client-js!Organ.INTERFACE:member'
+    package: '@organigram/client-js!'
+    fullName: INTERFACE
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'static INTERFACE: string;'
+      return:
+        type: string
+  - name: network
+    uid: '@organigram/client-js!Organ#network:member'
+    package: '@organigram/client-js!'
+    fullName: network
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'network: Network;'
+      return:
+        type: '<xref uid="@organigram/client-js!Network:type" />'
+  - name: procedures
+    uid: '@organigram/client-js!Organ#procedures:member'
+    package: '@organigram/client-js!'
+    fullName: procedures
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'procedures: OrganProcedure[];'
+      return:
+        type: '<xref uid="@organigram/client-js!OrganProcedure:interface" />[]'
+  - name: provider
+    uid: '@organigram/client-js!Organ#provider:member'
+    package: '@organigram/client-js!'
+    fullName: provider
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'provider?: ethers.Provider;'
+      return:
+        type: '<xref uid="@ethersproject/abstract-provider!Provider:class" />'
+  - name: removeEntries
+    uid: '@organigram/client-js!Organ#removeEntries:member'
+    package: '@organigram/client-js!'
+    fullName: removeEntries
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'removeEntries: (indexes: string[], options?: TransactionOptions) => Promise<ethers.ContractReceipt>;'
+      return:
+        type: >-
+          (indexes: string[], options?: <xref uid="@organigram/client-js!~TransactionOptions:interface" />) =&gt;
+          Promise&lt;<xref uid="@ethersproject/contracts!ContractReceipt:interface" />&gt;
+  - name: removeProcedure
+    uid: '@organigram/client-js!Organ#removeProcedure:member'
+    package: '@organigram/client-js!'
+    fullName: removeProcedure
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'removeProcedure: (procedure: string, options?: TransactionOptions) => Promise<ethers.ContractReceipt>;'
+      return:
+        type: >-
+          (procedure: string, options?: <xref uid="@organigram/client-js!~TransactionOptions:interface" />) =&gt;
+          Promise&lt;<xref uid="@ethersproject/contracts!ContractReceipt:interface" />&gt;
+  - name: replaceEntry
+    uid: '@organigram/client-js!Organ#replaceEntry:member'
+    package: '@organigram/client-js!'
+    fullName: replaceEntry
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        replaceEntry: (index: number, entry: OrganEntry, options?: TransactionOptions) =>
+        Promise<ethers.ContractReceipt>;
+      return:
+        type: >-
+          (index: number, entry: <xref uid="@organigram/client-js!OrganEntry:interface" />, options?: <xref
+          uid="@organigram/client-js!~TransactionOptions:interface" />) =&gt; Promise&lt;<xref
+          uid="@ethersproject/contracts!ContractReceipt:interface" />&gt;
+  - name: replaceProcedure
+    uid: '@organigram/client-js!Organ#replaceProcedure:member'
+    package: '@organigram/client-js!'
+    fullName: replaceProcedure
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        replaceProcedure: (oldProcedure: string, newOrganProcedure: OrganProcedure, options?: TransactionOptions) =>
+        Promise<ethers.ContractReceipt>;
+      return:
+        type: >-
+          (oldProcedure: string, newOrganProcedure: <xref uid="@organigram/client-js!OrganProcedure:interface" />,
+          options?: <xref uid="@organigram/client-js!~TransactionOptions:interface" />) =&gt; Promise&lt;<xref
+          uid="@ethersproject/contracts!ContractReceipt:interface" />&gt;
+  - name: signer
+    uid: '@organigram/client-js!Organ#signer:member'
+    package: '@organigram/client-js!'
+    fullName: signer
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'signer?: ethers.Signer;'
+      return:
+        type: '<xref uid="@ethersproject/abstract-signer!Signer:class" />'
+  - name: updateCid
+    uid: '@organigram/client-js!Organ#updateCid:member'
+    package: '@organigram/client-js!'
+    fullName: updateCid
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'updateCid: (cid: string, options?: TransactionOptions) => Promise<ethers.ContractReceipt>;'
+      return:
+        type: >-
+          (cid: string, options?: <xref uid="@organigram/client-js!~TransactionOptions:interface" />) =&gt;
+          Promise&lt;<xref uid="@ethersproject/contracts!ContractReceipt:interface" />&gt;
+methods:
+  - name: 'getBalance(address, signerOrProvider)'
+    uid: '@organigram/client-js!Organ.getBalance:member(1)'
+    package: '@organigram/client-js!'
+    fullName: 'getBalance(address, signerOrProvider)'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        static getBalance(address: string, signerOrProvider: ethers.Signer | ethers.Provider):
+        Promise<bigint>;
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: signerOrProvider
+          description: ''
+          type: >-
+            <xref uid="@ethersproject/abstract-signer!Signer:class" /> | <xref
+            uid="@ethersproject/abstract-provider!Provider:class" />
+      return:
+        type: 'Promise&lt;<xref uid="@ethersproject/bignumber!BigNumber:class" />&gt;'
+        description: ''
+  - name: 'isOrgan(address, signerOrProvider)'
+    uid: '@organigram/client-js!Organ.isOrgan:member(1)'
+    package: '@organigram/client-js!'
+    fullName: 'isOrgan(address, signerOrProvider)'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'static isOrgan(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<boolean>;'
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: signerOrProvider
+          description: ''
+          type: >-
+            <xref uid="@ethersproject/abstract-signer!Signer:class" /> | <xref
+            uid="@ethersproject/abstract-provider!Provider:class" />
+      return:
+        type: Promise&lt;boolean&gt;
+        description: ''
+  - name: 'load(address, signerOrProvider)'
+    uid: '@organigram/client-js!Organ.load:member(1)'
+    package: '@organigram/client-js!'
+    fullName: 'load(address, signerOrProvider)'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'static load(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<Organ>;'
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: signerOrProvider
+          description: ''
+          type: >-
+            <xref uid="@ethersproject/abstract-signer!Signer:class" /> | <xref
+            uid="@ethersproject/abstract-provider!Provider:class" />
+      return:
+        type: 'Promise&lt;<xref uid="@organigram/client-js!Organ:class" />&gt;'
+        description: ''
+  - name: 'loadData(address, signerOrProvider)'
+    uid: '@organigram/client-js!Organ.loadData:member(1)'
+    package: '@organigram/client-js!'
+    fullName: 'loadData(address, signerOrProvider)'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        static loadData(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<{
+                cid: string;
+                proceduresLength: bigint;
+                entriesLength: bigint;
+                entriesCount: bigint;
+            }>;
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: signerOrProvider
+          description: ''
+          type: >-
+            <xref uid="@ethersproject/abstract-signer!Signer:class" /> | <xref
+            uid="@ethersproject/abstract-provider!Provider:class" />
+      return:
+        type: |-
+          Promise&lt;{
+                  cid: string;
+                  proceduresLength: <xref uid="@ethersproject/bignumber!BigNumber:class" />;
+                  entriesLength: <xref uid="@ethersproject/bignumber!BigNumber:class" />;
+                  entriesCount: <xref uid="@ethersproject/bignumber!BigNumber:class" />;
+              }&gt;
+        description: ''
+  - name: 'loadEntries(address, signerOrProvider)'
+    uid: '@organigram/client-js!Organ.loadEntries:member(1)'
+    package: '@organigram/client-js!'
+    fullName: 'loadEntries(address, signerOrProvider)'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        static loadEntries(address: string, signerOrProvider: ethers.Signer | ethers.Provider):
+        Promise<OrganEntry[]>;
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: signerOrProvider
+          description: ''
+          type: >-
+            <xref uid="@ethersproject/abstract-signer!Signer:class" /> | <xref
+            uid="@ethersproject/abstract-provider!Provider:class" />
+      return:
+        type: 'Promise&lt;<xref uid="@organigram/client-js!OrganEntry:interface" />[]&gt;'
+        description: ''
+  - name: 'loadEntry(address, index, signerOrProvider)'
+    uid: '@organigram/client-js!Organ.loadEntry:member(1)'
+    package: '@organigram/client-js!'
+    fullName: 'loadEntry(address, index, signerOrProvider)'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        static loadEntry(address: string, index: string, signerOrProvider: ethers.Signer | ethers.Provider):
+        Promise<OrganEntry>;
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: index
+          description: ''
+          type: string
+        - id: signerOrProvider
+          description: ''
+          type: >-
+            <xref uid="@ethersproject/abstract-signer!Signer:class" /> | <xref
+            uid="@ethersproject/abstract-provider!Provider:class" />
+      return:
+        type: 'Promise&lt;<xref uid="@organigram/client-js!OrganEntry:interface" />&gt;'
+        description: ''
+  - name: 'loadEntryForAccount(address, account, signerOrProvider)'
+    uid: '@organigram/client-js!Organ.loadEntryForAccount:member(1)'
+    package: '@organigram/client-js!'
+    fullName: 'loadEntryForAccount(address, account, signerOrProvider)'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        static loadEntryForAccount(address: string, account: string, signerOrProvider: ethers.Signer |
+        ethers.Provider): Promise<OrganEntry | undefined>;
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: account
+          description: ''
+          type: string
+        - id: signerOrProvider
+          description: ''
+          type: >-
+            <xref uid="@ethersproject/abstract-signer!Signer:class" /> | <xref
+            uid="@ethersproject/abstract-provider!Provider:class" />
+      return:
+        type: 'Promise&lt;<xref uid="@organigram/client-js!OrganEntry:interface" /> | undefined&gt;'
+        description: ''
+  - name: 'loadPermissions(address, procedure, signerOrProvider)'
+    uid: '@organigram/client-js!Organ.loadPermissions:member(1)'
+    package: '@organigram/client-js!'
+    fullName: 'loadPermissions(address, procedure, signerOrProvider)'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        static loadPermissions(address: string, procedure: string, signerOrProvider: ethers.Signer |
+        ethers.Provider): Promise<number>;
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: procedure
+          description: ''
+          type: string
+        - id: signerOrProvider
+          description: ''
+          type: >-
+            <xref uid="@ethersproject/abstract-signer!Signer:class" /> | <xref
+            uid="@ethersproject/abstract-provider!Provider:class" />
+      return:
+        type: Promise&lt;number&gt;
+        description: ''
+  - name: 'loadProcedure(address, index, signerOrProvider)'
+    uid: '@organigram/client-js!Organ.loadProcedure:member(1)'
+    package: '@organigram/client-js!'
+    fullName: 'loadProcedure(address, index, signerOrProvider)'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        static loadProcedure(address: string, index: string, signerOrProvider: ethers.Signer |
+        ethers.Provider): Promise<OrganProcedure>;
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: index
+          description: ''
+          type: string
+        - id: signerOrProvider
+          description: ''
+          type: >-
+            <xref uid="@ethersproject/abstract-signer!Signer:class" /> | <xref
+            uid="@ethersproject/abstract-provider!Provider:class" />
+      return:
+        type: 'Promise&lt;<xref uid="@organigram/client-js!OrganProcedure:interface" />&gt;'
+        description: ''
+  - name: 'loadProcedures(address, signerOrProvider)'
+    uid: '@organigram/client-js!Organ.loadProcedures:member(1)'
+    package: '@organigram/client-js!'
+    fullName: 'loadProcedures(address, signerOrProvider)'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        static loadProcedures(address: string, signerOrProvider: ethers.Signer | ethers.Provider):
+        Promise<OrganProcedure[]>;
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: signerOrProvider
+          description: ''
+          type: >-
+            <xref uid="@ethersproject/abstract-signer!Signer:class" /> | <xref
+            uid="@ethersproject/abstract-provider!Provider:class" />
+      return:
+        type: 'Promise&lt;<xref uid="@organigram/client-js!OrganProcedure:interface" />[]&gt;'
+        description: ''
+  - name: 'populateTransaction(address, signer, functionName, args)'
+    uid: '@organigram/client-js!Organ.populateTransaction:member(1)'
+    package: '@organigram/client-js!'
+    fullName: 'populateTransaction(address, signer, functionName, args)'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        static populateTransaction(address: string, signer: ethers.Signer, functionName: OrganFunctionName, ...args:
+        unknown[]): Promise<ethers.ContractTransaction>;
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: signer
+          description: ''
+          type: '<xref uid="@ethersproject/abstract-signer!Signer:class" />'
+        - id: functionName
+          description: ''
+          type: '<xref uid="@organigram/client-js!OrganFunctionName:enum" />'
+        - id: args
+          description: ''
+          type: 'unknown[]'
+      return:
+        type: 'Promise&lt;<xref uid="@ethersproject/contracts!PopulatedTransaction:interface" />&gt;'
+        description: ''
+  - name: reload()
+    uid: '@organigram/client-js!Organ#reload:member(1)'
+    package: '@organigram/client-js!'
+    fullName: reload()
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'reload(): Promise<Organ>;'
+      return:
+        type: 'Promise&lt;<xref uid="@organigram/client-js!Organ:class" />&gt;'
+        description: ''
+  - name: reloadData()
+    uid: '@organigram/client-js!Organ#reloadData:member(1)'
+    package: '@organigram/client-js!'
+    fullName: reloadData()
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'reloadData(): Promise<Organ>;'
+      return:
+        type: 'Promise&lt;<xref uid="@organigram/client-js!Organ:class" />&gt;'
+        description: ''
+  - name: reloadEntries()
+    uid: '@organigram/client-js!Organ#reloadEntries:member(1)'
+    package: '@organigram/client-js!'
+    fullName: reloadEntries()
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'reloadEntries(): Promise<Organ>;'
+      return:
+        type: 'Promise&lt;<xref uid="@organigram/client-js!Organ:class" />&gt;'
+        description: ''
+  - name: reloadProcedures()
+    uid: '@organigram/client-js!Organ#reloadProcedures:member(1)'
+    package: '@organigram/client-js!'
+    fullName: reloadProcedures()
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'reloadProcedures(): Promise<Organ>;'
+      return:
+        type: 'Promise&lt;<xref uid="@organigram/client-js!Organ:class" />&gt;'
+        description: ''

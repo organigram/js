@@ -1,0 +1,56 @@
+### YamlMime:TSEnum
+name: OrganFunctionName
+uid: '@organigram/client-js!OrganFunctionName:enum'
+package: '@organigram/client-js!'
+fullName: OrganFunctionName
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+fields:
+  - name: addEntries
+    uid: '@organigram/client-js!OrganFunctionName.addEntries:member'
+    package: '@organigram/client-js!'
+    summary: ''
+    value: '0'
+  - name: addProcedure
+    uid: '@organigram/client-js!OrganFunctionName.addProcedure:member'
+    package: '@organigram/client-js!'
+    summary: ''
+    value: '3'
+  - name: removeEntries
+    uid: '@organigram/client-js!OrganFunctionName.removeEntries:member'
+    package: '@organigram/client-js!'
+    summary: ''
+    value: '1'
+  - name: removeProcedure
+    uid: '@organigram/client-js!OrganFunctionName.removeProcedure:member'
+    package: '@organigram/client-js!'
+    summary: ''
+    value: '4'
+  - name: replaceEntry
+    uid: '@organigram/client-js!OrganFunctionName.replaceEntry:member'
+    package: '@organigram/client-js!'
+    summary: ''
+    value: '2'
+  - name: replaceProcedure
+    uid: '@organigram/client-js!OrganFunctionName.replaceProcedure:member'
+    package: '@organigram/client-js!'
+    summary: ''
+    value: '5'
+  - name: withdrawERC20
+    uid: '@organigram/client-js!OrganFunctionName.withdrawERC20:member'
+    package: '@organigram/client-js!'
+    summary: ''
+    value: '7'
+  - name: withdrawERC721
+    uid: '@organigram/client-js!OrganFunctionName.withdrawERC721:member'
+    package: '@organigram/client-js!'
+    summary: ''
+    value: '8'
+  - name: withdrawEther
+    uid: '@organigram/client-js!OrganFunctionName.withdrawEther:member'
+    package: '@organigram/client-js!'
+    summary: ''
+    value: '6'

@@ -1,0 +1,38 @@
+### YamlMime:TSType
+name: OrganProcedure
+uid: '@organigram/client-js!OrganProcedure:interface'
+package: '@organigram/client-js!'
+fullName: OrganProcedure
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: address
+    uid: '@organigram/client-js!OrganProcedure#address:member'
+    package: '@organigram/client-js!'
+    fullName: address
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'address: string;'
+      return:
+        type: string
+  - name: permissions
+    uid: '@organigram/client-js!OrganProcedure#permissions:member'
+    package: '@organigram/client-js!'
+    fullName: permissions
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'permissions: number;'
+      return:
+        type: number

@@ -1,0 +1,11 @@
+### YamlMime:TSTypeAlias
+name: LibraryKey
+uid: '@organigram/client-js!LibraryKey:type'
+package: '@organigram/client-js!'
+fullName: LibraryKey
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+syntax: export type LibraryKey = 'organ' | 'procedure' | 'metadata';

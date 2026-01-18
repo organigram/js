@@ -1,0 +1,515 @@
+### YamlMime:TSType
+name: Organigram
+uid: '@organigram/client-js!Organigram:class'
+package: '@organigram/client-js!'
+fullName: Organigram
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: class
+constructors:
+  - name: '(constructor)(address, network, procedureTypes, signerOrProvider, contract)'
+    uid: '@organigram/client-js!Organigram:constructor(1)'
+    package: '@organigram/client-js!'
+    fullName: '(constructor)(address, network, procedureTypes, signerOrProvider, contract)'
+    summary: Constructs a new instance of the `Organigram` class
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        constructor(address: string, network: Network, procedureTypes: ProcedureType[], signerOrProvider: ethers.Signer
+        | ethers.Provider, contract: ethers.Contract);
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: network
+          description: ''
+          type: '<xref uid="@organigram/client-js!Network:type" />'
+        - id: procedureTypes
+          description: ''
+          type: '<xref uid="@organigram/client-js!ProcedureType:interface" />[]'
+        - id: signerOrProvider
+          description: ''
+          type: >-
+            <xref uid="@ethersproject/abstract-signer!Signer:class" /> | <xref
+            uid="@ethersproject/abstract-provider!Provider:class" />
+        - id: contract
+          description: ''
+          type: '<xref uid="@ethersproject/contracts!Contract:class" />'
+properties:
+  - name: address
+    uid: '@organigram/client-js!Organigram#address:member'
+    package: '@organigram/client-js!'
+    fullName: address
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'address: string;'
+      return:
+        type: string
+  - name: cids
+    uid: '@organigram/client-js!Organigram#cids:member'
+    package: '@organigram/client-js!'
+    fullName: cids
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'cids: File[];'
+      return:
+        type: '<xref uid="@organigram/client-js!~File_2:interface" />[]'
+  - name: contract
+    uid: '@organigram/client-js!Organigram#contract:member'
+    package: '@organigram/client-js!'
+    fullName: contract
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'contract: ethers.Contract;'
+      return:
+        type: '<xref uid="@ethersproject/contracts!Contract:class" />'
+  - name: network
+    uid: '@organigram/client-js!Organigram#network:member'
+    package: '@organigram/client-js!'
+    fullName: network
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'network: string;'
+      return:
+        type: string
+  - name: organs
+    uid: '@organigram/client-js!Organigram#organs:member'
+    package: '@organigram/client-js!'
+    fullName: organs
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'organs: Organ[];'
+      return:
+        type: '<xref uid="@organigram/client-js!Organ:class" />[]'
+  - name: procedures
+    uid: '@organigram/client-js!Organigram#procedures:member'
+    package: '@organigram/client-js!'
+    fullName: procedures
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'procedures: EnhancedProcedure[];'
+      return:
+        type: '<xref uid="@organigram/client-js!~EnhancedProcedure:type" />[]'
+  - name: procedureTypes
+    uid: '@organigram/client-js!Organigram#procedureTypes:member'
+    package: '@organigram/client-js!'
+    fullName: procedureTypes
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'procedureTypes: ProcedureType[];'
+      return:
+        type: '<xref uid="@organigram/client-js!ProcedureType:interface" />[]'
+  - name: provider
+    uid: '@organigram/client-js!Organigram#provider:member'
+    package: '@organigram/client-js!'
+    fullName: provider
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'provider?: ethers.Provider;'
+      return:
+        type: '<xref uid="@ethersproject/abstract-provider!Provider:class" />'
+  - name: signer
+    uid: '@organigram/client-js!Organigram#signer:member'
+    package: '@organigram/client-js!'
+    fullName: signer
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'signer?: ethers.Signer;'
+      return:
+        type: '<xref uid="@ethersproject/abstract-signer!Signer:class" />'
+methods:
+  - name: '_createProcedure(type, initialize, options)'
+    uid: '@organigram/client-js!Organigram#_createProcedure:member(1)'
+    package: '@organigram/client-js!'
+    fullName: '_createProcedure(type, initialize, options)'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        _createProcedure(type: string, initialize?: ethers.ContractTransaction, options?: TransactionOptions):
+        Promise<Procedure>;
+      parameters:
+        - id: type
+          description: ''
+          type: string
+        - id: initialize
+          description: ''
+          type: '<xref uid="@ethersproject/contracts!PopulatedTransaction:interface" />'
+        - id: options
+          description: ''
+          type: '<xref uid="@organigram/client-js!~TransactionOptions:interface" />'
+      return:
+        type: 'Promise&lt;<xref uid="@organigram/client-js!Procedure:class" />&gt;'
+        description: ''
+  - name: >-
+      _initializeProcedure(address, type, options, metadata, proposers, moderators, deciders, withModeration, forwarder,
+      args)
+    uid: '@organigram/client-js!Organigram#_initializeProcedure:member(1)'
+    package: '@organigram/client-js!'
+    fullName: >-
+      _initializeProcedure(address, type, options, metadata, proposers, moderators, deciders, withModeration, forwarder,
+      args)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        _initializeProcedure(address: string, type: string, options: TransactionOptions, metadata: string, proposers:
+        string, moderators: string, deciders: string, withModeration: boolean, forwarder: string, ...args: unknown[]):
+        Promise<EnhancedProcedure>;
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: type
+          description: ''
+          type: string
+        - id: options
+          description: ''
+          type: '<xref uid="@organigram/client-js!~TransactionOptions:interface" />'
+        - id: metadata
+          description: ''
+          type: string
+        - id: proposers
+          description: ''
+          type: string
+        - id: moderators
+          description: ''
+          type: string
+        - id: deciders
+          description: ''
+          type: string
+        - id: withModeration
+          description: ''
+          type: boolean
+        - id: forwarder
+          description: ''
+          type: string
+        - id: args
+          description: ''
+          type: 'unknown[]'
+      return:
+        type: 'Promise&lt;<xref uid="@organigram/client-js!~EnhancedProcedure:type" />&gt;'
+        description: ''
+  - name: '_populateInitializeProcedure(type, options, cid, proposers, moderators, deciders, withModeration, forwarder, args)'
+    uid: '@organigram/client-js!Organigram#_populateInitializeProcedure:member(1)'
+    package: '@organigram/client-js!'
+    fullName: '_populateInitializeProcedure(type, options, cid, proposers, moderators, deciders, withModeration, forwarder, args)'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        _populateInitializeProcedure(type: string, options: TransactionOptions, cid: string, proposers: string,
+        moderators: string, deciders: string, withModeration: boolean, forwarder: string, ...args: unknown[]):
+        Promise<PopulatedTransaction>;
+      parameters:
+        - id: type
+          description: ''
+          type: string
+        - id: options
+          description: ''
+          type: '<xref uid="@organigram/client-js!~TransactionOptions:interface" />'
+        - id: cid
+          description: ''
+          type: string
+        - id: proposers
+          description: ''
+          type: string
+        - id: moderators
+          description: ''
+          type: string
+        - id: deciders
+          description: ''
+          type: string
+        - id: withModeration
+          description: ''
+          type: boolean
+        - id: forwarder
+          description: ''
+          type: string
+        - id: args
+          description: ''
+          type: 'unknown[]'
+      return:
+        type: 'Promise&lt;<xref uid="@ethersproject/contracts!PopulatedTransaction:interface" />&gt;'
+        description: ''
+  - name: 'createOrgan(metadata, admin, options)'
+    uid: '@organigram/client-js!Organigram#createOrgan:member(1)'
+    package: '@organigram/client-js!'
+    fullName: 'createOrgan(metadata, admin, options)'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'createOrgan(metadata: string, admin: string, options?: TransactionOptions): Promise<Organ>;'
+      parameters:
+        - id: metadata
+          description: ''
+          type: string
+        - id: admin
+          description: ''
+          type: string
+        - id: options
+          description: ''
+          type: '<xref uid="@organigram/client-js!~TransactionOptions:interface" />'
+      return:
+        type: 'Promise&lt;<xref uid="@organigram/client-js!Organ:class" />&gt;'
+        description: ''
+  - name: 'createProcedure(type, options, cid, proposers, moderators, deciders, withModeration, forwarder, args)'
+    uid: '@organigram/client-js!Organigram#createProcedure:member(1)'
+    package: '@organigram/client-js!'
+    fullName: 'createProcedure(type, options, cid, proposers, moderators, deciders, withModeration, forwarder, args)'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        createProcedure(type: string, options: TransactionOptions, cid: string, proposers: string, moderators: string,
+        deciders: string, withModeration: boolean, forwarder: string, ...args: unknown[]): Promise<EnhancedProcedure>;
+      parameters:
+        - id: type
+          description: ''
+          type: string
+        - id: options
+          description: ''
+          type: '<xref uid="@organigram/client-js!~TransactionOptions:interface" />'
+        - id: cid
+          description: ''
+          type: string
+        - id: proposers
+          description: ''
+          type: string
+        - id: moderators
+          description: ''
+          type: string
+        - id: deciders
+          description: ''
+          type: string
+        - id: withModeration
+          description: ''
+          type: boolean
+        - id: forwarder
+          description: ''
+          type: string
+        - id: args
+          description: ''
+          type: 'unknown[]'
+      return:
+        type: 'Promise&lt;<xref uid="@organigram/client-js!~EnhancedProcedure:type" />&gt;'
+        description: ''
+  - name: 'getContract(address, cached)'
+    uid: '@organigram/client-js!Organigram#getContract:member(1)'
+    package: '@organigram/client-js!'
+    fullName: 'getContract(address, cached)'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'getContract(address: string, cached?: boolean): Promise<Organ | EnhancedProcedure | null>;'
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: cached
+          description: ''
+          type: boolean
+      return:
+        type: >-
+          Promise&lt;<xref uid="@organigram/client-js!Organ:class" /> | <xref
+          uid="@organigram/client-js!~EnhancedProcedure:type" /> | null&gt;
+        description: ''
+  - name: 'getOrgan(address, cached)'
+    uid: '@organigram/client-js!Organigram#getOrgan:member(1)'
+    package: '@organigram/client-js!'
+    fullName: 'getOrgan(address, cached)'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'getOrgan(address: string, cached?: boolean): Promise<Organ>;'
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: cached
+          description: ''
+          type: boolean
+      return:
+        type: 'Promise&lt;<xref uid="@organigram/client-js!Organ:class" />&gt;'
+        description: ''
+  - name: 'getProcedure(address, cached)'
+    uid: '@organigram/client-js!Organigram#getProcedure:member(1)'
+    package: '@organigram/client-js!'
+    fullName: 'getProcedure(address, cached)'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'getProcedure(address: string, cached?: boolean): Promise<EnhancedProcedure>;'
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: cached
+          description: ''
+          type: boolean
+      return:
+        type: 'Promise&lt;<xref uid="@organigram/client-js!~EnhancedProcedure:type" />&gt;'
+        description: ''
+  - name: getProcedureType(procedureAddress)
+    uid: '@organigram/client-js!Organigram#getProcedureType:member(1)'
+    package: '@organigram/client-js!'
+    fullName: getProcedureType(procedureAddress)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'getProcedureType(procedureAddress: string): Promise<ProcedureType | null>;'
+      parameters:
+        - id: procedureAddress
+          description: ''
+          type: string
+      return:
+        type: 'Promise&lt;<xref uid="@organigram/client-js!ProcedureType:interface" /> | null&gt;'
+        description: ''
+  - name: 'load(address, signerOrProvider)'
+    uid: '@organigram/client-js!Organigram.load:member(1)'
+    package: '@organigram/client-js!'
+    fullName: 'load(address, signerOrProvider)'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'static load(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<Organigram>;'
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: signerOrProvider
+          description: ''
+          type: >-
+            <xref uid="@ethersproject/abstract-signer!Signer:class" /> | <xref
+            uid="@ethersproject/abstract-provider!Provider:class" />
+      return:
+        type: 'Promise&lt;<xref uid="@organigram/client-js!Organigram:class" />&gt;'
+        description: ''
+  - name: 'loadProcedureType({ addr, cid }, signerOrProvider)'
+    uid: '@organigram/client-js!Organigram.loadProcedureType:member(1)'
+    package: '@organigram/client-js!'
+    fullName: 'loadProcedureType({ addr, cid }, signerOrProvider)'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        static loadProcedureType({ addr, cid }: {
+                addr: string;
+                cid?: string;
+            }, signerOrProvider: ethers.Signer | ethers.Provider): Promise<ProcedureType>;
+      parameters:
+        - id: '{ addr, cid }'
+          description: ''
+          type: |-
+            {
+                    addr: string;
+                    cid?: string;
+                }
+        - id: signerOrProvider
+          description: ''
+          type: >-
+            <xref uid="@ethersproject/abstract-signer!Signer:class" /> | <xref
+            uid="@ethersproject/abstract-provider!Provider:class" />
+      return:
+        type: 'Promise&lt;<xref uid="@organigram/client-js!ProcedureType:interface" />&gt;'
+        description: ''
+  - name: 'loadProcedureTypes(address, signerOrProvider)'
+    uid: '@organigram/client-js!Organigram.loadProcedureTypes:member(1)'
+    package: '@organigram/client-js!'
+    fullName: 'loadProcedureTypes(address, signerOrProvider)'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        static loadProcedureTypes(address: string, signerOrProvider: ethers.Signer | ethers.Provider):
+        Promise<ProcedureType[]>;
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: signerOrProvider
+          description: ''
+          type: >-
+            <xref uid="@ethersproject/abstract-signer!Signer:class" /> | <xref
+            uid="@ethersproject/abstract-provider!Provider:class" />
+      return:
+        type: 'Promise&lt;<xref uid="@organigram/client-js!ProcedureType:interface" />[]&gt;'
+        description: ''

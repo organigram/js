@@ -1,0 +1,105 @@
+### YamlMime:TSType
+name: OrganData
+uid: '@organigram/client-js!OrganData:interface'
+package: '@organigram/client-js!'
+fullName: OrganData
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: address
+    uid: '@organigram/client-js!OrganData#address:member'
+    package: '@organigram/client-js!'
+    fullName: address
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'address: string;'
+      return:
+        type: string
+  - name: balance
+    uid: '@organigram/client-js!OrganData#balance:member'
+    package: '@organigram/client-js!'
+    fullName: balance
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'balance: bigint;'
+      return:
+        type: '<xref uid="@ethersproject/bignumber!BigNumber:class" />'
+  - name: cid
+    uid: '@organigram/client-js!OrganData#cid:member'
+    package: '@organigram/client-js!'
+    fullName: cid
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'cid: string;'
+      return:
+        type: string
+  - name: entries
+    uid: '@organigram/client-js!OrganData#entries:member'
+    package: '@organigram/client-js!'
+    fullName: entries
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'entries: OrganEntry[];'
+      return:
+        type: '<xref uid="@organigram/client-js!OrganEntry:interface" />[]'
+  - name: network
+    uid: '@organigram/client-js!OrganData#network:member'
+    package: '@organigram/client-js!'
+    fullName: network
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'network: Network;'
+      return:
+        type: '<xref uid="@organigram/client-js!Network:type" />'
+  - name: procedures
+    uid: '@organigram/client-js!OrganData#procedures:member'
+    package: '@organigram/client-js!'
+    fullName: procedures
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'procedures: OrganProcedure[];'
+      return:
+        type: '<xref uid="@organigram/client-js!OrganProcedure:interface" />[]'
+  - name: signerOrProvider
+    uid: '@organigram/client-js!OrganData#signerOrProvider:member'
+    package: '@organigram/client-js!'
+    fullName: signerOrProvider
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'signerOrProvider: ethers.Signer | ethers.Provider;'
+      return:
+        type: >-
+          <xref uid="@ethersproject/abstract-signer!Signer:class" /> | <xref
+          uid="@ethersproject/abstract-provider!Provider:class" />

@@ -1,0 +1,23 @@
+### YamlMime:TSPackage
+uid: '@organigram/client-js!'
+name: '@organigram/client-js'
+type: package
+summary: ''
+typeAliases:
+  - '@organigram/client-js!LibraryKey:type'
+  - '@organigram/client-js!Network:type'
+interfaces:
+  - '@organigram/client-js!Multihash:interface'
+  - '@organigram/client-js!OrganData:interface'
+  - '@organigram/client-js!OrganEntry:interface'
+  - '@organigram/client-js!OrganProcedure:interface'
+  - '@organigram/client-js!ProcedureProposal:interface'
+  - '@organigram/client-js!ProcedureProposalOperation:interface'
+  - '@organigram/client-js!ProcedureProposalOperationFunction:interface'
+  - '@organigram/client-js!ProcedureType:interface'
+classes:
+  - '@organigram/client-js!Organ:class'
+  - '@organigram/client-js!Organigram:class'
+  - '@organigram/client-js!Procedure:class'
+enums:
+  - '@organigram/client-js!OrganFunctionName:enum'

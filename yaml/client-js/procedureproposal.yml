@@ -1,0 +1,129 @@
+### YamlMime:TSType
+name: ProcedureProposal
+uid: '@organigram/client-js!ProcedureProposal:interface'
+package: '@organigram/client-js!'
+fullName: ProcedureProposal
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: adopted
+    uid: '@organigram/client-js!ProcedureProposal#adopted:member'
+    package: '@organigram/client-js!'
+    fullName: adopted
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'adopted: boolean;'
+      return:
+        type: boolean
+  - name: applied
+    uid: '@organigram/client-js!ProcedureProposal#applied:member'
+    package: '@organigram/client-js!'
+    fullName: applied
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'applied: boolean;'
+      return:
+        type: boolean
+  - name: blocked
+    uid: '@organigram/client-js!ProcedureProposal#blocked:member'
+    package: '@organigram/client-js!'
+    fullName: blocked
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'blocked: boolean;'
+      return:
+        type: boolean
+  - name: blockReason
+    uid: '@organigram/client-js!ProcedureProposal#blockReason:member'
+    package: '@organigram/client-js!'
+    fullName: blockReason
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'blockReason: string;'
+      return:
+        type: string
+  - name: cid
+    uid: '@organigram/client-js!ProcedureProposal#cid:member'
+    package: '@organigram/client-js!'
+    fullName: cid
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'cid: string;'
+      return:
+        type: string
+  - name: creator
+    uid: '@organigram/client-js!ProcedureProposal#creator:member'
+    package: '@organigram/client-js!'
+    fullName: creator
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'creator: string;'
+      return:
+        type: string
+  - name: key
+    uid: '@organigram/client-js!ProcedureProposal#key:member'
+    package: '@organigram/client-js!'
+    fullName: key
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'key: string;'
+      return:
+        type: string
+  - name: operations
+    uid: '@organigram/client-js!ProcedureProposal#operations:member'
+    package: '@organigram/client-js!'
+    fullName: operations
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'operations: ProcedureProposalOperation[];'
+      return:
+        type: '<xref uid="@organigram/client-js!ProcedureProposalOperation:interface" />[]'
+  - name: presented
+    uid: '@organigram/client-js!ProcedureProposal#presented:member'
+    package: '@organigram/client-js!'
+    fullName: presented
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'presented: boolean;'
+      return:
+        type: boolean

@@ -1,0 +1,35 @@
+items:
+  - name: SharePoint Framework reference
+    href: ~/overview/sharepoint.md
+    items:
+      - name: client-js
+        uid: '@organigram/client-js!'
+        items:
+          - name: LibraryKey
+            uid: '@organigram/client-js!LibraryKey:type'
+          - name: Multihash
+            uid: '@organigram/client-js!Multihash:interface'
+          - name: Network
+            uid: '@organigram/client-js!Network:type'
+          - name: Organ
+            uid: '@organigram/client-js!Organ:class'
+          - name: OrganData
+            uid: '@organigram/client-js!OrganData:interface'
+          - name: OrganEntry
+            uid: '@organigram/client-js!OrganEntry:interface'
+          - name: OrganFunctionName
+            uid: '@organigram/client-js!OrganFunctionName:enum'
+          - name: Organigram
+            uid: '@organigram/client-js!Organigram:class'
+          - name: OrganProcedure
+            uid: '@organigram/client-js!OrganProcedure:interface'
+          - name: Procedure
+            uid: '@organigram/client-js!Procedure:class'
+          - name: ProcedureProposal
+            uid: '@organigram/client-js!ProcedureProposal:interface'
+          - name: ProcedureProposalOperation
+            uid: '@organigram/client-js!ProcedureProposalOperation:interface'
+          - name: ProcedureProposalOperationFunction
+            uid: '@organigram/client-js!ProcedureProposalOperationFunction:interface'
+          - name: ProcedureType
+            uid: '@organigram/client-js!ProcedureType:interface'
