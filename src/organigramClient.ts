@@ -5,9 +5,9 @@ import ProcedureContractABI from '@organigram/protocol/abi/Procedure.json'
 import Organ from './organ'
 import Procedure from './procedure'
 import type { TransactionOptions } from './types'
-import NominationProcedure from './nomination'
-import VoteProcedure from './vote'
-import ERC20VoteProcedure from './erc20Vote'
+import NominationProcedure from './procedure/nomination'
+import VoteProcedure from './procedure/vote'
+import ERC20VoteProcedure from './procedure/erc20Vote'
 
 const procedureMetadata = {
   description: '',
@@ -55,7 +55,7 @@ export type EnhancedProcedure = Procedure & {
   type: ProcedureType
 }
 
-export class Organigram {
+export class OrganigramClient {
   address: string
   chainId: string
   procedureTypes: ProcedureType[]
@@ -67,7 +67,7 @@ export class Organigram {
   signer?: ethers.Signer
 
   /**
-   * Creates an instance of Organigram manager.
+   * Creates an instance of Organigram client.
    * @param {string} address - The contract address.
    * @param {string} chainId - The network id.
    * @param {ProcedureType[]} procedureTypes - The procedure types.
@@ -561,4 +561,4 @@ export class Organigram {
   // }
 }
 
-export default Organigram
+export default OrganigramClient
