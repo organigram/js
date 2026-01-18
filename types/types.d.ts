@@ -9,3 +9,10 @@ export interface Multihash {
     hashSize: string;
 }
 export type LibraryKey = 'organ' | 'procedure' | 'metadata';
+export type Election = {
+    proposalKey: string;
+    start: string;
+    votesCount: string;
+    hasVoted: boolean;
+    approved?: boolean;
+};

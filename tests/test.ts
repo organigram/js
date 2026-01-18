@@ -1,10 +1,10 @@
 import { strictEqual } from 'assert'
-import { ethers } from 'ethers'
+import { ethers, JsonRpcProvider, Signer } from 'ethers'
 import { Organigram, type Organ, type ProcedureProposalOperation } from '../src'
 // import { CID } from 'multiformats/cid'
-import NominationProcedure from '@organigram/procedures/src/nomination/class'
-import VoteProcedure from '@organigram/procedures/src/vote/class'
-import ERC20VoteProcedure from '@organigram/procedures/src/erc20Vote/class'
+import NominationProcedure from '../src/nomination'
+import VoteProcedure from '../src/vote'
+import ERC20VoteProcedure from '../src/erc20Vote'
 import { type TransactionOptions } from '../types/types'
 
 const ETHEREUM_PROVIDER = process.env.ETHEREUM_PROVIDER as string
@@ -25,15 +25,15 @@ const txOptions: TransactionOptions = {
 // }
 
 describe('Organigram', () => {
-  let provider: ethers.providers.JsonRpcProvider
-  let signer: ethers.Signer
+  let provider: JsonRpcProvider
+  let signer: Signer
   // let ipfs: IPFS.IPFS
   let organ: Organ
 
   beforeEach(async () => {
     // ipfs = await loadIpfs()
-    provider = new ethers.providers.JsonRpcProvider(ETHEREUM_PROVIDER)
-    signer = provider.getSigner(0)
+    provider = new JsonRpcProvider(ETHEREUM_PROVIDER)
+    signer = await provider.getSigner(0)
     await Promise.resolve()
   })
 

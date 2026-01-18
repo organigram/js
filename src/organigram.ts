@@ -1,31 +1,39 @@
 import { ethers, type EventLog, type ContractTransaction } from 'ethers'
 import OrganigramContractABI from '@organigram/contracts/abi/Organigram.json'
 import ProcedureContractABI from '@organigram/contracts/abi/Procedure.json'
-// @ts-expect-error No types available.
-import { ERC20Vote, Nomination, Vote } from '@organigram/procedures'
 
 import Organ from './organ'
 import Procedure from './procedure'
 import type { TransactionOptions } from './types'
+import NominationProcedure from './nomination'
+import VoteProcedure from './vote'
+import ERC20VoteProcedure from './erc20Vote'
+
+const procedureMetadata = {
+  description: '',
+  _type: 'procedureType',
+  _generator: 'https://organigram.ai',
+  _generatedAt: 0
+}
 
 const procedures = [
   {
     key: 'nomination',
     address: '',
-    metadata: Nomination.metadata,
-    Class: Nomination.Class
+    metadata: { ...procedureMetadata, name: 'Nomination', type: 'nomination' },
+    Class: NominationProcedure
   },
   {
     key: 'vote',
     address: '',
-    metadata: Vote.metadata,
-    Class: Vote.Class
+    metadata: { ...procedureMetadata, name: 'Vote', type: 'vote' },
+    Class: VoteProcedure
   },
   {
     key: 'erc20Vote',
     address: '',
-    metadata: ERC20Vote.metadata,
-    Class: ERC20Vote.Class
+    metadata: { ...procedureMetadata, name: 'ERC20 Vote', type: 'erc20Vote' },
+    Class: ERC20VoteProcedure
   }
 ]
 
@@ -67,7 +75,7 @@ export class Organigram {
    * @param {ethers.Provider} provider - The ethers provider.
    * @param {ethers.Signer} [signer] - The ethers signer.
    */
-  constructor (
+  constructor(
     address: string,
     chainId: string,
     procedureTypes: ProcedureType[],
@@ -95,7 +103,7 @@ export class Organigram {
    * @returns {Promise<ProcedureType>} A promise that resolves to a ProcedureType object.
    * @throws {Error} Throws an error if the contract does not support interfaces or is not a procedure.
    */
-  static async loadProcedureType (
+  static async loadProcedureType(
     { addr, cid }: { addr: string; cid?: string },
     provider: ethers.Provider
   ): Promise<ProcedureType> {
@@ -136,7 +144,7 @@ export class Organigram {
    * @param {ethers.Provider} provider - The ethers provider.
    * @returns {Promise<ProcedureType[]>} A promise that resolves to an array of ProcedureType objects.
    */
-  static async loadProcedureTypes (
+  static async loadProcedureTypes(
     address: string,
     provider: ethers.Provider
   ): Promise<ProcedureType[]> {
@@ -172,7 +180,7 @@ export class Organigram {
    * @returns {Promise<Organigram>} A promise that resolves to an instance of Organigram.
    * @throws {Error} Throws an error if no provider or signer is provided.
    */
-  static async load (
+  static async load(
     address: string,
     provider: ethers.Provider,
     signer?: ethers.Signer
@@ -217,7 +225,7 @@ export class Organigram {
    */
 
   // Get master procedure data.
-  async getProcedureType (
+  async getProcedureType(
     procedureAddress: string
   ): Promise<ProcedureType | null> {
     if (this.provider == null) {
@@ -232,7 +240,7 @@ export class Organigram {
   }
 
   // Get or load organ data.
-  async getOrgan (address: string, cached = true): Promise<Organ> {
+  async getOrgan(address: string, cached = true): Promise<Organ> {
     const index = this.organs.findIndex(
       c =>
         c.address.toLowerCase() === address.toLowerCase() &&
@@ -262,7 +270,7 @@ export class Organigram {
   }
 
   // Get or load procedure data.
-  async getProcedure (
+  async getProcedure(
     address: string,
     cached = true
   ): Promise<EnhancedProcedure> {
@@ -301,7 +309,7 @@ export class Organigram {
   }
 
   // Get or load a contract.
-  async getContract (
+  async getContract(
     address: string,
     cached = true
   ): Promise<Organ | EnhancedProcedure | null> {
@@ -313,7 +321,7 @@ export class Organigram {
   }
 
   // Create and load an organ.
-  async createOrgan (
+  async createOrgan(
     metadata: string,
     admin: string,
     options?: TransactionOptions
@@ -351,7 +359,7 @@ export class Organigram {
     })
   }
 
-  async _createProcedure (
+  async _createProcedure(
     type: string,
     initialize?: ethers.ContractTransaction,
     options?: TransactionOptions
@@ -398,7 +406,7 @@ export class Organigram {
     })
   }
 
-  async _initializeProcedure (
+  async _initializeProcedure(
     address: string,
     type: string,
     options: TransactionOptions,
@@ -439,7 +447,7 @@ export class Organigram {
     return await this.getProcedure(address, true)
   }
 
-  async _populateInitializeProcedure (
+  async _populateInitializeProcedure(
     type: string,
     options: TransactionOptions,
     cid: string,
@@ -479,7 +487,7 @@ export class Organigram {
   }
 
   // Create and load a procedure.
-  async createProcedure (
+  async createProcedure(
     type: string,
     options: TransactionOptions,
     cid: string,

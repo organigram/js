@@ -7,27 +7,35 @@ exports.Organigram = void 0;
 const ethers_1 = require("ethers");
 const Organigram_json_1 = __importDefault(require("@organigram/contracts/abi/Organigram.json"));
 const Procedure_json_1 = __importDefault(require("@organigram/contracts/abi/Procedure.json"));
-const procedures_1 = require("@organigram/procedures");
 const organ_1 = __importDefault(require("./organ"));
 const procedure_1 = __importDefault(require("./procedure"));
+const nomination_1 = __importDefault(require("./nomination"));
+const vote_1 = __importDefault(require("./vote"));
+const erc20Vote_1 = __importDefault(require("./erc20Vote"));
+const procedureMetadata = {
+    description: '',
+    _type: 'procedureType',
+    _generator: 'https://organigram.ai',
+    _generatedAt: 0
+};
 const procedures = [
     {
         key: 'nomination',
         address: '',
-        metadata: procedures_1.Nomination.metadata,
-        Class: procedures_1.Nomination.Class
+        metadata: { ...procedureMetadata, name: 'Nomination', type: 'nomination' },
+        Class: nomination_1.default
     },
     {
         key: 'vote',
         address: '',
-        metadata: procedures_1.Vote.metadata,
-        Class: procedures_1.Vote.Class
+        metadata: { ...procedureMetadata, name: 'Vote', type: 'vote' },
+        Class: vote_1.default
     },
     {
         key: 'erc20Vote',
         address: '',
-        metadata: procedures_1.ERC20Vote.metadata,
-        Class: procedures_1.ERC20Vote.Class
+        metadata: { ...procedureMetadata, name: 'ERC20 Vote', type: 'erc20Vote' },
+        Class: erc20Vote_1.default
     }
 ];
 class Organigram {
