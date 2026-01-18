@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Organ = exports.OrganFunctionName = void 0;
 const ethers_1 = require("ethers");
-const Organ_json_1 = __importDefault(require("@organigram/contracts/abi/Organ.json"));
+const Organ_json_1 = __importDefault(require("@organigram/protocol/abi/Organ.json"));
 const utils_1 = require("./utils");
 var OrganFunctionName;
 (function (OrganFunctionName) {

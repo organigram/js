@@ -1,7 +1,7 @@
 import { ethers } from 'ethers'
 import type { ProcedureProposal } from './procedure'
 import Procedure from './procedure'
-import NominationProcedureContractABI from '@organigram/contracts/abi/NominationProcedure.json'
+import NominationProcedureContractABI from '@organigram/protocol/abi/NominationProcedure.json'
 import { TransactionOptions } from './types'
 
 export default class NominationProcedure extends Procedure {

@@ -1,6 +1,6 @@
 import { ethers, type EventLog, type ContractTransaction } from 'ethers'
-import OrganigramContractABI from '@organigram/contracts/abi/Organigram.json'
-import ProcedureContractABI from '@organigram/contracts/abi/Procedure.json'
+import OrganigramContractABI from '@organigram/protocol/abi/Organigram.json'
+import ProcedureContractABI from '@organigram/protocol/abi/Procedure.json'
 
 import Organ from './organ'
 import Procedure from './procedure'

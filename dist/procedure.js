@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const Procedure_json_1 = __importDefault(require("@organigram/contracts/abi/Procedure.json"));
+const Procedure_json_1 = __importDefault(require("@organigram/protocol/abi/Procedure.json"));
 const ethers_1 = require("ethers");
 class Procedure {
     static INTERFACE = '0x71dbd330';

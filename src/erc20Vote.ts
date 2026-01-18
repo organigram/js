@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import Procedure, { type ProcedureProposal } from './procedure'
-import ERC20VoteProcedureContractABI from '@organigram/contracts/abi/ERC20VoteProcedure.json'
+import ERC20VoteProcedureContractABI from '@organigram/protocol/abi/ERC20VoteProcedure.json'
 import { Election, TransactionOptions } from './types'
 
 export default class ERC20VoteProcedure extends Procedure {

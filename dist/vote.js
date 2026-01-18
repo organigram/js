@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const ethers_1 = require("ethers");
 const procedure_1 = __importDefault(require("./procedure"));
-const VoteProcedure_json_1 = __importDefault(require("@organigram/contracts/abi/VoteProcedure.json"));
+const VoteProcedure_json_1 = __importDefault(require("@organigram/protocol/abi/VoteProcedure.json"));
 class VoteProcedure extends procedure_1.default {
     static INTERFACE = '0xc9d27afe';
     contract;
