@@ -97,6 +97,16 @@ export interface ProcedureProposal {
   adopted: boolean
   applied: boolean
   operations: ProcedureProposalOperation[]
+  metadata?: ProposalMetadata
+}
+
+export interface ProposalMetadata {
+  title: string
+  subtitle?: string
+  description?: string
+  discussion?: string
+  file?: string
+  cid?: string
 }
 
 export class Procedure {
@@ -294,7 +304,6 @@ export class Procedure {
       ProcedureContractABI,
       signerOrProvider
     )
-    // eslint-disable-next-line @typescript-eslint/return-await
     return await contract.getProcedure()
   }
 

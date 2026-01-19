@@ -49,6 +49,15 @@ export interface ProcedureProposal {
     adopted: boolean;
     applied: boolean;
     operations: ProcedureProposalOperation[];
+    metadata?: ProposalMetadata;
+}
+export interface ProposalMetadata {
+    title: string;
+    subtitle?: string;
+    description?: string;
+    discussion?: string;
+    file?: string;
+    cid?: string;
 }
 export declare class Procedure {
     static INTERFACE: string;
