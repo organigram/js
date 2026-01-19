@@ -4,7 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getPermissionsSet = exports.PERMISSIONS = exports.EMPTY_ADDRESS = exports.OrganigramClient = exports.ERC20Vote = exports.Vote = exports.Nomination = exports.Procedure = exports.OrganFunctionName = exports.Organ = void 0;
-require("./types");
 var organ_1 = require("./organ");
 Object.defineProperty(exports, "Organ", { enumerable: true, get: function () { return __importDefault(organ_1).default; } });
 Object.defineProperty(exports, "OrganFunctionName", { enumerable: true, get: function () { return organ_1.OrganFunctionName; } });

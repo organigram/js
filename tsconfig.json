@@ -8,11 +8,11 @@
     "removeComments": true,
     "resolveJsonModule": true,
     "preserveConstEnums": true,
+    "rootDir": "src",
     "outDir": "dist",
     "sourceMap": false,
     "declaration": true,
-    "declarationDir": "./types"
+    "declarationDir": "types"
   },
-  "include": ["src/**/*.ts", "./namespaces.d.ts", "scripts/**/*.js"],
-  "exclude": ["node_modules", "types", "dist"]
+  "exclude": ["node_modules", "types", "dist", "jest.config.ts", "tests"]
 }

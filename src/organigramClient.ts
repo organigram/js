@@ -4,10 +4,14 @@ import ProcedureContractABI from '@organigram/protocol/abi/Procedure.json'
 
 import Organ from './organ'
 import Procedure from './procedure'
-import type { TransactionOptions } from './types'
 import NominationProcedure from './procedure/nomination'
 import VoteProcedure from './procedure/vote'
 import ERC20VoteProcedure from './procedure/erc20Vote'
+
+export interface TransactionOptions {
+  nonce?: number
+  onTransaction?: (tx: ethers.TransactionResponse, description: string) => void
+}
 
 const procedureMetadata = {
   description: '',

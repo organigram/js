@@ -1,5 +1,12 @@
-import type { TransactionOptions } from '../types';
 import { type ContractTransaction, ethers } from 'ethers';
+import type { TransactionOptions } from '../organigramClient';
+export type Election = {
+    proposalKey: string;
+    start: string;
+    votesCount: string;
+    hasVoted: boolean;
+    approved?: boolean;
+};
 export type OperationTag = 'cid' | 'entries' | 'procedures' | 'coins' | 'collectibles' | 'erc721' | 'erc20' | 'erc1155' | 'ether' | 'add' | 'replace' | 'remove' | 'deposit' | 'withdraw' | 'transfer';
 export type OperationParamType = 'cid' | 'entry' | 'entries' | 'address' | 'addresses' | 'index' | 'indexes' | 'organ' | 'procedure' | 'permissions' | 'proposal' | 'proposals' | 'amount' | 'tokenId';
 export type OperationParamAction = 'select' | 'create' | 'update' | 'delete' | 'withdraw' | 'deposit' | 'transfer' | 'block';

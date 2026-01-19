@@ -1,6 +1,15 @@
 import ProcedureContractABI from '@organigram/protocol/abi/Procedure.json'
-import type { TransactionOptions } from '../types'
 import { type ContractTransaction, ethers } from 'ethers'
+
+import type { TransactionOptions } from '../organigramClient'
+
+export type Election = {
+  proposalKey: string
+  start: string
+  votesCount: string
+  hasVoted: boolean
+  approved?: boolean
+}
 
 export type OperationTag =
   | 'cid'

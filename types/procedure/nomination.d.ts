@@ -1,7 +1,6 @@
 import { ethers } from 'ethers';
-import type { ProcedureProposal } from '.';
-import Procedure from '.';
-import { TransactionOptions } from '../types';
+import Procedure, { type ProcedureProposal } from '.';
+import { TransactionOptions } from '../organigramClient';
 export default class NominationProcedure extends Procedure {
     static INTERFACE: string;
     contract: ethers.Contract;

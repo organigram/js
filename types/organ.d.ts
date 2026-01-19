@@ -1,5 +1,5 @@
 import { ethers, type Signer } from 'ethers';
-import type { TransactionOptions } from './types';
+import type { TransactionOptions } from './organigramClient';
 export interface OrganEntry {
     index: string;
     address: string;

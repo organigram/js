@@ -1,7 +1,8 @@
 import { ethers, type Signer } from 'ethers'
 import OrganContractABI from '@organigram/protocol/abi/Organ.json'
+
 import { EMPTY_ADDRESS } from './utils'
-import type { TransactionOptions } from './types'
+import type { TransactionOptions } from './organigramClient'
 
 export interface OrganEntry {
   index: string
