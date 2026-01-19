@@ -1,5 +1,5 @@
 import ProcedureContractABI from '@organigram/protocol/abi/Procedure.json'
-import type { TransactionOptions } from './types'
+import type { TransactionOptions } from '../types'
 import { type ContractTransaction, ethers } from 'ethers'
 
 export type OperationTag =

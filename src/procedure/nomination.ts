@@ -1,8 +1,8 @@
 import { ethers } from 'ethers'
-import type { ProcedureProposal } from './procedure'
-import Procedure from './procedure'
+import type { ProcedureProposal } from '.'
+import Procedure from '.'
 import NominationProcedureContractABI from '@organigram/protocol/abi/NominationProcedure.json'
-import { TransactionOptions } from './types'
+import { TransactionOptions } from '../types'
 
 export default class NominationProcedure extends Procedure {
   static INTERFACE = '0xc5f28e49' // nominate() signature.

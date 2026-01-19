@@ -1,22 +1,23 @@
 import { ethers } from 'ethers'
-import Procedure, { type ProcedureProposal } from './procedure'
-import VoteProcedureContractABI from '@organigram/protocol/abi/VoteProcedure.json'
-import { Election, TransactionOptions } from './types'
+import Procedure, { type ProcedureProposal } from '.'
+import ERC20VoteProcedureContractABI from '@organigram/protocol/abi/ERC20VoteProcedure.json'
+import { Election, TransactionOptions } from '../types'
 
-export default class VoteProcedure extends Procedure {
+export default class ERC20VoteProcedure extends Procedure {
   static INTERFACE = '0xc9d27afe' // vote() signature.
-  contract: ethers.Contract
+  erc20: string
   quorumSize: string
   voteDuration: string
   majoritySize: string
   elections: Election[]
+  contract: ethers.Contract
 
   // Constructor needs to call Procedure constructor.
   constructor(
     cid: string,
     address: string,
     chainId: string,
-    signer: ethers.Signer,
+    signerOrProvider: ethers.Signer | ethers.Provider,
     metadata: unknown,
     proposers: string,
     moderators: string,
@@ -24,6 +25,7 @@ export default class VoteProcedure extends Procedure {
     withModeration: boolean,
     forwarder: string,
     proposals: ProcedureProposal[],
+    erc20: string,
     quorumSize: string,
     voteDuration: string,
     majoritySize: string,
@@ -33,7 +35,7 @@ export default class VoteProcedure extends Procedure {
       cid,
       address,
       chainId,
-      signer,
+      signerOrProvider,
       metadata,
       proposers,
       moderators,
@@ -42,19 +44,19 @@ export default class VoteProcedure extends Procedure {
       forwarder,
       proposals
     )
+    this.erc20 = erc20
     this.quorumSize = quorumSize
     this.voteDuration = voteDuration
     this.majoritySize = majoritySize
     this.elections = elections
     this.contract = new ethers.Contract(
       address,
-      VoteProcedureContractABI,
-      signer
+      ERC20VoteProcedureContractABI,
+      signerOrProvider
     )
   }
 
   // _populateInitialize() overrides Procedure _populateInitialize.
-  // @ts-ignore
   static async _populateInitialize(
     type: string,
     options: { signer: ethers.Signer } & TransactionOptions,
@@ -64,6 +66,7 @@ export default class VoteProcedure extends Procedure {
     deciders: string,
     withModeration: boolean,
     forwarder: string,
+    erc20: string,
     quorumSize: string,
     voteDuration: string,
     majoritySize: string
@@ -73,7 +76,7 @@ export default class VoteProcedure extends Procedure {
     }
     const contract = new ethers.Contract(
       type,
-      VoteProcedureContractABI,
+      ERC20VoteProcedureContractABI,
       options.signer
     )
     return await contract.initialize.populateTransaction(
@@ -83,6 +86,7 @@ export default class VoteProcedure extends Procedure {
       deciders,
       withModeration,
       forwarder,
+      erc20,
       quorumSize,
       voteDuration,
       majoritySize
@@ -92,12 +96,12 @@ export default class VoteProcedure extends Procedure {
   static async loadElection(
     address: string,
     proposalKey: string,
-    signer: ethers.Signer
+    signerOrProvider: ethers.Signer | ethers.Provider
   ): Promise<Election> {
     const contract = new ethers.Contract(
       address,
-      VoteProcedureContractABI,
-      signer
+      ERC20VoteProcedureContractABI,
+      signerOrProvider
     )
     const election = await contract.getElection(proposalKey)
     if (!election.start) throw new Error('Election not found.')
@@ -125,20 +129,20 @@ export default class VoteProcedure extends Procedure {
 
   static async loadElections(
     address: string,
-    signer: ethers.Signer
+    signerOrProvider: ethers.Signer | ethers.Provider
   ): Promise<Election[]> {
-    const data = await Procedure.loadData(address, signer)
+    const data = await Procedure.loadData(address, signerOrProvider)
     const proposalsLength = BigInt(data.proposalsLength)
     const elections: Election[] = []
     for (let i = 0; i < proposalsLength; i++) {
       const key: string = i.toString()
-      const election: Election | null = await VoteProcedure.loadElection(
+      const election: Election | null = await ERC20VoteProcedure.loadElection(
         address,
         key,
-        signer
+        signerOrProvider
       ).catch((error: Error) => {
         console.warn(
-          'Error while loading election in vote procedure.',
+          'Error while loading election in ERC20 vote procedure.',
           address,
           key,
           error.message
@@ -152,25 +156,30 @@ export default class VoteProcedure extends Procedure {
 
   static async load(
     address: string,
-    signer: ethers.Signer
-  ): Promise<VoteProcedure> {
-    const procedure = await Procedure.load(address, signer)
+    signerOrProvider: ethers.Signer | ethers.Provider
+  ): Promise<ERC20VoteProcedure> {
+    const procedure = await Procedure.load(address, signerOrProvider)
     if (!procedure) throw new Error('Not a valid procedure.')
     const contract = new ethers.Contract(
       address,
-      VoteProcedureContractABI,
-      signer
+      ERC20VoteProcedureContractABI,
+      signerOrProvider
     )
+    const erc20 = await contract.tokenContract()
     const quorumSize = await contract.quorumSize()
     const voteDuration = await contract.voteDuration()
     const majoritySize = await contract.majoritySize()
-    const elections = await VoteProcedure.loadElections(address, signer)
+    const elections = await ERC20VoteProcedure.loadElections(
+      address,
+      signerOrProvider
+    )
     // Make sure expired proposals are listed as blocked.
-    const proposals = procedure.proposals.map((proposal: ProcedureProposal) => {
+    const proposals = procedure.proposals.map(proposal => {
       if (!proposal.blocked && !proposal.applied && !proposal.adopted) {
         const election = elections.find(ba => ba.proposalKey === proposal.key)
         if (election?.start) {
           // Proposal is blocked if election is expired and not approved.
+          // @todo User BigNumber
           proposal.blocked =
             !election.approved &&
             parseInt(election.start) + parseInt(voteDuration) <=
@@ -179,11 +188,11 @@ export default class VoteProcedure extends Procedure {
       }
       return proposal
     })
-    return new VoteProcedure(
+    return new ERC20VoteProcedure(
       procedure.cid,
       procedure.address,
       procedure.chainId,
-      signer,
+      signerOrProvider,
       procedure.metadata,
       procedure.proposers,
       procedure.moderators,
@@ -191,6 +200,7 @@ export default class VoteProcedure extends Procedure {
       procedure.withModeration,
       procedure.forwarder,
       proposals,
+      erc20.toString(),
       quorumSize.toString(),
       voteDuration.toString(),
       majoritySize.toString(),
@@ -198,10 +208,47 @@ export default class VoteProcedure extends Procedure {
     )
   }
 
+  async erc20Balance(account?: string): Promise<bigint> {
+    const erc20 = await this.contract.tokenContract()
+    const ERC20_ABI = [
+      // balanceOf
+      {
+        constant: true,
+        inputs: [{ name: '_owner', type: 'address' }],
+        name: 'balanceOf',
+        outputs: [{ name: 'balance', type: 'uint256' }],
+        type: 'function'
+      },
+      // decimals
+      {
+        constant: true,
+        inputs: [],
+        name: 'decimals',
+        outputs: [{ name: '', type: 'uint8' }],
+        type: 'function'
+      }
+    ]
+    const signerOrProvider = this.signer ?? this.provider
+    if (signerOrProvider == null) {
+      throw new Error('Not connected.')
+    }
+    const erc20Contract = new ethers.Contract(
+      erc20,
+      ERC20_ABI,
+      signerOrProvider
+    )
+    if (this.signer == null && account == null) {
+      return BigInt(0)
+    }
+    return await erc20Contract.balanceOf(
+      account ?? (await this.signer?.getAddress())
+    )
+  }
+
   async vote(
     proposalKey: string,
     approval: boolean,
-    options?: TransactionOptions
+    options: TransactionOptions
   ): Promise<boolean> {
     const tx = await this.contract
       .vote(proposalKey, approval)
@@ -215,7 +262,7 @@ export default class VoteProcedure extends Procedure {
         return false
       })
     if (options?.onTransaction != null) {
-      options.onTransaction(tx, 'Initialize Nomination procedure.')
+      options.onTransaction(tx, 'Initialize ERC20 Vote procedure.')
     }
     return tx.wait()
   }
@@ -223,7 +270,7 @@ export default class VoteProcedure extends Procedure {
   async count(proposalKey: string): Promise<boolean> {
     return this.contract.count(proposalKey).catch((error: Error) => {
       console.error(
-        'Error while counting.',
+        'Error while voting.',
         this.address,
         proposalKey,
         error.message

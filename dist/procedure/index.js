@@ -1,0 +1,416 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const Procedure_json_1 = __importDefault(require("@organigram/protocol/abi/Procedure.json"));
+const ethers_1 = require("ethers");
+class Procedure {
+    static INTERFACE = '0x71dbd330';
+    static OPERATIONS_FUNCTIONS = [
+        {
+            funcSig: '0x4d3f8407',
+            key: 'updateCid',
+            signature: 'updateCid(string)',
+            label: 'Update cid',
+            tags: ['cid', 'replace'],
+            params: ['cid'],
+            target: 'organ'
+        },
+        {
+            funcSig: '0xd610b570',
+            key: 'addEntries',
+            signature: 'addEntries(OrganLibrary.Entry[])',
+            label: 'Add entries',
+            tags: ['entries', 'add'],
+            params: ['entries'],
+            target: 'organ'
+        },
+        {
+            funcSig: '0x7615eb81',
+            key: 'removeEntries',
+            signature: 'removeEntries(uint256[])',
+            label: 'Remove entries',
+            tags: ['entries', 'remove'],
+            params: ['indexes'],
+            target: 'organ'
+        },
+        {
+            funcSig: '0x62f7f997',
+            key: 'replaceEntry',
+            signature: 'replaceEntry(uint256,CoreLibrary.Entry)',
+            label: 'Replace entry',
+            tags: ['entries', 'replace'],
+            params: ['index', 'entry'],
+            target: 'organ'
+        },
+        {
+            funcSig: '0x7f0a4e27',
+            key: 'addProcedure',
+            signature: 'addProcedure(address,bytes2)',
+            label: 'Add procedure',
+            tags: ['procedures', 'add'],
+            params: ['procedure', 'permissions'],
+            target: 'organ'
+        },
+        {
+            funcSig: '0x19b9404c',
+            key: 'removeProcedure',
+            signature: 'removeProcedure(address)',
+            label: 'Remove procedure',
+            tags: ['procedures', 'remove'],
+            params: ['procedure'],
+            target: 'organ'
+        },
+        {
+            funcSig: '0xd0922d4a',
+            key: 'replaceProcedure',
+            signature: 'replaceProcedure(address,address,bytes2)',
+            label: 'Replace procedure',
+            tags: ['procedures', 'replace'],
+            params: ['procedure', 'procedure', 'permissions'],
+            target: 'organ'
+        },
+        {
+            funcSig: '0xa9059cbb',
+            key: 'withdrawEther',
+            signature: 'transfer(address,uint256)',
+            label: 'Withdraw ether',
+            tags: ['transfer', 'withdraw', 'ether'],
+            params: ['address', 'amount'],
+            target: 'organ'
+        },
+        {
+            funcSig: '0xf49b5848',
+            key: 'withdrawERC20',
+            signature: 'transferCoins(address,address,address,uint256)',
+            label: 'Withdraw ERC20',
+            tags: ['transfer', 'withdraw', 'coins', 'erc20'],
+            params: ['address', 'address', 'address', 'amount'],
+            target: 'organ'
+        },
+        {
+            funcSig: '0xbdb3e1c4',
+            key: 'withdrawERC721',
+            signature: 'transferCollectible(address,address,address,uint256)',
+            label: 'Withdraw ERC721',
+            tags: ['transfer', 'withdraw', 'collectibles', 'erc721'],
+            params: ['address', 'address', 'address', 'tokenId'],
+            target: 'organ'
+        }
+    ];
+    cid;
+    address;
+    chainId;
+    metadata;
+    proposers;
+    moderators;
+    deciders;
+    withModeration;
+    forwarder;
+    proposals;
+    signer;
+    provider;
+    _contract;
+    constructor(cid, address, chainId, signerOrProvider, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals) {
+        this.cid = cid;
+        this.address = address;
+        this.chainId = chainId;
+        this.metadata = metadata;
+        this.proposers = proposers;
+        this.moderators = moderators;
+        this.deciders = deciders;
+        this.withModeration = withModeration;
+        this.forwarder = forwarder;
+        this.proposals = proposals;
+        if (signerOrProvider.provider != null) {
+            this.signer = signerOrProvider;
+            this.provider = this.signer.provider;
+        }
+        else {
+            this.provider = signerOrProvider;
+            this.signer = undefined;
+            try {
+                if (this.provider instanceof ethers_1.ethers.JsonRpcProvider) {
+                    this.provider
+                        .getSigner(this.address)
+                        .then(signer => {
+                        this.signer = signer;
+                    })
+                        .catch(error => {
+                        console.warn('Error while getting signer from provider.', error);
+                    });
+                }
+            }
+            catch (error) { }
+        }
+        this._contract = new ethers_1.ethers.Contract(address, Procedure_json_1.default, signerOrProvider);
+    }
+    static async _populateInitialize(_address, _options, _metadata, _proposers, _moderators, _deciders, _withModeration, _forwarder, ..._args) {
+        throw new Error('Procedure cannot be initialized.');
+    }
+    static async loadData(address, signerOrProvider) {
+        const contract = new ethers_1.ethers.Contract(address, Procedure_json_1.default, signerOrProvider);
+        return await contract.getProcedure();
+    }
+    static async loadProposal(address, proposalKey, signerOrProvider) {
+        const contract = new ethers_1.ethers.Contract(address, Procedure_json_1.default, signerOrProvider);
+        const proposal = await contract.getProposal(proposalKey);
+        const [creator, cid, blockReason, presented, blocked, adopted, applied] = proposal;
+        const parsedOperations = proposal.operations.map((op) => Procedure.parseOperation(op));
+        return {
+            key: proposalKey,
+            creator,
+            cid,
+            blockReason,
+            presented,
+            blocked,
+            adopted,
+            applied,
+            operations: parsedOperations
+        };
+    }
+    static async loadProposals(address, signerOrProvider) {
+        const data = await Procedure.loadData(address, signerOrProvider);
+        const proposalsLength = BigInt(data.proposalsLength);
+        const proposals = [];
+        for (let i = 0; i < proposalsLength; i++) {
+            const key = i.toString();
+            const proposal = await Procedure.loadProposal(address, key, signerOrProvider).catch((error) => {
+                console.warn('Error while loading proposal in procedure.', address, key, error.message);
+                return null;
+            });
+            if (proposal != null) {
+                proposals.push(proposal);
+            }
+        }
+        return proposals;
+    }
+    static async load(address, signerOrProvider) {
+        const provider = signerOrProvider.provider ?? signerOrProvider;
+        if (provider == null) {
+            throw new Error('No provider found.');
+        }
+        const chainId = await provider
+            .getNetwork()
+            .then(({ chainId }) => chainId.toString())
+            .catch(_err => undefined);
+        if (chainId == null) {
+            throw new Error('No chainId found.');
+        }
+        const isProcedure = await Procedure.isProcedure(address, signerOrProvider);
+        if (!isProcedure) {
+            throw new Error('Contract at address is not a Procedure.');
+        }
+        const data = await Procedure.loadData(address, signerOrProvider);
+        const proposals = await Procedure.loadProposals(address, signerOrProvider);
+        return new Procedure(data.cid, address, chainId, signerOrProvider, data.metadata, data.proposers, data.moderators, data.deciders, data.withModeration, data.forwarder, proposals);
+    }
+    static _stringifyParamType(type) {
+        switch (type) {
+            case 'cid':
+                return 'string';
+            case 'index':
+                return 'uint256';
+            case 'indexes':
+                return 'uint256[]';
+            case 'permissions':
+                return 'bytes2';
+            case 'addresses':
+                return 'address[]';
+            case 'address':
+                return 'address';
+            case 'organ':
+                return 'address';
+            case 'procedure':
+                return 'address';
+            case 'proposal':
+                return 'uint256';
+            case 'proposals':
+                return 'uint256';
+            case 'entry':
+                return '(address,string)';
+            case 'entries':
+                return '(address,string)[]';
+            case 'amount':
+                return 'uint256';
+            case 'tokenId':
+                return 'uint256';
+            default:
+                return 'uint256';
+        }
+    }
+    static _extractParams(types, operation) {
+        if (operation?.data != null) {
+            const typesArray = types.map(type => Procedure._stringifyParamType(type));
+            const decoder = ethers_1.ethers.AbiCoder.defaultAbiCoder();
+            const decodedParams = decoder.decode(typesArray, `0x${operation.data.substring(10)}`);
+            return types.map((type, index) => {
+                let _value;
+                let value = decodedParams[index];
+                if (value != null && type != null) {
+                    switch (type) {
+                        case 'cid':
+                            _value = value;
+                            value = _value[0];
+                            break;
+                        case 'entry':
+                            _value = value;
+                            value = {
+                                addr: _value[0],
+                                cid: _value[1]
+                            };
+                            break;
+                        case 'entries':
+                            _value = value;
+                            value = _value.map(e => ({
+                                addr: e[0],
+                                cid: e[1]
+                            }));
+                            break;
+                        default:
+                    }
+                }
+                return { type, value };
+            });
+        }
+        else {
+            return types.map(type => ({ type }));
+        }
+    }
+    static parseOperation(_operation) {
+        const [index, target, data, value, processed] = _operation;
+        const functionSelector = data.toString().slice(0, 10);
+        const operation = {
+            index,
+            target,
+            value,
+            data,
+            processed,
+            functionSelector
+        };
+        operation.function = Procedure.OPERATIONS_FUNCTIONS.find(pof => pof.funcSig === functionSelector);
+        if (operation.function == null) {
+            return operation;
+        }
+        operation.params =
+            operation.function.params != null
+                ? Procedure._extractParams(operation.function.params, operation)
+                : [];
+        return operation;
+    }
+    static async isProcedure(address, signerOrProvider) {
+        const contract = new ethers_1.ethers.Contract(address, Procedure_json_1.default, signerOrProvider);
+        const isERC165 = await contract.supportsInterface('0x01ffc9a7');
+        if (!isERC165)
+            return false;
+        return true;
+    }
+    async updateCid(cid, options) {
+        const tx = await this._contract.updateCid(cid);
+        if (options?.onTransaction != null) {
+            options.onTransaction(tx, `Update metadata of procedure ${this.address} with CID ${cid.toString()}`);
+        }
+        return tx;
+    }
+    async updateAdmin(address, options) {
+        const tx = await this._contract.updateAdmin(address);
+        if (options?.onTransaction != null) {
+            options.onTransaction(tx, `Update admin of procedure ${this.address} to ${address}.`);
+        }
+        return tx;
+    }
+    async propose(cid, operations, options) {
+        const signerOrProvider = this.signer ?? this.provider;
+        if (signerOrProvider == null) {
+            throw new Error('Not connected.');
+        }
+        const ops = operations.map(operation => {
+            return {
+                index: operation?.index != null && operation.index !== ''
+                    ? operation.index
+                    : '0',
+                target: operation.target,
+                data: operation.data,
+                value: operation.value,
+                processed: false
+            };
+        });
+        const tx = await this._contract.propose(cid, ops);
+        if (options?.onTransaction != null) {
+            options.onTransaction(tx, `Create proposal with CID ${cid} on procedure ${this.address}`);
+        }
+        const receipt = await tx.wait();
+        const proposalKey = receipt.logs[0].topics[2];
+        if (proposalKey == null || proposalKey === '') {
+            throw new Error('Proposal not created.');
+        }
+        const proposal = await Procedure.loadProposal(this.address, proposalKey, signerOrProvider);
+        if (proposal == null) {
+            throw new Error('Proposal not found.');
+        }
+        this.proposals.push(proposal);
+        return proposal;
+    }
+    async blockProposal(proposalKey, reason, options) {
+        const tx = await this._contract.blockProposal(proposalKey, reason);
+        if (options?.onTransaction != null) {
+            options.onTransaction(tx, `Block proposal ${proposalKey} of procedure ${this.address}`);
+        }
+        return tx.wait();
+    }
+    async presentProposal(proposalKey, options) {
+        const tx = await this._contract.presentProposal(proposalKey);
+        if (options?.onTransaction != null) {
+            options.onTransaction(tx, `Present proposal ${proposalKey} of procedure ${this.address}`);
+        }
+        return tx.wait();
+    }
+    async adoptProposal(proposalKey, options) {
+        const tx = await this._contract.adoptProposal(proposalKey);
+        if (options?.onTransaction != null) {
+            options.onTransaction(tx, `Adopt proposal ${proposalKey} of procedure ${this.address}`);
+        }
+        return tx.wait();
+    }
+    async applyProposal(proposalKey, options) {
+        const tx = await this._contract.applyProposal(proposalKey);
+        if (options?.onTransaction != null) {
+            options.onTransaction(tx, `Apply proposal ${proposalKey} of procedure ${this.address}`);
+        }
+        return tx.wait();
+    }
+    async reloadProposals() {
+        const signerOrProvider = this.signer ?? this.provider;
+        if (signerOrProvider == null) {
+            throw new Error('Not connected.');
+        }
+        const proposals = await Procedure.loadProposals(this.address, signerOrProvider);
+        this.proposals = proposals;
+        return this;
+    }
+    async reloadProposal(proposalKey) {
+        const signerOrProvider = this.signer ?? this.provider;
+        if (signerOrProvider == null) {
+            throw new Error('Not connected.');
+        }
+        const proposal = await Procedure.loadProposal(this.address, proposalKey, signerOrProvider);
+        const proposals = this.proposals.map(m => m.key === proposalKey ? proposal : m);
+        this.proposals = proposals;
+        return this;
+    }
+    async reloadData() {
+        const signerOrProvider = this.signer ?? this.provider;
+        if (signerOrProvider == null) {
+            throw new Error('Not connected.');
+        }
+        const data = await Procedure.loadData(this.address, signerOrProvider);
+        this.cid = data.cid;
+        this.proposers = data.proposers;
+        this.moderators = data.moderators;
+        this.deciders = data.deciders;
+        this.withModeration = data.withModeration;
+        return this;
+    }
+}
+exports.default = Procedure;
