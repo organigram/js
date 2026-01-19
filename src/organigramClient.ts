@@ -158,7 +158,7 @@ export class OrganigramClient {
     const procedureTypes = await Promise.all(
       procedures.map(
         async procedure =>
-          await Organigram.loadProcedureType(
+          await OrganigramClient.loadProcedureType(
             {
               addr: procedure.address,
               cid: procedure.cid
@@ -185,7 +185,7 @@ export class OrganigramClient {
     provider: ethers.Provider,
     signer?: ethers.Signer
     // ipfs?: IPFS
-  ): Promise<Organigram> {
+  ): Promise<OrganigramClient> {
     if (provider == null && signer == null) {
       throw new Error('No provider or signer.')
     }
@@ -194,7 +194,7 @@ export class OrganigramClient {
       OrganigramContractABI,
       signer ?? provider
     )
-    const procedureTypes = await Organigram.loadProcedureTypes(
+    const procedureTypes = await OrganigramClient.loadProcedureTypes(
       address,
       provider
     )
@@ -202,7 +202,7 @@ export class OrganigramClient {
       ?.getNetwork()
       .then(n => n.chainId.toString())
       .catch(() => '')
-    const newOrganigram = new Organigram(
+    const newOrganigram = new OrganigramClient(
       address,
       chainId,
       procedureTypes,
