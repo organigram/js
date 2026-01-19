@@ -3,10 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.VoteProcedure = void 0;
 const ethers_1 = require("ethers");
-const procedure_1 = __importDefault(require("../procedure"));
+const procedure_1 = require("../procedure");
 const VoteProcedure_json_1 = __importDefault(require("@organigram/protocol/abi/VoteProcedure.json"));
-class VoteProcedure extends procedure_1.default {
+class VoteProcedure extends procedure_1.Procedure {
     static INTERFACE = '0xc9d27afe';
     contract;
     quorumSize;
@@ -49,7 +50,7 @@ class VoteProcedure extends procedure_1.default {
         };
     }
     static async loadElections(address, signer) {
-        const data = await procedure_1.default.loadData(address, signer);
+        const data = await procedure_1.Procedure.loadData(address, signer);
         const proposalsLength = BigInt(data.proposalsLength);
         const elections = [];
         for (let i = 0; i < proposalsLength; i++) {
@@ -64,7 +65,7 @@ class VoteProcedure extends procedure_1.default {
         return elections;
     }
     static async load(address, signer) {
-        const procedure = await procedure_1.default.load(address, signer);
+        const procedure = await procedure_1.Procedure.load(address, signer);
         if (!procedure)
             throw new Error('Not a valid procedure.');
         const contract = new ethers_1.ethers.Contract(address, VoteProcedure_json_1.default, signer);
@@ -105,4 +106,4 @@ class VoteProcedure extends procedure_1.default {
         });
     }
 }
-exports.default = VoteProcedure;
+exports.VoteProcedure = VoteProcedure;

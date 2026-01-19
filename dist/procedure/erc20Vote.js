@@ -3,10 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ERC20VoteProcedure = void 0;
 const ethers_1 = require("ethers");
-const _1 = __importDefault(require("."));
+const _1 = require(".");
 const ERC20VoteProcedure_json_1 = __importDefault(require("@organigram/protocol/abi/ERC20VoteProcedure.json"));
-class ERC20VoteProcedure extends _1.default {
+class ERC20VoteProcedure extends _1.Procedure {
     static INTERFACE = '0xc9d27afe';
     erc20;
     quorumSize;
@@ -51,7 +52,7 @@ class ERC20VoteProcedure extends _1.default {
         };
     }
     static async loadElections(address, signerOrProvider) {
-        const data = await _1.default.loadData(address, signerOrProvider);
+        const data = await _1.Procedure.loadData(address, signerOrProvider);
         const proposalsLength = BigInt(data.proposalsLength);
         const elections = [];
         for (let i = 0; i < proposalsLength; i++) {
@@ -66,7 +67,7 @@ class ERC20VoteProcedure extends _1.default {
         return elections;
     }
     static async load(address, signerOrProvider) {
-        const procedure = await _1.default.load(address, signerOrProvider);
+        const procedure = await _1.Procedure.load(address, signerOrProvider);
         if (!procedure)
             throw new Error('Not a valid procedure.');
         const contract = new ethers_1.ethers.Contract(address, ERC20VoteProcedure_json_1.default, signerOrProvider);
@@ -136,4 +137,4 @@ class ERC20VoteProcedure extends _1.default {
         });
     }
 }
-exports.default = ERC20VoteProcedure;
+exports.ERC20VoteProcedure = ERC20VoteProcedure;

@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
-import Procedure, { type ProcedureProposal } from '.';
+import { Procedure, type ProcedureProposal } from '.';
 import { TransactionOptions } from '../organigramClient';
-export default class NominationProcedure extends Procedure {
+export declare class NominationProcedure extends Procedure {
     static INTERFACE: string;
     contract: ethers.Contract;
     constructor(cid: string, address: string, chainId: string, signerOrProvider: ethers.Signer | ethers.Provider, metadata: unknown, proposers: string, moderators: string, deciders: string, withModeration: boolean, forwarder: string, proposals: ProcedureProposal[]);

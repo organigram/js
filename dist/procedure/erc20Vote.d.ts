@@ -1,7 +1,7 @@
 import { ethers } from 'ethers';
-import Procedure, { type ProcedureProposal, type Election } from '.';
+import { Procedure, type ProcedureProposal, type Election } from '.';
 import { TransactionOptions } from '../organigramClient';
-export default class ERC20VoteProcedure extends Procedure {
+export declare class ERC20VoteProcedure extends Procedure {
     static INTERFACE: string;
     erc20: string;
     quorumSize: string;

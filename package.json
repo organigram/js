@@ -16,7 +16,7 @@
     "registry": "https://npm.pkg.github.com"
   },
   "main": "dist/index.js",
-  "types": "./types/index.d.ts",
+  "type": "module",
   "devDependencies": {
     "@microsoft/api-documenter": "^7.25.9",
     "@microsoft/api-extractor": "^7.47.4",

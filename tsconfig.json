@@ -11,8 +11,7 @@
     "rootDir": "src",
     "outDir": "dist",
     "sourceMap": false,
-    "declaration": true,
-    "declarationDir": "types"
+    "declaration": true
   },
   "exclude": ["node_modules", "types", "dist", "jest.config.ts", "tests"]
 }

@@ -3,10 +3,10 @@ import OrganigramContractABI from '@organigram/protocol/abi/Organigram.json'
 import ProcedureContractABI from '@organigram/protocol/abi/Procedure.json'
 
 import Organ from './organ'
-import Procedure from './procedure'
-import NominationProcedure from './procedure/nomination'
-import VoteProcedure from './procedure/vote'
-import ERC20VoteProcedure from './procedure/erc20Vote'
+import { Procedure } from './procedure'
+import { NominationProcedure } from './procedure/nomination'
+import { VoteProcedure } from './procedure/vote'
+import { ERC20VoteProcedure } from './procedure/erc20Vote'
 
 export interface TransactionOptions {
   nonce?: number

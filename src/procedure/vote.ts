@@ -1,9 +1,9 @@
 import { ethers } from 'ethers'
-import Procedure, { type ProcedureProposal, type Election } from '../procedure'
+import { Procedure, type ProcedureProposal, type Election } from '../procedure'
 import VoteProcedureContractABI from '@organigram/protocol/abi/VoteProcedure.json'
 import { type TransactionOptions } from '../organigramClient'
 
-export default class VoteProcedure extends Procedure {
+export class VoteProcedure extends Procedure {
   static INTERFACE = '0xc9d27afe' // vote() signature.
   contract: ethers.Contract
   quorumSize: string

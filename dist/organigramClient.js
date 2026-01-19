@@ -8,10 +8,10 @@ const ethers_1 = require("ethers");
 const Organigram_json_1 = __importDefault(require("@organigram/protocol/abi/Organigram.json"));
 const Procedure_json_1 = __importDefault(require("@organigram/protocol/abi/Procedure.json"));
 const organ_1 = __importDefault(require("./organ"));
-const procedure_1 = __importDefault(require("./procedure"));
-const nomination_1 = __importDefault(require("./procedure/nomination"));
-const vote_1 = __importDefault(require("./procedure/vote"));
-const erc20Vote_1 = __importDefault(require("./procedure/erc20Vote"));
+const procedure_1 = require("./procedure");
+const nomination_1 = require("./procedure/nomination");
+const vote_1 = require("./procedure/vote");
+const erc20Vote_1 = require("./procedure/erc20Vote");
 const procedureMetadata = {
     description: '',
     _type: 'procedureType',
@@ -23,19 +23,19 @@ const procedures = [
         key: 'nomination',
         address: '',
         metadata: { ...procedureMetadata, name: 'Nomination', type: 'nomination' },
-        Class: nomination_1.default
+        Class: nomination_1.NominationProcedure
     },
     {
         key: 'vote',
         address: '',
         metadata: { ...procedureMetadata, name: 'Vote', type: 'vote' },
-        Class: vote_1.default
+        Class: vote_1.VoteProcedure
     },
     {
         key: 'erc20Vote',
         address: '',
         metadata: { ...procedureMetadata, name: 'ERC20 Vote', type: 'erc20Vote' },
-        Class: erc20Vote_1.default
+        Class: erc20Vote_1.ERC20VoteProcedure
     }
 ];
 class OrganigramClient {
@@ -67,7 +67,7 @@ class OrganigramClient {
         if (!(await contract.supportsInterface('0x01ffc9a7'))) {
             throw new Error('Contract does not support interfaces.');
         }
-        if (!(await contract.supportsInterface(procedure_1.default.INTERFACE))) {
+        if (!(await contract.supportsInterface(procedure_1.Procedure.INTERFACE))) {
             throw new Error('Contract is not a procedure.');
         }
         if (cid === 'nomination' || cid === 'vote' || cid === 'erc20Vote') {
@@ -177,7 +177,7 @@ class OrganigramClient {
     async getContract(address, cached = true) {
         return (await organ_1.default.isOrgan(address, this.provider))
             ? await this.getOrgan(address, cached)
-            : (await procedure_1.default.isProcedure(address, this.provider))
+            : (await procedure_1.Procedure.isProcedure(address, this.provider))
                 ? await this.getProcedure(address, cached)
                 : null;
     }

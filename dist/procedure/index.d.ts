@@ -50,7 +50,7 @@ export interface ProcedureProposal {
     applied: boolean;
     operations: ProcedureProposalOperation[];
 }
-export default class Procedure {
+export declare class Procedure {
     static INTERFACE: string;
     static OPERATIONS_FUNCTIONS: ProcedureProposalOperationFunction[];
     cid: string;

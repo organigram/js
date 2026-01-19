@@ -99,7 +99,7 @@ export interface ProcedureProposal {
   operations: ProcedureProposalOperation[]
 }
 
-export default class Procedure {
+export class Procedure {
   static INTERFACE = '0x71dbd330' // Procedure.INTERFACE_ID
 
   // @todo : Implement a registry.

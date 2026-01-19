@@ -3,10 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.NominationProcedure = void 0;
 const ethers_1 = require("ethers");
 const NominationProcedure_json_1 = __importDefault(require("@organigram/protocol/abi/NominationProcedure.json"));
-const _1 = __importDefault(require("."));
-class NominationProcedure extends _1.default {
+const _1 = require(".");
+class NominationProcedure extends _1.Procedure {
     static INTERFACE = '0xc5f28e49';
     contract;
     constructor(cid, address, chainId, signerOrProvider, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals) {
@@ -21,7 +22,7 @@ class NominationProcedure extends _1.default {
         return await contract.initialize.populateTransaction(cid, proposers, moderators, deciders, false, forwarder);
     }
     static async load(address, signerOrProvider) {
-        const procedure = await _1.default.load(address, signerOrProvider);
+        const procedure = await _1.Procedure.load(address, signerOrProvider);
         if (!procedure)
             throw new Error('Not a valid procedure.');
         return new NominationProcedure(procedure.cid, procedure.address, procedure.chainId, signerOrProvider, procedure.metadata, procedure.proposers, procedure.moderators, procedure.deciders, procedure.withModeration, procedure.forwarder, procedure.proposals);
@@ -37,4 +38,4 @@ class NominationProcedure extends _1.default {
         return receipt.status === 1;
     }
 }
-exports.default = NominationProcedure;
+exports.NominationProcedure = NominationProcedure;

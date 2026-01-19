@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Procedure = void 0;
 const Procedure_json_1 = __importDefault(require("@organigram/protocol/abi/Procedure.json"));
 const ethers_1 = require("ethers");
 class Procedure {
@@ -413,4 +414,4 @@ class Procedure {
         return this;
     }
 }
-exports.default = Procedure;
+exports.Procedure = Procedure;
