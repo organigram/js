@@ -8,7 +8,7 @@ import {
   formatEther
 } from 'ethers'
 
-const ERC20_INITIAL_SUPPLY = '10000000000000000000000000' // 1 million tokens.
+const ERC20_INITIAL_SUPPLY = '10000000000000000000000000' // 10 million tokens.
 
 export interface Asset {
   contract: EthersContract
@@ -41,7 +41,7 @@ export const getAssetData = async (
 }
 
 export const deployERC20 = async (
-  signer: Signer
+  signer?: Signer | null
 ): Promise<BaseContract & Omit<BaseContract, keyof BaseContract>> => {
   const erc777Interface = new ethers.Interface(ExampleCoin.abi)
   const factory = new ethers.ContractFactory(

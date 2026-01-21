@@ -1,28 +1,22 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.NominationProcedure = void 0;
-const ethers_1 = require("ethers");
-const NominationProcedure_json_1 = __importDefault(require("@organigram/protocol/abi/NominationProcedure.json"));
-const _1 = require(".");
-class NominationProcedure extends _1.Procedure {
+import { ethers } from 'ethers';
+import NominationProcedureContractABI from '@organigram/protocol/abi/NominationProcedure.json';
+import { Procedure } from '.';
+export class NominationProcedure extends Procedure {
     static INTERFACE = '0xc5f28e49';
     contract;
     constructor(cid, address, chainId, signerOrProvider, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals) {
         super(cid, address, chainId, signerOrProvider, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals);
-        this.contract = new ethers_1.ethers.Contract(address, NominationProcedure_json_1.default, signerOrProvider);
+        this.contract = new ethers.Contract(address, NominationProcedureContractABI, signerOrProvider);
     }
     static async _populateInitialize(type, options, cid, proposers, moderators, deciders, _withModeration, forwarder, ..._args) {
         if (options.signer == null) {
             throw new Error('Not connected.');
         }
-        const contract = new ethers_1.ethers.Contract(type, NominationProcedure_json_1.default, options.signer);
+        const contract = new ethers.Contract(type, NominationProcedureContractABI, options.signer);
         return await contract.initialize.populateTransaction(cid, proposers, moderators, deciders, false, forwarder);
     }
     static async load(address, signerOrProvider) {
-        const procedure = await _1.Procedure.load(address, signerOrProvider);
+        const procedure = await Procedure.load(address, signerOrProvider);
         if (!procedure)
             throw new Error('Not a valid procedure.');
         return new NominationProcedure(procedure.cid, procedure.address, procedure.chainId, signerOrProvider, procedure.metadata, procedure.proposers, procedure.moderators, procedure.deciders, procedure.withModeration, procedure.forwarder, procedure.proposals);
@@ -38,4 +32,3 @@ class NominationProcedure extends _1.Procedure {
         return receipt.status === 1;
     }
 }
-exports.NominationProcedure = NominationProcedure;

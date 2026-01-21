@@ -1,15 +1,19 @@
 import { strictEqual } from 'assert'
+import deployedAddresses from '@organigram/protocol/ignition/deployments/chain-11155111/deployed_addresses.json'
 import { ethers, JsonRpcProvider, Signer } from 'ethers'
-import { Organigram, type Organ, type ProcedureProposalOperation } from '../src'
+import {
+  OrganigramClient,
+  type Organ,
+  type ProcedureProposalOperation
+} from '../src'
 // import { CID } from 'multiformats/cid'
-import NominationProcedure from '../src/nomination'
-import VoteProcedure from '../src/vote'
-import ERC20VoteProcedure from '../src/erc20Vote'
-import { type TransactionOptions } from '../types/types'
+import { NominationProcedure } from '../src/procedure/nomination'
+import { VoteProcedure } from '../src/procedure/vote'
+import { ERC20VoteProcedure } from '../src/procedure/erc20Vote'
+import { type TransactionOptions } from '../src/organigramClient'
 
 const ETHEREUM_PROVIDER = process.env.ETHEREUM_PROVIDER as string
-const ORGANIGRAM = process.env.NEXT_PUBLIC_GANACHE_MANAGER as string
-const ERC20_EXAMPLE = process.env.ERC20_EXAMPLE as string
+const ERC20_EXAMPLE = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238' // Sepolia USDC
 // const ERC721_EXAMPLE = process.env.ERC721_EXAMPLE
 // const ERC1155_EXAMPLE = process.env.ERC1155_EXAMPLE
 
@@ -24,7 +28,7 @@ const txOptions: TransactionOptions = {
 //   return node
 // }
 
-describe('Organigram', () => {
+describe('Organigram JS Client', () => {
   let provider: JsonRpcProvider
   let signer: Signer
   // let ipfs: IPFS.IPFS
@@ -47,34 +51,38 @@ describe('Organigram', () => {
     it('should connect Web3 to a provider', async () => {
       const network = await provider.getNetwork()
 
-      strictEqual(network.chainId, 1337)
-      strictEqual(network.name, 'unknown')
+      strictEqual(network.chainId, 11155111n)
+      strictEqual(network.name, 'sepolia')
     })
 
     it('should provide signer with funds', async () => {
-      const chainId = await signer.getChainId()
+      const chainId = (await signer.provider?.getNetwork())?.chainId
       const address = await signer.getAddress()
-      const balance = await signer.getBalance()
+      const balance = await signer.provider?.getBalance(address)
 
-      strictEqual(chainId, 1337)
+      strictEqual(chainId, 11155111n)
       strictEqual(address != null && address !== '', true)
-      strictEqual(balance.gt(0), true)
+      strictEqual(balance != null && balance > 0n, true)
     })
   })
 
   describe('Protocol', () => {
-    let organigram: Organigram
+    let organigramClient: OrganigramClient
 
     beforeEach(async () => {
-      organigram = await Organigram.load(ORGANIGRAM, provider, signer)
+      organigramClient = await OrganigramClient.load(
+        deployedAddresses['OrganigramClientModule#OrganigramClient'],
+        provider,
+        signer
+      )
     })
 
-    it('should connect to the deployed protocol', async () => {
-      strictEqual(organigram?.address != null, true)
+    it('should connect to the deployed client', async () => {
+      strictEqual(organigramClient?.address != null, true)
     })
 
     it('should create an organ', async () => {
-      organ = await organigram.createOrgan(
+      organ = await organigramClient.createOrgan(
         '',
         await signer.getAddress(),
         txOptions
@@ -88,15 +96,15 @@ describe('Organigram', () => {
 
       it('should create a nomination procedure', async () => {
         const address = await signer.getAddress()
-        procedure = (await organigram.createProcedure(
-          organigram.procedureTypes[0].address,
+        procedure = (await organigramClient.createProcedure(
+          organigramClient.procedureTypes[0].address,
           txOptions,
           '',
           address,
           address,
           address,
           false,
-          process.env.NEXT_PUBLIC_GOERLI_GAS_STATION_FORWARDER as string
+          process.env.NEXT_PUBLIC_SEPOLIA_GAS_STATION_FORWARDER as string
         )) as unknown as NominationProcedure
 
         strictEqual(procedure?.address != null, true)
@@ -111,7 +119,7 @@ describe('Organigram', () => {
 
       it('should create a proposal', async () => {
         const randomWallet = ethers.Wallet.createRandom()
-        const data = await organ.contract.populateTransaction.addEntries([
+        const data = await organ.contract.addEntries.populateTransaction([
           {
             addr: randomWallet.address,
             cid: ''
@@ -140,7 +148,7 @@ describe('Organigram', () => {
       it('should block a proposal', async () => {
         // Creating a new proposal
         const randomWallet = ethers.Wallet.createRandom()
-        const data = await organ.contract.populateTransaction.addEntries([
+        const data = await organ.contract.addEntries.populateTransaction([
           {
             addr: randomWallet.address,
             cid: ''
@@ -164,7 +172,6 @@ describe('Organigram', () => {
           proposal.key,
           signer
         )
-
         strictEqual(receipt.status, 1)
         strictEqual(payload.blocked, true)
       })
@@ -176,14 +183,15 @@ describe('Organigram', () => {
 
       it('should create a vote procedure', async () => {
         const address = await signer.getAddress()
-        procedure = (await organigram.createProcedure(
-          organigram.procedureTypes[1].address,
+        procedure = (await organigramClient.createProcedure(
+          organigramClient.procedureTypes[1].address,
           txOptions,
           '',
           address,
           address,
           address,
           false,
+          process.env.NEXT_PUBLIC_SEPOLIA_GAS_STATION_FORWARDER as string,
           '1',
           '8',
           '1'
@@ -201,7 +209,7 @@ describe('Organigram', () => {
 
       it('should create a proposal', async () => {
         const randomWallet = ethers.Wallet.createRandom()
-        const data = await organ.contract.populateTransaction.addEntries([
+        const data = await organ.contract.addEntries.populateTransaction([
           {
             addr: randomWallet.address,
             cid: ''
@@ -224,7 +232,7 @@ describe('Organigram', () => {
       it('should block a proposal', async () => {
         // Creating a new proposal
         const randomWallet = ethers.Wallet.createRandom()
-        const data = await organ.contract.populateTransaction.addEntries([
+        const data = await organ.contract.addEntries.populateTransaction([
           {
             addr: randomWallet.address,
             cid: ''
@@ -248,7 +256,6 @@ describe('Organigram', () => {
           proposal.key,
           signer
         )
-
         strictEqual(receipt.status, 1)
         strictEqual(payload.blocked, true)
       })
@@ -260,14 +267,15 @@ describe('Organigram', () => {
 
       it('should create an erc20Vote procedure', async () => {
         const address = await signer.getAddress()
-        procedure = (await organigram.createProcedure(
-          organigram.procedureTypes[2].address,
+        procedure = (await organigramClient.createProcedure(
+          organigramClient.procedureTypes[2].address,
           txOptions,
           '',
           address,
           address,
           address,
           false,
+          process.env.NEXT_PUBLIC_SEPOLIA_GAS_STATION_FORWARDER as string,
           ERC20_EXAMPLE,
           '1',
           '1',
@@ -286,7 +294,7 @@ describe('Organigram', () => {
 
       it('should create a proposal', async () => {
         const randomWallet = ethers.Wallet.createRandom()
-        const data = await organ.contract.populateTransaction.addEntries([
+        const data = await organ.contract.addEntries.populateTransaction([
           {
             addr: randomWallet.address,
             cid: ''
@@ -309,7 +317,7 @@ describe('Organigram', () => {
       it('should block a proposal', async () => {
         // Creating a new proposal
         const randomWallet = ethers.Wallet.createRandom()
-        const data = await organ.contract.populateTransaction.addEntries([
+        const data = await organ.contract.addEntries.populateTransaction([
           {
             addr: randomWallet.address,
             cid: ''
@@ -333,7 +341,6 @@ describe('Organigram', () => {
           proposal.key,
           signer
         )
-
         strictEqual(receipt.status, 1)
         strictEqual(payload.blocked, true)
       })

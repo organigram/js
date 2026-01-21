@@ -1,17 +1,11 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.OrganigramClient = void 0;
-const ethers_1 = require("ethers");
-const Organigram_json_1 = __importDefault(require("@organigram/protocol/abi/Organigram.json"));
-const Procedure_json_1 = __importDefault(require("@organigram/protocol/abi/Procedure.json"));
-const organ_1 = __importDefault(require("./organ"));
-const procedure_1 = require("./procedure");
-const nomination_1 = require("./procedure/nomination");
-const vote_1 = require("./procedure/vote");
-const erc20Vote_1 = require("./procedure/erc20Vote");
+import { ethers } from 'ethers';
+import OrganigramContractABI from '@organigram/protocol/abi/Organigram.json';
+import ProcedureContractABI from '@organigram/protocol/abi/Procedure.json';
+import Organ from './organ';
+import { Procedure } from './procedure';
+import { NominationProcedure } from './procedure/nomination';
+import { VoteProcedure } from './procedure/vote';
+import { ERC20VoteProcedure } from './procedure/erc20Vote';
 const procedureMetadata = {
     description: '',
     _type: 'procedureType',
@@ -23,22 +17,22 @@ const procedures = [
         key: 'nomination',
         address: '',
         metadata: { ...procedureMetadata, name: 'Nomination', type: 'nomination' },
-        Class: nomination_1.NominationProcedure
+        Class: NominationProcedure
     },
     {
         key: 'vote',
         address: '',
         metadata: { ...procedureMetadata, name: 'Vote', type: 'vote' },
-        Class: vote_1.VoteProcedure
+        Class: VoteProcedure
     },
     {
         key: 'erc20Vote',
         address: '',
         metadata: { ...procedureMetadata, name: 'ERC20 Vote', type: 'erc20Vote' },
-        Class: erc20Vote_1.ERC20VoteProcedure
+        Class: ERC20VoteProcedure
     }
 ];
-class OrganigramClient {
+export class OrganigramClient {
     address;
     chainId;
     procedureTypes;
@@ -60,14 +54,14 @@ class OrganigramClient {
         this.contract = contract;
     }
     static async loadProcedureType({ addr, cid }, provider) {
-        const contract = new ethers_1.ethers.Contract(addr, Procedure_json_1.default, provider);
+        const contract = new ethers.Contract(addr, ProcedureContractABI, provider);
         let Class;
         let metadata;
         let name = '';
         if (!(await contract.supportsInterface('0x01ffc9a7'))) {
             throw new Error('Contract does not support interfaces.');
         }
-        if (!(await contract.supportsInterface(procedure_1.Procedure.INTERFACE))) {
+        if (!(await contract.supportsInterface(Procedure.INTERFACE))) {
             throw new Error('Contract is not a procedure.');
         }
         if (cid === 'nomination' || cid === 'vote' || cid === 'erc20Vote') {
@@ -88,9 +82,9 @@ class OrganigramClient {
         };
     }
     static async loadProcedureTypes(address, provider) {
-        const contract = new ethers_1.ethers.Contract(address, Organigram_json_1.default, provider);
+        const contract = new ethers.Contract(address, OrganigramContractABI, provider);
         const proceduresRegistry = (await contract.procedures()).toString();
-        const procedures = await organ_1.default.loadEntries(proceduresRegistry, provider);
+        const procedures = await Organ.loadEntries(proceduresRegistry, provider);
         const procedureTypes = await Promise.all(procedures.map(async (procedure) => await OrganigramClient.loadProcedureType({
             addr: procedure.address,
             cid: procedure.cid
@@ -101,7 +95,7 @@ class OrganigramClient {
         if (provider == null && signer == null) {
             throw new Error('No provider or signer.');
         }
-        const contract = new ethers_1.ethers.Contract(address, Organigram_json_1.default, signer ?? provider);
+        const contract = new ethers.Contract(address, OrganigramContractABI, signer ?? provider);
         const procedureTypes = await OrganigramClient.loadProcedureTypes(address, provider);
         const chainId = await provider
             ?.getNetwork()
@@ -124,7 +118,7 @@ class OrganigramClient {
             c.chainId === this.chainId);
         let organ = cached && index > 0 ? this.organs[parseInt(index.toString())] : undefined;
         if (organ == null && this.provider != null) {
-            organ = await organ_1.default.load(address, this.signer ?? this.provider).catch((error) => {
+            organ = await Organ.load(address, this.signer ?? this.provider).catch((error) => {
                 console.error('Error loading organ ', address, error.message);
                 return undefined;
             });
@@ -175,9 +169,9 @@ class OrganigramClient {
         return procedure;
     }
     async getContract(address, cached = true) {
-        return (await organ_1.default.isOrgan(address, this.provider))
+        return (await Organ.isOrgan(address, this.provider))
             ? await this.getOrgan(address, cached)
-            : (await procedure_1.Procedure.isProcedure(address, this.provider))
+            : (await Procedure.isProcedure(address, this.provider))
                 ? await this.getProcedure(address, cached)
                 : null;
     }
@@ -281,5 +275,4 @@ class OrganigramClient {
         });
     }
 }
-exports.OrganigramClient = OrganigramClient;
-exports.default = OrganigramClient;
+export default OrganigramClient;

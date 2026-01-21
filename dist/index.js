@@ -1,24 +1,8 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-__exportStar(require("./asset"), exports);
-__exportStar(require("./organ"), exports);
-__exportStar(require("./procedure"), exports);
-__exportStar(require("./procedure/nomination"), exports);
-__exportStar(require("./procedure/vote"), exports);
-__exportStar(require("./procedure/erc20Vote"), exports);
-__exportStar(require("./organigramClient"), exports);
-__exportStar(require("./utils"), exports);
+export * from './asset';
+export * from './organ';
+export * from './organigramClient';
+export * from './procedure';
+export * from './procedure/nomination';
+export * from './procedure/vote';
+export * from './procedure/erc20Vote';
+export * from './utils';

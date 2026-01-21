@@ -54,7 +54,7 @@ export class Organ {
   provider?: ethers.Provider
   contract: ethers.Contract
 
-  public constructor ({
+  public constructor({
     address,
     chainId,
     signerOrProvider,
@@ -143,7 +143,9 @@ export class Organ {
     indexes: string[],
     options?: TransactionOptions
   ): Promise<ethers.Transaction> => {
-    const tx = await this.contract.removeEntries(indexes, { nonce: options?.nonce })
+    const tx = await this.contract.removeEntries(indexes, {
+      nonce: options?.nonce
+    })
     if (options?.onTransaction != null) {
       options.onTransaction(
         tx,
@@ -234,7 +236,7 @@ export class Organ {
   }
 
   /* Static API */
-  static async load (
+  static async load(
     address: string,
     signerOrProvider: ethers.Signer | ethers.Provider
   ): Promise<Organ> {
@@ -274,7 +276,7 @@ export class Organ {
     })
   }
 
-  static async isOrgan (
+  static async isOrgan(
     address: string,
     signerOrProvider: ethers.Signer | ethers.Provider
   ): Promise<boolean> {
@@ -285,11 +287,10 @@ export class Organ {
     )
     const isERC165 = await contract.supportsInterface('0x01ffc9a7')
     if (isERC165 === false) return false
-    // eslint-disable-next-line @typescript-eslint/return-await
     return await contract.supportsInterface(Organ.INTERFACE)
   }
 
-  static async getBalance (
+  static async getBalance(
     address: string,
     signerOrProvider: ethers.Signer | ethers.Provider
   ): Promise<bigint> {
@@ -300,7 +301,7 @@ export class Organ {
     return await balance
   }
 
-  static async loadData (
+  static async loadData(
     address: string,
     signerOrProvider: ethers.Signer | ethers.Provider
   ): Promise<{
@@ -314,13 +315,12 @@ export class Organ {
       OrganContractABI,
       signerOrProvider
     )
-    // eslint-disable-next-line @typescript-eslint/return-await
     return await contract.getOrgan().catch((e: Error) => {
       console.error(e.message)
     })
   }
 
-  static async loadEntryForAccount (
+  static async loadEntryForAccount(
     address: string,
     account: string,
     signerOrProvider: ethers.Signer | ethers.Provider
@@ -336,7 +336,7 @@ export class Organ {
     )
   }
 
-  static async loadPermissions (
+  static async loadPermissions(
     address: string,
     procedure: string,
     signerOrProvider: ethers.Signer | ethers.Provider
@@ -356,7 +356,7 @@ export class Organ {
       )
   }
 
-  static async loadProcedure (
+  static async loadProcedure(
     address: string,
     index: string,
     signerOrProvider: ethers.Signer | ethers.Provider
@@ -381,7 +381,7 @@ export class Organ {
     }
   }
 
-  static async loadProcedures (
+  static async loadProcedures(
     address: string,
     signerOrProvider: ethers.Signer | ethers.Provider
   ): Promise<OrganProcedure[]> {
@@ -406,7 +406,7 @@ export class Organ {
     return procedures
   }
 
-  static async loadEntry (
+  static async loadEntry(
     address: string,
     index: string,
     signerOrProvider: ethers.Signer | ethers.Provider
@@ -420,7 +420,7 @@ export class Organ {
     return { index, address: entry.addr, cid: entry.cid }
   }
 
-  static async loadEntries (
+  static async loadEntries(
     address: string,
     signerOrProvider: ethers.Signer | ethers.Provider
   ): Promise<OrganEntry[]> {
@@ -454,7 +454,7 @@ export class Organ {
   /**
    * Generate the encoded ABI with arguments, used for building Operations.
    */
-  static async populateTransaction (
+  static async populateTransaction(
     address: string,
     signer: ethers.Signer,
     functionName: OrganFunctionName,
@@ -465,7 +465,7 @@ export class Organ {
   }
 
   /* Sync API */
-  async reload (): Promise<Organ> {
+  async reload(): Promise<Organ> {
     const signerOrProvider = this.signer ?? this.provider
     if (signerOrProvider == null) {
       throw new Error('Not connected.')
@@ -480,7 +480,7 @@ export class Organ {
     return this
   }
 
-  async reloadEntries (): Promise<Organ> {
+  async reloadEntries(): Promise<Organ> {
     const signerOrProvider = this.signer ?? this.provider
     if (signerOrProvider == null) {
       throw new Error('Not connected.')
@@ -499,7 +499,7 @@ export class Organ {
     return this
   }
 
-  async reloadProcedures (): Promise<Organ> {
+  async reloadProcedures(): Promise<Organ> {
     const signerOrProvider = this.signer ?? this.provider
     if (signerOrProvider == null) {
       throw new Error('Not connected.')
@@ -518,7 +518,7 @@ export class Organ {
     return this
   }
 
-  async reloadData (): Promise<Organ> {
+  async reloadData(): Promise<Organ> {
     const signerOrProvider = this.signer ?? this.provider
     if (signerOrProvider == null) {
       throw new Error('Not connected.')

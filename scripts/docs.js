@@ -97,7 +97,7 @@ pnpm add ${declarations.name}
 ### Init
 
 \`\`\`js init.js
-// from ../../code-examples/initOrganigram.ts
+// from ../../code-examples/initOrganigramClient.ts
 \`\`\`
 
 ### Classes

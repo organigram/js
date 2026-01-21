@@ -1,13 +1,7 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.VoteProcedure = void 0;
-const ethers_1 = require("ethers");
-const procedure_1 = require("../procedure");
-const VoteProcedure_json_1 = __importDefault(require("@organigram/protocol/abi/VoteProcedure.json"));
-class VoteProcedure extends procedure_1.Procedure {
+import { ethers } from 'ethers';
+import { Procedure } from '../procedure';
+import VoteProcedureContractABI from '@organigram/protocol/abi/VoteProcedure.json';
+export class VoteProcedure extends Procedure {
     static INTERFACE = '0xc9d27afe';
     contract;
     quorumSize;
@@ -20,17 +14,17 @@ class VoteProcedure extends procedure_1.Procedure {
         this.voteDuration = voteDuration;
         this.majoritySize = majoritySize;
         this.elections = elections;
-        this.contract = new ethers_1.ethers.Contract(address, VoteProcedure_json_1.default, signer);
+        this.contract = new ethers.Contract(address, VoteProcedureContractABI, signer);
     }
     static async _populateInitialize(type, options, cid, proposers, moderators, deciders, withModeration, forwarder, quorumSize, voteDuration, majoritySize) {
         if (options.signer == null) {
             throw new Error('Not connected.');
         }
-        const contract = new ethers_1.ethers.Contract(type, VoteProcedure_json_1.default, options.signer);
+        const contract = new ethers.Contract(type, VoteProcedureContractABI, options.signer);
         return await contract.initialize.populateTransaction(cid, proposers, moderators, deciders, withModeration, forwarder, quorumSize, voteDuration, majoritySize);
     }
     static async loadElection(address, proposalKey, signer) {
-        const contract = new ethers_1.ethers.Contract(address, VoteProcedure_json_1.default, signer);
+        const contract = new ethers.Contract(address, VoteProcedureContractABI, signer);
         const election = await contract.getElection(proposalKey);
         if (!election.start)
             throw new Error('Election not found.');
@@ -50,7 +44,7 @@ class VoteProcedure extends procedure_1.Procedure {
         };
     }
     static async loadElections(address, signer) {
-        const data = await procedure_1.Procedure.loadData(address, signer);
+        const data = await Procedure.loadData(address, signer);
         const proposalsLength = BigInt(data.proposalsLength);
         const elections = [];
         for (let i = 0; i < proposalsLength; i++) {
@@ -65,10 +59,10 @@ class VoteProcedure extends procedure_1.Procedure {
         return elections;
     }
     static async load(address, signer) {
-        const procedure = await procedure_1.Procedure.load(address, signer);
+        const procedure = await Procedure.load(address, signer);
         if (!procedure)
             throw new Error('Not a valid procedure.');
-        const contract = new ethers_1.ethers.Contract(address, VoteProcedure_json_1.default, signer);
+        const contract = new ethers.Contract(address, VoteProcedureContractABI, signer);
         const quorumSize = await contract.quorumSize();
         const voteDuration = await contract.voteDuration();
         const majoritySize = await contract.majoritySize();
@@ -106,4 +100,3 @@ class VoteProcedure extends procedure_1.Procedure {
         });
     }
 }
-exports.VoteProcedure = VoteProcedure;

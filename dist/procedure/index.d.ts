@@ -1,4 +1,4 @@
-import { type ContractTransaction, ethers } from 'ethers';
+import { type ContractTransactionReceipt, ethers } from 'ethers';
 import type { TransactionOptions } from '../organigramClient';
 export type Election = {
     proposalKey: string;
@@ -7,18 +7,23 @@ export type Election = {
     hasVoted: boolean;
     approved?: boolean;
 };
+export type AccountInOrgans = {
+    moderators?: boolean;
+    proposers?: boolean;
+    deciders?: boolean;
+};
 export type OperationTag = 'cid' | 'entries' | 'procedures' | 'coins' | 'collectibles' | 'erc721' | 'erc20' | 'erc1155' | 'ether' | 'add' | 'replace' | 'remove' | 'deposit' | 'withdraw' | 'transfer';
 export type OperationParamType = 'cid' | 'entry' | 'entries' | 'address' | 'addresses' | 'index' | 'indexes' | 'organ' | 'procedure' | 'permissions' | 'proposal' | 'proposals' | 'amount' | 'tokenId';
 export type OperationParamAction = 'select' | 'create' | 'update' | 'delete' | 'withdraw' | 'deposit' | 'transfer' | 'block';
 export interface OperationParam {
-    type: string;
+    type: OperationParamType;
     action?: OperationParamAction;
     value?: unknown;
     parser?: unknown;
 }
 export interface ProcedureProposalOperationFunction {
     funcSig: string;
-    key: string;
+    key: ProposalKey;
     signature?: string;
     label?: string;
     tags?: OperationTag[];
@@ -40,7 +45,7 @@ export interface ProcedureProposalOperation {
     description?: string;
 }
 export interface ProcedureProposal {
-    key: string;
+    key: ProposalKey;
     creator: string;
     cid: string;
     blockReason: string;
@@ -51,6 +56,7 @@ export interface ProcedureProposal {
     operations: ProcedureProposalOperation[];
     metadata?: ProposalMetadata;
 }
+export type ProposalKey = 'addEntries' | 'removeEntries' | 'replaceEntry' | 'addProcedure' | 'removeProcedure' | 'replaceProcedure' | 'updateMetadata' | 'transfer' | string;
 export interface ProposalMetadata {
     title: string;
     subtitle?: string;
@@ -99,10 +105,10 @@ export declare class Procedure {
     updateCid(cid: string, options?: TransactionOptions): Promise<ethers.Transaction>;
     updateAdmin(address: string, options?: TransactionOptions): Promise<ethers.Transaction>;
     propose(cid: string, operations: ProcedureProposalOperation[], options?: TransactionOptions): Promise<ProcedureProposal>;
-    blockProposal(proposalKey: string, reason: string, options?: TransactionOptions): Promise<ContractTransaction>;
-    presentProposal(proposalKey: string, options?: TransactionOptions): Promise<ContractTransaction>;
-    adoptProposal(proposalKey: string, options?: TransactionOptions): Promise<ContractTransaction>;
-    applyProposal(proposalKey: string, options?: TransactionOptions): Promise<ContractTransaction>;
+    blockProposal(proposalKey: string, reason: string, options?: TransactionOptions): Promise<ContractTransactionReceipt>;
+    presentProposal(proposalKey: string, options?: TransactionOptions): Promise<ContractTransactionReceipt>;
+    adoptProposal(proposalKey: string, options?: TransactionOptions): Promise<ContractTransactionReceipt>;
+    applyProposal(proposalKey: string, options?: TransactionOptions): Promise<ContractTransactionReceipt>;
     reloadProposals(): Promise<Procedure>;
     reloadProposal(proposalKey: string): Promise<Procedure>;
     reloadData(): Promise<Procedure>;

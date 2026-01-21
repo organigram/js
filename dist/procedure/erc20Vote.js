@@ -1,13 +1,7 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ERC20VoteProcedure = void 0;
-const ethers_1 = require("ethers");
-const _1 = require(".");
-const ERC20VoteProcedure_json_1 = __importDefault(require("@organigram/protocol/abi/ERC20VoteProcedure.json"));
-class ERC20VoteProcedure extends _1.Procedure {
+import { ethers } from 'ethers';
+import { Procedure } from '.';
+import ERC20VoteProcedureContractABI from '@organigram/protocol/abi/ERC20VoteProcedure.json';
+export class ERC20VoteProcedure extends Procedure {
     static INTERFACE = '0xc9d27afe';
     erc20;
     quorumSize;
@@ -22,17 +16,17 @@ class ERC20VoteProcedure extends _1.Procedure {
         this.voteDuration = voteDuration;
         this.majoritySize = majoritySize;
         this.elections = elections;
-        this.contract = new ethers_1.ethers.Contract(address, ERC20VoteProcedure_json_1.default, signerOrProvider);
+        this.contract = new ethers.Contract(address, ERC20VoteProcedureContractABI, signerOrProvider);
     }
     static async _populateInitialize(type, options, cid, proposers, moderators, deciders, withModeration, forwarder, erc20, quorumSize, voteDuration, majoritySize) {
         if (options.signer == null) {
             throw new Error('Not connected.');
         }
-        const contract = new ethers_1.ethers.Contract(type, ERC20VoteProcedure_json_1.default, options.signer);
+        const contract = new ethers.Contract(type, ERC20VoteProcedureContractABI, options.signer);
         return await contract.initialize.populateTransaction(cid, proposers, moderators, deciders, withModeration, forwarder, erc20, quorumSize, voteDuration, majoritySize);
     }
     static async loadElection(address, proposalKey, signerOrProvider) {
-        const contract = new ethers_1.ethers.Contract(address, ERC20VoteProcedure_json_1.default, signerOrProvider);
+        const contract = new ethers.Contract(address, ERC20VoteProcedureContractABI, signerOrProvider);
         const election = await contract.getElection(proposalKey);
         if (!election.start)
             throw new Error('Election not found.');
@@ -52,7 +46,7 @@ class ERC20VoteProcedure extends _1.Procedure {
         };
     }
     static async loadElections(address, signerOrProvider) {
-        const data = await _1.Procedure.loadData(address, signerOrProvider);
+        const data = await Procedure.loadData(address, signerOrProvider);
         const proposalsLength = BigInt(data.proposalsLength);
         const elections = [];
         for (let i = 0; i < proposalsLength; i++) {
@@ -67,10 +61,10 @@ class ERC20VoteProcedure extends _1.Procedure {
         return elections;
     }
     static async load(address, signerOrProvider) {
-        const procedure = await _1.Procedure.load(address, signerOrProvider);
+        const procedure = await Procedure.load(address, signerOrProvider);
         if (!procedure)
             throw new Error('Not a valid procedure.');
-        const contract = new ethers_1.ethers.Contract(address, ERC20VoteProcedure_json_1.default, signerOrProvider);
+        const contract = new ethers.Contract(address, ERC20VoteProcedureContractABI, signerOrProvider);
         const erc20 = await contract.tokenContract();
         const quorumSize = await contract.quorumSize();
         const voteDuration = await contract.voteDuration();
@@ -112,7 +106,7 @@ class ERC20VoteProcedure extends _1.Procedure {
         if (signerOrProvider == null) {
             throw new Error('Not connected.');
         }
-        const erc20Contract = new ethers_1.ethers.Contract(erc20, ERC20_ABI, signerOrProvider);
+        const erc20Contract = new ethers.Contract(erc20, ERC20_ABI, signerOrProvider);
         if (this.signer == null && account == null) {
             return BigInt(0);
         }
@@ -137,4 +131,3 @@ class ERC20VoteProcedure extends _1.Procedure {
         });
     }
 }
-exports.ERC20VoteProcedure = ERC20VoteProcedure;

@@ -1,12 +1,6 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Procedure = void 0;
-const Procedure_json_1 = __importDefault(require("@organigram/protocol/abi/Procedure.json"));
-const ethers_1 = require("ethers");
-class Procedure {
+import ProcedureContractABI from '@organigram/protocol/abi/Procedure.json';
+import { ethers } from 'ethers';
+export class Procedure {
     static INTERFACE = '0x71dbd330';
     static OPERATIONS_FUNCTIONS = [
         {
@@ -132,7 +126,7 @@ class Procedure {
             this.provider = signerOrProvider;
             this.signer = undefined;
             try {
-                if (this.provider instanceof ethers_1.ethers.JsonRpcProvider) {
+                if (this.provider instanceof ethers.JsonRpcProvider) {
                     this.provider
                         .getSigner(this.address)
                         .then(signer => {
@@ -145,17 +139,17 @@ class Procedure {
             }
             catch (error) { }
         }
-        this._contract = new ethers_1.ethers.Contract(address, Procedure_json_1.default, signerOrProvider);
+        this._contract = new ethers.Contract(address, ProcedureContractABI, signerOrProvider);
     }
     static async _populateInitialize(_address, _options, _metadata, _proposers, _moderators, _deciders, _withModeration, _forwarder, ..._args) {
         throw new Error('Procedure cannot be initialized.');
     }
     static async loadData(address, signerOrProvider) {
-        const contract = new ethers_1.ethers.Contract(address, Procedure_json_1.default, signerOrProvider);
+        const contract = new ethers.Contract(address, ProcedureContractABI, signerOrProvider);
         return await contract.getProcedure();
     }
     static async loadProposal(address, proposalKey, signerOrProvider) {
-        const contract = new ethers_1.ethers.Contract(address, Procedure_json_1.default, signerOrProvider);
+        const contract = new ethers.Contract(address, ProcedureContractABI, signerOrProvider);
         const proposal = await contract.getProposal(proposalKey);
         const [creator, cid, blockReason, presented, blocked, adopted, applied] = proposal;
         const parsedOperations = proposal.operations.map((op) => Procedure.parseOperation(op));
@@ -244,7 +238,7 @@ class Procedure {
     static _extractParams(types, operation) {
         if (operation?.data != null) {
             const typesArray = types.map(type => Procedure._stringifyParamType(type));
-            const decoder = ethers_1.ethers.AbiCoder.defaultAbiCoder();
+            const decoder = ethers.AbiCoder.defaultAbiCoder();
             const decodedParams = decoder.decode(typesArray, `0x${operation.data.substring(10)}`);
             return types.map((type, index) => {
                 let _value;
@@ -301,7 +295,7 @@ class Procedure {
         return operation;
     }
     static async isProcedure(address, signerOrProvider) {
-        const contract = new ethers_1.ethers.Contract(address, Procedure_json_1.default, signerOrProvider);
+        const contract = new ethers.Contract(address, ProcedureContractABI, signerOrProvider);
         const isERC165 = await contract.supportsInterface('0x01ffc9a7');
         if (!isERC165)
             return false;
@@ -414,4 +408,3 @@ class Procedure {
         return this;
     }
 }
-exports.Procedure = Procedure;

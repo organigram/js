@@ -1,5 +1,5 @@
 import ProcedureContractABI from '@organigram/protocol/abi/Procedure.json'
-import { type ContractTransaction, ethers } from 'ethers'
+import { type ContractTransactionReceipt, ethers } from 'ethers'
 
 import type { TransactionOptions } from '../organigramClient'
 
@@ -9,6 +9,13 @@ export type Election = {
   votesCount: string
   hasVoted: boolean
   approved?: boolean
+}
+
+// Is the connected account present the deciders/proposers/moderators organ?
+export type AccountInOrgans = {
+  moderators?: boolean
+  proposers?: boolean
+  deciders?: boolean
 }
 
 export type OperationTag =
@@ -55,7 +62,7 @@ export type OperationParamAction =
   | 'block'
 
 export interface OperationParam {
-  type: string
+  type: OperationParamType
   action?: OperationParamAction // Used to generate form UI.
   value?: unknown // Used to display an operation
   parser?: unknown // Used to parse a submitted form
@@ -63,7 +70,7 @@ export interface OperationParam {
 
 export interface ProcedureProposalOperationFunction {
   funcSig: string
-  key: string
+  key: ProposalKey
   signature?: string
   label?: string
   tags?: OperationTag[]
@@ -88,7 +95,7 @@ export interface ProcedureProposalOperation {
 }
 
 export interface ProcedureProposal {
-  key: string
+  key: ProposalKey
   creator: string
   cid: string
   blockReason: string
@@ -99,6 +106,17 @@ export interface ProcedureProposal {
   operations: ProcedureProposalOperation[]
   metadata?: ProposalMetadata
 }
+
+export type ProposalKey =
+  | 'addEntries'
+  | 'removeEntries'
+  | 'replaceEntry'
+  | 'addProcedure'
+  | 'removeProcedure'
+  | 'replaceProcedure'
+  | 'updateMetadata'
+  | 'transfer'
+  | string
 
 export interface ProposalMetadata {
   title: string
@@ -616,7 +634,7 @@ export class Procedure {
     proposalKey: string,
     reason: string,
     options?: TransactionOptions
-  ): Promise<ContractTransaction> {
+  ): Promise<ContractTransactionReceipt> {
     const tx = await this._contract.blockProposal(proposalKey, reason)
     if (options?.onTransaction != null) {
       options.onTransaction(
@@ -630,7 +648,7 @@ export class Procedure {
   async presentProposal(
     proposalKey: string,
     options?: TransactionOptions
-  ): Promise<ContractTransaction> {
+  ): Promise<ContractTransactionReceipt> {
     const tx = await this._contract.presentProposal(proposalKey)
     if (options?.onTransaction != null) {
       options.onTransaction(
@@ -644,7 +662,7 @@ export class Procedure {
   async adoptProposal(
     proposalKey: string,
     options?: TransactionOptions
-  ): Promise<ContractTransaction> {
+  ): Promise<ContractTransactionReceipt> {
     const tx = await this._contract.adoptProposal(proposalKey)
     if (options?.onTransaction != null) {
       options.onTransaction(
@@ -658,7 +676,7 @@ export class Procedure {
   async applyProposal(
     proposalKey: string,
     options?: TransactionOptions
-  ): Promise<ContractTransaction> {
+  ): Promise<ContractTransactionReceipt> {
     const tx = await this._contract.applyProposal(proposalKey)
     if (options?.onTransaction != null) {
       options.onTransaction(

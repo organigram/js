@@ -1,8 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPermissionsSet = exports.PERMISSIONS = exports.EMPTY_ADDRESS = void 0;
-exports.EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000';
-exports.PERMISSIONS = {
+export const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000';
+export const PERMISSIONS = {
     ADMIN: 0xffff,
     ALL: 0x07ff,
     ALL_PROCEDURES: 0x0003,
@@ -19,7 +16,6 @@ exports.PERMISSIONS = {
     DEPOSIT_COLLECTIBLES: 0x0200,
     WITHDRAW_COLLECTIBLES: 0x0400
 };
-const getPermissionsSet = (permissions) => Object.entries(exports.PERMISSIONS)
+export const getPermissionsSet = (permissions) => Object.entries(PERMISSIONS)
     .filter((permission) => (permissions & permission[1]) === permission[1])
     .map((permission) => permission[0]);
-exports.getPermissionsSet = getPermissionsSet;
