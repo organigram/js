@@ -1,5 +1,5 @@
 import { ethers } from 'ethers';
-import OrganContractABI from '@organigram/protocol/abi/Organ.json';
+import OrganContractABI from '@organigram/protocol/artifacts/contracts/Organ.sol/Organ.json';
 import { EMPTY_ADDRESS } from './utils';
 export var OrganFunctionName;
 (function (OrganFunctionName) {
@@ -46,7 +46,7 @@ export class Organ {
                 console.warn('Error while getting signer from provider.', error.message);
             });
         }
-        this.contract = new ethers.Contract(address, OrganContractABI, signerOrProvider);
+        this.contract = new ethers.Contract(address, OrganContractABI.abi, signerOrProvider);
     }
     updateCid = async (cid, options) => {
         const tx = await this.contract.updateCid(cid, { nonce: options?.nonce });
@@ -146,7 +146,7 @@ export class Organ {
         });
     }
     static async isOrgan(address, signerOrProvider) {
-        const contract = new ethers.Contract(address, OrganContractABI, signerOrProvider);
+        const contract = new ethers.Contract(address, OrganContractABI.abi, signerOrProvider);
         const isERC165 = await contract.supportsInterface('0x01ffc9a7');
         if (isERC165 === false)
             return false;
@@ -160,18 +160,18 @@ export class Organ {
         return await balance;
     }
     static async loadData(address, signerOrProvider) {
-        const contract = new ethers.Contract(address, OrganContractABI, signerOrProvider);
+        const contract = new ethers.Contract(address, OrganContractABI.abi, signerOrProvider);
         return await contract.getOrgan().catch((e) => {
             console.error(e.message);
         });
     }
     static async loadEntryForAccount(address, account, signerOrProvider) {
-        const contract = new ethers.Contract(address, OrganContractABI, signerOrProvider);
+        const contract = new ethers.Contract(address, OrganContractABI.abi, signerOrProvider);
         const index = await contract.getEntryIndexForAddress(account, {});
         return await Organ.loadEntry(address, index, signerOrProvider).catch(() => undefined);
     }
     static async loadPermissions(address, procedure, signerOrProvider) {
-        const contract = new ethers.Contract(address, OrganContractABI, signerOrProvider);
+        const contract = new ethers.Contract(address, OrganContractABI.abi, signerOrProvider);
         return await contract
             .getPermissions(procedure)
             .catch((e) => {
@@ -180,7 +180,7 @@ export class Organ {
             .then((res) => typeof res.perms === 'string' ? parseInt(res.perms, 16) : res.perms);
     }
     static async loadProcedure(address, index, signerOrProvider) {
-        const contract = new ethers.Contract(address, OrganContractABI, signerOrProvider);
+        const contract = new ethers.Contract(address, OrganContractABI.abi, signerOrProvider);
         const procedure = await contract.getProcedure(index).catch((e) => {
             console.error(e.message);
         });
@@ -208,7 +208,7 @@ export class Organ {
         return procedures;
     }
     static async loadEntry(address, index, signerOrProvider) {
-        const contract = new ethers.Contract(address, OrganContractABI, signerOrProvider);
+        const contract = new ethers.Contract(address, OrganContractABI.abi, signerOrProvider);
         const entry = await contract.getEntry(index);
         return { index, address: entry.addr, cid: entry.cid };
     }
@@ -228,7 +228,7 @@ export class Organ {
         return entries;
     }
     static async populateTransaction(address, signer, functionName, ...args) {
-        const contract = new ethers.Contract(address, OrganContractABI, signer);
+        const contract = new ethers.Contract(address, OrganContractABI.abi, signer);
         return await contract[functionName.toString()].populateTransaction(...args);
     }
     async reload() {

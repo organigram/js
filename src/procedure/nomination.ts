@@ -1,5 +1,5 @@
 import { ethers } from 'ethers'
-import NominationProcedureContractABI from '@organigram/protocol/abi/NominationProcedure.json'
+import NominationProcedureContractABI from '@organigram/protocol/artifacts/contracts/procedures/Nomination.sol/NominationProcedure.json'
 
 import { Procedure, type ProcedureProposal } from '.'
 import { TransactionOptions } from '../organigramClient'
@@ -37,7 +37,7 @@ export class NominationProcedure extends Procedure {
     )
     this.contract = new ethers.Contract(
       address,
-      NominationProcedureContractABI,
+      NominationProcedureContractABI.abi,
       signerOrProvider
     )
   }
@@ -59,7 +59,7 @@ export class NominationProcedure extends Procedure {
     }
     const contract = new ethers.Contract(
       type,
-      NominationProcedureContractABI,
+      NominationProcedureContractABI.abi,
       options.signer
     )
     return await contract.initialize.populateTransaction(

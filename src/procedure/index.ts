@@ -1,4 +1,4 @@
-import ProcedureContractABI from '@organigram/protocol/abi/Procedure.json'
+import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json'
 import { type ContractTransactionReceipt, ethers } from 'ethers'
 
 import type { TransactionOptions } from '../organigramClient'
@@ -282,7 +282,7 @@ export class Procedure {
     }
     this._contract = new ethers.Contract(
       address,
-      ProcedureContractABI,
+      ProcedureContractABI.abi,
       signerOrProvider
     )
   }
@@ -319,7 +319,7 @@ export class Procedure {
   }> {
     const contract = new ethers.Contract(
       address,
-      ProcedureContractABI,
+      ProcedureContractABI.abi,
       signerOrProvider
     )
     return await contract.getProcedure()
@@ -332,7 +332,7 @@ export class Procedure {
   ): Promise<ProcedureProposal> {
     const contract = new ethers.Contract(
       address,
-      ProcedureContractABI,
+      ProcedureContractABI.abi,
       signerOrProvider
     )
     const proposal = await contract.getProposal(proposalKey)
@@ -542,7 +542,7 @@ export class Procedure {
   ): Promise<boolean> {
     const contract = new ethers.Contract(
       address,
-      ProcedureContractABI,
+      ProcedureContractABI.abi,
       signerOrProvider
     )
     const isERC165: boolean = await contract.supportsInterface('0x01ffc9a7')

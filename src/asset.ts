@@ -1,4 +1,4 @@
-import ExampleCoin from '@organigram/protocol/build/contracts/ExampleCoin.json'
+import ExampleCoin from '@organigram/protocol/artifacts/contracts/utils/ExampleCoin.sol/ExampleCoin.json'
 import {
   type BaseContract,
   type Contract as EthersContract,

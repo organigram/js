@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import { Procedure, type ProcedureProposal, type Election } from '../procedure'
-import VoteProcedureContractABI from '@organigram/protocol/abi/VoteProcedure.json'
+import VoteProcedureContractABI from '@organigram/protocol/artifacts/contracts/procedures/Vote.sol/VoteProcedure.json'
 import { type TransactionOptions } from '../organigramClient'
 
 export class VoteProcedure extends Procedure {
@@ -48,7 +48,7 @@ export class VoteProcedure extends Procedure {
     this.elections = elections
     this.contract = new ethers.Contract(
       address,
-      VoteProcedureContractABI,
+      VoteProcedureContractABI.abi,
       signer
     )
   }
@@ -73,7 +73,7 @@ export class VoteProcedure extends Procedure {
     }
     const contract = new ethers.Contract(
       type,
-      VoteProcedureContractABI,
+      VoteProcedureContractABI.abi,
       options.signer
     )
     return await contract.initialize.populateTransaction(
@@ -96,7 +96,7 @@ export class VoteProcedure extends Procedure {
   ): Promise<Election> {
     const contract = new ethers.Contract(
       address,
-      VoteProcedureContractABI,
+      VoteProcedureContractABI.abi,
       signer
     )
     const election = await contract.getElection(proposalKey)
@@ -158,7 +158,7 @@ export class VoteProcedure extends Procedure {
     if (!procedure) throw new Error('Not a valid procedure.')
     const contract = new ethers.Contract(
       address,
-      VoteProcedureContractABI,
+      VoteProcedureContractABI.abi,
       signer
     )
     const quorumSize = await contract.quorumSize()

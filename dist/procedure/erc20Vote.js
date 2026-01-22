@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { Procedure } from '.';
-import ERC20VoteProcedureContractABI from '@organigram/protocol/abi/ERC20VoteProcedure.json';
+import ERC20VoteProcedureContractABI from '@organigram/protocol/artifacts/contracts/procedures/ERC20Vote.sol/ERC20VoteProcedure.json';
 export class ERC20VoteProcedure extends Procedure {
     static INTERFACE = '0xc9d27afe';
     erc20;
@@ -16,17 +16,17 @@ export class ERC20VoteProcedure extends Procedure {
         this.voteDuration = voteDuration;
         this.majoritySize = majoritySize;
         this.elections = elections;
-        this.contract = new ethers.Contract(address, ERC20VoteProcedureContractABI, signerOrProvider);
+        this.contract = new ethers.Contract(address, ERC20VoteProcedureContractABI.abi, signerOrProvider);
     }
     static async _populateInitialize(type, options, cid, proposers, moderators, deciders, withModeration, forwarder, erc20, quorumSize, voteDuration, majoritySize) {
         if (options.signer == null) {
             throw new Error('Not connected.');
         }
-        const contract = new ethers.Contract(type, ERC20VoteProcedureContractABI, options.signer);
+        const contract = new ethers.Contract(type, ERC20VoteProcedureContractABI.abi, options.signer);
         return await contract.initialize.populateTransaction(cid, proposers, moderators, deciders, withModeration, forwarder, erc20, quorumSize, voteDuration, majoritySize);
     }
     static async loadElection(address, proposalKey, signerOrProvider) {
-        const contract = new ethers.Contract(address, ERC20VoteProcedureContractABI, signerOrProvider);
+        const contract = new ethers.Contract(address, ERC20VoteProcedureContractABI.abi, signerOrProvider);
         const election = await contract.getElection(proposalKey);
         if (!election.start)
             throw new Error('Election not found.');
@@ -64,7 +64,7 @@ export class ERC20VoteProcedure extends Procedure {
         const procedure = await Procedure.load(address, signerOrProvider);
         if (!procedure)
             throw new Error('Not a valid procedure.');
-        const contract = new ethers.Contract(address, ERC20VoteProcedureContractABI, signerOrProvider);
+        const contract = new ethers.Contract(address, ERC20VoteProcedureContractABI.abi, signerOrProvider);
         const erc20 = await contract.tokenContract();
         const quorumSize = await contract.quorumSize();
         const voteDuration = await contract.voteDuration();

@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import { Procedure } from '../procedure';
-import VoteProcedureContractABI from '@organigram/protocol/abi/VoteProcedure.json';
+import VoteProcedureContractABI from '@organigram/protocol/artifacts/contracts/procedures/Vote.sol/VoteProcedure.json';
 export class VoteProcedure extends Procedure {
     static INTERFACE = '0xc9d27afe';
     contract;
@@ -14,17 +14,17 @@ export class VoteProcedure extends Procedure {
         this.voteDuration = voteDuration;
         this.majoritySize = majoritySize;
         this.elections = elections;
-        this.contract = new ethers.Contract(address, VoteProcedureContractABI, signer);
+        this.contract = new ethers.Contract(address, VoteProcedureContractABI.abi, signer);
     }
     static async _populateInitialize(type, options, cid, proposers, moderators, deciders, withModeration, forwarder, quorumSize, voteDuration, majoritySize) {
         if (options.signer == null) {
             throw new Error('Not connected.');
         }
-        const contract = new ethers.Contract(type, VoteProcedureContractABI, options.signer);
+        const contract = new ethers.Contract(type, VoteProcedureContractABI.abi, options.signer);
         return await contract.initialize.populateTransaction(cid, proposers, moderators, deciders, withModeration, forwarder, quorumSize, voteDuration, majoritySize);
     }
     static async loadElection(address, proposalKey, signer) {
-        const contract = new ethers.Contract(address, VoteProcedureContractABI, signer);
+        const contract = new ethers.Contract(address, VoteProcedureContractABI.abi, signer);
         const election = await contract.getElection(proposalKey);
         if (!election.start)
             throw new Error('Election not found.');
@@ -62,7 +62,7 @@ export class VoteProcedure extends Procedure {
         const procedure = await Procedure.load(address, signer);
         if (!procedure)
             throw new Error('Not a valid procedure.');
-        const contract = new ethers.Contract(address, VoteProcedureContractABI, signer);
+        const contract = new ethers.Contract(address, VoteProcedureContractABI.abi, signer);
         const quorumSize = await contract.quorumSize();
         const voteDuration = await contract.voteDuration();
         const majoritySize = await contract.majoritySize();

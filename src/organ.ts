@@ -1,5 +1,5 @@
 import { ethers, type Signer } from 'ethers'
-import OrganContractABI from '@organigram/protocol/abi/Organ.json'
+import OrganContractABI from '@organigram/protocol/artifacts/contracts/Organ.sol/Organ.json'
 
 import { EMPTY_ADDRESS } from './utils'
 import type { TransactionOptions } from './organigramClient'
@@ -88,7 +88,7 @@ export class Organ {
     }
     this.contract = new ethers.Contract(
       address,
-      OrganContractABI,
+      OrganContractABI.abi,
       signerOrProvider
     )
   }
@@ -282,7 +282,7 @@ export class Organ {
   ): Promise<boolean> {
     const contract = new ethers.Contract(
       address,
-      OrganContractABI,
+      OrganContractABI.abi,
       signerOrProvider
     )
     const isERC165 = await contract.supportsInterface('0x01ffc9a7')
@@ -312,7 +312,7 @@ export class Organ {
   }> {
     const contract = new ethers.Contract(
       address,
-      OrganContractABI,
+      OrganContractABI.abi,
       signerOrProvider
     )
     return await contract.getOrgan().catch((e: Error) => {
@@ -327,7 +327,7 @@ export class Organ {
   ): Promise<OrganEntry | undefined> {
     const contract = new ethers.Contract(
       address,
-      OrganContractABI,
+      OrganContractABI.abi,
       signerOrProvider
     )
     const index = await contract.getEntryIndexForAddress(account, {})
@@ -343,7 +343,7 @@ export class Organ {
   ): Promise<number> {
     const contract = new ethers.Contract(
       address,
-      OrganContractABI,
+      OrganContractABI.abi,
       signerOrProvider
     )
     return await contract
@@ -363,7 +363,7 @@ export class Organ {
   ): Promise<OrganProcedure> {
     const contract = new ethers.Contract(
       address,
-      OrganContractABI,
+      OrganContractABI.abi,
       signerOrProvider
     )
     const procedure = await contract.getProcedure(index).catch((e: Error) => {
@@ -413,7 +413,7 @@ export class Organ {
   ): Promise<OrganEntry> {
     const contract = new ethers.Contract(
       address,
-      OrganContractABI,
+      OrganContractABI.abi,
       signerOrProvider
     )
     const entry = await contract.getEntry(index)
@@ -460,7 +460,7 @@ export class Organ {
     functionName: OrganFunctionName,
     ...args: unknown[]
   ): Promise<ethers.ContractTransaction> {
-    const contract = new ethers.Contract(address, OrganContractABI, signer)
+    const contract = new ethers.Contract(address, OrganContractABI.abi, signer)
     return await contract[functionName.toString()].populateTransaction(...args)
   }
 

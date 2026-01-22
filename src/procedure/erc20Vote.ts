@@ -1,6 +1,6 @@
 import { ethers } from 'ethers'
 import { Procedure, type ProcedureProposal, type Election } from '.'
-import ERC20VoteProcedureContractABI from '@organigram/protocol/abi/ERC20VoteProcedure.json'
+import ERC20VoteProcedureContractABI from '@organigram/protocol/artifacts/contracts/procedures/ERC20Vote.sol/ERC20VoteProcedure.json'
 import { TransactionOptions } from '../organigramClient'
 
 export class ERC20VoteProcedure extends Procedure {
@@ -51,7 +51,7 @@ export class ERC20VoteProcedure extends Procedure {
     this.elections = elections
     this.contract = new ethers.Contract(
       address,
-      ERC20VoteProcedureContractABI,
+      ERC20VoteProcedureContractABI.abi,
       signerOrProvider
     )
   }
@@ -76,7 +76,7 @@ export class ERC20VoteProcedure extends Procedure {
     }
     const contract = new ethers.Contract(
       type,
-      ERC20VoteProcedureContractABI,
+      ERC20VoteProcedureContractABI.abi,
       options.signer
     )
     return await contract.initialize.populateTransaction(
@@ -100,7 +100,7 @@ export class ERC20VoteProcedure extends Procedure {
   ): Promise<Election> {
     const contract = new ethers.Contract(
       address,
-      ERC20VoteProcedureContractABI,
+      ERC20VoteProcedureContractABI.abi,
       signerOrProvider
     )
     const election = await contract.getElection(proposalKey)
@@ -162,7 +162,7 @@ export class ERC20VoteProcedure extends Procedure {
     if (!procedure) throw new Error('Not a valid procedure.')
     const contract = new ethers.Contract(
       address,
-      ERC20VoteProcedureContractABI,
+      ERC20VoteProcedureContractABI.abi,
       signerOrProvider
     )
     const erc20 = await contract.tokenContract()

@@ -1,4 +1,4 @@
-import ProcedureContractABI from '@organigram/protocol/abi/Procedure.json';
+import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json';
 import { ethers } from 'ethers';
 export class Procedure {
     static INTERFACE = '0x71dbd330';
@@ -139,17 +139,17 @@ export class Procedure {
             }
             catch (error) { }
         }
-        this._contract = new ethers.Contract(address, ProcedureContractABI, signerOrProvider);
+        this._contract = new ethers.Contract(address, ProcedureContractABI.abi, signerOrProvider);
     }
     static async _populateInitialize(_address, _options, _metadata, _proposers, _moderators, _deciders, _withModeration, _forwarder, ..._args) {
         throw new Error('Procedure cannot be initialized.');
     }
     static async loadData(address, signerOrProvider) {
-        const contract = new ethers.Contract(address, ProcedureContractABI, signerOrProvider);
+        const contract = new ethers.Contract(address, ProcedureContractABI.abi, signerOrProvider);
         return await contract.getProcedure();
     }
     static async loadProposal(address, proposalKey, signerOrProvider) {
-        const contract = new ethers.Contract(address, ProcedureContractABI, signerOrProvider);
+        const contract = new ethers.Contract(address, ProcedureContractABI.abi, signerOrProvider);
         const proposal = await contract.getProposal(proposalKey);
         const [creator, cid, blockReason, presented, blocked, adopted, applied] = proposal;
         const parsedOperations = proposal.operations.map((op) => Procedure.parseOperation(op));
@@ -295,7 +295,7 @@ export class Procedure {
         return operation;
     }
     static async isProcedure(address, signerOrProvider) {
-        const contract = new ethers.Contract(address, ProcedureContractABI, signerOrProvider);
+        const contract = new ethers.Contract(address, ProcedureContractABI.abi, signerOrProvider);
         const isERC165 = await contract.supportsInterface('0x01ffc9a7');
         if (!isERC165)
             return false;

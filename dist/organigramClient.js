@@ -1,11 +1,15 @@
 import { ethers } from 'ethers';
-import OrganigramContractABI from '@organigram/protocol/abi/Organigram.json';
-import ProcedureContractABI from '@organigram/protocol/abi/Procedure.json';
+import OrganigramContractABI from '@organigram/protocol/artifacts/contracts/OrganigramClient.sol/OrganigramClient.json';
+import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json';
+import sepoliaAddresses from '@organigram/protocol/ignition/deployments/chain-11155111/deployed_addresses.json';
 import Organ from './organ';
 import { Procedure } from './procedure';
 import { NominationProcedure } from './procedure/nomination';
 import { VoteProcedure } from './procedure/vote';
 import { ERC20VoteProcedure } from './procedure/erc20Vote';
+export const organigramClientDeployedAddresses = {
+    11155111: sepoliaAddresses['OrganigramClientModule#OrganigramClient']
+};
 const procedureMetadata = {
     description: '',
     _type: 'procedureType',
@@ -54,7 +58,7 @@ export class OrganigramClient {
         this.contract = contract;
     }
     static async loadProcedureType({ addr, cid }, provider) {
-        const contract = new ethers.Contract(addr, ProcedureContractABI, provider);
+        const contract = new ethers.Contract(addr, ProcedureContractABI.abi, provider);
         let Class;
         let metadata;
         let name = '';
@@ -82,7 +86,7 @@ export class OrganigramClient {
         };
     }
     static async loadProcedureTypes(address, provider) {
-        const contract = new ethers.Contract(address, OrganigramContractABI, provider);
+        const contract = new ethers.Contract(address, OrganigramContractABI.abi, provider);
         const proceduresRegistry = (await contract.procedures()).toString();
         const procedures = await Organ.loadEntries(proceduresRegistry, provider);
         const procedureTypes = await Promise.all(procedures.map(async (procedure) => await OrganigramClient.loadProcedureType({
@@ -95,7 +99,7 @@ export class OrganigramClient {
         if (provider == null && signer == null) {
             throw new Error('No provider or signer.');
         }
-        const contract = new ethers.Contract(address, OrganigramContractABI, signer ?? provider);
+        const contract = new ethers.Contract(address, OrganigramContractABI.abi, signer ?? provider);
         const procedureTypes = await OrganigramClient.loadProcedureTypes(address, provider);
         const chainId = await provider
             ?.getNetwork()

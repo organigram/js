@@ -1,12 +1,17 @@
 import { ethers, type EventLog, type ContractTransaction } from 'ethers'
-import OrganigramContractABI from '@organigram/protocol/abi/Organigram.json'
-import ProcedureContractABI from '@organigram/protocol/abi/Procedure.json'
+import OrganigramContractABI from '@organigram/protocol/artifacts/contracts/OrganigramClient.sol/OrganigramClient.json'
+import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json'
+import sepoliaAddresses from '@organigram/protocol/ignition/deployments/chain-11155111/deployed_addresses.json'
 
 import Organ from './organ'
 import { Procedure } from './procedure'
 import { NominationProcedure } from './procedure/nomination'
 import { VoteProcedure } from './procedure/vote'
 import { ERC20VoteProcedure } from './procedure/erc20Vote'
+
+export const organigramClientDeployedAddresses = {
+  11155111: sepoliaAddresses['OrganigramClientModule#OrganigramClient']
+}
 
 export interface TransactionOptions {
   nonce?: number
@@ -111,7 +116,11 @@ export class OrganigramClient {
     { addr, cid }: { addr: string; cid?: string },
     provider: ethers.Provider
   ): Promise<ProcedureType> {
-    const contract = new ethers.Contract(addr, ProcedureContractABI, provider)
+    const contract = new ethers.Contract(
+      addr,
+      ProcedureContractABI.abi,
+      provider
+    )
     // @todo : Parse doc for custom parser.
     let Class: Procedure | undefined
     let metadata: { type: string; name: string } | undefined
@@ -154,7 +163,7 @@ export class OrganigramClient {
   ): Promise<ProcedureType[]> {
     const contract = new ethers.Contract(
       address,
-      OrganigramContractABI,
+      OrganigramContractABI.abi,
       provider
     )
     const proceduresRegistry = (await contract.procedures()).toString()
@@ -195,7 +204,7 @@ export class OrganigramClient {
     }
     const contract = new ethers.Contract(
       address,
-      OrganigramContractABI,
+      OrganigramContractABI.abi,
       signer ?? provider
     )
     const procedureTypes = await OrganigramClient.loadProcedureTypes(

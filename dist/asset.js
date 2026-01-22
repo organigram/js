@@ -1,4 +1,4 @@
-import ExampleCoin from '@organigram/protocol/build/contracts/ExampleCoin.json';
+import ExampleCoin from '@organigram/protocol/artifacts/contracts/utils/ExampleCoin.sol/ExampleCoin.json';
 import { ethers, Interface, formatEther } from 'ethers';
 const ERC20_INITIAL_SUPPLY = '10000000000000000000000000';
 export const getAssetData = async (assetAddress, signer) => {
