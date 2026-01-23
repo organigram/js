@@ -1,17 +1,12 @@
 import { ethers, type EventLog, type ContractTransaction } from 'ethers'
 import OrganigramContractABI from '@organigram/protocol/artifacts/contracts/OrganigramClient.sol/OrganigramClient.json'
 import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json'
-import sepoliaAddresses from '@organigram/protocol/ignition/deployments/chain-11155111/deployed_addresses.json'
 
 import Organ from './organ'
 import { Procedure } from './procedure'
 import { NominationProcedure } from './procedure/nomination'
 import { VoteProcedure } from './procedure/vote'
 import { ERC20VoteProcedure } from './procedure/erc20Vote'
-
-export const organigramClientDeployedAddresses = {
-  11155111: sepoliaAddresses['OrganigramClientModule#OrganigramClient']
-}
 
 export interface TransactionOptions {
   nonce?: number

@@ -1,3 +1,8 @@
+export declare const deployedAddresses: {
+    11155111: {
+        [k: string]: string;
+    };
+};
 export declare const EMPTY_ADDRESS = "0x0000000000000000000000000000000000000000";
 export declare const PERMISSIONS: {
     ADMIN: number;
