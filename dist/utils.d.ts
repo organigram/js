@@ -1,8 +1,5 @@
-export declare const deployedAddresses: {
-    11155111: {
-        [k: string]: string;
-    };
-};
+import deployedAddresses from '@organigram/protocol/deployments.json';
+export { deployedAddresses };
 export declare const EMPTY_ADDRESS = "0x0000000000000000000000000000000000000000";
 export declare const PERMISSIONS: {
     ADMIN: number;

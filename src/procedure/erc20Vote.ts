@@ -264,7 +264,7 @@ export class ERC20VoteProcedure extends Procedure {
     if (options?.onTransaction != null) {
       options.onTransaction(tx, 'Initialize ERC20 Vote procedure.')
     }
-    return tx.wait()
+    return await tx.wait()
   }
 
   async count(proposalKey: string): Promise<boolean> {

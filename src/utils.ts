@@ -1,13 +1,6 @@
-import sepoliaAddresses from '@organigram/protocol/ignition/deployments/chain-11155111/deployed_addresses.json'
+import deployedAddresses from '@organigram/protocol/deployments.json'
 
-const formatDeployedJson = (object: typeof sepoliaAddresses) =>
-  Object.fromEntries(
-    Object.entries(object).map(([key, value]) => [key.split('#')[1], value])
-  )
-
-export const deployedAddresses = {
-  11155111: formatDeployedJson(sepoliaAddresses)
-}
+export { deployedAddresses }
 
 export const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000'
 

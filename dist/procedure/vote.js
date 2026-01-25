@@ -91,7 +91,7 @@ export class VoteProcedure extends Procedure {
         if (options?.onTransaction != null) {
             options.onTransaction(tx, 'Initialize Nomination procedure.');
         }
-        return tx.wait();
+        return await tx.wait();
     }
     async count(proposalKey) {
         return this.contract.count(proposalKey).catch((error) => {

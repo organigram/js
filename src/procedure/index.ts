@@ -642,7 +642,7 @@ export class Procedure {
         `Block proposal ${proposalKey} of procedure ${this.address}`
       )
     }
-    return tx.wait()
+    return await tx.wait()
   }
 
   async presentProposal(
@@ -656,7 +656,7 @@ export class Procedure {
         `Present proposal ${proposalKey} of procedure ${this.address}`
       )
     }
-    return tx.wait()
+    return await tx.wait()
   }
 
   async adoptProposal(
@@ -670,7 +670,7 @@ export class Procedure {
         `Adopt proposal ${proposalKey} of procedure ${this.address}`
       )
     }
-    return tx.wait()
+    return await tx.wait()
   }
 
   async applyProposal(
@@ -684,7 +684,7 @@ export class Procedure {
         `Apply proposal ${proposalKey} of procedure ${this.address}`
       )
     }
-    return tx.wait()
+    return await tx.wait()
   }
 
   /**

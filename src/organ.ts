@@ -106,7 +106,7 @@ export class Organ {
         `Update CID of organ ${this.address} to ${cid}.`
       )
     }
-    return tx.wait()
+    return await tx.wait()
   }
 
   public addEntries = async (
@@ -136,7 +136,7 @@ export class Organ {
         `Add ${_entries.length} entries to organ ${this.address}.`
       )
     }
-    return tx.wait()
+    return await tx.wait()
   }
 
   public removeEntries = async (
@@ -152,7 +152,7 @@ export class Organ {
         `Remove ${indexes.length} entries from organ ${this.address}.`
       )
     }
-    return tx.wait()
+    return await tx.wait()
   }
 
   public replaceEntry = async (
@@ -172,7 +172,7 @@ export class Organ {
         `Replace entry ${index} of organ ${this.address}.`
       )
     }
-    return tx.wait()
+    return await tx.wait()
   }
 
   public addProcedure = async (
@@ -193,7 +193,7 @@ export class Organ {
         `Add procedure ${procedure.address} to organ ${this.address}.`
       )
     }
-    return tx.wait()
+    return await tx.wait()
   }
 
   public removeProcedure = async (
@@ -209,7 +209,7 @@ export class Organ {
         `Remove procedure ${procedure} from organ ${this.address}.`
       )
     }
-    return tx.wait()
+    return await tx.wait()
   }
 
   public replaceProcedure = async (
@@ -232,7 +232,7 @@ export class Organ {
         `Replace procedure ${oldProcedure} with ${newOrganProcedure.address} in organ ${this.address}.`
       )
     }
-    return tx.wait()
+    return await tx.wait()
   }
 
   /* Static API */

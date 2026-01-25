@@ -53,7 +53,7 @@ export class Organ {
         if (options?.onTransaction != null) {
             options.onTransaction(tx, `Update CID of organ ${this.address} to ${cid}.`);
         }
-        return tx.wait();
+        return await tx.wait();
     };
     addEntries = async (entries, options) => {
         const _entries = entries
@@ -74,7 +74,7 @@ export class Organ {
         if (options?.onTransaction != null) {
             options.onTransaction(tx, `Add ${_entries.length} entries to organ ${this.address}.`);
         }
-        return tx.wait();
+        return await tx.wait();
     };
     removeEntries = async (indexes, options) => {
         const tx = await this.contract.removeEntries(indexes, {
@@ -83,14 +83,14 @@ export class Organ {
         if (options?.onTransaction != null) {
             options.onTransaction(tx, `Remove ${indexes.length} entries from organ ${this.address}.`);
         }
-        return tx.wait();
+        return await tx.wait();
     };
     replaceEntry = async (index, entry, options) => {
         const tx = await this.contract.replaceEntry(index, entry.address ?? '', entry.cid ?? '', { nonce: options?.nonce });
         if (options?.onTransaction != null) {
             options.onTransaction(tx, `Replace entry ${index} of organ ${this.address}.`);
         }
-        return tx.wait();
+        return await tx.wait();
     };
     addProcedure = async (procedure, options) => {
         const permissions = `0x${procedure.permissions
@@ -100,7 +100,7 @@ export class Organ {
         if (options?.onTransaction != null) {
             options.onTransaction(tx, `Add procedure ${procedure.address} to organ ${this.address}.`);
         }
-        return tx.wait();
+        return await tx.wait();
     };
     removeProcedure = async (procedure, options) => {
         const tx = await this.contract.removeProcedure(procedure, {
@@ -109,7 +109,7 @@ export class Organ {
         if (options?.onTransaction != null) {
             options.onTransaction(tx, `Remove procedure ${procedure} from organ ${this.address}.`);
         }
-        return tx.wait();
+        return await tx.wait();
     };
     replaceProcedure = async (oldProcedure, newOrganProcedure, options) => {
         const permissions = `0x${newOrganProcedure.permissions
@@ -119,7 +119,7 @@ export class Organ {
         if (options?.onTransaction != null) {
             options.onTransaction(tx, `Replace procedure ${oldProcedure} with ${newOrganProcedure.address} in organ ${this.address}.`);
         }
-        return tx.wait();
+        return await tx.wait();
     };
     static async load(address, signerOrProvider) {
         const provider = signerOrProvider.provider ?? signerOrProvider;

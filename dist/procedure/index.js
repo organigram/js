@@ -352,28 +352,28 @@ export class Procedure {
         if (options?.onTransaction != null) {
             options.onTransaction(tx, `Block proposal ${proposalKey} of procedure ${this.address}`);
         }
-        return tx.wait();
+        return await tx.wait();
     }
     async presentProposal(proposalKey, options) {
         const tx = await this._contract.presentProposal(proposalKey);
         if (options?.onTransaction != null) {
             options.onTransaction(tx, `Present proposal ${proposalKey} of procedure ${this.address}`);
         }
-        return tx.wait();
+        return await tx.wait();
     }
     async adoptProposal(proposalKey, options) {
         const tx = await this._contract.adoptProposal(proposalKey);
         if (options?.onTransaction != null) {
             options.onTransaction(tx, `Adopt proposal ${proposalKey} of procedure ${this.address}`);
         }
-        return tx.wait();
+        return await tx.wait();
     }
     async applyProposal(proposalKey, options) {
         const tx = await this._contract.applyProposal(proposalKey);
         if (options?.onTransaction != null) {
             options.onTransaction(tx, `Apply proposal ${proposalKey} of procedure ${this.address}`);
         }
-        return tx.wait();
+        return await tx.wait();
     }
     async reloadProposals() {
         const signerOrProvider = this.signer ?? this.provider;
