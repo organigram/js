@@ -3,8 +3,7 @@
   "compilerOptions": {
     "lib": ["ESNext"],
     "target": "ESNext",
-    "skipLibCheck": true,
-    "noImplicitAny": true,
+    "strict": true,
     "removeComments": true,
     "resolveJsonModule": true,
     "preserveConstEnums": true,
