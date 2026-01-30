@@ -2,6 +2,7 @@ import { ethers, type ContractTransaction } from 'ethers';
 import Organ from './organ';
 import { Procedure } from './procedure';
 export interface TransactionOptions {
+    index?: number;
     nonce?: number;
     onTransaction?: (tx: ethers.TransactionResponse, description: string) => void;
 }
@@ -40,10 +41,10 @@ export declare class OrganigramClient {
     getOrgan(address: string, cached?: boolean): Promise<Organ>;
     getProcedure(address: string, cached?: boolean): Promise<EnhancedProcedure>;
     getContract(address: string, cached?: boolean): Promise<Organ | EnhancedProcedure | null>;
-    createOrgan(metadata: string, admin: string, options?: TransactionOptions): Promise<Organ>;
-    _createProcedure(type: string, initialize?: ethers.ContractTransaction, options?: TransactionOptions): Promise<Procedure>;
-    _initializeProcedure(address: string, type: string, options: TransactionOptions, metadata: string, proposers: string, moderators: string, deciders: string, withModeration: boolean, forwarder: string, ...args: unknown[]): Promise<EnhancedProcedure>;
+    createOrgan(metadata: string, admin: string, salt?: string, options?: TransactionOptions): Promise<Organ>;
+    _createProcedure(type: string, initialize: ethers.ContractTransaction, salt?: string, options?: TransactionOptions): Promise<Procedure>;
     _populateInitializeProcedure(type: string, options: TransactionOptions, cid: string, proposers: string, moderators: string, deciders: string, withModeration: boolean, forwarder: string, ...args: unknown[]): Promise<ContractTransaction>;
-    createProcedure(type: string, options: TransactionOptions, cid: string, proposers: string, moderators: string, deciders: string, withModeration: boolean, forwarder: string, ...args: unknown[]): Promise<EnhancedProcedure>;
+    createProcedure(type: string, options: TransactionOptions, cid: string, proposers: string, moderators: string, deciders: string, withModeration: boolean, forwarder: string, salt?: string, ...args: unknown[]): Promise<EnhancedProcedure>;
+    predictContractAddress(type: 'Organ' | 'Erc20Vote' | 'Vote' | 'Nomination', salt: string): Promise<string>;
 }
 export default OrganigramClient;

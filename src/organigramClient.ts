@@ -1,6 +1,9 @@
 import { ethers, type EventLog, type ContractTransaction } from 'ethers'
+import deployedAddresses from '@organigram/protocol/deployments.json'
 import OrganigramContractABI from '@organigram/protocol/artifacts/contracts/OrganigramClient.sol/OrganigramClient.json'
 import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json'
+import { predictDeterministicAddress } from 'predict-deterministic-address'
+import crypto from 'crypto'
 
 import Organ from './organ'
 import { Procedure } from './procedure'
@@ -8,7 +11,13 @@ import { NominationProcedure } from './procedure/nomination'
 import { VoteProcedure } from './procedure/vote'
 import { ERC20VoteProcedure } from './procedure/erc20Vote'
 
+const checkSalt = (salt?: string) =>
+  salt == null || salt.length === 0
+    ? '0x' + crypto.randomBytes(32).toString('hex')
+    : ethers.id(salt)
+
 export interface TransactionOptions {
+  index?: number
   nonce?: number
   onTransaction?: (tx: ethers.TransactionResponse, description: string) => void
 }
@@ -332,6 +341,7 @@ export class OrganigramClient {
   async createOrgan(
     metadata: string,
     admin: string,
+    salt?: string,
     options?: TransactionOptions
   ): Promise<Organ> {
     if (this.signer == null) {
@@ -339,9 +349,10 @@ export class OrganigramClient {
     }
     let nonce: bigint | undefined
     if (options?.nonce != null) {
-      nonce = BigInt(options?.nonce)
+      nonce = BigInt(options?.nonce ?? 0) + BigInt(options?.index ?? 0)
     }
-    const tx = await this.contract.createOrgan(admin, metadata, {
+    const _salt = checkSalt(salt)
+    const tx = await this.contract.createOrgan(admin, metadata, _salt, {
       nonce
     })
     if (options?.onTransaction != null) {
@@ -369,7 +380,8 @@ export class OrganigramClient {
 
   async _createProcedure(
     type: string,
-    initialize?: ethers.ContractTransaction,
+    initialize: ethers.ContractTransaction,
+    salt?: string,
     options?: TransactionOptions
   ): Promise<Procedure> {
     if (this.signer == null) {
@@ -385,9 +397,11 @@ export class OrganigramClient {
     if (options?.nonce != null) {
       nonce = BigInt(options?.nonce)
     }
+    const _salt = checkSalt(salt)
     const tx = await this.contract.createProcedure(
       procedureType.address,
       initialize?.data,
+      _salt,
       { nonce }
     )
     if (options?.onTransaction != null) {
@@ -414,46 +428,46 @@ export class OrganigramClient {
     })
   }
 
-  async _initializeProcedure(
-    address: string,
-    type: string,
-    options: TransactionOptions,
-    metadata: string,
-    proposers: string,
-    moderators: string,
-    deciders: string,
-    withModeration: boolean,
-    forwarder: string,
-    ...args: unknown[]
-  ): Promise<EnhancedProcedure> {
-    if (this.signer == null) {
-      throw new Error('Signer not connected.')
-    }
-    const initialize = await this._populateInitializeProcedure(
-      type,
-      options,
-      metadata,
-      proposers,
-      moderators,
-      deciders,
-      withModeration,
-      forwarder,
-      ...args
-    )
-    if (initialize?.data == null) {
-      throw new Error('Could not initialize procedure.')
-    }
-    const tx = await this.signer.sendTransaction({
-      from: this.signer.getAddress(),
-      to: address,
-      data: initialize.data
-    })
-    if (options?.onTransaction != null) {
-      options.onTransaction(tx, `Initialize procedure ${address}`)
-    }
-    await tx.wait()
-    return await this.getProcedure(address, true)
-  }
+  // async _initializeProcedure(
+  //   address: string,
+  //   type: string,
+  //   options: TransactionOptions,
+  //   metadata: string,
+  //   proposers: string,
+  //   moderators: string,
+  //   deciders: string,
+  //   withModeration: boolean,
+  //   forwarder: string,
+  //   ...args: unknown[]
+  // ): Promise<EnhancedProcedure> {
+  //   if (this.signer == null) {
+  //     throw new Error('Signer not connected.')
+  //   }
+  //   const initialize = await this._populateInitializeProcedure(
+  //     type,
+  //     options,
+  //     metadata,
+  //     proposers,
+  //     moderators,
+  //     deciders,
+  //     withModeration,
+  //     forwarder,
+  //     ...args
+  //   )
+  //   if (initialize?.data == null) {
+  //     throw new Error('Could not initialize procedure.')
+  //   }
+  //   const tx = await this.signer.sendTransaction({
+  //     from: this.signer.getAddress(),
+  //     to: address,
+  //     data: initialize.data
+  //   })
+  //   if (options?.onTransaction != null) {
+  //     options.onTransaction(tx, `Initialize procedure ${address}`)
+  //   }
+  //   await tx.wait()
+  //   return await this.getProcedure(address, true)
+  // }
 
   async _populateInitializeProcedure(
     type: string,
@@ -504,6 +518,7 @@ export class OrganigramClient {
     deciders: string,
     withModeration: boolean,
     forwarder: string,
+    salt?: string,
     ...args: unknown[]
   ): Promise<EnhancedProcedure> {
     const initializeProcedure = await this._populateInitializeProcedure(
@@ -517,9 +532,11 @@ export class OrganigramClient {
       forwarder,
       ...args
     )
+
     const { address } = await this._createProcedure(
       type,
       initializeProcedure,
+      salt,
       options
     )
     return await this.getProcedure(address, false).catch((error: Error) => {
@@ -533,6 +550,16 @@ export class OrganigramClient {
     })
   }
 
+  async predictContractAddress(
+    type: 'Organ' | 'Erc20Vote' | 'Vote' | 'Nomination',
+    salt: string
+  ): Promise<string> {
+    return await predictDeterministicAddress(
+      deployedAddresses[this.chainId as '11155111'][type as 'Organ'],
+      this.address,
+      salt
+    )
+  }
   // Deploy entire organigram.
   // async deployOrganigram (
   //   metadata: string,

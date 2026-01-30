@@ -38,6 +38,7 @@
   "dependencies": {
     "@organigram/protocol": "workspace:^",
     "openpgp": "^5.11.2",
+    "predict-deterministic-address": "^1.0.0",
     "typedoc": "^0.26.5",
     "uint8arrays": "^5.1.0"
   },
