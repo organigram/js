@@ -128,7 +128,7 @@ export class Organ {
       })
       .filter(i => i != null)
     const tx = await this.contract.addEntries(_entries, {
-      nonce: options?.nonce
+      ...(options?.nonce != null ? { nonce: options.nonce } : {})
     })
     if (options?.onTransaction != null) {
       options.onTransaction(
@@ -144,7 +144,7 @@ export class Organ {
     options?: TransactionOptions
   ): Promise<ethers.Transaction> => {
     const tx = await this.contract.removeEntries(indexes, {
-      nonce: options?.nonce
+      ...(options?.nonce != null ? { nonce: options.nonce } : {})
     })
     if (options?.onTransaction != null) {
       options.onTransaction(
@@ -164,7 +164,7 @@ export class Organ {
       index,
       entry.address ?? '',
       entry.cid ?? '',
-      { nonce: options?.nonce }
+      { ...(options?.nonce != null ? { nonce: options.nonce } : {}) }
     )
     if (options?.onTransaction != null) {
       options.onTransaction(
@@ -185,7 +185,7 @@ export class Organ {
     const tx = await this.contract.addProcedure(
       procedure.address,
       permissions,
-      { nonce: options?.nonce }
+      { ...(options?.nonce != null ? { nonce: options.nonce } : {}) }
     )
     if (options?.onTransaction != null) {
       options.onTransaction(
@@ -201,7 +201,7 @@ export class Organ {
     options?: TransactionOptions
   ): Promise<ethers.Transaction> => {
     const tx = await this.contract.removeProcedure(procedure, {
-      nonce: options?.nonce
+      ...(options?.nonce != null ? { nonce: options.nonce } : {})
     })
     if (options?.onTransaction != null) {
       options.onTransaction(
@@ -224,7 +224,7 @@ export class Organ {
       oldProcedure,
       newOrganProcedure.address,
       permissions,
-      { nonce: options?.nonce }
+      { ...(options?.nonce != null ? { nonce: options.nonce } : {}) }
     )
     if (options?.onTransaction != null) {
       options.onTransaction(

@@ -69,7 +69,7 @@ export class Organ {
         })
             .filter(i => i != null);
         const tx = await this.contract.addEntries(_entries, {
-            nonce: options?.nonce
+            ...(options?.nonce != null ? { nonce: options.nonce } : {})
         });
         if (options?.onTransaction != null) {
             options.onTransaction(tx, `Add ${_entries.length} entries to organ ${this.address}.`);
@@ -78,7 +78,7 @@ export class Organ {
     };
     removeEntries = async (indexes, options) => {
         const tx = await this.contract.removeEntries(indexes, {
-            nonce: options?.nonce
+            ...(options?.nonce != null ? { nonce: options.nonce } : {})
         });
         if (options?.onTransaction != null) {
             options.onTransaction(tx, `Remove ${indexes.length} entries from organ ${this.address}.`);
@@ -86,7 +86,7 @@ export class Organ {
         return await tx.wait();
     };
     replaceEntry = async (index, entry, options) => {
-        const tx = await this.contract.replaceEntry(index, entry.address ?? '', entry.cid ?? '', { nonce: options?.nonce });
+        const tx = await this.contract.replaceEntry(index, entry.address ?? '', entry.cid ?? '', { ...(options?.nonce != null ? { nonce: options.nonce } : {}) });
         if (options?.onTransaction != null) {
             options.onTransaction(tx, `Replace entry ${index} of organ ${this.address}.`);
         }
@@ -96,7 +96,7 @@ export class Organ {
         const permissions = `0x${procedure.permissions
             .toString(16)
             .padStart(4, '0')}`;
-        const tx = await this.contract.addProcedure(procedure.address, permissions, { nonce: options?.nonce });
+        const tx = await this.contract.addProcedure(procedure.address, permissions, { ...(options?.nonce != null ? { nonce: options.nonce } : {}) });
         if (options?.onTransaction != null) {
             options.onTransaction(tx, `Add procedure ${procedure.address} to organ ${this.address}.`);
         }
@@ -104,7 +104,7 @@ export class Organ {
     };
     removeProcedure = async (procedure, options) => {
         const tx = await this.contract.removeProcedure(procedure, {
-            nonce: options?.nonce
+            ...(options?.nonce != null ? { nonce: options.nonce } : {})
         });
         if (options?.onTransaction != null) {
             options.onTransaction(tx, `Remove procedure ${procedure} from organ ${this.address}.`);
@@ -115,7 +115,7 @@ export class Organ {
         const permissions = `0x${newOrganProcedure.permissions
             .toString(16)
             .padStart(4, '0')}`;
-        const tx = await this.contract.replaceProcedure(oldProcedure, newOrganProcedure.address, permissions, { nonce: options?.nonce });
+        const tx = await this.contract.replaceProcedure(oldProcedure, newOrganProcedure.address, permissions, { ...(options?.nonce != null ? { nonce: options.nonce } : {}) });
         if (options?.onTransaction != null) {
             options.onTransaction(tx, `Replace procedure ${oldProcedure} with ${newOrganProcedure.address} in organ ${this.address}.`);
         }

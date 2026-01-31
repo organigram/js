@@ -1,4 +1,5 @@
 import deployedAddresses from '@organigram/protocol/deployments.json';
+import sha3 from 'js-sha3';
 export { deployedAddresses };
 export const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000';
 export const PERMISSIONS = {
@@ -21,3 +22,53 @@ export const PERMISSIONS = {
 export const getPermissionsSet = (permissions) => Object.entries(PERMISSIONS)
     .filter((permission) => (permissions & permission[1]) === permission[1])
     .map((permission) => permission[0]);
+const PROXY_START = '0x3d602d80600a3d3981f3363d3d373d3d3d363d73';
+const PROXY_END = '5af43d82803e903d91602b57fd5bf3';
+export function predictDeterministicAddress(implementation, salt, deployer, virtualMachine = 'EVM') {
+    const creationCode = PROXY_START + removeHexStart(implementation).toLowerCase() + PROXY_END;
+    const bytecode = keccak256(creationCode);
+    const vm = getVM(virtualMachine);
+    return toChecksumAddress(`0x${keccak256(`0x${[vm, deployer, salt, bytecode].map(removeHexStart).join('')}`).slice(-40)}`);
+}
+function getVM(vm) {
+    if (!vm || vm === 'EVM')
+        return 'ff';
+    throw new Error('Invalid virtual machine code');
+}
+function keccak256(value) {
+    value = removeHexStart(value);
+    return sha3.keccak_256(hexToInts(value));
+}
+function removeHexStart(value) {
+    if (value[0] === '0' && value[1] === 'x')
+        return value.slice(2);
+    return value;
+}
+function toChecksumAddress(address) {
+    if (typeof address !== 'string') {
+        throw new Error('Invalid address: ' + address);
+    }
+    if (!/^(0x)?[0-9a-f]{40}$/i.test(address)) {
+        throw new Error('Invalid address: ' + address);
+    }
+    const addr = removeHexStart(address).toLowerCase();
+    const hash = sha3.keccak_256(addr);
+    let checksum = '0x';
+    for (let i = 0; i < addr.length; i++) {
+        const shouldUpperCase = parseInt(hash[i], 16) > 7;
+        checksum += shouldUpperCase ? addr[i].toUpperCase() : addr[i];
+    }
+    return checksum;
+}
+function hexToInts(hex) {
+    const ints = new Uint8Array(hex.length / 2);
+    let count = 0;
+    for (let i = 0; i < ints.length; i++) {
+        ints[i] = fromHex(hex.substr(count, 2));
+        count += 2;
+    }
+    return ints;
+}
+function fromHex(byte) {
+    return parseInt(byte, 16);
+}

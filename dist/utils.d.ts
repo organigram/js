@@ -19,3 +19,4 @@ export declare const PERMISSIONS: {
     WITHDRAW_COLLECTIBLES: number;
 };
 export declare const getPermissionsSet: (permissions: number) => string[];
+export declare function predictDeterministicAddress(implementation: string, salt: string, deployer: string, virtualMachine?: string): string;

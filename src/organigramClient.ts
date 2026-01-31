@@ -2,7 +2,7 @@ import { ethers, type EventLog, type ContractTransaction } from 'ethers'
 import deployedAddresses from '@organigram/protocol/deployments.json'
 import OrganigramContractABI from '@organigram/protocol/artifacts/contracts/OrganigramClient.sol/OrganigramClient.json'
 import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json'
-import { predictDeterministicAddress } from 'predict-deterministic-address'
+import { predictDeterministicAddress } from './utils'
 import crypto from 'crypto'
 
 import Organ from './organ'
@@ -17,8 +17,8 @@ const checkSalt = (salt?: string) =>
     : ethers.id(salt)
 
 export interface TransactionOptions {
-  index?: number
   nonce?: number
+  customData?: { index?: number }
   onTransaction?: (tx: ethers.TransactionResponse, description: string) => void
 }
 
@@ -349,11 +349,12 @@ export class OrganigramClient {
     }
     let nonce: bigint | undefined
     if (options?.nonce != null) {
-      nonce = BigInt(options?.nonce ?? 0) + BigInt(options?.index ?? 0)
+      nonce = BigInt(options?.nonce ?? 0)
     }
     const _salt = checkSalt(salt)
     const tx = await this.contract.createOrgan(admin, metadata, _salt, {
-      nonce
+      nonce,
+      customData: options?.customData
     })
     if (options?.onTransaction != null) {
       options.onTransaction(tx, `Create organ with CID ${metadata.toString()}`)
@@ -402,7 +403,7 @@ export class OrganigramClient {
       procedureType.address,
       initialize?.data,
       _salt,
-      { nonce }
+      { nonce, customData: options?.customData }
     )
     if (options?.onTransaction != null) {
       options.onTransaction(

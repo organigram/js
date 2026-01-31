@@ -2,8 +2,10 @@ import { ethers, type ContractTransaction } from 'ethers';
 import Organ from './organ';
 import { Procedure } from './procedure';
 export interface TransactionOptions {
-    index?: number;
     nonce?: number;
+    customData?: {
+        index?: number;
+    };
     onTransaction?: (tx: ethers.TransactionResponse, description: string) => void;
 }
 export interface File {
