@@ -1,16 +1,49 @@
 import deployedAddresses from '@organigram/protocol/deployments.json'
-import sha3 from 'js-sha3'
-import crypto from 'crypto'
 import { ethers } from 'ethers'
+import sha3 from 'js-sha3'
 
 export { deployedAddresses }
 
 export const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000'
 
-export const formatSalt = (salt?: string) =>
-  salt == null || salt.length === 0
-    ? '0x' + crypto.randomBytes(32).toString('hex')
-    : ethers.id(salt)
+export const predictContractAddress = ({
+  type,
+  chainId,
+  salt
+}: {
+  type:
+    | 'Organ'
+    | 'Asset'
+    | 'Erc20VoteProcedure'
+    | 'VoteProcedure'
+    | 'NominationProcedure'
+  chainId: string
+  salt: string
+}): string =>
+  predictDeterministicAddress(
+    deployedAddresses[chainId as '11155111'][type as 'Organ'],
+    deployedAddresses[chainId as '11155111'].OrganigramClient,
+    salt
+  )
+
+export const createRandom32BytesHexId = () =>
+  ethers.hexlify(ethers.randomBytes(32))
+
+export const formatSalt = (salt?: string) => {
+  if (salt == null) {
+    return createRandom32BytesHexId()
+  } else if (
+    salt.length === 0 ||
+    !salt.startsWith('0x') ||
+    salt.length !== 66
+  ) {
+    throw new Error(
+      'Invalid salt: ' +
+        salt +
+        'Salt must be a 32 bytes hex string prefixed with 0x'
+    )
+  } else return salt
+}
 
 // Organ permissions granted to procedures
 export const PERMISSIONS = {
@@ -42,7 +75,7 @@ export const getPermissionsSet = (permissions: number): string[] =>
 const PROXY_START = '0x3d602d80600a3d3981f3363d3d373d3d3d363d73'
 const PROXY_END = '5af43d82803e903d91602b57fd5bf3'
 
-export function predictDeterministicAddress(
+function predictDeterministicAddress(
   implementation: string,
   salt: string,
   deployer: string,
@@ -68,10 +101,11 @@ function getVM(vm: string | undefined) {
 function keccak256(value: string): string {
   value = removeHexStart(value)
   return sha3.keccak_256(hexToInts(value))
+  // return ethers.keccak256(`0x${value}`).slice(2)
 }
 
 function removeHexStart(value: string): string {
-  if (value[0] === '0' && value[1] === 'x') return value.slice(2)
+  if (value?.[0] === '0' && value[1] === 'x') return value.slice(2)
   return value
 }
 
@@ -86,6 +120,7 @@ function toChecksumAddress(address: string): string {
 
   const addr = removeHexStart(address).toLowerCase()
   const hash = sha3.keccak_256(addr)
+  // const hash = ethers.keccak256(`0x${addr}`).slice(2)
   let checksum = '0x'
 
   for (let i = 0; i < addr.length; i++) {

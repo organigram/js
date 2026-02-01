@@ -91,7 +91,6 @@ export declare class OrganigramClient {
         options: TransactionOptions | undefined;
     }[]>;
     createProcedures(createProceduresInput: CreateProceduresInput[]): Promise<EnhancedProcedure[]>;
-    predictContractAddress(type: 'Organ' | 'Erc20Vote' | 'Vote' | 'Nomination', salt: string): Promise<string>;
     deployOrganigram(input: {
         organs: CreateOrganInput[];
         assets: CreateAssetInput[];

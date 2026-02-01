@@ -1,8 +1,7 @@
 import { ethers, type EventLog, type ContractTransaction } from 'ethers'
-import deployedAddresses from '@organigram/protocol/deployments.json'
 import OrganigramContractABI from '@organigram/protocol/artifacts/contracts/OrganigramClient.sol/OrganigramClient.json'
 import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json'
-import { formatSalt, predictDeterministicAddress } from './utils'
+import { formatSalt } from './utils'
 
 import Organ, { OrganProcedure } from './organ'
 import { Procedure } from './procedure'
@@ -780,17 +779,6 @@ export class OrganigramClient {
             return { address } as unknown as EnhancedProcedure
           })
       )
-    )
-  }
-
-  async predictContractAddress(
-    type: 'Organ' | 'Erc20Vote' | 'Vote' | 'Nomination',
-    salt: string
-  ): Promise<string> {
-    return predictDeterministicAddress(
-      deployedAddresses[this.chainId as '11155111'][type as 'Organ'],
-      this.address,
-      salt
     )
   }
 

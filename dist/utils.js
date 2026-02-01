@@ -1,12 +1,24 @@
 import deployedAddresses from '@organigram/protocol/deployments.json';
-import sha3 from 'js-sha3';
-import crypto from 'crypto';
 import { ethers } from 'ethers';
+import sha3 from 'js-sha3';
 export { deployedAddresses };
 export const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000';
-export const formatSalt = (salt) => salt == null || salt.length === 0
-    ? '0x' + crypto.randomBytes(32).toString('hex')
-    : ethers.id(salt);
+export const predictContractAddress = ({ type, chainId, salt }) => predictDeterministicAddress(deployedAddresses[chainId][type], deployedAddresses[chainId].OrganigramClient, salt);
+export const createRandom32BytesHexId = () => ethers.hexlify(ethers.randomBytes(32));
+export const formatSalt = (salt) => {
+    if (salt == null) {
+        return createRandom32BytesHexId();
+    }
+    else if (salt.length === 0 ||
+        !salt.startsWith('0x') ||
+        salt.length !== 66) {
+        throw new Error('Invalid salt: ' +
+            salt +
+            'Salt must be a 32 bytes hex string prefixed with 0x');
+    }
+    else
+        return salt;
+};
 export const PERMISSIONS = {
     ADMIN: 0xffff,
     ALL: 0x07ff,
@@ -29,7 +41,7 @@ export const getPermissionsSet = (permissions) => Object.entries(PERMISSIONS)
     .map((permission) => permission[0]);
 const PROXY_START = '0x3d602d80600a3d3981f3363d3d373d3d3d363d73';
 const PROXY_END = '5af43d82803e903d91602b57fd5bf3';
-export function predictDeterministicAddress(implementation, salt, deployer, virtualMachine = 'EVM') {
+function predictDeterministicAddress(implementation, salt, deployer, virtualMachine = 'EVM') {
     const creationCode = PROXY_START + removeHexStart(implementation).toLowerCase() + PROXY_END;
     const bytecode = keccak256(creationCode);
     const vm = getVM(virtualMachine);
@@ -45,7 +57,7 @@ function keccak256(value) {
     return sha3.keccak_256(hexToInts(value));
 }
 function removeHexStart(value) {
-    if (value[0] === '0' && value[1] === 'x')
+    if (value?.[0] === '0' && value[1] === 'x')
         return value.slice(2);
     return value;
 }

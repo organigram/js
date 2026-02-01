@@ -1,6 +1,12 @@
 import deployedAddresses from '@organigram/protocol/deployments.json';
 export { deployedAddresses };
 export declare const EMPTY_ADDRESS = "0x0000000000000000000000000000000000000000";
+export declare const predictContractAddress: ({ type, chainId, salt }: {
+    type: "Organ" | "Asset" | "Erc20VoteProcedure" | "VoteProcedure" | "NominationProcedure";
+    chainId: string;
+    salt: string;
+}) => string;
+export declare const createRandom32BytesHexId: () => string;
 export declare const formatSalt: (salt?: string) => string;
 export declare const PERMISSIONS: {
     ADMIN: number;
@@ -20,4 +26,3 @@ export declare const PERMISSIONS: {
     WITHDRAW_COLLECTIBLES: number;
 };
 export declare const getPermissionsSet: (permissions: number) => string[];
-export declare function predictDeterministicAddress(implementation: string, salt: string, deployer: string, virtualMachine?: string): string;

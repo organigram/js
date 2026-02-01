@@ -1,8 +1,7 @@
 import { ethers } from 'ethers';
-import deployedAddresses from '@organigram/protocol/deployments.json';
 import OrganigramContractABI from '@organigram/protocol/artifacts/contracts/OrganigramClient.sol/OrganigramClient.json';
 import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json';
-import { formatSalt, predictDeterministicAddress } from './utils';
+import { formatSalt } from './utils';
 import Organ from './organ';
 import { Procedure } from './procedure';
 import { NominationProcedure } from './procedure/nomination';
@@ -371,9 +370,6 @@ export class OrganigramClient {
                 ' after creating it.', error.message);
             return { address };
         })));
-    }
-    async predictContractAddress(type, salt) {
-        return predictDeterministicAddress(deployedAddresses[this.chainId][type], this.address, salt);
     }
     async deployOrganigram(input) {
         if (this.signer == null) {
