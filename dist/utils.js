@@ -1,7 +1,12 @@
 import deployedAddresses from '@organigram/protocol/deployments.json';
 import sha3 from 'js-sha3';
+import crypto from 'crypto';
+import { ethers } from 'ethers';
 export { deployedAddresses };
 export const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000';
+export const formatSalt = (salt) => salt == null || salt.length === 0
+    ? '0x' + crypto.randomBytes(32).toString('hex')
+    : ethers.id(salt);
 export const PERMISSIONS = {
     ADMIN: 0xffff,
     ALL: 0x07ff,

@@ -1,6 +1,30 @@
 import { ethers, type ContractTransaction } from 'ethers';
-import Organ from './organ';
+import Organ, { OrganProcedure } from './organ';
 import { Procedure } from './procedure';
+export interface CreateOrganInput {
+    metadata: string;
+    procedures: OrganProcedure[];
+    salt?: string;
+    options?: TransactionOptions;
+}
+export interface CreateProceduresInput {
+    type: string;
+    cid: string;
+    proposers: string;
+    moderators: string;
+    deciders: string;
+    withModeration: boolean;
+    forwarder: string;
+    salt?: string;
+    options?: TransactionOptions;
+    args?: unknown[];
+}
+export interface CreateAssetInput {
+    name: string;
+    symbol: string;
+    initialSupply: number;
+    salt?: string;
+}
 export interface TransactionOptions {
     nonce?: number;
     customData?: {
@@ -42,11 +66,36 @@ export declare class OrganigramClient {
     getProcedureType(procedureAddress: string): Promise<ProcedureType | null>;
     getOrgan(address: string, cached?: boolean): Promise<Organ>;
     getProcedure(address: string, cached?: boolean): Promise<EnhancedProcedure>;
-    getContract(address: string, cached?: boolean): Promise<Organ | EnhancedProcedure | null>;
-    createOrgan(metadata: string, admin: string, salt?: string, options?: TransactionOptions): Promise<Organ>;
-    _createProcedure(type: string, initialize: ethers.ContractTransaction, salt?: string, options?: TransactionOptions): Promise<Procedure>;
+    createOrgan({ metadata, procedures, salt, options }: CreateOrganInput): Promise<Organ>;
+    _prepareCreateOrgansInput(createOrgansInput: CreateOrganInput[]): {
+        procedures: string[];
+        permissions: number[];
+        cid: string;
+        salt: string;
+    }[];
+    createOrgans(createOrgansInput: CreateOrganInput[]): Promise<Organ[]>;
+    createAsset(name: string, symbol: string, initialSupply: number, salt?: string, options?: TransactionOptions): Promise<string>;
+    createAssets(assets: CreateAssetInput[], options?: TransactionOptions): Promise<string[]>;
+    _createProcedure({ type, initialize, salt, options }: {
+        type: string;
+        initialize: ethers.ContractTransaction;
+        salt?: string;
+        options?: TransactionOptions;
+    }): Promise<Procedure>;
     _populateInitializeProcedure(type: string, options: TransactionOptions, cid: string, proposers: string, moderators: string, deciders: string, withModeration: boolean, forwarder: string, ...args: unknown[]): Promise<ContractTransaction>;
-    createProcedure(type: string, options: TransactionOptions, cid: string, proposers: string, moderators: string, deciders: string, withModeration: boolean, forwarder: string, salt?: string, ...args: unknown[]): Promise<EnhancedProcedure>;
+    createProcedure(type: string, options: TransactionOptions, cid: string, proposers: string, moderators: string, deciders: string, withModeration: boolean, forwarder: string, salt: string, ...args: unknown[]): Promise<EnhancedProcedure>;
+    _prepareCreateProceduresInput(createProceduresInput: CreateProceduresInput[]): Promise<{
+        procedureType: string;
+        data: string;
+        salt: string;
+        options: TransactionOptions | undefined;
+    }[]>;
+    createProcedures(createProceduresInput: CreateProceduresInput[]): Promise<EnhancedProcedure[]>;
     predictContractAddress(type: 'Organ' | 'Erc20Vote' | 'Vote' | 'Nomination', salt: string): Promise<string>;
+    deployOrganigram(input: {
+        organs: CreateOrganInput[];
+        assets: CreateAssetInput[];
+        procedures: CreateProceduresInput[];
+    }): Promise<ContractTransaction>;
 }
 export default OrganigramClient;

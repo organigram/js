@@ -2,16 +2,12 @@ import { ethers } from 'ethers';
 import deployedAddresses from '@organigram/protocol/deployments.json';
 import OrganigramContractABI from '@organigram/protocol/artifacts/contracts/OrganigramClient.sol/OrganigramClient.json';
 import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json';
-import { predictDeterministicAddress } from './utils';
-import crypto from 'crypto';
+import { formatSalt, predictDeterministicAddress } from './utils';
 import Organ from './organ';
 import { Procedure } from './procedure';
 import { NominationProcedure } from './procedure/nomination';
 import { VoteProcedure } from './procedure/vote';
 import { ERC20VoteProcedure } from './procedure/erc20Vote';
-const checkSalt = (salt) => salt == null || salt.length === 0
-    ? '0x' + crypto.randomBytes(32).toString('hex')
-    : ethers.id(salt);
 const procedureMetadata = {
     description: '',
     _type: 'procedureType',
@@ -174,14 +170,7 @@ export class OrganigramClient {
         }
         return procedure;
     }
-    async getContract(address, cached = true) {
-        return (await Organ.isOrgan(address, this.provider))
-            ? await this.getOrgan(address, cached)
-            : (await Procedure.isProcedure(address, this.provider))
-                ? await this.getProcedure(address, cached)
-                : null;
-    }
-    async createOrgan(metadata, admin, salt, options) {
+    async createOrgan({ metadata, procedures, salt, options }) {
         if (this.signer == null) {
             throw new Error('Signer not connected.');
         }
@@ -189,8 +178,14 @@ export class OrganigramClient {
         if (options?.nonce != null) {
             nonce = BigInt(options?.nonce ?? 0);
         }
-        const _salt = checkSalt(salt);
-        const tx = await this.contract.createOrgan(admin, metadata, _salt, {
+        const _salt = formatSalt(salt);
+        const _procedures = [];
+        const _permissions = [];
+        procedures.forEach(p => {
+            _procedures.push(p.address);
+            _permissions.push(p.permissions);
+        });
+        const tx = await this.contract.createOrgan(_procedures, _permissions, metadata, _salt, {
             nonce,
             customData: options?.customData
         });
@@ -208,7 +203,88 @@ export class OrganigramClient {
             return { address };
         });
     }
-    async _createProcedure(type, initialize, salt, options) {
+    _prepareCreateOrgansInput(createOrgansInput) {
+        return createOrgansInput.map(organ => {
+            const _procedures = [];
+            const _permissions = [];
+            organ.procedures.forEach(p => {
+                _procedures.push(p.address);
+                _permissions.push(p.permissions);
+            });
+            return {
+                procedures: _procedures,
+                permissions: _permissions,
+                cid: organ.metadata,
+                salt: formatSalt(organ.salt)
+            };
+        });
+    }
+    async createOrgans(createOrgansInput) {
+        if (this.signer == null) {
+            throw new Error('Signer not connected.');
+        }
+        const input = this._prepareCreateOrgansInput(createOrgansInput);
+        const tx = await this.contract.createOrgans(input);
+        const receipt = await tx?.wait();
+        const eventCreations = receipt?.logs?.filter((e) => e.address !== this.address);
+        if (eventCreations == null || eventCreations.length === 0) {
+            throw new Error('Organ creations failed.');
+        }
+        const addresses = eventCreations.map((eventCreation) => eventCreation.address);
+        return await Promise.all(addresses.map(async (address) => await this.getOrgan(address, false).catch((error) => {
+            console.error('Unable to load organ with address ' +
+                address +
+                ' after creating it in batch.', error.message);
+            return { address };
+        })));
+    }
+    async createAsset(name, symbol, initialSupply, salt, options) {
+        if (this.signer == null) {
+            throw new Error('Signer not connected.');
+        }
+        let nonce;
+        if (options?.nonce != null) {
+            nonce = BigInt(options?.nonce);
+        }
+        const tx = await this.contract.createAsset(name, symbol, initialSupply, formatSalt(salt), {
+            nonce,
+            customData: options?.customData
+        });
+        if (options?.onTransaction != null) {
+            options.onTransaction(tx, `Create asset ${name} (${symbol})`);
+        }
+        const receipt = await tx?.wait();
+        const address = receipt?.logs?.find((e) => e.address !== this.address).address;
+        if (address == null) {
+            throw new Error('Asset creation failed.');
+        }
+        return address;
+    }
+    async createAssets(assets, options) {
+        if (this.signer == null) {
+            throw new Error('Signer not connected.');
+        }
+        const formattedAssets = assets.map(asset => ({
+            name: asset.name,
+            symbol: asset.symbol,
+            initialSupply: asset.initialSupply,
+            salt: formatSalt(asset.salt)
+        }));
+        const tx = await this.contract.createAssets(formattedAssets, {
+            customData: options?.customData
+        });
+        if (options?.onTransaction != null) {
+            options.onTransaction(tx, `Create ${assets.length} assets`);
+        }
+        const receipt = await tx?.wait();
+        const eventCreations = receipt?.logs?.filter((e) => e.address !== this.address);
+        if (eventCreations == null || eventCreations.length === 0) {
+            throw new Error('Asset batch creations failed.');
+        }
+        const addresses = eventCreations.map((eventCreation) => eventCreation.address);
+        return addresses;
+    }
+    async _createProcedure({ type, initialize, salt, options }) {
         if (this.signer == null) {
             throw new Error('Signer not connected.');
         }
@@ -220,7 +296,7 @@ export class OrganigramClient {
         if (options?.nonce != null) {
             nonce = BigInt(options?.nonce);
         }
-        const _salt = checkSalt(salt);
+        const _salt = formatSalt(salt);
         const tx = await this.contract.createProcedure(procedureType.address, initialize?.data, _salt, { nonce, customData: options?.customData });
         if (options?.onTransaction != null) {
             options.onTransaction(tx, `Create procedure of type ${procedureType.name}`);
@@ -256,7 +332,12 @@ export class OrganigramClient {
     }
     async createProcedure(type, options, cid, proposers, moderators, deciders, withModeration, forwarder, salt, ...args) {
         const initializeProcedure = await this._populateInitializeProcedure(type, options, cid, proposers, moderators, deciders, withModeration, forwarder, ...args);
-        const { address } = await this._createProcedure(type, initializeProcedure, salt, options);
+        const { address } = await this._createProcedure({
+            type,
+            initialize: initializeProcedure,
+            salt,
+            options
+        });
         return await this.getProcedure(address, false).catch((error) => {
             console.error('Unable to load procedure with address ' +
                 address +
@@ -264,8 +345,50 @@ export class OrganigramClient {
             return { address };
         });
     }
+    async _prepareCreateProceduresInput(createProceduresInput) {
+        return await Promise.all(createProceduresInput.map(async (procedure) => {
+            const initialize = await this._populateInitializeProcedure(procedure.type, procedure.options ?? {}, procedure.cid, procedure.proposers, procedure.moderators, procedure.deciders, procedure.withModeration, procedure.forwarder, ...(procedure.args ?? []));
+            return {
+                procedureType: procedure.type,
+                data: initialize.data,
+                salt: formatSalt(procedure.salt),
+                options: procedure.options
+            };
+        }));
+    }
+    async createProcedures(createProceduresInput) {
+        const input = await this._prepareCreateProceduresInput(createProceduresInput);
+        const tx = await this.contract.createProcedures(input, {});
+        const receipt = await tx?.wait();
+        const eventCreations = receipt?.logs?.filter((e) => e.address !== this.address);
+        if (eventCreations == null || eventCreations.length === 0) {
+            throw new Error('Procedure batch creations failed.');
+        }
+        const addresses = eventCreations.map((eventCreation) => eventCreation.address);
+        return await Promise.all(addresses.map(async (address) => await this.getProcedure(address, false).catch((error) => {
+            console.error('Unable to load procedure with address ' +
+                address +
+                ' after creating it.', error.message);
+            return { address };
+        })));
+    }
     async predictContractAddress(type, salt) {
-        return await predictDeterministicAddress(deployedAddresses[this.chainId][type], this.address, salt);
+        return predictDeterministicAddress(deployedAddresses[this.chainId][type], this.address, salt);
+    }
+    async deployOrganigram(input) {
+        if (this.signer == null) {
+            throw new Error('Signer not connected.');
+        }
+        const formattedAssets = input.assets.map(asset => ({
+            name: asset.name,
+            symbol: asset.symbol,
+            initialSupply: asset.initialSupply,
+            salt: formatSalt(asset.salt)
+        }));
+        const organsInput = await this._prepareCreateOrgansInput(input.organs);
+        const proceduresInput = await this._prepareCreateProceduresInput(input.procedures);
+        const tx = await this.contract.deployOrganigram(organsInput, formattedAssets, proceduresInput);
+        return tx;
     }
 }
 export default OrganigramClient;

@@ -1,7 +1,9 @@
 import { strictEqual } from 'assert'
-import deployedAddresses from '@organigram/protocol/ignition/deployments/chain-11155111/deployed_addresses.json'
-import { ethers, JsonRpcProvider, Signer } from 'ethers'
+import deployedAddresses from '@organigram/protocol/deployments.json'
+import { ethers, isAddress, JsonRpcProvider, Signer } from 'ethers'
 import {
+  ERC20_INITIAL_SUPPLY,
+  formatSalt,
   OrganigramClient,
   type Organ,
   type ProcedureProposalOperation
@@ -19,7 +21,7 @@ const ERC20_EXAMPLE = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238' // Sepolia US
 
 const txOptions: TransactionOptions = {
   onTransaction: (tx, description) => {
-    console.info('New transaction:', description, 'Hash:', tx.hash)
+    console.info('New test transaction:', description, 'Hash:', tx.hash)
   }
 }
 
@@ -71,7 +73,7 @@ describe('Organigram JS Client', () => {
 
     beforeEach(async () => {
       organigramClient = await OrganigramClient.load(
-        deployedAddresses['OrganigramClientModule#OrganigramClient'],
+        deployedAddresses['11155111'].OrganigramClient,
         provider,
         signer
       )
@@ -82,12 +84,59 @@ describe('Organigram JS Client', () => {
     })
 
     it('should create an organ', async () => {
-      organ = await organigramClient.createOrgan(
-        '',
-        await signer.getAddress(),
+      organ = await organigramClient.createOrgan({
+        metadata: '',
+        procedures: [],
+        options: txOptions
+      })
+      strictEqual(organ?.address != null, true)
+    })
+
+    it('should create organs in batch', async () => {
+      const organs = await organigramClient.createOrgans([
+        {
+          metadata: '',
+          procedures: []
+        },
+        {
+          metadata: '',
+          procedures: []
+        }
+      ])
+      strictEqual(organs?.length === 2, true)
+    })
+
+    it('should deploy an ERC20 asset', async () => {
+      const asset = await organigramClient.createAsset(
+        'ERC20',
+        'ERC',
+        ERC20_INITIAL_SUPPLY,
+        undefined,
         txOptions
       )
-      strictEqual(organ?.address != null, true)
+      strictEqual(isAddress(asset), true)
+    })
+
+    it('should deploy assets in batch', async () => {
+      const assets = await organigramClient.createAssets(
+        [
+          {
+            name: 'ERC20_1',
+            symbol: 'ERC',
+            initialSupply: ERC20_INITIAL_SUPPLY,
+            salt: undefined
+          },
+          {
+            name: 'ERC20_2',
+            symbol: 'ERC',
+            initialSupply: ERC20_INITIAL_SUPPLY,
+            salt: undefined
+          }
+        ],
+        txOptions
+      )
+      strictEqual(assets?.length === 2, true)
+      strictEqual(isAddress(assets[0]), true)
     })
 
     describe('Nomination', () => {
@@ -104,7 +153,8 @@ describe('Organigram JS Client', () => {
           address,
           address,
           false,
-          process.env.NEXT_PUBLIC_SEPOLIA_GAS_STATION_FORWARDER as string
+          deployedAddresses['11155111'].MetaGasStation,
+          formatSalt()
         )) as unknown as NominationProcedure
 
         strictEqual(procedure?.address != null, true)
@@ -191,7 +241,8 @@ describe('Organigram JS Client', () => {
           address,
           address,
           false,
-          process.env.NEXT_PUBLIC_SEPOLIA_GAS_STATION_FORWARDER as string,
+          deployedAddresses['11155111'].MetaGasStation,
+          formatSalt(),
           '1',
           '8',
           '1'
@@ -275,7 +326,8 @@ describe('Organigram JS Client', () => {
           address,
           address,
           false,
-          process.env.NEXT_PUBLIC_SEPOLIA_GAS_STATION_FORWARDER as string,
+          deployedAddresses['11155111'].MetaGasStation,
+          formatSalt(),
           ERC20_EXAMPLE,
           '1',
           '1',
@@ -345,13 +397,79 @@ describe('Organigram JS Client', () => {
         strictEqual(payload.blocked, true)
       })
     })
-  })
 
-  // describe('Cleanup', () => {
-  //   it('should terminate ipfs', () => {
-  //     try {
-  //       void ipfs?.stop()
-  //     } catch (_err) {}
-  //   })
-  // })
+    it('should create procedures in batch', async () => {
+      const address = await signer.getAddress()
+      const procedures = await organigramClient.createProcedures([
+        {
+          type: deployedAddresses['11155111'].NominationProcedure,
+          cid: '',
+          proposers: address,
+          moderators: address,
+          deciders: address,
+          withModeration: false,
+          forwarder: deployedAddresses['11155111'].MetaGasStation
+        },
+        {
+          type: deployedAddresses['11155111'].VoteProcedure,
+          cid: '',
+          proposers: address,
+          moderators: address,
+          deciders: address,
+          withModeration: false,
+          forwarder: deployedAddresses['11155111'].MetaGasStation,
+          args: ['1', '8', '1']
+        }
+      ])
+      strictEqual(procedures?.length === 2, true)
+    })
+
+    it('should deploy test organigram', async () => {
+      const address = await signer.getAddress()
+      const organigram = await organigramClient.deployOrganigram({
+        organs: [
+          {
+            metadata: '',
+            procedures: []
+          },
+          {
+            metadata: '',
+            procedures: []
+          }
+        ],
+        assets: [
+          {
+            name: 'ERC20_Organigram',
+            symbol: 'ERC',
+            initialSupply: ERC20_INITIAL_SUPPLY,
+            salt: undefined
+          }
+        ],
+        procedures: [
+          {
+            type: deployedAddresses['11155111'].NominationProcedure,
+            cid: '',
+            proposers: address,
+            moderators: address,
+            deciders: address,
+            withModeration: false,
+            forwarder: deployedAddresses['11155111'].MetaGasStation
+          },
+          {
+            type: deployedAddresses['11155111'].VoteProcedure,
+            cid: '',
+            proposers: address,
+            moderators: address,
+            deciders: address,
+            withModeration: false,
+            forwarder: deployedAddresses['11155111'].MetaGasStation,
+            args: ['1', '8', '1']
+          }
+        ]
+      })
+      strictEqual(organigram != null, true)
+    })
+  })
 })
+
+// predictContractAddresses()

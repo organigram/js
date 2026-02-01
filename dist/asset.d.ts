@@ -1,4 +1,5 @@
 import { type BaseContract, type Contract as EthersContract, type Signer } from 'ethers';
+export declare const ERC20_INITIAL_SUPPLY = 10000000;
 export interface Asset {
     contract: EthersContract;
     name: string;
