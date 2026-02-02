@@ -84,7 +84,7 @@ describe('Organigram JS Client', () => {
     })
 
     it('should create an organ', async () => {
-      organ = await organigramClient.createOrgan({
+      organ = await organigramClient.deployOrgan({
         metadata: '',
         permissions: [],
         options: txOptions
@@ -93,7 +93,7 @@ describe('Organigram JS Client', () => {
     })
 
     it('should create organs in batch', async () => {
-      const organs = await organigramClient.createOrgans([
+      const organs = await organigramClient.deployOrgans([
         {
           metadata: '',
           permissions: []
@@ -107,7 +107,7 @@ describe('Organigram JS Client', () => {
     })
 
     it('should deploy an ERC20 asset', async () => {
-      const asset = await organigramClient.createAsset(
+      const asset = await organigramClient.deployAsset(
         'ERC20',
         'ERC',
         ERC20_INITIAL_SUPPLY,
@@ -118,7 +118,7 @@ describe('Organigram JS Client', () => {
     })
 
     it('should deploy assets in batch', async () => {
-      const assets = await organigramClient.createAssets(
+      const assets = await organigramClient.deployAssets(
         [
           {
             name: 'ERC20_1',
@@ -146,7 +146,7 @@ describe('Organigram JS Client', () => {
       it('should create a nomination procedure', async () => {
         const address = await signer.getAddress()
 
-        procedure = (await organigramClient.createProcedure(
+        procedure = (await organigramClient.deployProcedure(
           organigramClient.procedureTypes[0].address,
           txOptions,
           '',
@@ -234,7 +234,7 @@ describe('Organigram JS Client', () => {
 
       it('should create a vote procedure', async () => {
         const address = await signer.getAddress()
-        procedure = (await organigramClient.createProcedure(
+        procedure = (await organigramClient.deployProcedure(
           organigramClient.procedureTypes[1].address,
           txOptions,
           '',
@@ -319,7 +319,7 @@ describe('Organigram JS Client', () => {
 
       it('should create an erc20Vote procedure', async () => {
         const address = await signer.getAddress()
-        procedure = (await organigramClient.createProcedure(
+        procedure = (await organigramClient.deployProcedure(
           organigramClient.procedureTypes[2].address,
           txOptions,
           '',
@@ -401,7 +401,7 @@ describe('Organigram JS Client', () => {
 
     it('should create procedures in batch', async () => {
       const address = await signer.getAddress()
-      const procedures = await organigramClient.createProcedures([
+      const procedures = await organigramClient.deployProcedures([
         {
           type: deployedAddresses['11155111'].NominationProcedure,
           cid: '',

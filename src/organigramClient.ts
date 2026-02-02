@@ -4,19 +4,20 @@ import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Proce
 import { formatSalt } from './utils'
 
 import Organ, { OrganPermission } from './organ'
+import { Asset } from './asset'
 import { Procedure } from './procedure'
 import { NominationProcedure } from './procedure/nomination'
 import { VoteProcedure } from './procedure/vote'
 import { ERC20VoteProcedure } from './procedure/erc20Vote'
 
-export interface CreateOrganInput {
+export interface DeployOrganInput {
   metadata: string
   permissions: OrganPermission[]
   salt?: string
   options?: TransactionOptions
 }
 
-export interface CreateProceduresInput {
+export interface DeployProceduresInput {
   type: string
   cid: string
   proposers: string
@@ -86,6 +87,12 @@ export interface ProcedureType {
 
 export type EnhancedProcedure = Procedure & {
   type: ProcedureType
+}
+
+export type Organigram = {
+  organs: Organ[]
+  assets: Asset[]
+  procedures: EnhancedProcedure[]
 }
 
 export class OrganigramClient {
@@ -215,11 +222,11 @@ export class OrganigramClient {
   }
 
   /**
-   * Loads an instance of Organigram manager.
+   * Loads an instance of Organigram client.
    * @param {string} address - The contract address.
    * @param {ethers.Provider} provider - The ethers provider.
    * @param {ethers.Signer} [signer] - The ethers signer.
-   * @returns {Promise<Organigram>} A promise that resolves to an instance of Organigram.
+   * @returns {Promise<OrganigramClient>} A promise that resolves to an instance of OrganigramClient  .
    * @throws {Error} Throws an error if no provider or signer is provided.
    */
   static async load(
@@ -363,12 +370,12 @@ export class OrganigramClient {
   // }
 
   // Create and load an organ.
-  async createOrgan({
+  async deployOrgan({
     metadata,
     permissions,
     salt,
     options
-  }: CreateOrganInput): Promise<Organ> {
+  }: DeployOrganInput): Promise<Organ> {
     if (this.signer == null) {
       throw new Error('Signer not connected.')
     }
@@ -383,7 +390,7 @@ export class OrganigramClient {
       _permissionAddresses.push(p.permissionAddress)
       _permissionValues.push(p.permissionValue)
     })
-    const tx = await this.contract.createOrgan(
+    const tx = await this.contract.deployOrgan(
       _permissionAddresses,
       _permissionValues,
       metadata,
@@ -394,7 +401,7 @@ export class OrganigramClient {
       }
     )
     if (options?.onTransaction != null) {
-      options.onTransaction(tx, `Create organ with CID ${metadata.toString()}`)
+      options.onTransaction(tx, `Deploy organ with CID ${metadata.toString()}`)
     }
     const receipt = await tx?.wait()
     const eventCreation = receipt?.logs?.find(
@@ -416,8 +423,8 @@ export class OrganigramClient {
     })
   }
 
-  _prepareCreateOrgansInput(createOrgansInput: CreateOrganInput[]) {
-    return createOrgansInput.map(organ => {
+  _prepareDeployOrgansInput(deployOrgansInput: DeployOrganInput[]) {
+    return deployOrgansInput.map(organ => {
       const _permissionAddresses: string[] = []
       const _permissionValues: number[] = []
       organ.permissions.forEach(p => {
@@ -433,12 +440,12 @@ export class OrganigramClient {
     })
   }
 
-  async createOrgans(createOrgansInput: CreateOrganInput[]): Promise<Organ[]> {
+  async deployOrgans(deployOrgansInput: DeployOrganInput[]): Promise<Organ[]> {
     if (this.signer == null) {
       throw new Error('Signer not connected.')
     }
-    const input = this._prepareCreateOrgansInput(createOrgansInput)
-    const tx = await this.contract.createOrgans(input)
+    const input = this._prepareDeployOrgansInput(deployOrgansInput)
+    const tx = await this.contract.deployOrgans(input)
 
     const receipt = await tx?.wait()
     const eventCreations = receipt?.logs?.filter(
@@ -448,7 +455,7 @@ export class OrganigramClient {
     )
 
     if (eventCreations == null || eventCreations.length === 0) {
-      throw new Error('Organ creations failed.')
+      throw new Error('Organ deployment failed.')
     }
     const addresses: string[] = eventCreations.map(
       (eventCreation: EventLog) => eventCreation.address
@@ -460,7 +467,7 @@ export class OrganigramClient {
             console.error(
               'Unable to load organ with address ' +
                 address +
-                ' after creating it in batch.',
+                ' after deploying it in batch.',
               error.message
             )
             return { address } as unknown as Organ
@@ -469,7 +476,7 @@ export class OrganigramClient {
     )
   }
 
-  async createAsset(
+  async deployAsset(
     name: string,
     symbol: string,
     initialSupply: number,
@@ -483,7 +490,7 @@ export class OrganigramClient {
     if (options?.nonce != null) {
       nonce = BigInt(options?.nonce)
     }
-    const tx = await this.contract.createAsset(
+    const tx = await this.contract.deployAsset(
       name,
       symbol,
       initialSupply,
@@ -506,7 +513,7 @@ export class OrganigramClient {
     return address
   }
 
-  async createAssets(
+  async deployAssets(
     assets: CreateAssetInput[],
     options?: TransactionOptions
   ): Promise<string[]> {
@@ -519,7 +526,7 @@ export class OrganigramClient {
       initialSupply: asset.initialSupply,
       salt: formatSalt(asset.salt)
     }))
-    const tx = await this.contract.createAssets(formattedAssets, {
+    const tx = await this.contract.deployAssets(formattedAssets, {
       customData: options?.customData
     })
     if (options?.onTransaction != null) {
@@ -531,7 +538,7 @@ export class OrganigramClient {
     )
 
     if (eventCreations == null || eventCreations.length === 0) {
-      throw new Error('Asset batch creations failed.')
+      throw new Error('Asset batch deployments failed.')
     }
 
     const addresses: string[] = eventCreations.map(
@@ -540,7 +547,7 @@ export class OrganigramClient {
     return addresses
   }
 
-  async _createProcedure({
+  async _deployProcedure({
     type,
     initialize,
     salt,
@@ -565,7 +572,7 @@ export class OrganigramClient {
       nonce = BigInt(options?.nonce)
     }
     const _salt = formatSalt(salt)
-    const tx = await this.contract.createProcedure(
+    const tx = await this.contract.deployProcedure(
       procedureType.address,
       initialize?.data,
       _salt,
@@ -574,7 +581,7 @@ export class OrganigramClient {
     if (options?.onTransaction != null) {
       options.onTransaction(
         tx,
-        `Create procedure of type ${procedureType.name}`
+        `Deploy procedure of type ${procedureType.name}`
       )
     }
     const receipt = await tx?.wait()
@@ -582,13 +589,13 @@ export class OrganigramClient {
       (e: EventLog) => e.address !== this.address
     ).address
     if (address == null) {
-      throw new Error('Procedure creation failed.')
+      throw new Error('Procedure deployment failed.')
     }
     return await this.getProcedure(address, true).catch((error: Error) => {
       console.error(
         'Unable to load procedure with address ' +
           address +
-          ' after creating it.',
+          ' after deploying it.',
         error.message
       )
       return { address } as unknown as EnhancedProcedure
@@ -676,7 +683,7 @@ export class OrganigramClient {
   }
 
   // Create and load a procedure.
-  async createProcedure(
+  async deployProcedure(
     type: string,
     options: TransactionOptions,
     cid: string,
@@ -699,7 +706,7 @@ export class OrganigramClient {
       forwarder,
       ...args
     )
-    const { address } = await this._createProcedure({
+    const { address } = await this._deployProcedure({
       type,
       initialize: initializeProcedure,
       salt,
@@ -716,11 +723,11 @@ export class OrganigramClient {
     })
   }
 
-  async _prepareCreateProceduresInput(
-    createProceduresInput: CreateProceduresInput[]
+  async _prepareDeployProceduresInput(
+    deployProceduresInput: DeployProceduresInput[]
   ) {
     return await Promise.all(
-      createProceduresInput.map(async procedure => {
+      deployProceduresInput.map(async procedure => {
         const initialize = await this._populateInitializeProcedure(
           procedure.type,
           procedure.options ?? {},
@@ -742,13 +749,13 @@ export class OrganigramClient {
     )
   }
 
-  async createProcedures(
-    createProceduresInput: CreateProceduresInput[]
+  async deployProcedures(
+    deployProceduresInput: DeployProceduresInput[]
   ): Promise<EnhancedProcedure[]> {
-    const input = await this._prepareCreateProceduresInput(
-      createProceduresInput
+    const input = await this._prepareDeployProceduresInput(
+      deployProceduresInput
     )
-    const tx = await this.contract.createProcedures(input, {})
+    const tx = await this.contract.deployProcedures(input, {})
 
     const receipt = await tx?.wait()
     const eventCreations = receipt?.logs?.filter(
@@ -787,9 +794,9 @@ export class OrganigramClient {
   }
 
   async deployOrganigram(input: {
-    organs: CreateOrganInput[]
+    organs: DeployOrganInput[]
     assets: CreateAssetInput[]
-    procedures: CreateProceduresInput[]
+    procedures: DeployProceduresInput[]
   }): Promise<ContractTransaction> {
     if (this.signer == null) {
       throw new Error('Signer not connected.')
@@ -800,8 +807,8 @@ export class OrganigramClient {
       initialSupply: asset.initialSupply,
       salt: formatSalt(asset.salt)
     }))
-    const organsInput = await this._prepareCreateOrgansInput(input.organs)
-    const proceduresInput = await this._prepareCreateProceduresInput(
+    const organsInput = await this._prepareDeployOrgansInput(input.organs)
+    const proceduresInput = await this._prepareDeployProceduresInput(
       input.procedures
     )
     const tx = await this.contract.deployOrganigram(
