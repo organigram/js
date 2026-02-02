@@ -3,7 +3,7 @@ import OrganigramContractABI from '@organigram/protocol/artifacts/contracts/Orga
 import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json'
 import { formatSalt } from './utils'
 
-import Organ, { OrganProcedure } from './organ'
+import Organ, { OrganPermission } from './organ'
 import { Procedure } from './procedure'
 import { NominationProcedure } from './procedure/nomination'
 import { VoteProcedure } from './procedure/vote'
@@ -11,7 +11,7 @@ import { ERC20VoteProcedure } from './procedure/erc20Vote'
 
 export interface CreateOrganInput {
   metadata: string
-  procedures: OrganProcedure[]
+  permissions: OrganPermission[]
   salt?: string
   options?: TransactionOptions
 }
@@ -190,8 +190,13 @@ export class OrganigramClient {
       OrganigramContractABI.abi,
       provider
     )
-    const proceduresRegistry = (await contract.procedures()).toString()
-    const procedures = await Organ.loadEntries(proceduresRegistry, provider)
+    const proceduresRegistryAddress = (
+      await contract.proceduresRegistry()
+    ).toString()
+    const procedures = await Organ.loadEntries(
+      proceduresRegistryAddress,
+      provider
+    )
     const procedureTypes = await Promise.all(
       procedures.map(
         async procedure =>
@@ -360,7 +365,7 @@ export class OrganigramClient {
   // Create and load an organ.
   async createOrgan({
     metadata,
-    procedures,
+    permissions,
     salt,
     options
   }: CreateOrganInput): Promise<Organ> {
@@ -372,15 +377,15 @@ export class OrganigramClient {
       nonce = BigInt(options?.nonce ?? 0)
     }
     const _salt = formatSalt(salt)
-    const _procedures: string[] = []
-    const _permissions: number[] = []
-    procedures.forEach(p => {
-      _procedures.push(p.address)
-      _permissions.push(p.permissions)
+    const _permissionAddresses: string[] = []
+    const _permissionValues: number[] = []
+    permissions.forEach((p: OrganPermission) => {
+      _permissionAddresses.push(p.permissionAddress)
+      _permissionValues.push(p.permissionValue)
     })
     const tx = await this.contract.createOrgan(
-      _procedures,
-      _permissions,
+      _permissionAddresses,
+      _permissionValues,
       metadata,
       _salt,
       {
@@ -413,15 +418,15 @@ export class OrganigramClient {
 
   _prepareCreateOrgansInput(createOrgansInput: CreateOrganInput[]) {
     return createOrgansInput.map(organ => {
-      const _procedures: string[] = []
-      const _permissions: number[] = []
-      organ.procedures.forEach(p => {
-        _procedures.push(p.address)
-        _permissions.push(p.permissions)
+      const _permissionAddresses: string[] = []
+      const _permissionValues: number[] = []
+      organ.permissions.forEach(p => {
+        _permissionAddresses.push(p.permissionAddress)
+        _permissionValues.push(p.permissionValue)
       })
       return {
-        procedures: _procedures,
-        permissions: _permissions,
+        permissionAddresses: _permissionAddresses,
+        permissionValues: _permissionValues,
         cid: organ.metadata,
         salt: formatSalt(organ.salt)
       }
@@ -694,7 +699,6 @@ export class OrganigramClient {
       forwarder,
       ...args
     )
-
     const { address } = await this._createProcedure({
       type,
       initialize: initializeProcedure,

@@ -15,9 +15,9 @@ export interface IOrganEntry {
   address?: string
   cid?: string
 }
-export interface OrganProcedure {
-  address: string
-  permissions: number
+export interface OrganPermission {
+  permissionAddress: string
+  permissionValue: number
 }
 
 export interface OrganData {
@@ -26,7 +26,7 @@ export interface OrganData {
   signerOrProvider: ethers.Signer | ethers.Provider
   balance: bigint
   cid: string
-  procedures: OrganProcedure[]
+  permissions: OrganPermission[]
   entries: OrganEntry[]
 }
 
@@ -34,9 +34,9 @@ export enum OrganFunctionName {
   addEntries,
   removeEntries,
   replaceEntry,
-  addProcedure,
-  removeProcedure,
-  replaceProcedure,
+  addPermission,
+  removePermission,
+  replacePermission,
   withdrawEther,
   withdrawERC20,
   withdrawERC721
@@ -47,7 +47,7 @@ export class Organ {
   address: string
   chainId: string = '1'
   balance: bigint
-  procedures: OrganProcedure[] = []
+  permissions: OrganPermission[] = []
   cid: string
   entries: OrganEntry[] = []
   signer?: Signer
@@ -59,14 +59,14 @@ export class Organ {
     chainId,
     signerOrProvider,
     balance,
-    procedures,
+    permissions,
     cid,
     entries
   }: OrganData) {
     this.address = address
     this.chainId = chainId
     this.balance = balance
-    this.procedures = procedures
+    this.permissions = permissions
     this.cid = cid
     this.entries = entries
     if (signerOrProvider.provider != null) {
@@ -175,61 +175,61 @@ export class Organ {
     return await tx.wait()
   }
 
-  public addProcedure = async (
-    procedure: OrganProcedure,
+  public addPermission = async (
+    permission: OrganPermission,
     options?: TransactionOptions
   ): Promise<ethers.Transaction> => {
-    const permissions = `0x${procedure.permissions
+    const permissions = `0x${permission.permissionValue
       .toString(16)
       .padStart(4, '0')}`
-    const tx = await this.contract.addProcedure(
-      procedure.address,
+    const tx = await this.contract.addPermission(
+      permission.permissionAddress,
       permissions,
       { ...(options?.nonce != null ? { nonce: options.nonce } : {}) }
     )
     if (options?.onTransaction != null) {
       options.onTransaction(
         tx,
-        `Add procedure ${procedure.address} to organ ${this.address}.`
+        `Add permission ${permission.permissionAddress} to organ ${this.address}.`
       )
     }
     return await tx.wait()
   }
 
-  public removeProcedure = async (
-    procedure: string,
+  public removePermission = async (
+    permission: string,
     options?: TransactionOptions
   ): Promise<ethers.Transaction> => {
-    const tx = await this.contract.removeProcedure(procedure, {
+    const tx = await this.contract.removePermission(permission, {
       ...(options?.nonce != null ? { nonce: options.nonce } : {})
     })
     if (options?.onTransaction != null) {
       options.onTransaction(
         tx,
-        `Remove procedure ${procedure} from organ ${this.address}.`
+        `Remove permission ${permission} from organ ${this.address}.`
       )
     }
     return await tx.wait()
   }
 
-  public replaceProcedure = async (
-    oldProcedure: string,
-    newOrganProcedure: OrganProcedure,
+  public replacePermission = async (
+    oldPermissionAddress: string,
+    newOrganPermission: OrganPermission,
     options?: TransactionOptions
   ): Promise<ethers.Transaction> => {
-    const permissions = `0x${newOrganProcedure.permissions
+    const permissions = `0x${newOrganPermission.permissionValue
       .toString(16)
       .padStart(4, '0')}`
-    const tx = await this.contract.replaceProcedure(
-      oldProcedure,
-      newOrganProcedure.address,
+    const tx = await this.contract.replacePermission(
+      oldPermissionAddress,
+      newOrganPermission.permissionAddress,
       permissions,
       { ...(options?.nonce != null ? { nonce: options.nonce } : {}) }
     )
     if (options?.onTransaction != null) {
       options.onTransaction(
         tx,
-        `Replace procedure ${oldProcedure} with ${newOrganProcedure.address} in organ ${this.address}.`
+        `Replace procedure ${oldPermissionAddress} with ${newOrganPermission.permissionAddress} in organ ${this.address}.`
       )
     }
     return await tx.wait()
@@ -254,7 +254,7 @@ export class Organ {
     // }
     const data = await Organ.loadData(address, signerOrProvider)
     const balance = (await provider?.getBalance(address).catch(() => 0n)) ?? 0n
-    const procedures: OrganProcedure[] = await Organ.loadProcedures(
+    const permissions: OrganPermission[] = await Organ.loadPermissions(
       address,
       signerOrProvider
     )
@@ -270,7 +270,7 @@ export class Organ {
       chainId,
       signerOrProvider,
       balance,
-      procedures,
+      permissions,
       cid: data?.cid,
       entries
     })
@@ -306,7 +306,7 @@ export class Organ {
     signerOrProvider: ethers.Signer | ethers.Provider
   ): Promise<{
     cid: string
-    proceduresLength: bigint
+    permissionsLength: bigint
     entriesLength: bigint
     entriesCount: bigint
   }> {
@@ -336,18 +336,18 @@ export class Organ {
     )
   }
 
-  static async loadPermissions(
-    address: string,
-    procedure: string,
+  static async checkAddressPermissions(
+    organAddress: string,
+    addressToCheck: string,
     signerOrProvider: ethers.Signer | ethers.Provider
   ): Promise<number> {
     const contract = new ethers.Contract(
-      address,
+      organAddress,
       OrganContractABI.abi,
       signerOrProvider
     )
     return await contract
-      .getPermissions(procedure)
+      .getPermissions(addressToCheck)
       .catch((e: Error) => {
         console.error('Error', e.message)
       })
@@ -356,54 +356,54 @@ export class Organ {
       )
   }
 
-  static async loadProcedure(
+  static async loadPermission(
     address: string,
     index: string,
     signerOrProvider: ethers.Signer | ethers.Provider
-  ): Promise<OrganProcedure> {
+  ): Promise<OrganPermission> {
     const contract = new ethers.Contract(
       address,
       OrganContractABI.abi,
       signerOrProvider
     )
-    const procedure = await contract.getProcedure(index).catch((e: Error) => {
+    const permission = await contract.getPermission(index).catch((e: Error) => {
       console.error(e.message)
     })
-    if (procedure == null) {
-      throw new Error('Unable to load procedure.')
+    if (permission == null) {
+      throw new Error('Unable to load permission.')
     }
     return {
-      address: procedure.addr,
-      permissions:
-        typeof procedure.perms === 'string'
-          ? parseInt(procedure.perms, 16)
-          : procedure.perms
+      permissionAddress: permission.addr,
+      permissionValue:
+        typeof permission.perms === 'string'
+          ? parseInt(permission.perms, 16)
+          : permission.perms
     }
   }
 
-  static async loadProcedures(
+  static async loadPermissions(
     address: string,
     signerOrProvider: ethers.Signer | ethers.Provider
-  ): Promise<OrganProcedure[]> {
+  ): Promise<OrganPermission[]> {
     const data = await Organ.loadData(address, signerOrProvider)
-    const procedures: OrganProcedure[] = []
-    for (let i = 0n; i < data.proceduresLength; i++) {
-      const procedure: OrganProcedure | null = await Organ.loadProcedure(
+    const permissions: OrganPermission[] = []
+    for (let i = 0n; i < data.permissionsLength; i++) {
+      const permission: OrganPermission | null = await Organ.loadPermission(
         address,
         i.toString(),
         signerOrProvider
       ).catch((error: Error) => {
         console.warn(
-          'Error while loading procedure in organ.',
+          'Error while loading permission in organ ',
           address,
           i.toString(),
           error.message
         )
         return null
       })
-      if (procedure != null) procedures.push(procedure)
+      if (permission != null) permissions.push(permission)
     }
-    return procedures
+    return permissions
   }
 
   static async loadEntry(
@@ -470,12 +470,12 @@ export class Organ {
     if (signerOrProvider == null) {
       throw new Error('Not connected.')
     }
-    const { procedures, cid, entries } = await Organ.load(
+    const { permissions, cid, entries } = await Organ.load(
       this.address,
       signerOrProvider
     )
     this.cid = cid
-    this.procedures = procedures
+    this.permissions = permissions
     this.entries = entries
     return this
   }
@@ -499,21 +499,21 @@ export class Organ {
     return this
   }
 
-  async reloadProcedures(): Promise<Organ> {
+  async reloadPermissions(): Promise<Organ> {
     const signerOrProvider = this.signer ?? this.provider
     if (signerOrProvider == null) {
       throw new Error('Not connected.')
     }
-    this.procedures = await Organ.loadProcedures(
+    this.permissions = await Organ.loadPermissions(
       this.address,
       signerOrProvider
     ).catch(error => {
       console.warn(
-        "Error while reloading organ's procedures",
+        "Error while reloading organ's permissions",
         this.address,
         error.message
       )
-      return this.procedures
+      return this.permissions
     })
     return this
   }

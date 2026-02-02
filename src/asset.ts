@@ -15,13 +15,12 @@ export interface Asset {
   name: string
   symbol: string
   totalSupply: string
-  userBalance: string
 }
 
 export const getAssetData = async (
   assetAddress?: string | null,
   signer?: Signer | null
-): Promise<Asset | undefined> => {
+): Promise<(Asset & { userBalance: string }) | undefined> => {
   if (assetAddress == null || assetAddress === '' || signer == null) {
     return undefined
   }

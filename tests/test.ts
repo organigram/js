@@ -86,7 +86,7 @@ describe('Organigram JS Client', () => {
     it('should create an organ', async () => {
       organ = await organigramClient.createOrgan({
         metadata: '',
-        procedures: [],
+        permissions: [],
         options: txOptions
       })
       strictEqual(organ?.address != null, true)
@@ -96,11 +96,11 @@ describe('Organigram JS Client', () => {
       const organs = await organigramClient.createOrgans([
         {
           metadata: '',
-          procedures: []
+          permissions: []
         },
         {
           metadata: '',
-          procedures: []
+          permissions: []
         }
       ])
       strictEqual(organs?.length === 2, true)
@@ -145,6 +145,7 @@ describe('Organigram JS Client', () => {
 
       it('should create a nomination procedure', async () => {
         const address = await signer.getAddress()
+
         procedure = (await organigramClient.createProcedure(
           organigramClient.procedureTypes[0].address,
           txOptions,
@@ -161,9 +162,9 @@ describe('Organigram JS Client', () => {
       })
 
       it('should add procedure to an organ', async () => {
-        return await organ.addProcedure({
-          address: procedure.address,
-          permissions: parseInt('0xffff', 16)
+        return await organ.addPermission({
+          permissionAddress: procedure.address,
+          permissionValue: parseInt('0xffff', 16)
         })
       })
 
@@ -252,9 +253,9 @@ describe('Organigram JS Client', () => {
       })
 
       it('should add procedure to an organ', async () => {
-        return await organ.addProcedure({
-          address: procedure.address,
-          permissions: parseInt('0xffff', 16)
+        return await organ.addPermission({
+          permissionAddress: procedure.address,
+          permissionValue: parseInt('0xffff', 16)
         })
       })
 
@@ -338,9 +339,9 @@ describe('Organigram JS Client', () => {
       })
 
       it('should add procedure to an organ', async () => {
-        return await organ.addProcedure({
-          address: procedure.address,
-          permissions: parseInt('0xffff', 16)
+        return await organ.addPermission({
+          permissionAddress: procedure.address,
+          permissionValue: parseInt('0xffff', 16)
         })
       })
 
@@ -430,11 +431,11 @@ describe('Organigram JS Client', () => {
         organs: [
           {
             metadata: '',
-            procedures: []
+            permissions: []
           },
           {
             metadata: '',
-            procedures: []
+            permissions: []
           }
         ],
         assets: [
