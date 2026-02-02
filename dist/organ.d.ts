@@ -9,9 +9,9 @@ export interface IOrganEntry {
     address?: string;
     cid?: string;
 }
-export interface OrganProcedure {
-    address: string;
-    permissions: number;
+export interface OrganPermission {
+    permissionAddress: string;
+    permissionValue: number;
 }
 export interface OrganData {
     address: string;
@@ -19,16 +19,16 @@ export interface OrganData {
     signerOrProvider: ethers.Signer | ethers.Provider;
     balance: bigint;
     cid: string;
-    procedures: OrganProcedure[];
+    permissions: OrganPermission[];
     entries: OrganEntry[];
 }
 export declare enum OrganFunctionName {
     addEntries = 0,
     removeEntries = 1,
     replaceEntry = 2,
-    addProcedure = 3,
-    removeProcedure = 4,
-    replaceProcedure = 5,
+    addPermission = 3,
+    removePermission = 4,
+    replacePermission = 5,
     withdrawEther = 6,
     withdrawERC20 = 7,
     withdrawERC721 = 8
@@ -38,39 +38,39 @@ export declare class Organ {
     address: string;
     chainId: string;
     balance: bigint;
-    procedures: OrganProcedure[];
+    permissions: OrganPermission[];
     cid: string;
     entries: OrganEntry[];
     signer?: Signer;
     provider?: ethers.Provider;
     contract: ethers.Contract;
-    constructor({ address, chainId, signerOrProvider, balance, procedures, cid, entries }: OrganData);
+    constructor({ address, chainId, signerOrProvider, balance, permissions, cid, entries }: OrganData);
     updateCid: (cid: string, options?: TransactionOptions) => Promise<ethers.Transaction>;
     addEntries: (entries: IOrganEntry[], options?: TransactionOptions) => Promise<ethers.Transaction>;
     removeEntries: (indexes: string[], options?: TransactionOptions) => Promise<ethers.Transaction>;
     replaceEntry: (index: number, entry: OrganEntry, options?: TransactionOptions) => Promise<ethers.Transaction>;
-    addProcedure: (procedure: OrganProcedure, options?: TransactionOptions) => Promise<ethers.Transaction>;
-    removeProcedure: (procedure: string, options?: TransactionOptions) => Promise<ethers.Transaction>;
-    replaceProcedure: (oldProcedure: string, newOrganProcedure: OrganProcedure, options?: TransactionOptions) => Promise<ethers.Transaction>;
+    addPermission: (permission: OrganPermission, options?: TransactionOptions) => Promise<ethers.Transaction>;
+    removePermission: (permission: string, options?: TransactionOptions) => Promise<ethers.Transaction>;
+    replacePermission: (oldPermissionAddress: string, newOrganPermission: OrganPermission, options?: TransactionOptions) => Promise<ethers.Transaction>;
     static load(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<Organ>;
     static isOrgan(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<boolean>;
     static getBalance(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<bigint>;
     static loadData(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<{
         cid: string;
-        proceduresLength: bigint;
+        permissionsLength: bigint;
         entriesLength: bigint;
         entriesCount: bigint;
     }>;
     static loadEntryForAccount(address: string, account: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<OrganEntry | undefined>;
-    static loadPermissions(address: string, procedure: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<number>;
-    static loadProcedure(address: string, index: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<OrganProcedure>;
-    static loadProcedures(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<OrganProcedure[]>;
+    static checkAddressPermissions(organAddress: string, addressToCheck: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<number>;
+    static loadPermission(address: string, index: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<OrganPermission>;
+    static loadPermissions(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<OrganPermission[]>;
     static loadEntry(address: string, index: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<OrganEntry>;
     static loadEntries(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<OrganEntry[]>;
     static populateTransaction(address: string, signer: ethers.Signer, functionName: OrganFunctionName, ...args: unknown[]): Promise<ethers.ContractTransaction>;
     reload(): Promise<Organ>;
     reloadEntries(): Promise<Organ>;
-    reloadProcedures(): Promise<Organ>;
+    reloadPermissions(): Promise<Organ>;
     reloadData(): Promise<Organ>;
 }
 export default Organ;

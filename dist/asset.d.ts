@@ -5,7 +5,8 @@ export interface Asset {
     name: string;
     symbol: string;
     totalSupply: string;
-    userBalance: string;
 }
-export declare const getAssetData: (assetAddress?: string | null, signer?: Signer | null) => Promise<Asset | undefined>;
+export declare const getAssetData: (assetAddress?: string | null, signer?: Signer | null) => Promise<(Asset & {
+    userBalance: string;
+}) | undefined>;
 export declare const deployERC20: (signer?: Signer | null) => Promise<BaseContract & Omit<BaseContract, keyof BaseContract>>;

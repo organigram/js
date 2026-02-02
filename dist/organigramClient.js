@@ -84,8 +84,8 @@ export class OrganigramClient {
     }
     static async loadProcedureTypes(address, provider) {
         const contract = new ethers.Contract(address, OrganigramContractABI.abi, provider);
-        const proceduresRegistry = (await contract.procedures()).toString();
-        const procedures = await Organ.loadEntries(proceduresRegistry, provider);
+        const proceduresRegistryAddress = (await contract.proceduresRegistry()).toString();
+        const procedures = await Organ.loadEntries(proceduresRegistryAddress, provider);
         const procedureTypes = await Promise.all(procedures.map(async (procedure) => await OrganigramClient.loadProcedureType({
             addr: procedure.address,
             cid: procedure.cid
@@ -169,7 +169,7 @@ export class OrganigramClient {
         }
         return procedure;
     }
-    async createOrgan({ metadata, procedures, salt, options }) {
+    async createOrgan({ metadata, permissions, salt, options }) {
         if (this.signer == null) {
             throw new Error('Signer not connected.');
         }
@@ -178,13 +178,13 @@ export class OrganigramClient {
             nonce = BigInt(options?.nonce ?? 0);
         }
         const _salt = formatSalt(salt);
-        const _procedures = [];
-        const _permissions = [];
-        procedures.forEach(p => {
-            _procedures.push(p.address);
-            _permissions.push(p.permissions);
+        const _permissionAddresses = [];
+        const _permissionValues = [];
+        permissions.forEach((p) => {
+            _permissionAddresses.push(p.permissionAddress);
+            _permissionValues.push(p.permissionValue);
         });
-        const tx = await this.contract.createOrgan(_procedures, _permissions, metadata, _salt, {
+        const tx = await this.contract.createOrgan(_permissionAddresses, _permissionValues, metadata, _salt, {
             nonce,
             customData: options?.customData
         });
@@ -204,15 +204,15 @@ export class OrganigramClient {
     }
     _prepareCreateOrgansInput(createOrgansInput) {
         return createOrgansInput.map(organ => {
-            const _procedures = [];
-            const _permissions = [];
-            organ.procedures.forEach(p => {
-                _procedures.push(p.address);
-                _permissions.push(p.permissions);
+            const _permissionAddresses = [];
+            const _permissionValues = [];
+            organ.permissions.forEach(p => {
+                _permissionAddresses.push(p.permissionAddress);
+                _permissionValues.push(p.permissionValue);
             });
             return {
-                procedures: _procedures,
-                permissions: _permissions,
+                permissionAddresses: _permissionAddresses,
+                permissionValues: _permissionValues,
                 cid: organ.metadata,
                 salt: formatSalt(organ.salt)
             };
@@ -331,12 +331,14 @@ export class OrganigramClient {
     }
     async createProcedure(type, options, cid, proposers, moderators, deciders, withModeration, forwarder, salt, ...args) {
         const initializeProcedure = await this._populateInitializeProcedure(type, options, cid, proposers, moderators, deciders, withModeration, forwarder, ...args);
+        console.log('initializeProcedure', initializeProcedure);
         const { address } = await this._createProcedure({
             type,
             initialize: initializeProcedure,
             salt,
             options
         });
+        console.log('created procedure at address', address);
         return await this.getProcedure(address, false).catch((error) => {
             console.error('Unable to load procedure with address ' +
                 address +

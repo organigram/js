@@ -1,9 +1,9 @@
 import { ethers, type ContractTransaction } from 'ethers';
-import Organ, { OrganProcedure } from './organ';
+import Organ, { OrganPermission } from './organ';
 import { Procedure } from './procedure';
 export interface CreateOrganInput {
     metadata: string;
-    procedures: OrganProcedure[];
+    permissions: OrganPermission[];
     salt?: string;
     options?: TransactionOptions;
 }
@@ -66,10 +66,10 @@ export declare class OrganigramClient {
     getProcedureType(procedureAddress: string): Promise<ProcedureType | null>;
     getOrgan(address: string, cached?: boolean): Promise<Organ>;
     getProcedure(address: string, cached?: boolean): Promise<EnhancedProcedure>;
-    createOrgan({ metadata, procedures, salt, options }: CreateOrganInput): Promise<Organ>;
+    createOrgan({ metadata, permissions, salt, options }: CreateOrganInput): Promise<Organ>;
     _prepareCreateOrgansInput(createOrgansInput: CreateOrganInput[]): {
-        procedures: string[];
-        permissions: number[];
+        permissionAddresses: string[];
+        permissionValues: number[];
         cid: string;
         salt: string;
     }[];
