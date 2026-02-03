@@ -2,6 +2,7 @@ import { ethers } from 'ethers'
 import { Procedure, type ProcedureProposal, type Election } from '../procedure'
 import VoteProcedureContractABI from '@organigram/protocol/artifacts/contracts/procedures/Vote.sol/VoteProcedure.json'
 import { type TransactionOptions } from '../organigramClient'
+import { predictContractAddress } from '../utils'
 
 export class VoteProcedure extends Procedure {
   static INTERFACE = '0xc9d27afe' // vote() signature.
@@ -24,10 +25,12 @@ export class VoteProcedure extends Procedure {
     withModeration: boolean,
     forwarder: string,
     proposals: ProcedureProposal[],
+    isDeployed: boolean,
     quorumSize: string,
     voteDuration: string,
     majoritySize: string,
-    elections: Election[]
+    elections: Election[],
+    salt?: string
   ) {
     super(
       cid,
@@ -40,14 +43,23 @@ export class VoteProcedure extends Procedure {
       deciders,
       withModeration,
       forwarder,
-      proposals
+      proposals,
+      isDeployed,
+      salt
     )
+    this.address =
+      address ??
+      predictContractAddress({
+        type: 'VoteProcedure',
+        chainId,
+        salt: this.salt as string
+      })
     this.quorumSize = quorumSize
     this.voteDuration = voteDuration
     this.majoritySize = majoritySize
     this.elections = elections
     this.contract = new ethers.Contract(
-      address,
+      this.address,
       VoteProcedureContractABI.abi,
       signer
     )
@@ -191,6 +203,7 @@ export class VoteProcedure extends Procedure {
       procedure.withModeration,
       procedure.forwarder,
       proposals,
+      true,
       quorumSize.toString(),
       voteDuration.toString(),
       majoritySize.toString(),

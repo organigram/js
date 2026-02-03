@@ -2,6 +2,7 @@ import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Proce
 import { type ContractTransactionReceipt, ethers } from 'ethers'
 
 import type { TransactionOptions } from '../organigramClient'
+import { formatSalt } from '../utils'
 
 export type Election = {
   proposalKey: string
@@ -224,6 +225,8 @@ export class Procedure {
     }
   ]
 
+  salt?: string
+  isDeployed: boolean
   cid: string
   address: string
   chainId: string
@@ -237,6 +240,8 @@ export class Procedure {
   signer?: ethers.Signer
   provider?: ethers.Provider
   _contract: ethers.Contract
+  name?: string
+  description?: string
 
   constructor(
     cid: string,
@@ -249,9 +254,17 @@ export class Procedure {
     deciders: string,
     withModeration: boolean,
     forwarder: string,
-    proposals: ProcedureProposal[]
+    proposals: ProcedureProposal[],
+    isDeployed: boolean,
+    salt?: string,
+    name?: string,
+    description?: string
   ) {
     this.cid = cid
+    this.name = name ?? 'Unnamed procedure'
+    this.description = description ?? ''
+    this.isDeployed = isDeployed ?? false
+    this.salt = salt || isDeployed ? undefined : formatSalt()
     this.address = address
     this.chainId = chainId
     this.metadata = metadata
@@ -424,7 +437,8 @@ export class Procedure {
       data.deciders,
       data.withModeration,
       data.forwarder,
-      proposals
+      proposals,
+      true
     )
   }
 
@@ -479,7 +493,7 @@ export class Procedure {
       return types.map((type, index): OperationParam => {
         let _value
         // @todo Avoid Generic Injection Sink when using index like this.
-        let value = decodedParams[index] as unknown
+        let value = decodedParams[index]
         if (value != null && type != null) {
           switch (type) {
             case 'cid':

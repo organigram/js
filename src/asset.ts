@@ -11,6 +11,7 @@ import {
 export const ERC20_INITIAL_SUPPLY = 10_000_000 // 10 million tokens.
 
 export interface Asset {
+  address: string
   contract: EthersContract
   name: string
   symbol: string
@@ -18,12 +19,9 @@ export interface Asset {
 }
 
 export const getAssetData = async (
-  assetAddress?: string | null,
+  assetAddress: string,
   signer?: Signer | null
 ): Promise<(Asset & { userBalance: string }) | undefined> => {
-  if (assetAddress == null || assetAddress === '' || signer == null) {
-    return undefined
-  }
   const erc777Interface = new Interface(AssetContract.abi)
   const contract = new ethers.Contract(assetAddress, erc777Interface, signer)
   const name = await contract.name()
@@ -31,11 +29,18 @@ export const getAssetData = async (
   const _totalSupply = await contract.totalSupply()
   let totalSupply = formatEther(_totalSupply)
   totalSupply = (+totalSupply).toFixed(0)
-  const _userBalance = await contract.balanceOf(signer.getAddress())
+  const _userBalance = await contract.balanceOf(await signer?.getAddress())
   let userBalance = formatEther(_userBalance)
   userBalance = (+userBalance).toFixed(0)
   if (contract != null) {
-    return { contract, name, symbol, totalSupply, userBalance }
+    return {
+      address: assetAddress,
+      contract,
+      name,
+      symbol,
+      totalSupply,
+      userBalance
+    }
   }
 }
 

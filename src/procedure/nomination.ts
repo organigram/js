@@ -3,6 +3,7 @@ import NominationProcedureContractABI from '@organigram/protocol/artifacts/contr
 
 import { Procedure, type ProcedureProposal } from '.'
 import { TransactionOptions } from '../organigramClient'
+import { formatSalt, predictContractAddress } from '../utils'
 
 export class NominationProcedure extends Procedure {
   static INTERFACE = '0xc5f28e49' // nominate() signature.
@@ -20,7 +21,9 @@ export class NominationProcedure extends Procedure {
     deciders: string,
     withModeration: boolean,
     forwarder: string,
-    proposals: ProcedureProposal[]
+    proposals: ProcedureProposal[],
+    isDeployed: boolean,
+    salt?: string
   ) {
     super(
       cid,
@@ -33,8 +36,18 @@ export class NominationProcedure extends Procedure {
       deciders,
       withModeration,
       forwarder,
-      proposals
+      proposals,
+      isDeployed,
+      salt
     )
+    this.salt = salt || isDeployed ? undefined : formatSalt()
+    this.address =
+      address ??
+      predictContractAddress({
+        type: 'NominationProcedure',
+        chainId,
+        salt: this.salt as string
+      })
     this.contract = new ethers.Contract(
       address,
       NominationProcedureContractABI.abi,
@@ -94,7 +107,9 @@ export class NominationProcedure extends Procedure {
       procedure.deciders,
       procedure.withModeration,
       procedure.forwarder,
-      procedure.proposals
+      procedure.proposals,
+      true,
+      procedure.salt
     )
   }
 

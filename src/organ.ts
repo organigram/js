@@ -1,7 +1,7 @@
 import { ethers, type Signer } from 'ethers'
 import OrganContractABI from '@organigram/protocol/artifacts/contracts/Organ.sol/Organ.json'
 
-import { EMPTY_ADDRESS } from './utils'
+import { EMPTY_ADDRESS, formatSalt, predictContractAddress } from './utils'
 import type { TransactionOptions } from './organigramClient'
 
 export interface OrganEntry {
@@ -44,6 +44,7 @@ export enum OrganFunctionName {
 
 export class Organ {
   static INTERFACE = '0xf81b1307' // Organ.INTERFACE_ID.
+  salt?: string
   address: string
   chainId: string = '1'
   balance: bigint
@@ -53,6 +54,9 @@ export class Organ {
   signer?: Signer
   provider?: ethers.Provider
   contract: ethers.Contract
+  isDeployed: boolean
+  name?: string
+  description?: string
 
   public constructor({
     address,
@@ -61,9 +65,28 @@ export class Organ {
     balance,
     permissions,
     cid,
-    entries
-  }: OrganData) {
-    this.address = address
+    entries,
+    salt,
+    isDeployed,
+    name,
+    description
+  }: OrganData & {
+    salt?: string
+    isDeployed?: boolean
+    name?: string
+    description?: string
+  }) {
+    this.name = name
+    this.description = description
+    this.isDeployed = isDeployed ?? false
+    this.salt = salt || (!isDeployed ? formatSalt() : undefined)
+    this.address =
+      address ??
+      predictContractAddress({
+        type: 'Organ',
+        chainId,
+        salt: this.salt as string
+      })
     this.chainId = chainId
     this.balance = balance
     this.permissions = permissions
@@ -272,7 +295,8 @@ export class Organ {
       balance,
       permissions,
       cid: data?.cid,
-      entries
+      entries,
+      isDeployed: true
     })
   }
 
