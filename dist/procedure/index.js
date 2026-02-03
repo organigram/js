@@ -1,5 +1,6 @@
 import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json';
 import { ethers } from 'ethers';
+import { formatSalt } from '../utils';
 export class Procedure {
     static INTERFACE = '0x71dbd330';
     static OPERATIONS_FUNCTIONS = [
@@ -94,6 +95,8 @@ export class Procedure {
             target: 'organ'
         }
     ];
+    salt;
+    isDeployed;
     cid;
     address;
     chainId;
@@ -107,8 +110,14 @@ export class Procedure {
     signer;
     provider;
     _contract;
-    constructor(cid, address, chainId, signerOrProvider, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals) {
+    name;
+    description;
+    constructor(cid, address, chainId, signerOrProvider, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals, isDeployed, salt, name, description) {
         this.cid = cid;
+        this.name = name ?? 'Unnamed procedure';
+        this.description = description ?? '';
+        this.isDeployed = isDeployed ?? false;
+        this.salt = salt || isDeployed ? undefined : formatSalt();
         this.address = address;
         this.chainId = chainId;
         this.metadata = metadata;
@@ -199,7 +208,7 @@ export class Procedure {
         }
         const data = await Procedure.loadData(address, signerOrProvider);
         const proposals = await Procedure.loadProposals(address, signerOrProvider);
-        return new Procedure(data.cid, address, chainId, signerOrProvider, data.metadata, data.proposers, data.moderators, data.deciders, data.withModeration, data.forwarder, proposals);
+        return new Procedure(data.cid, address, chainId, signerOrProvider, data.metadata, data.proposers, data.moderators, data.deciders, data.withModeration, data.forwarder, proposals, true);
     }
     static _stringifyParamType(type) {
         switch (type) {

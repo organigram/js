@@ -35,6 +35,7 @@ export declare enum OrganFunctionName {
 }
 export declare class Organ {
     static INTERFACE: string;
+    salt?: string;
     address: string;
     chainId: string;
     balance: bigint;
@@ -44,7 +45,15 @@ export declare class Organ {
     signer?: Signer;
     provider?: ethers.Provider;
     contract: ethers.Contract;
-    constructor({ address, chainId, signerOrProvider, balance, permissions, cid, entries }: OrganData);
+    isDeployed: boolean;
+    name?: string;
+    description?: string;
+    constructor({ address, chainId, signerOrProvider, balance, permissions, cid, entries, salt, isDeployed, name, description }: OrganData & {
+        salt?: string;
+        isDeployed?: boolean;
+        name?: string;
+        description?: string;
+    });
     updateCid: (cid: string, options?: TransactionOptions) => Promise<ethers.Transaction>;
     addEntries: (entries: IOrganEntry[], options?: TransactionOptions) => Promise<ethers.Transaction>;
     removeEntries: (indexes: string[], options?: TransactionOptions) => Promise<ethers.Transaction>;

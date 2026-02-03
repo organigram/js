@@ -8,7 +8,7 @@ export declare class VoteProcedure extends Procedure {
     voteDuration: string;
     majoritySize: string;
     elections: Election[];
-    constructor(cid: string, address: string, chainId: string, signer: ethers.Signer, metadata: unknown, proposers: string, moderators: string, deciders: string, withModeration: boolean, forwarder: string, proposals: ProcedureProposal[], quorumSize: string, voteDuration: string, majoritySize: string, elections: Election[]);
+    constructor(cid: string, address: string, chainId: string, signer: ethers.Signer, metadata: unknown, proposers: string, moderators: string, deciders: string, withModeration: boolean, forwarder: string, proposals: ProcedureProposal[], isDeployed: boolean, quorumSize: string, voteDuration: string, majoritySize: string, elections: Election[], salt?: string);
     static _populateInitialize(type: string, options: {
         signer: ethers.Signer;
     } & TransactionOptions, cid: string, proposers: string, moderators: string, deciders: string, withModeration: boolean, forwarder: string, quorumSize: string, voteDuration: string, majoritySize: string): Promise<ethers.ContractTransaction>;

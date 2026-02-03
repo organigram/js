@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 import { Procedure } from '.';
 import ERC20VoteProcedureContractABI from '@organigram/protocol/artifacts/contracts/procedures/ERC20Vote.sol/ERC20VoteProcedure.json';
+import { formatSalt, predictContractAddress } from '../utils';
 export class ERC20VoteProcedure extends Procedure {
     static INTERFACE = '0xc9d27afe';
     erc20;
@@ -9,14 +10,22 @@ export class ERC20VoteProcedure extends Procedure {
     majoritySize;
     elections;
     contract;
-    constructor(cid, address, chainId, signerOrProvider, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals, erc20, quorumSize, voteDuration, majoritySize, elections) {
-        super(cid, address, chainId, signerOrProvider, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals);
+    constructor(cid, address, chainId, signerOrProvider, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals, isDeployed, erc20, quorumSize, voteDuration, majoritySize, elections, salt) {
+        super(cid, address, chainId, signerOrProvider, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals, isDeployed, salt);
+        this.salt = salt || isDeployed ? undefined : formatSalt();
+        this.address =
+            address ??
+                predictContractAddress({
+                    type: 'Erc20VoteProcedure',
+                    chainId,
+                    salt: this.salt
+                });
         this.erc20 = erc20;
         this.quorumSize = quorumSize;
         this.voteDuration = voteDuration;
         this.majoritySize = majoritySize;
         this.elections = elections;
-        this.contract = new ethers.Contract(address, ERC20VoteProcedureContractABI.abi, signerOrProvider);
+        this.contract = new ethers.Contract(this.address, ERC20VoteProcedureContractABI.abi, signerOrProvider);
     }
     static async _populateInitialize(type, options, cid, proposers, moderators, deciders, withModeration, forwarder, erc20, quorumSize, voteDuration, majoritySize) {
         if (options.signer == null) {
@@ -82,7 +91,7 @@ export class ERC20VoteProcedure extends Procedure {
             }
             return proposal;
         });
-        return new ERC20VoteProcedure(procedure.cid, procedure.address, procedure.chainId, signerOrProvider, procedure.metadata, procedure.proposers, procedure.moderators, procedure.deciders, procedure.withModeration, procedure.forwarder, proposals, erc20.toString(), quorumSize.toString(), voteDuration.toString(), majoritySize.toString(), elections);
+        return new ERC20VoteProcedure(procedure.cid, procedure.address, procedure.chainId, signerOrProvider, procedure.metadata, procedure.proposers, procedure.moderators, procedure.deciders, procedure.withModeration, procedure.forwarder, proposals, true, erc20.toString(), quorumSize.toString(), voteDuration.toString(), majoritySize.toString(), elections);
     }
     async erc20Balance(account) {
         const erc20 = await this.contract.tokenContract();

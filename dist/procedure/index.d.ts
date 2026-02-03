@@ -68,6 +68,8 @@ export interface ProposalMetadata {
 export declare class Procedure {
     static INTERFACE: string;
     static OPERATIONS_FUNCTIONS: ProcedureProposalOperationFunction[];
+    salt?: string;
+    isDeployed: boolean;
     cid: string;
     address: string;
     chainId: string;
@@ -81,7 +83,9 @@ export declare class Procedure {
     signer?: ethers.Signer;
     provider?: ethers.Provider;
     _contract: ethers.Contract;
-    constructor(cid: string, address: string, chainId: string, signerOrProvider: ethers.Signer | ethers.Provider, metadata: unknown, proposers: string, moderators: string, deciders: string, withModeration: boolean, forwarder: string, proposals: ProcedureProposal[]);
+    name?: string;
+    description?: string;
+    constructor(cid: string, address: string, chainId: string, signerOrProvider: ethers.Signer | ethers.Provider, metadata: unknown, proposers: string, moderators: string, deciders: string, withModeration: boolean, forwarder: string, proposals: ProcedureProposal[], isDeployed: boolean, salt?: string, name?: string, description?: string);
     static _populateInitialize(_address: string, _options: {
         signer: ethers.Signer;
     } & TransactionOptions, _metadata: string, _proposers: string, _moderators: string, _deciders: string, _withModeration: boolean, _forwarder: string, ..._args: unknown[]): Promise<ethers.ContractTransaction>;

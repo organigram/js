@@ -4,7 +4,7 @@ import { TransactionOptions } from '../organigramClient';
 export declare class NominationProcedure extends Procedure {
     static INTERFACE: string;
     contract: ethers.Contract;
-    constructor(cid: string, address: string, chainId: string, signerOrProvider: ethers.Signer | ethers.Provider, metadata: unknown, proposers: string, moderators: string, deciders: string, withModeration: boolean, forwarder: string, proposals: ProcedureProposal[]);
+    constructor(cid: string, address: string, chainId: string, signerOrProvider: ethers.Signer | ethers.Provider, metadata: unknown, proposers: string, moderators: string, deciders: string, withModeration: boolean, forwarder: string, proposals: ProcedureProposal[], isDeployed: boolean, salt?: string);
     static _populateInitialize(type: string, options: {
         signer: ethers.Signer;
     } & TransactionOptions, cid: string, proposers: string, moderators: string, deciders: string, _withModeration: Boolean, forwarder: string, ..._args: any[]): Promise<ethers.ContractTransaction>;

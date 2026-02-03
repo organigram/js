@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import OrganContractABI from '@organigram/protocol/artifacts/contracts/Organ.sol/Organ.json';
-import { EMPTY_ADDRESS } from './utils';
+import { EMPTY_ADDRESS, formatSalt, predictContractAddress } from './utils';
 export var OrganFunctionName;
 (function (OrganFunctionName) {
     OrganFunctionName[OrganFunctionName["addEntries"] = 0] = "addEntries";
@@ -15,6 +15,7 @@ export var OrganFunctionName;
 })(OrganFunctionName || (OrganFunctionName = {}));
 export class Organ {
     static INTERFACE = '0xf81b1307';
+    salt;
     address;
     chainId = '1';
     balance;
@@ -24,8 +25,21 @@ export class Organ {
     signer;
     provider;
     contract;
-    constructor({ address, chainId, signerOrProvider, balance, permissions, cid, entries }) {
-        this.address = address;
+    isDeployed;
+    name;
+    description;
+    constructor({ address, chainId, signerOrProvider, balance, permissions, cid, entries, salt, isDeployed, name, description }) {
+        this.name = name;
+        this.description = description;
+        this.isDeployed = isDeployed ?? false;
+        this.salt = salt || (!isDeployed ? formatSalt() : undefined);
+        this.address =
+            address ??
+                predictContractAddress({
+                    type: 'Organ',
+                    chainId,
+                    salt: this.salt
+                });
         this.chainId = chainId;
         this.balance = balance;
         this.permissions = permissions;
@@ -142,7 +156,8 @@ export class Organ {
             balance,
             permissions,
             cid: data?.cid,
-            entries
+            entries,
+            isDeployed: true
         });
     }
     static async isOrgan(address, signerOrProvider) {

@@ -1,5 +1,6 @@
 export * from './asset';
 export * from './organ';
+export * from './organigram';
 export * from './organigramClient';
 export * from './procedure';
 export * from './procedure/nomination';

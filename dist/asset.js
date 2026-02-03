@@ -16,7 +16,14 @@ export const getAssetData = async (assetAddress, signer) => {
     let userBalance = formatEther(_userBalance);
     userBalance = (+userBalance).toFixed(0);
     if (contract != null) {
-        return { contract, name, symbol, totalSupply, userBalance };
+        return {
+            address: assetAddress,
+            contract,
+            name,
+            symbol,
+            totalSupply,
+            userBalance
+        };
     }
 };
 export const deployERC20 = async (signer) => {

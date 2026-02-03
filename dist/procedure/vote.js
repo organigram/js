@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 import { Procedure } from '../procedure';
 import VoteProcedureContractABI from '@organigram/protocol/artifacts/contracts/procedures/Vote.sol/VoteProcedure.json';
+import { predictContractAddress } from '../utils';
 export class VoteProcedure extends Procedure {
     static INTERFACE = '0xc9d27afe';
     contract;
@@ -8,13 +9,20 @@ export class VoteProcedure extends Procedure {
     voteDuration;
     majoritySize;
     elections;
-    constructor(cid, address, chainId, signer, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals, quorumSize, voteDuration, majoritySize, elections) {
-        super(cid, address, chainId, signer, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals);
+    constructor(cid, address, chainId, signer, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals, isDeployed, quorumSize, voteDuration, majoritySize, elections, salt) {
+        super(cid, address, chainId, signer, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals, isDeployed, salt);
+        this.address =
+            address ??
+                predictContractAddress({
+                    type: 'VoteProcedure',
+                    chainId,
+                    salt: this.salt
+                });
         this.quorumSize = quorumSize;
         this.voteDuration = voteDuration;
         this.majoritySize = majoritySize;
         this.elections = elections;
-        this.contract = new ethers.Contract(address, VoteProcedureContractABI.abi, signer);
+        this.contract = new ethers.Contract(this.address, VoteProcedureContractABI.abi, signer);
     }
     static async _populateInitialize(type, options, cid, proposers, moderators, deciders, withModeration, forwarder, quorumSize, voteDuration, majoritySize) {
         if (options.signer == null) {
@@ -79,7 +87,7 @@ export class VoteProcedure extends Procedure {
             }
             return proposal;
         });
-        return new VoteProcedure(procedure.cid, procedure.address, procedure.chainId, signer, procedure.metadata, procedure.proposers, procedure.moderators, procedure.deciders, procedure.withModeration, procedure.forwarder, proposals, quorumSize.toString(), voteDuration.toString(), majoritySize.toString(), elections);
+        return new VoteProcedure(procedure.cid, procedure.address, procedure.chainId, signer, procedure.metadata, procedure.proposers, procedure.moderators, procedure.deciders, procedure.withModeration, procedure.forwarder, proposals, true, quorumSize.toString(), voteDuration.toString(), majoritySize.toString(), elections);
     }
     async vote(proposalKey, approval, options) {
         const tx = await this.contract
