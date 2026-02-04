@@ -1,6 +1,13 @@
 import { ethers } from 'ethers';
-import { Procedure, type ProcedureProposal, type Election } from '.';
+import { Procedure, type Election, ProcedureInput } from '.';
 import { TransactionOptions } from '../organigramClient';
+export type ERC20VoteProcedureInput = ProcedureInput & {
+    erc20: string;
+    quorumSize: string;
+    voteDuration: string;
+    majoritySize: string;
+    elections: Election[];
+};
 export declare class ERC20VoteProcedure extends Procedure {
     static INTERFACE: string;
     erc20: string;
@@ -9,7 +16,7 @@ export declare class ERC20VoteProcedure extends Procedure {
     majoritySize: string;
     elections: Election[];
     contract: ethers.Contract;
-    constructor(cid: string, address: string, chainId: string, signerOrProvider: ethers.Signer | ethers.Provider, metadata: unknown, proposers: string, moderators: string, deciders: string, withModeration: boolean, forwarder: string, proposals: ProcedureProposal[], isDeployed: boolean, erc20: string, quorumSize: string, voteDuration: string, majoritySize: string, elections: Election[], salt?: string);
+    constructor({ cid, salt, address, chainId, signerOrProvider, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals, isDeployed, erc20, quorumSize, voteDuration, majoritySize, elections, sourceOrgans, targetOrgans }: ERC20VoteProcedureInput);
     static _populateInitialize(type: string, options: {
         signer: ethers.Signer;
     } & TransactionOptions, cid: string, proposers: string, moderators: string, deciders: string, withModeration: boolean, forwarder: string, erc20: string, quorumSize: string, voteDuration: string, majoritySize: string): Promise<ethers.ContractTransaction>;

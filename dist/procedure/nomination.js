@@ -1,21 +1,30 @@
 import { ethers } from 'ethers';
 import NominationProcedureContractABI from '@organigram/protocol/artifacts/contracts/procedures/Nomination.sol/NominationProcedure.json';
 import { Procedure } from '.';
-import { formatSalt, predictContractAddress } from '../utils';
 export class NominationProcedure extends Procedure {
     static INTERFACE = '0xc5f28e49';
     contract;
-    constructor(cid, address, chainId, signerOrProvider, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals, isDeployed, salt) {
-        super(cid, address, chainId, signerOrProvider, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals, isDeployed, salt);
-        this.salt = salt || isDeployed ? undefined : formatSalt();
-        this.address =
-            address ??
-                predictContractAddress({
-                    type: 'NominationProcedure',
-                    chainId,
-                    salt: this.salt
-                });
-        this.contract = new ethers.Contract(address, NominationProcedureContractABI.abi, signerOrProvider);
+    constructor({ cid, address, chainId, signerOrProvider, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals, isDeployed, salt, contract, sourceOrgans, targetOrgans }) {
+        super({
+            cid,
+            address,
+            chainId,
+            signerOrProvider,
+            metadata,
+            proposers,
+            moderators,
+            deciders,
+            withModeration,
+            forwarder,
+            proposals,
+            isDeployed,
+            salt,
+            sourceOrgans,
+            targetOrgans
+        });
+        this.contract =
+            contract ??
+                new ethers.Contract(this.address, NominationProcedureContractABI.abi, signerOrProvider);
     }
     static async _populateInitialize(type, options, cid, proposers, moderators, deciders, _withModeration, forwarder, ..._args) {
         if (options.signer == null) {
@@ -28,7 +37,27 @@ export class NominationProcedure extends Procedure {
         const procedure = await Procedure.load(address, signerOrProvider);
         if (!procedure)
             throw new Error('Not a valid procedure.');
-        return new NominationProcedure(procedure.cid, procedure.address, procedure.chainId, signerOrProvider, procedure.metadata, procedure.proposers, procedure.moderators, procedure.deciders, procedure.withModeration, procedure.forwarder, procedure.proposals, true, procedure.salt);
+        const chainId = (await signerOrProvider.provider?.getNetwork().then(n => n.chainId)) ??
+            (await signerOrProvider
+                .getNetwork()
+                .then(n => n.chainId));
+        const contract = new ethers.Contract(address, NominationProcedureContractABI.abi, signerOrProvider);
+        return new NominationProcedure({
+            cid: procedure.cid,
+            address: procedure.address,
+            chainId: chainId?.toString(),
+            signerOrProvider,
+            metadata: procedure.metadata,
+            proposers: procedure.proposers,
+            moderators: procedure.moderators,
+            deciders: procedure.deciders,
+            withModeration: procedure.withModeration,
+            forwarder: procedure.forwarder,
+            proposals: procedure.proposals,
+            isDeployed: true,
+            salt: procedure.salt,
+            contract
+        });
     }
     async nominate(proposalKey, options) {
         const tx = await this.contract.nominate(proposalKey, {

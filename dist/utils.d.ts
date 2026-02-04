@@ -1,8 +1,9 @@
 import deployedAddresses from '@organigram/protocol/deployments.json';
 export { deployedAddresses };
 export declare const EMPTY_ADDRESS = "0x0000000000000000000000000000000000000000";
+export type ContractName = 'Organ' | 'Asset' | 'Erc20VoteProcedure' | 'VoteProcedure' | 'NominationProcedure' | 'OrganigramClient';
 export declare const predictContractAddress: ({ type, chainId, salt }: {
-    type: "Organ" | "Asset" | "Erc20VoteProcedure" | "VoteProcedure" | "NominationProcedure";
+    type: Omit<ContractName, "OrganigramClient">;
     chainId: string;
     salt: string;
 }) => string;
@@ -26,3 +27,4 @@ export declare const PERMISSIONS: {
     WITHDRAW_COLLECTIBLES: number;
 };
 export declare const getPermissionsSet: (permissions: number) => string[];
+export declare const capitalize: (s: string) => string;

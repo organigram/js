@@ -8,11 +8,7 @@ import { Procedure } from './procedure'
 import { NominationProcedure } from './procedure/nomination'
 import { VoteProcedure } from './procedure/vote'
 import { ERC20VoteProcedure } from './procedure/erc20Vote'
-import {
-  getOrganSourcesAndTargets,
-  getProcedureSourcesAndTargets,
-  Organigram
-} from './organigram'
+import { Organigram } from './organigram'
 
 export interface DeployOrganInput {
   metadata: string
@@ -829,49 +825,49 @@ export class OrganigramClient {
       limit: 100
     }
   ): Organigram {
-    // Load organs
-    organigram.organs = []
-    // @todo : implement pagination with limit and offset.
-    this.contract
-      .getOrgans()
-      .then(async (organAddresses: string[]) => {
-        for (const address of organAddresses) {
-          const organ = await this.getOrgan(address, cached).catch(
-            (error: Error) => {
-              console.error('Error loading organ ' + address, error.message)
-              return undefined
-            }
-          )
-          if (organ != null) {
-            organigram.organs.push(getOrganSourcesAndTargets(organ))
-          }
-        }
-      })
-      .catch((error: Error) => {
-        console.error('Error fetching organs', error.message)
-      })
+    // // Load organs
+    // organigram.organs = []
+    // // @todo : implement pagination with limit and offset.
+    // this.contract
+    //   .getOrgans()
+    //   .then(async (organAddresses: string[]) => {
+    //     for (const address of organAddresses) {
+    //       const organ = await this.getOrgan(address, cached).catch(
+    //         (error: Error) => {
+    //           console.error('Error loading organ ' + address, error.message)
+    //           return undefined
+    //         }
+    //       )
+    //       if (organ != null) {
+    //         organigram.organs.push(getOrganSourcesAndTargets(organ, organigram))
+    //       }
+    //     }
+    //   })
+    //   .catch((error: Error) => {
+    //     console.error('Error fetching organs', error.message)
+    //   })
 
-    // Load procedures
-    organigram.procedures = []
-    // @todo : implement pagination with limit and offset.
-    this.contract
-      .getProcedures()
-      .then(async (procedureAddresses: string[]) => {
-        for (const address of procedureAddresses) {
-          const procedure = await this.getProcedure(address, cached).catch(
-            (error: Error) => {
-              console.error('Error loading procedure ' + address, error.message)
-              return undefined
-            }
-          )
-          if (procedure != null) {
-            organigram.procedures.push(getProcedureSourcesAndTargets(procedure))
-          }
-        }
-      })
-      .catch((error: Error) => {
-        console.error('Error fetching procedures', error.message)
-      })
+    // // Load procedures
+    // organigram.procedures = []
+    // // @todo : implement pagination with limit and offset.
+    // this.contract
+    //   .getProcedures()
+    //   .then(async (procedureAddresses: string[]) => {
+    //     for (const address of procedureAddresses) {
+    //       const procedure = await this.getProcedure(address, cached).catch(
+    //         (error: Error) => {
+    //           console.error('Error loading procedure ' + address, error.message)
+    //           return undefined
+    //         }
+    //       )
+    //       if (procedure != null) {
+    //         organigram.procedures.push(getProcedureSourcesAndTargets(procedure, organigram))
+    //       }
+    //     }
+    //   })
+    //   .catch((error: Error) => {
+    //     console.error('Error fetching procedures', error.message)
+    //   })
 
     return organigram
   }

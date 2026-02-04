@@ -1,6 +1,6 @@
 import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json';
 import { ethers } from 'ethers';
-import { formatSalt } from '../utils';
+import { capitalize, createRandom32BytesHexId, deployedAddresses, predictContractAddress } from '../utils';
 export class Procedure {
     static INTERFACE = '0x71dbd330';
     static OPERATIONS_FUNCTIONS = [
@@ -95,39 +95,53 @@ export class Procedure {
             target: 'organ'
         }
     ];
-    salt;
-    isDeployed;
-    cid;
-    address;
-    chainId;
-    metadata;
-    proposers;
-    moderators;
-    deciders;
-    withModeration;
-    forwarder;
-    proposals;
-    signer;
-    provider;
-    _contract;
     name;
     description;
-    constructor(cid, address, chainId, signerOrProvider, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals, isDeployed, salt, name, description) {
-        this.cid = cid;
+    address;
+    typeName;
+    cid;
+    isDeployed;
+    deciders;
+    proposers;
+    withModeration;
+    moderators;
+    metadata;
+    forwarder;
+    proposals;
+    _contract;
+    salt;
+    chainId;
+    signer;
+    provider;
+    sourceOrgans;
+    targetOrgans;
+    constructor({ address, deciders, typeName, name, description, salt, cid, chainId, signerOrProvider, metadata, proposers, withModeration, forwarder, moderators, proposals, isDeployed, sourceOrgans, targetOrgans }) {
+        if (!chainId && (!address || !forwarder)) {
+            throw new Error('Either chainId or address and forwarder must be provided to procedure constructor.');
+        }
+        this.salt = salt ?? (isDeployed ? undefined : createRandom32BytesHexId());
+        this.address =
+            address ??
+                predictContractAddress({
+                    type: (capitalize(typeName) + 'Procedure'),
+                    chainId: chainId,
+                    salt: this.salt
+                });
+        this.deciders = deciders;
+        this.typeName = typeName ?? 'Procedure';
+        this.isDeployed = isDeployed ?? false;
+        this.cid = cid ?? '';
         this.name = name ?? 'Unnamed procedure';
         this.description = description ?? '';
-        this.isDeployed = isDeployed ?? false;
-        this.salt = salt || isDeployed ? undefined : formatSalt();
-        this.address = address;
         this.chainId = chainId;
         this.metadata = metadata;
-        this.proposers = proposers;
+        this.proposers = proposers ?? deciders;
         this.moderators = moderators;
-        this.deciders = deciders;
-        this.withModeration = withModeration;
-        this.forwarder = forwarder;
-        this.proposals = proposals;
-        if (signerOrProvider.provider != null) {
+        this.withModeration = withModeration ?? false;
+        this.forwarder =
+            forwarder ?? deployedAddresses[chainId]?.MetaGasStation;
+        this.proposals = proposals ?? [];
+        if (signerOrProvider?.provider != null) {
             this.signer = signerOrProvider;
             this.provider = this.signer.provider;
         }
@@ -148,7 +162,9 @@ export class Procedure {
             }
             catch (error) { }
         }
-        this._contract = new ethers.Contract(address, ProcedureContractABI.abi, signerOrProvider);
+        this._contract = new ethers.Contract(this.address, ProcedureContractABI.abi, signerOrProvider);
+        this.sourceOrgans = sourceOrgans ?? [];
+        this.targetOrgans = targetOrgans ?? [];
     }
     static async _populateInitialize(_address, _options, _metadata, _proposers, _moderators, _deciders, _withModeration, _forwarder, ..._args) {
         throw new Error('Procedure cannot be initialized.');
@@ -208,7 +224,20 @@ export class Procedure {
         }
         const data = await Procedure.loadData(address, signerOrProvider);
         const proposals = await Procedure.loadProposals(address, signerOrProvider);
-        return new Procedure(data.cid, address, chainId, signerOrProvider, data.metadata, data.proposers, data.moderators, data.deciders, data.withModeration, data.forwarder, proposals, true);
+        return new Procedure({
+            cid: data.cid,
+            address,
+            chainId,
+            signerOrProvider,
+            metadata: data.metadata,
+            proposers: data.proposers,
+            moderators: data.moderators,
+            deciders: data.deciders,
+            withModeration: data.withModeration,
+            forwarder: data.forwarder,
+            proposals,
+            isDeployed: true
+        });
     }
     static _stringifyParamType(type) {
         switch (type) {

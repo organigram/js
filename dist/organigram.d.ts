@@ -1,8 +1,9 @@
 import { Signer } from 'ethers';
-import { Asset } from './asset';
-import Organ from './organ';
-import { Procedure } from './procedure';
+import { Asset, AssetJson } from './asset';
+import Organ, { OrganInput, OrganJson } from './organ';
+import { Procedure, ProcedureJson } from './procedure';
 import OrganigramClient, { DeployOrganigramInput, EnhancedProcedure } from './organigramClient';
+import { templates } from './template';
 export type SourceOrgan = {
     organAddress: string;
     procedureAddress: string;
@@ -22,26 +23,51 @@ export type TargetOrgan = SourceOrgan & {
 export type OrganWithSourcesAndTargets = Organ & SourcesAndTargets;
 export type AssetWithSourcesAndTargets = Asset & SourcesAndTargets;
 export type ProcedureWithSourcesAndTargets = EnhancedProcedure & ProcedureSourcesAndTargets;
-export declare const getSourcesAndTargets: (initialOrganigram: Organigram) => Organigram;
-export declare const getProcedureSourcesAndTargets: (procedure: Procedure) => ProcedureWithSourcesAndTargets;
-export declare const getOrganSourcesAndTargets: (organ: Organ) => OrganWithSourcesAndTargets;
-export declare const getAssetSourcesAndTargets: (asset: Asset) => AssetWithSourcesAndTargets;
+export type OrganigramJson = {
+    organs: OrganJson[];
+    procedures: ProcedureJson[];
+    assets: AssetJson[];
+};
+export declare const getProcedureSourcesAndTargets: (procedure: Procedure, organigram: Organigram) => ProcedureWithSourcesAndTargets;
+export declare const getOrganSourcesAndTargets: (organ: OrganInput, organigram: Organigram) => OrganWithSourcesAndTargets;
+export declare const getAssetSourcesAndTargets: (asset: Asset, organigram: Organigram) => AssetWithSourcesAndTargets;
+export declare const getSourcesAndTargets: (initialOrganigram: OrganigramInput) => {
+    organs: OrganWithSourcesAndTargets[] | undefined;
+    procedures: ProcedureWithSourcesAndTargets[] | undefined;
+    assets: AssetWithSourcesAndTargets[] | undefined;
+    id?: string | undefined;
+    name?: string | undefined;
+    description?: string | undefined;
+    chainId?: string | undefined;
+    client?: OrganigramClient | undefined;
+    signer?: Signer | undefined;
+    contractAddresses?: string[] | undefined;
+};
 export declare const makeOrganigramDeployArgument: (organigram: Organigram, signer?: Signer) => DeployOrganigramInput;
-export declare class Organigram {
+export type OrganigramInput = Partial<{
     id?: string;
     name?: string;
     description?: string;
+    chainId?: string;
+    organs: OrganInput[];
+    procedures: Partial<ProcedureWithSourcesAndTargets>[];
+    assets: Partial<AssetWithSourcesAndTargets>[];
+    client?: OrganigramClient;
+    signer?: Signer;
+    contractAddresses?: string[];
+}>;
+export declare const defaultChainId = "11155111";
+export declare class Organigram {
     organs: OrganWithSourcesAndTargets[];
     procedures: ProcedureWithSourcesAndTargets[];
     assets: AssetWithSourcesAndTargets[];
+    chainId: string;
+    id?: string;
+    name?: string;
+    description?: string;
     client?: OrganigramClient;
     signer?: Signer;
-    constructor(initialOrganigram: {
-        id?: string;
-        name?: string;
-        description?: string;
-        contractAddresses?: string[];
-    });
+    constructor(input?: OrganigramInput | keyof typeof templates | string[]);
     editDetails({ name, description }: {
         name?: string;
         description?: string;

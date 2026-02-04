@@ -1,5 +1,6 @@
 import { ethers, type Signer } from 'ethers';
 import type { TransactionOptions } from './organigramClient';
+import { SourceOrgan, TargetOrgan } from './organigram';
 export interface OrganEntry {
     index: string;
     address: string;
@@ -22,6 +23,24 @@ export interface OrganData {
     permissions: OrganPermission[];
     entries: OrganEntry[];
 }
+export interface OrganInput extends Partial<OrganData> {
+    salt?: string;
+    isDeployed?: boolean;
+    name?: string;
+    description?: string;
+    isSource?: SourceOrgan[];
+    isTarget?: TargetOrgan[];
+}
+export interface OrganJson {
+    address: string;
+    entries?: OrganEntry[];
+    permissions?: OrganPermission[];
+    name?: string;
+    description?: string;
+    cid?: string;
+    salt?: string;
+    chainId?: string;
+}
 export declare enum OrganFunctionName {
     addEntries = 0,
     removeEntries = 1,
@@ -35,9 +54,11 @@ export declare enum OrganFunctionName {
 }
 export declare class Organ {
     static INTERFACE: string;
-    salt?: string;
+    name: string;
+    description: string;
     address: string;
-    chainId: string;
+    salt?: string;
+    chainId?: string;
     balance: bigint;
     permissions: OrganPermission[];
     cid: string;
@@ -46,14 +67,9 @@ export declare class Organ {
     provider?: ethers.Provider;
     contract: ethers.Contract;
     isDeployed: boolean;
-    name?: string;
-    description?: string;
-    constructor({ address, chainId, signerOrProvider, balance, permissions, cid, entries, salt, isDeployed, name, description }: OrganData & {
-        salt?: string;
-        isDeployed?: boolean;
-        name?: string;
-        description?: string;
-    });
+    isSource: SourceOrgan[];
+    isTarget: TargetOrgan[];
+    constructor({ address, chainId, signerOrProvider, balance, permissions, cid, entries, salt, isDeployed, name, description, isSource, isTarget }: OrganInput);
     updateCid: (cid: string, options?: TransactionOptions) => Promise<ethers.Transaction>;
     addEntries: (entries: IOrganEntry[], options?: TransactionOptions) => Promise<ethers.Transaction>;
     removeEntries: (indexes: string[], options?: TransactionOptions) => Promise<ethers.Transaction>;

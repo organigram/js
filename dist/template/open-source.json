@@ -1,0 +1,605 @@
+{
+    "id": null,
+    "slug": null,
+    "name": "Open-source project",
+    "description": "This is the default organigram.",
+    "workspaceId": "clf8f8g3y000at8kb226l4f49",
+    "isPublic": false,
+    "organigramClient": null,
+    "networkName": "",
+    "organs": [
+        {
+            "id": "clfbr1rkl000hadkbhpb0bg0f",
+            "name": "Project founders",
+            "description": "This organ does not have a description",
+            "cid": "",
+            "address": "",
+            "organigramId": "clfbr1rkv000vkbadb4pv8czh",
+            "organigramClient": null,
+            "network": null,
+            "entries": [],
+            "isTarget": [
+                {
+                    "id": "clfbrc9uo002hkbaduembmsmn",
+                    "contractId": null,
+                    "permissions": 12,
+                    "organAddress": "",
+                    "organId": "clfbr1rkl000hadkbhpb0bg0f",
+                    "procedureId": "clfbr1rkl000padkb7r7s8aph",
+                    "procedureName": "Manage founders",
+                    "procedureAddress": ""
+                },
+                {
+                    "id": "clfbrgx4w003qkbad36tnokwb",
+                    "contractId": null,
+                    "permissions": 19,
+                    "organAddress": "",
+                    "organId": "clfbr1rkl000hadkbhpb0bg0f",
+                    "procedureId": "clfbr1rkl000radkbhygahc3m",
+                    "procedureName": "Amend Constitution",
+                    "procedureAddress": ""
+                }
+            ]
+        },
+        {
+            "id": "clfbr1rkl000kadkb83ay9d76",
+            "name": "Project's Constitution",
+            "description": "This organ does not have a description yet. You can edit it by clicking here.",
+            "cid": "",
+            "address": "",
+            "organigramId": "clfbr1rkv000vkbadb4pv8czh",
+            "organigramClient": null,
+            "network": null,
+            "entries": [],
+            "isTarget": [
+                {
+                    "id": "clfbrhuce0042kbadlpdb5utv",
+                    "contractId": null,
+                    "permissions": 31,
+                    "organAddress": "",
+                    "organId": "clfbr1rkl000kadkb83ay9d76",
+                    "procedureId": "clfbr1rkl000radkbhygahc3m",
+                    "procedureName": "Amend Constitution",
+                    "procedureAddress": ""
+                }
+            ]
+        },
+        {
+            "id": "clfbr1rkl000nadkbg1px75pl",
+            "name": "Treasury",
+            "description": "This organ does not have a description yet. You can edit it by clicking here.",
+            "cid": "",
+            "address": "",
+            "organigramId": "clfbr1rkv000vkbadb4pv8czh",
+            "organigramClient": null,
+            "network": null,
+            "entries": [],
+            "isTarget": [
+                {
+                    "id": "clfbr1rkw001skbad1v2onxuz",
+                    "contractId": null,
+                    "permissions": 2028,
+                    "organAddress": "",
+                    "organId": "clfbr1rkl000nadkbg1px75pl",
+                    "procedureId": "clfbr1rkl000tadkbaonlhx79",
+                    "procedureName": "Manage treasury",
+                    "procedureAddress": ""
+                },
+                {
+                    "id": "clfbrgx4w003pkbad7voqivwi",
+                    "contractId": null,
+                    "permissions": 19,
+                    "organAddress": "",
+                    "organId": "clfbr1rkl000nadkbg1px75pl",
+                    "procedureId": "clfbr1rkl000radkbhygahc3m",
+                    "procedureName": "Amend Constitution",
+                    "procedureAddress": ""
+                }
+            ]
+        },
+        {
+            "id": "clfbr50tq0024kbadj2dpwb0g",
+            "name": "Contributors",
+            "description": "This organ does not have a description yet. You can edit it by clicking here.",
+            "cid": "",
+            "address": "",
+            "organigramId": "clfbr1rkv000vkbadb4pv8czh",
+            "organigramClient": null,
+            "network": null,
+            "entries": [],
+            "isTarget": [
+                {
+                    "id": "clfbrf1e4002zkbadgoonc3ih",
+                    "contractId": null,
+                    "permissions": 12,
+                    "organAddress": "",
+                    "organId": "clfbr50tq0024kbadj2dpwb0g",
+                    "procedureId": "clfbr80ht0017adkb19fd50ve",
+                    "procedureName": "Manage contributors",
+                    "procedureAddress": ""
+                }
+            ]
+        },
+        {
+            "id": "clfbr5lxj0025kbadnlagrukz",
+            "name": "Codebase",
+            "description": "This organ does not have a description yet. You can edit it by clicking here.",
+            "cid": "",
+            "address": "",
+            "organigramId": "clfbr1rkv000vkbadb4pv8czh",
+            "organigramClient": null,
+            "network": null,
+            "entries": [],
+            "isTarget": [
+                {
+                    "id": "clfbr6rcl0028kbadj4qzji92",
+                    "contractId": null,
+                    "permissions": 12,
+                    "organAddress": "",
+                    "organId": "clfbr5lxj0025kbadnlagrukz",
+                    "procedureId": "clfbr6rck0014adkb993u57pu",
+                    "procedureName": "Manage codebase",
+                    "procedureAddress": ""
+                }
+            ]
+        }
+    ],
+    "procedures": [
+        {
+            "id": "clfbr1rkl000padkb7r7s8aph",
+            "name": "Manage founders",
+            "description": "This procedure does not have any description yet. You can edit it by clicking here.",
+            "cid": "",
+            "address": "",
+            "typeName": "nomination",
+            "organigramId": "clfbr1rkv000vkbadb4pv8czh",
+            "data": null,
+            "organigramClient": null,
+            "network": null,
+            "sourceOrgans": [
+                {
+                    "id": "clfbrc9uo002gkbad7tjjqky7",
+                    "procedureId": "clfbr1rkl000padkb7r7s8aph",
+                    "organId": "clfbr1rkl000hadkbhpb0bg0f",
+                    "contractId": null,
+                    "assetId": null,
+                    "types": [
+                        {
+                            "name": "deciders",
+                            "label": "Approve proposals"
+                        },
+                        {
+                            "name": "proposers",
+                            "label": "Create proposals"
+                        }
+                    ],
+                    "organ": {
+                        "id": "clfbr1rkl000hadkbhpb0bg0f",
+                        "name": "Project founders",
+                        "description": "This organ does not have a description",
+                        "cid": "",
+                        "address": "",
+                        "organigramId": "clfbr1rkv000vkbadb4pv8czh",
+                        "organigramClient": null,
+                        "network": null,
+                        "entries": [],
+                        "isTarget": [
+                            {
+                                "id": "clfbrc9uo002hkbaduembmsmn",
+                                "contractId": null,
+                                "permissions": 12,
+                                "organAddress": "",
+                                "organId": "clfbr1rkl000hadkbhpb0bg0f",
+                                "procedureId": "clfbr1rkl000padkb7r7s8aph",
+                                "procedureName": "Manage founders",
+                                "procedureAddress": ""
+                            },
+                            {
+                                "id": "clfbrgx4w003qkbad36tnokwb",
+                                "contractId": null,
+                                "permissions": 19,
+                                "organAddress": "",
+                                "organId": "clfbr1rkl000hadkbhpb0bg0f",
+                                "procedureId": "clfbr1rkl000radkbhygahc3m",
+                                "procedureName": "Amend Constitution",
+                                "procedureAddress": ""
+                            }
+                        ]
+                    },
+                    "asset": null
+                }
+            ],
+            "targetOrgans": [
+                {
+                    "id": "clfbrc9uo002hkbaduembmsmn",
+                    "contractId": null,
+                    "permissions": 12,
+                    "organAddress": "",
+                    "organId": "clfbr1rkl000hadkbhpb0bg0f",
+                    "procedureId": "clfbr1rkl000padkb7r7s8aph",
+                    "procedureName": "Manage founders",
+                    "procedureAddress": ""
+                }
+            ],
+            "type": {
+                "name": "nomination",
+                "label": "Nomination",
+                "description": "A nomination allows any user in the source organ to directly add, remove or replace one or many entries, assets or procedures in the target organ.",
+                "fields": []
+            }
+        },
+        {
+            "id": "clfbr1rkl000radkbhygahc3m",
+            "name": "Amend Constitution",
+            "description": "This procedure does not have any description yet. You can edit it by clicking here.",
+            "cid": "",
+            "address": "",
+            "typeName": "nomination",
+            "organigramId": "clfbr1rkv000vkbadb4pv8czh",
+            "data": null,
+            "organigramClient": null,
+            "network": null,
+            "sourceOrgans": [
+                {
+                    "id": "clfbrgx4w003mkbadlm62t83s",
+                    "procedureId": "clfbr1rkl000radkbhygahc3m",
+                    "organId": "clfbr50tq0024kbadj2dpwb0g",
+                    "contractId": null,
+                    "assetId": null,
+                    "types": [
+                        {
+                            "name": "proposers",
+                            "label": "Create proposals"
+                        }
+                    ],
+                    "organ": {
+                        "id": "clfbr50tq0024kbadj2dpwb0g",
+                        "name": "Contributors",
+                        "description": "This organ does not have a description yet. You can edit it by clicking here.",
+                        "cid": "",
+                        "address": "",
+                        "organigramId": "clfbr1rkv000vkbadb4pv8czh",
+                        "organigramClient": null,
+                        "network": null,
+                        "entries": [],
+                        "isTarget": [
+                            {
+                                "id": "clfbrf1e4002zkbadgoonc3ih",
+                                "contractId": null,
+                                "permissions": 12,
+                                "organAddress": "",
+                                "organId": "clfbr50tq0024kbadj2dpwb0g",
+                                "procedureId": "clfbr80ht0017adkb19fd50ve",
+                                "procedureName": "Manage contributors",
+                                "procedureAddress": ""
+                            }
+                        ]
+                    },
+                    "asset": null
+                },
+                {
+                    "id": "clfbrgx4w003nkbadk7h8xjmx",
+                    "procedureId": "clfbr1rkl000radkbhygahc3m",
+                    "organId": "clfbr1rkl000hadkbhpb0bg0f",
+                    "contractId": null,
+                    "assetId": null,
+                    "types": [
+                        {
+                            "name": "deciders",
+                            "label": "Approve proposals"
+                        }
+                    ],
+                    "organ": {
+                        "id": "clfbr1rkl000hadkbhpb0bg0f",
+                        "name": "Project founders",
+                        "description": "This organ does not have a description",
+                        "cid": "",
+                        "address": "",
+                        "organigramId": "clfbr1rkv000vkbadb4pv8czh",
+                        "organigramClient": null,
+                        "network": null,
+                        "entries": [],
+                        "isTarget": [
+                            {
+                                "id": "clfbrc9uo002hkbaduembmsmn",
+                                "contractId": null,
+                                "permissions": 12,
+                                "organAddress": "",
+                                "organId": "clfbr1rkl000hadkbhpb0bg0f",
+                                "procedureId": "clfbr1rkl000padkb7r7s8aph",
+                                "procedureName": "Manage founders",
+                                "procedureAddress": ""
+                            },
+                            {
+                                "id": "clfbrgx4w003qkbad36tnokwb",
+                                "contractId": null,
+                                "permissions": 19,
+                                "organAddress": "",
+                                "organId": "clfbr1rkl000hadkbhpb0bg0f",
+                                "procedureId": "clfbr1rkl000radkbhygahc3m",
+                                "procedureName": "Amend Constitution",
+                                "procedureAddress": ""
+                            }
+                        ]
+                    },
+                    "asset": null
+                }
+            ],
+            "targetOrgans": [
+                {
+                    "id": "clfbrgx4w003pkbad7voqivwi",
+                    "contractId": null,
+                    "permissions": 19,
+                    "organAddress": "",
+                    "organId": "clfbr1rkl000nadkbg1px75pl",
+                    "procedureId": "clfbr1rkl000radkbhygahc3m",
+                    "procedureName": "Amend Constitution",
+                    "procedureAddress": ""
+                },
+                {
+                    "id": "clfbrgx4w003qkbad36tnokwb",
+                    "contractId": null,
+                    "permissions": 19,
+                    "organAddress": "",
+                    "organId": "clfbr1rkl000hadkbhpb0bg0f",
+                    "procedureId": "clfbr1rkl000radkbhygahc3m",
+                    "procedureName": "Amend Constitution",
+                    "procedureAddress": ""
+                },
+                {
+                    "id": "clfbrhuce0042kbadlpdb5utv",
+                    "contractId": null,
+                    "permissions": 31,
+                    "organAddress": "",
+                    "organId": "clfbr1rkl000kadkb83ay9d76",
+                    "procedureId": "clfbr1rkl000radkbhygahc3m",
+                    "procedureName": "Amend Constitution",
+                    "procedureAddress": ""
+                }
+            ],
+            "type": {
+                "name": "nomination",
+                "label": "Nomination",
+                "description": "A nomination allows any user in the source organ to directly add, remove or replace one or many entries, assets or procedures in the target organ.",
+                "fields": []
+            }
+        },
+        {
+            "id": "clfbr1rkl000tadkbaonlhx79",
+            "name": "Manage treasury",
+            "description": "This procedure does not have any description yet. You can edit it by clicking here.",
+            "cid": "",
+            "address": "",
+            "typeName": "nomination",
+            "organigramId": "clfbr1rkv000vkbadb4pv8czh",
+            "data": null,
+            "organigramClient": null,
+            "network": null,
+            "sourceOrgans": [
+                {
+                    "id": "clfbr1rkw001pkbadjtv4dwic",
+                    "procedureId": "clfbr1rkl000tadkbaonlhx79",
+                    "organId": "clfbr1rkl000hadkbhpb0bg0f",
+                    "contractId": null,
+                    "assetId": null,
+                    "types": [
+                        {
+                            "name": "moderators",
+                            "label": "Filter proposals"
+                        }
+                    ],
+                    "organ": {
+                        "id": "clfbr1rkl000hadkbhpb0bg0f",
+                        "name": "Project founders",
+                        "description": "This organ does not have a description",
+                        "cid": "",
+                        "address": "",
+                        "organigramId": "clfbr1rkv000vkbadb4pv8czh",
+                        "organigramClient": null,
+                        "network": null,
+                        "entries": [],
+                        "isTarget": [
+                            {
+                                "id": "clfbrc9uo002hkbaduembmsmn",
+                                "contractId": null,
+                                "permissions": 12,
+                                "organAddress": "",
+                                "organId": "clfbr1rkl000hadkbhpb0bg0f",
+                                "procedureId": "clfbr1rkl000padkb7r7s8aph",
+                                "procedureName": "Manage founders",
+                                "procedureAddress": ""
+                            },
+                            {
+                                "id": "clfbrgx4w003qkbad36tnokwb",
+                                "contractId": null,
+                                "permissions": 19,
+                                "organAddress": "",
+                                "organId": "clfbr1rkl000hadkbhpb0bg0f",
+                                "procedureId": "clfbr1rkl000radkbhygahc3m",
+                                "procedureName": "Amend Constitution",
+                                "procedureAddress": ""
+                            }
+                        ]
+                    },
+                    "asset": null
+                }
+            ],
+            "targetOrgans": [
+                {
+                    "id": "clfbr1rkw001skbad1v2onxuz",
+                    "contractId": null,
+                    "permissions": 2028,
+                    "organAddress": "",
+                    "organId": "clfbr1rkl000nadkbg1px75pl",
+                    "procedureId": "clfbr1rkl000tadkbaonlhx79",
+                    "procedureName": "Manage treasury",
+                    "procedureAddress": ""
+                }
+            ],
+            "type": {
+                "name": "nomination",
+                "label": "Nomination",
+                "description": "A nomination allows any user in the source organ to directly add, remove or replace one or many entries, assets or procedures in the target organ.",
+                "fields": []
+            }
+        },
+        {
+            "id": "clfbr6rck0014adkb993u57pu",
+            "name": "Manage codebase",
+            "description": "This procedure does not have any description yet. You can edit it by clicking here.",
+            "cid": "",
+            "address": "",
+            "typeName": "nomination",
+            "organigramId": "clfbr1rkv000vkbadb4pv8czh",
+            "data": "{}",
+            "organigramClient": null,
+            "network": null,
+            "sourceOrgans": [
+                {
+                    "id": "clfbr6rcl0027kbadwbepr6ss",
+                    "procedureId": "clfbr6rck0014adkb993u57pu",
+                    "organId": "clfbr50tq0024kbadj2dpwb0g",
+                    "contractId": null,
+                    "assetId": null,
+                    "types": [
+                        {
+                            "name": "deciders",
+                            "label": "Approve proposals"
+                        },
+                        {
+                            "name": "proposers",
+                            "label": "Create proposals"
+                        }
+                    ],
+                    "organ": {
+                        "id": "clfbr50tq0024kbadj2dpwb0g",
+                        "name": "Contributors",
+                        "description": "This organ does not have a description yet. You can edit it by clicking here.",
+                        "cid": "",
+                        "address": "",
+                        "organigramId": "clfbr1rkv000vkbadb4pv8czh",
+                        "organigramClient": null,
+                        "network": null,
+                        "entries": [],
+                        "isTarget": [
+                            {
+                                "id": "clfbrf1e4002zkbadgoonc3ih",
+                                "contractId": null,
+                                "permissions": 12,
+                                "organAddress": "",
+                                "organId": "clfbr50tq0024kbadj2dpwb0g",
+                                "procedureId": "clfbr80ht0017adkb19fd50ve",
+                                "procedureName": "Manage contributors",
+                                "procedureAddress": ""
+                            }
+                        ]
+                    },
+                    "asset": null
+                }
+            ],
+            "targetOrgans": [
+                {
+                    "id": "clfbr6rcl0028kbadj4qzji92",
+                    "contractId": null,
+                    "permissions": 12,
+                    "organAddress": "",
+                    "organId": "clfbr5lxj0025kbadnlagrukz",
+                    "procedureId": "clfbr6rck0014adkb993u57pu",
+                    "procedureName": "Manage codebase",
+                    "procedureAddress": ""
+                }
+            ],
+            "type": {
+                "name": "nomination",
+                "label": "Nomination",
+                "description": "A nomination allows any user in the source organ to directly add, remove or replace one or many entries, assets or procedures in the target organ.",
+                "fields": []
+            }
+        },
+        {
+            "id": "clfbr80ht0017adkb19fd50ve",
+            "name": "Manage contributors",
+            "description": "This procedure does not have any description yet. You can edit it by clicking here.",
+            "cid": "",
+            "address": "",
+            "typeName": "nomination",
+            "organigramId": "clfbr1rkv000vkbadb4pv8czh",
+            "data": "{}",
+            "organigramClient": null,
+            "network": null,
+            "sourceOrgans": [
+                {
+                    "id": "clfbrf1e4002ykbadzwmx78mh",
+                    "procedureId": "clfbr80ht0017adkb19fd50ve",
+                    "organId": "clfbr1rkl000hadkbhpb0bg0f",
+                    "contractId": null,
+                    "assetId": null,
+                    "types": [
+                        {
+                            "name": "deciders",
+                            "label": "Approve proposals"
+                        },
+                        {
+                            "name": "proposers",
+                            "label": "Create proposals"
+                        }
+                    ],
+                    "organ": {
+                        "id": "clfbr1rkl000hadkbhpb0bg0f",
+                        "name": "Project founders",
+                        "description": "This organ does not have a description",
+                        "cid": "",
+                        "address": "",
+                        "organigramId": "clfbr1rkv000vkbadb4pv8czh",
+                        "organigramClient": null,
+                        "network": null,
+                        "entries": [],
+                        "isTarget": [
+                            {
+                                "id": "clfbrc9uo002hkbaduembmsmn",
+                                "contractId": null,
+                                "permissions": 12,
+                                "organAddress": "",
+                                "organId": "clfbr1rkl000hadkbhpb0bg0f",
+                                "procedureId": "clfbr1rkl000padkb7r7s8aph",
+                                "procedureName": "Manage founders",
+                                "procedureAddress": ""
+                            },
+                            {
+                                "id": "clfbrgx4w003qkbad36tnokwb",
+                                "contractId": null,
+                                "permissions": 19,
+                                "organAddress": "",
+                                "organId": "clfbr1rkl000hadkbhpb0bg0f",
+                                "procedureId": "clfbr1rkl000radkbhygahc3m",
+                                "procedureName": "Amend Constitution",
+                                "procedureAddress": ""
+                            }
+                        ]
+                    },
+                    "asset": null
+                }
+            ],
+            "targetOrgans": [
+                {
+                    "id": "clfbrf1e4002zkbadgoonc3ih",
+                    "contractId": null,
+                    "permissions": 12,
+                    "organAddress": "",
+                    "organId": "clfbr50tq0024kbadj2dpwb0g",
+                    "procedureId": "clfbr80ht0017adkb19fd50ve",
+                    "procedureName": "Manage contributors",
+                    "procedureAddress": ""
+                }
+            ],
+            "type": {
+                "name": "nomination",
+                "label": "Nomination",
+                "description": "A nomination allows any user in the source organ to directly add, remove or replace one or many entries, assets or procedures in the target organ.",
+                "fields": []
+            }
+        }
+    ],
+    "assets": [],
+    "canEdit": true
+}

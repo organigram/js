@@ -9,8 +9,22 @@ export class VoteProcedure extends Procedure {
     voteDuration;
     majoritySize;
     elections;
-    constructor(cid, address, chainId, signer, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals, isDeployed, quorumSize, voteDuration, majoritySize, elections, salt) {
-        super(cid, address, chainId, signer, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals, isDeployed, salt);
+    constructor({ cid, address, chainId, signerOrProvider, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals, isDeployed, quorumSize, voteDuration, majoritySize, elections, salt }) {
+        super({
+            cid,
+            address,
+            chainId,
+            signerOrProvider,
+            metadata,
+            proposers,
+            moderators,
+            deciders,
+            withModeration,
+            forwarder,
+            proposals,
+            isDeployed,
+            salt
+        });
         this.address =
             address ??
                 predictContractAddress({
@@ -22,7 +36,7 @@ export class VoteProcedure extends Procedure {
         this.voteDuration = voteDuration;
         this.majoritySize = majoritySize;
         this.elections = elections;
-        this.contract = new ethers.Contract(this.address, VoteProcedureContractABI.abi, signer);
+        this.contract = new ethers.Contract(this.address, VoteProcedureContractABI.abi, signerOrProvider);
     }
     static async _populateInitialize(type, options, cid, proposers, moderators, deciders, withModeration, forwarder, quorumSize, voteDuration, majoritySize) {
         if (options.signer == null) {
@@ -66,15 +80,15 @@ export class VoteProcedure extends Procedure {
         }
         return elections;
     }
-    static async load(address, signer) {
-        const procedure = await Procedure.load(address, signer);
+    static async load(address, signerOrProvider) {
+        const procedure = await Procedure.load(address, signerOrProvider);
         if (!procedure)
             throw new Error('Not a valid procedure.');
-        const contract = new ethers.Contract(address, VoteProcedureContractABI.abi, signer);
+        const contract = new ethers.Contract(address, VoteProcedureContractABI.abi, signerOrProvider);
         const quorumSize = await contract.quorumSize();
         const voteDuration = await contract.voteDuration();
         const majoritySize = await contract.majoritySize();
-        const elections = await VoteProcedure.loadElections(address, signer);
+        const elections = await VoteProcedure.loadElections(address, signerOrProvider);
         const proposals = procedure.proposals.map((proposal) => {
             if (!proposal.blocked && !proposal.applied && !proposal.adopted) {
                 const election = elections.find(ba => ba.proposalKey === proposal.key);
@@ -87,7 +101,28 @@ export class VoteProcedure extends Procedure {
             }
             return proposal;
         });
-        return new VoteProcedure(procedure.cid, procedure.address, procedure.chainId, signer, procedure.metadata, procedure.proposers, procedure.moderators, procedure.deciders, procedure.withModeration, procedure.forwarder, proposals, true, quorumSize.toString(), voteDuration.toString(), majoritySize.toString(), elections);
+        const chainId = (await signerOrProvider.provider?.getNetwork().then(n => n.chainId)) ??
+            (await signerOrProvider
+                .getNetwork()
+                .then(n => n.chainId));
+        return new VoteProcedure({
+            cid: procedure.cid,
+            address: procedure.address,
+            chainId: chainId?.toString(),
+            signerOrProvider,
+            metadata: procedure.metadata,
+            proposers: procedure.proposers,
+            moderators: procedure.moderators,
+            deciders: procedure.deciders,
+            withModeration: procedure.withModeration,
+            forwarder: procedure.forwarder,
+            proposals,
+            isDeployed: true,
+            quorumSize: quorumSize.toString(),
+            voteDuration: voteDuration.toString(),
+            majoritySize: majoritySize.toString(),
+            elections
+        });
     }
     async vote(proposalKey, approval, options) {
         const tx = await this.contract

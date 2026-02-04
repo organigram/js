@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import OrganContractABI from '@organigram/protocol/artifacts/contracts/Organ.sol/Organ.json';
-import { EMPTY_ADDRESS, formatSalt, predictContractAddress } from './utils';
+import { createRandom32BytesHexId, EMPTY_ADDRESS, predictContractAddress } from './utils';
 export var OrganFunctionName;
 (function (OrganFunctionName) {
     OrganFunctionName[OrganFunctionName["addEntries"] = 0] = "addEntries";
@@ -15,9 +15,11 @@ export var OrganFunctionName;
 })(OrganFunctionName || (OrganFunctionName = {}));
 export class Organ {
     static INTERFACE = '0xf81b1307';
-    salt;
+    name;
+    description;
     address;
-    chainId = '1';
+    salt;
+    chainId;
     balance;
     permissions = [];
     cid;
@@ -26,26 +28,30 @@ export class Organ {
     provider;
     contract;
     isDeployed;
-    name;
-    description;
-    constructor({ address, chainId, signerOrProvider, balance, permissions, cid, entries, salt, isDeployed, name, description }) {
-        this.name = name;
-        this.description = description;
+    isSource;
+    isTarget;
+    constructor({ address, chainId, signerOrProvider, balance, permissions, cid, entries, salt, isDeployed, name, description, isSource, isTarget }) {
+        if (!address && !chainId) {
+            throw new Error('Either address or chainId must be provided to organ constructor.');
+        }
+        this.name = name ?? 'Unnamed Organ';
+        this.description = description ?? 'This organ does not have a description.';
         this.isDeployed = isDeployed ?? false;
-        this.salt = salt || (!isDeployed ? formatSalt() : undefined);
+        this.salt =
+            (salt ?? this.isDeployed) ? undefined : createRandom32BytesHexId();
+        this.chainId = chainId;
         this.address =
             address ??
                 predictContractAddress({
                     type: 'Organ',
-                    chainId,
+                    chainId: chainId,
                     salt: this.salt
                 });
-        this.chainId = chainId;
-        this.balance = balance;
-        this.permissions = permissions;
-        this.cid = cid;
-        this.entries = entries;
-        if (signerOrProvider.provider != null) {
+        this.balance = balance ?? 0n;
+        this.permissions = permissions ?? [];
+        this.cid = cid ?? '';
+        this.entries = entries ?? [];
+        if (signerOrProvider?.provider != null) {
             this.signer = signerOrProvider;
             this.provider = this.signer.provider;
         }
@@ -60,7 +66,9 @@ export class Organ {
                 console.warn('Error while getting signer from provider.', error.message);
             });
         }
-        this.contract = new ethers.Contract(address, OrganContractABI.abi, signerOrProvider);
+        this.contract = new ethers.Contract(this.address, OrganContractABI.abi, signerOrProvider);
+        this.isSource = isSource ?? [];
+        this.isTarget = isTarget ?? [];
     }
     updateCid = async (cid, options) => {
         const tx = await this.contract.updateCid(cid, { nonce: options?.nonce });

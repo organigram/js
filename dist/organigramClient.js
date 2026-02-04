@@ -7,7 +7,6 @@ import { Procedure } from './procedure';
 import { NominationProcedure } from './procedure/nomination';
 import { VoteProcedure } from './procedure/vote';
 import { ERC20VoteProcedure } from './procedure/erc20Vote';
-import { getOrganSourcesAndTargets, getProcedureSourcesAndTargets } from './organigram';
 const procedureMetadata = {
     description: '',
     _type: 'procedureType',
@@ -391,40 +390,6 @@ export class OrganigramClient {
         discover: true,
         limit: 100
     }) {
-        organigram.organs = [];
-        this.contract
-            .getOrgans()
-            .then(async (organAddresses) => {
-            for (const address of organAddresses) {
-                const organ = await this.getOrgan(address, cached).catch((error) => {
-                    console.error('Error loading organ ' + address, error.message);
-                    return undefined;
-                });
-                if (organ != null) {
-                    organigram.organs.push(getOrganSourcesAndTargets(organ));
-                }
-            }
-        })
-            .catch((error) => {
-            console.error('Error fetching organs', error.message);
-        });
-        organigram.procedures = [];
-        this.contract
-            .getProcedures()
-            .then(async (procedureAddresses) => {
-            for (const address of procedureAddresses) {
-                const procedure = await this.getProcedure(address, cached).catch((error) => {
-                    console.error('Error loading procedure ' + address, error.message);
-                    return undefined;
-                });
-                if (procedure != null) {
-                    organigram.procedures.push(getProcedureSourcesAndTargets(procedure));
-                }
-            }
-        })
-            .catch((error) => {
-            console.error('Error fetching procedures', error.message);
-        });
         return organigram;
     }
 }

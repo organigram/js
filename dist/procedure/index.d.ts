@@ -1,5 +1,23 @@
 import { type ContractTransactionReceipt, ethers } from 'ethers';
 import type { TransactionOptions } from '../organigramClient';
+import { SourceOrgan, TargetOrgan } from '../organigram';
+export type ProcedureJson = {
+    address: string;
+    deciders: string;
+    typeName: string;
+    name?: string;
+    description?: string;
+    cid?: string;
+    salt?: string;
+    chainId?: string;
+    metadata?: unknown;
+    proposers?: string;
+    moderators?: string;
+    withModeration?: boolean;
+    forwarder?: string;
+    proposals?: ProcedureProposal[];
+    args?: unknown[];
+};
 export type Election = {
     proposalKey: string;
     start: string;
@@ -65,27 +83,50 @@ export interface ProposalMetadata {
     file?: string;
     cid?: string;
 }
+export interface ProcedureInput {
+    address?: string;
+    deciders: string;
+    typeName?: string;
+    name?: string;
+    description?: string;
+    salt?: string;
+    chainId?: string;
+    cid?: string;
+    signerOrProvider?: ethers.Signer | ethers.Provider;
+    metadata?: unknown;
+    proposers?: string;
+    withModeration?: boolean;
+    moderators?: string;
+    forwarder?: string;
+    proposals?: ProcedureProposal[];
+    isDeployed?: boolean;
+    sourceOrgans?: SourceOrgan[];
+    targetOrgans?: TargetOrgan[];
+}
 export declare class Procedure {
     static INTERFACE: string;
     static OPERATIONS_FUNCTIONS: ProcedureProposalOperationFunction[];
-    salt?: string;
-    isDeployed: boolean;
-    cid: string;
+    name: string;
+    description: string;
     address: string;
-    chainId: string;
-    metadata: unknown;
-    proposers: string;
-    moderators: string;
+    typeName: string;
+    cid: string;
+    isDeployed: boolean;
     deciders: string;
+    proposers: string;
     withModeration: boolean;
+    moderators?: string;
+    metadata: unknown;
     forwarder: string;
     proposals: ProcedureProposal[];
+    _contract: ethers.Contract;
+    salt?: string;
+    chainId?: string;
     signer?: ethers.Signer;
     provider?: ethers.Provider;
-    _contract: ethers.Contract;
-    name?: string;
-    description?: string;
-    constructor(cid: string, address: string, chainId: string, signerOrProvider: ethers.Signer | ethers.Provider, metadata: unknown, proposers: string, moderators: string, deciders: string, withModeration: boolean, forwarder: string, proposals: ProcedureProposal[], isDeployed: boolean, salt?: string, name?: string, description?: string);
+    sourceOrgans?: SourceOrgan[];
+    targetOrgans?: TargetOrgan[];
+    constructor({ address, deciders, typeName, name, description, salt, cid, chainId, signerOrProvider, metadata, proposers, withModeration, forwarder, moderators, proposals, isDeployed, sourceOrgans, targetOrgans }: ProcedureInput);
     static _populateInitialize(_address: string, _options: {
         signer: ethers.Signer;
     } & TransactionOptions, _metadata: string, _proposers: string, _moderators: string, _deciders: string, _withModeration: boolean, _forwarder: string, ..._args: unknown[]): Promise<ethers.ContractTransaction>;

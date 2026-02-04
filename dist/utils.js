@@ -3,7 +3,7 @@ import { ethers } from 'ethers';
 import sha3 from 'js-sha3';
 export { deployedAddresses };
 export const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000';
-export const predictContractAddress = ({ type, chainId, salt }) => predictDeterministicAddress(deployedAddresses[chainId][type], deployedAddresses[chainId].OrganigramClient, salt);
+export const predictContractAddress = ({ type, chainId, salt }) => predictDeterministicAddress(deployedAddresses[chainId]?.[type], deployedAddresses[chainId]?.OrganigramClient, salt);
 export const createRandom32BytesHexId = () => ethers.hexlify(ethers.randomBytes(32));
 export const formatSalt = (salt) => {
     if (salt == null) {
@@ -89,3 +89,4 @@ function hexToInts(hex) {
 function fromHex(byte) {
     return parseInt(byte, 16);
 }
+export const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);

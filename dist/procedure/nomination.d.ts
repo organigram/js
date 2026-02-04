@@ -1,10 +1,12 @@
 import { ethers } from 'ethers';
-import { Procedure, type ProcedureProposal } from '.';
+import { Procedure, ProcedureInput } from '.';
 import { TransactionOptions } from '../organigramClient';
 export declare class NominationProcedure extends Procedure {
     static INTERFACE: string;
     contract: ethers.Contract;
-    constructor(cid: string, address: string, chainId: string, signerOrProvider: ethers.Signer | ethers.Provider, metadata: unknown, proposers: string, moderators: string, deciders: string, withModeration: boolean, forwarder: string, proposals: ProcedureProposal[], isDeployed: boolean, salt?: string);
+    constructor({ cid, address, chainId, signerOrProvider, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals, isDeployed, salt, contract, sourceOrgans, targetOrgans }: ProcedureInput & {
+        contract?: ethers.Contract;
+    });
     static _populateInitialize(type: string, options: {
         signer: ethers.Signer;
     } & TransactionOptions, cid: string, proposers: string, moderators: string, deciders: string, _withModeration: Boolean, forwarder: string, ..._args: any[]): Promise<ethers.ContractTransaction>;

@@ -2,9 +2,6 @@ import AssetContract from '@organigram/protocol/artifacts/contracts/Asset.sol/As
 import { ethers, Interface, formatEther } from 'ethers';
 export const ERC20_INITIAL_SUPPLY = 10_000_000;
 export const getAssetData = async (assetAddress, signer) => {
-    if (assetAddress == null || assetAddress === '' || signer == null) {
-        return undefined;
-    }
     const erc777Interface = new Interface(AssetContract.abi);
     const contract = new ethers.Contract(assetAddress, erc777Interface, signer);
     const name = await contract.name();
@@ -12,7 +9,7 @@ export const getAssetData = async (assetAddress, signer) => {
     const _totalSupply = await contract.totalSupply();
     let totalSupply = formatEther(_totalSupply);
     totalSupply = (+totalSupply).toFixed(0);
-    const _userBalance = await contract.balanceOf(signer.getAddress());
+    const _userBalance = await contract.balanceOf(await signer?.getAddress());
     let userBalance = formatEther(_userBalance);
     userBalance = (+userBalance).toFixed(0);
     if (contract != null) {
@@ -22,7 +19,8 @@ export const getAssetData = async (assetAddress, signer) => {
             name,
             symbol,
             totalSupply,
-            userBalance
+            userBalance,
+            chainId: (await signer?.provider?.getNetwork())?.chainId.toString()
         };
     }
 };

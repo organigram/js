@@ -6,23 +6,26 @@ export { deployedAddresses }
 
 export const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000'
 
+export type ContractName =
+  | 'Organ'
+  | 'Asset'
+  | 'Erc20VoteProcedure'
+  | 'VoteProcedure'
+  | 'NominationProcedure'
+  | 'OrganigramClient'
+
 export const predictContractAddress = ({
   type,
   chainId,
   salt
 }: {
-  type:
-    | 'Organ'
-    | 'Asset'
-    | 'Erc20VoteProcedure'
-    | 'VoteProcedure'
-    | 'NominationProcedure'
+  type: Omit<ContractName, 'OrganigramClient'>
   chainId: string
   salt: string
 }): string =>
   predictDeterministicAddress(
-    deployedAddresses[chainId as '11155111'][type as 'Organ'],
-    deployedAddresses[chainId as '11155111'].OrganigramClient,
+    deployedAddresses[chainId as '11155111']?.[type as 'Organ'],
+    deployedAddresses[chainId as '11155111']?.OrganigramClient,
     salt
   )
 
@@ -158,3 +161,5 @@ function hexToInts(hex: string) {
 function fromHex(byte: string): number {
   return parseInt(byte, 16)
 }
+
+export const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
