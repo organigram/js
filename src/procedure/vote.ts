@@ -4,6 +4,25 @@ import VoteProcedureContractABI from '@organigram/protocol/artifacts/contracts/p
 import { type TransactionOptions } from '../organigramClient'
 import { predictContractAddress } from '../utils'
 
+export type VoteProcedureInput = {
+  cid: string
+  address?: string
+  chainId: string
+  signerOrProvider: ethers.Signer | ethers.Provider
+  metadata: unknown
+  proposers: string
+  moderators?: string
+  deciders: string
+  withModeration: boolean
+  forwarder: string
+  proposals: ProcedureProposal[]
+  isDeployed: boolean
+  quorumSize: string
+  voteDuration: string
+  majoritySize: string
+  elections: Election[]
+  salt?: string
+}
 export class VoteProcedure extends Procedure {
   static INTERFACE = '0xc9d27afe' // vote() signature.
   contract: ethers.Contract
@@ -13,30 +32,30 @@ export class VoteProcedure extends Procedure {
   elections: Election[]
 
   // Constructor needs to call Procedure constructor.
-  constructor(
-    cid: string,
-    address: string,
-    chainId: string,
-    signer: ethers.Signer,
-    metadata: unknown,
-    proposers: string,
-    moderators: string,
-    deciders: string,
-    withModeration: boolean,
-    forwarder: string,
-    proposals: ProcedureProposal[],
-    isDeployed: boolean,
-    quorumSize: string,
-    voteDuration: string,
-    majoritySize: string,
-    elections: Election[],
-    salt?: string
-  ) {
-    super(
+  constructor({
+    cid,
+    address,
+    chainId,
+    signerOrProvider,
+    metadata,
+    proposers,
+    moderators,
+    deciders,
+    withModeration,
+    forwarder,
+    proposals,
+    isDeployed,
+    quorumSize,
+    voteDuration,
+    majoritySize,
+    elections,
+    salt
+  }: VoteProcedureInput) {
+    super({
       cid,
       address,
       chainId,
-      signer,
+      signerOrProvider,
       metadata,
       proposers,
       moderators,
@@ -46,7 +65,7 @@ export class VoteProcedure extends Procedure {
       proposals,
       isDeployed,
       salt
-    )
+    })
     this.address =
       address ??
       predictContractAddress({
@@ -61,7 +80,7 @@ export class VoteProcedure extends Procedure {
     this.contract = new ethers.Contract(
       this.address,
       VoteProcedureContractABI.abi,
-      signer
+      signerOrProvider
     )
   }
 
@@ -164,19 +183,22 @@ export class VoteProcedure extends Procedure {
 
   static async load(
     address: string,
-    signer: ethers.Signer
+    signerOrProvider: ethers.Signer | ethers.Provider
   ): Promise<VoteProcedure> {
-    const procedure = await Procedure.load(address, signer)
+    const procedure = await Procedure.load(address, signerOrProvider)
     if (!procedure) throw new Error('Not a valid procedure.')
     const contract = new ethers.Contract(
       address,
       VoteProcedureContractABI.abi,
-      signer
+      signerOrProvider
     )
     const quorumSize = await contract.quorumSize()
     const voteDuration = await contract.voteDuration()
     const majoritySize = await contract.majoritySize()
-    const elections = await VoteProcedure.loadElections(address, signer)
+    const elections = await VoteProcedure.loadElections(
+      address,
+      signerOrProvider as ethers.Signer
+    )
     // Make sure expired proposals are listed as blocked.
     const proposals = procedure.proposals.map((proposal: ProcedureProposal) => {
       if (!proposal.blocked && !proposal.applied && !proposal.adopted) {
@@ -191,24 +213,30 @@ export class VoteProcedure extends Procedure {
       }
       return proposal
     })
-    return new VoteProcedure(
-      procedure.cid,
-      procedure.address,
-      procedure.chainId,
-      signer,
-      procedure.metadata,
-      procedure.proposers,
-      procedure.moderators,
-      procedure.deciders,
-      procedure.withModeration,
-      procedure.forwarder,
+
+    const chainId =
+      (await signerOrProvider.provider?.getNetwork().then(n => n.chainId)) ??
+      (await (signerOrProvider as ethers.Provider)
+        .getNetwork()
+        .then(n => n.chainId))
+    return new VoteProcedure({
+      cid: procedure.cid,
+      address: procedure.address,
+      chainId: chainId?.toString()!,
+      signerOrProvider,
+      metadata: procedure.metadata,
+      proposers: procedure.proposers,
+      moderators: procedure.moderators,
+      deciders: procedure.deciders,
+      withModeration: procedure.withModeration,
+      forwarder: procedure.forwarder,
       proposals,
-      true,
-      quorumSize.toString(),
-      voteDuration.toString(),
-      majoritySize.toString(),
+      isDeployed: true,
+      quorumSize: quorumSize.toString(),
+      voteDuration: voteDuration.toString(),
+      majoritySize: majoritySize.toString(),
       elections
-    )
+    })
   }
 
   async vote(

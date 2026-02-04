@@ -1,8 +1,15 @@
 import { ethers } from 'ethers'
-import { Procedure, type ProcedureProposal, type Election } from '.'
+import { Procedure, type Election, ProcedureInput } from '.'
 import ERC20VoteProcedureContractABI from '@organigram/protocol/artifacts/contracts/procedures/ERC20Vote.sol/ERC20VoteProcedure.json'
 import { TransactionOptions } from '../organigramClient'
-import { formatSalt, predictContractAddress } from '../utils'
+
+export type ERC20VoteProcedureInput = ProcedureInput & {
+  erc20: string
+  quorumSize: string
+  voteDuration: string
+  majoritySize: string
+  elections: Election[]
+}
 
 export class ERC20VoteProcedure extends Procedure {
   static INTERFACE = '0xc9d27afe' // vote() signature.
@@ -14,27 +21,29 @@ export class ERC20VoteProcedure extends Procedure {
   contract: ethers.Contract
 
   // Constructor needs to call Procedure constructor.
-  constructor(
-    cid: string,
-    address: string,
-    chainId: string,
-    signerOrProvider: ethers.Signer | ethers.Provider,
-    metadata: unknown,
-    proposers: string,
-    moderators: string,
-    deciders: string,
-    withModeration: boolean,
-    forwarder: string,
-    proposals: ProcedureProposal[],
-    isDeployed: boolean,
-    erc20: string,
-    quorumSize: string,
-    voteDuration: string,
-    majoritySize: string,
-    elections: Election[],
-    salt?: string
-  ) {
-    super(
+  constructor({
+    cid,
+    salt,
+    address,
+    chainId,
+    signerOrProvider,
+    metadata,
+    proposers,
+    moderators,
+    deciders,
+    withModeration,
+    forwarder,
+    proposals,
+    isDeployed,
+    erc20,
+    quorumSize,
+    voteDuration,
+    majoritySize,
+    elections,
+    sourceOrgans,
+    targetOrgans
+  }: ERC20VoteProcedureInput) {
+    super({
       cid,
       address,
       chainId,
@@ -47,16 +56,10 @@ export class ERC20VoteProcedure extends Procedure {
       forwarder,
       proposals,
       isDeployed,
-      salt
-    )
-    this.salt = salt || isDeployed ? undefined : formatSalt()
-    this.address =
-      address ??
-      predictContractAddress({
-        type: 'Erc20VoteProcedure',
-        chainId,
-        salt: this.salt as string
-      })
+      salt,
+      sourceOrgans,
+      targetOrgans
+    })
     this.erc20 = erc20
     this.quorumSize = quorumSize
     this.voteDuration = voteDuration
@@ -201,25 +204,31 @@ export class ERC20VoteProcedure extends Procedure {
       }
       return proposal
     })
-    return new ERC20VoteProcedure(
-      procedure.cid,
-      procedure.address,
-      procedure.chainId,
+
+    const chainId = await (
+      signerOrProvider.provider ? signerOrProvider : signerOrProvider.provider
+    )?.provider
+      ?.getNetwork()
+      .then(n => n.chainId)
+    return new ERC20VoteProcedure({
+      cid: procedure.cid,
+      address: procedure.address,
+      chainId: chainId?.toString()!,
       signerOrProvider,
-      procedure.metadata,
-      procedure.proposers,
-      procedure.moderators,
-      procedure.deciders,
-      procedure.withModeration,
-      procedure.forwarder,
+      metadata: procedure.metadata,
+      proposers: procedure.proposers,
+      moderators: procedure.moderators,
+      deciders: procedure.deciders,
+      withModeration: procedure.withModeration,
+      forwarder: procedure.forwarder,
       proposals,
-      true,
-      erc20.toString(),
-      quorumSize.toString(),
-      voteDuration.toString(),
-      majoritySize.toString(),
+      isDeployed: true,
+      erc20: erc20.toString(),
+      quorumSize: quorumSize.toString(),
+      voteDuration: voteDuration.toString(),
+      majoritySize: majoritySize.toString(),
       elections
-    )
+    })
   }
 
   async erc20Balance(account?: string): Promise<bigint> {

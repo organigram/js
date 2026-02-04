@@ -1,8 +1,13 @@
 import { ethers, type Signer } from 'ethers'
 import OrganContractABI from '@organigram/protocol/artifacts/contracts/Organ.sol/Organ.json'
 
-import { EMPTY_ADDRESS, formatSalt, predictContractAddress } from './utils'
+import {
+  createRandom32BytesHexId,
+  EMPTY_ADDRESS,
+  predictContractAddress
+} from './utils'
 import type { TransactionOptions } from './organigramClient'
+import { SourceOrgan, TargetOrgan } from './organigram'
 
 export interface OrganEntry {
   index: string
@@ -30,6 +35,26 @@ export interface OrganData {
   entries: OrganEntry[]
 }
 
+export interface OrganInput extends Partial<OrganData> {
+  salt?: string
+  isDeployed?: boolean
+  name?: string
+  description?: string
+  isSource?: SourceOrgan[]
+  isTarget?: TargetOrgan[]
+}
+
+export interface OrganJson {
+  address: string
+  entries?: OrganEntry[]
+  permissions?: OrganPermission[]
+  name?: string
+  description?: string
+  cid?: string
+  salt?: string
+  chainId?: string
+}
+
 export enum OrganFunctionName {
   addEntries,
   removeEntries,
@@ -44,9 +69,11 @@ export enum OrganFunctionName {
 
 export class Organ {
   static INTERFACE = '0xf81b1307' // Organ.INTERFACE_ID.
-  salt?: string
+  name: string
+  description: string
   address: string
-  chainId: string = '1'
+  salt?: string
+  chainId?: string
   balance: bigint
   permissions: OrganPermission[] = []
   cid: string
@@ -55,8 +82,10 @@ export class Organ {
   provider?: ethers.Provider
   contract: ethers.Contract
   isDeployed: boolean
-  name?: string
-  description?: string
+
+  // State variables that are helpful in the context of an organigram
+  isSource: SourceOrgan[]
+  isTarget: TargetOrgan[]
 
   public constructor({
     address,
@@ -69,30 +98,31 @@ export class Organ {
     salt,
     isDeployed,
     name,
-    description
-  }: OrganData & {
-    salt?: string
-    isDeployed?: boolean
-    name?: string
-    description?: string
-  }) {
-    this.name = name
-    this.description = description
+    description,
+    isSource,
+    isTarget
+  }: OrganInput) {
+    if (!address && !chainId) {
+      throw new Error('Either address or chainId must be provided to organ constructor.')
+    }
+    this.name = name ?? 'Unnamed Organ'
+    this.description = description ?? 'This organ does not have a description.'
     this.isDeployed = isDeployed ?? false
-    this.salt = salt || (!isDeployed ? formatSalt() : undefined)
+    this.salt =
+      (salt ?? this.isDeployed) ? undefined : createRandom32BytesHexId()
+    this.chainId = chainId
     this.address =
       address ??
       predictContractAddress({
         type: 'Organ',
-        chainId,
-        salt: this.salt as string
+        chainId: chainId!,
+        salt: this.salt!
       })
-    this.chainId = chainId
-    this.balance = balance
-    this.permissions = permissions
-    this.cid = cid
-    this.entries = entries
-    if (signerOrProvider.provider != null) {
+    this.balance = balance ?? 0n
+    this.permissions = permissions ?? []
+    this.cid = cid ?? ''
+    this.entries = entries ?? []
+    if (signerOrProvider?.provider != null) {
       this.signer = signerOrProvider as ethers.Signer
       this.provider = this.signer.provider as ethers.Provider
     } else if (signerOrProvider instanceof ethers.JsonRpcProvider) {
@@ -110,10 +140,12 @@ export class Organ {
         })
     }
     this.contract = new ethers.Contract(
-      address,
+      this.address,
       OrganContractABI.abi,
       signerOrProvider
     )
+    this.isSource = isSource ?? []
+    this.isTarget = isTarget ?? []
   }
 
   /* Organ API */

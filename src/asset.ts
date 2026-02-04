@@ -7,15 +7,28 @@ import {
   Interface,
   formatEther
 } from 'ethers'
+import { SourceOrgan } from './organigram'
 
 export const ERC20_INITIAL_SUPPLY = 10_000_000 // 10 million tokens.
 
+export interface AssetJson {
+  address: string
+  name?: string
+  symbol?: string
+  totalSupply?: string
+  chainId?: string
+  salt?: string
+}
+
 export interface Asset {
   address: string
-  contract: EthersContract
   name: string
+  contract: EthersContract
   symbol: string
   totalSupply: string
+  chainId: string
+  salt?: string
+  isSourceOrgan?: SourceOrgan[]
 }
 
 export const getAssetData = async (
@@ -39,7 +52,8 @@ export const getAssetData = async (
       name,
       symbol,
       totalSupply,
-      userBalance
+      userBalance,
+      chainId: (await signer?.provider?.getNetwork())?.chainId.toString()!
     }
   }
 }

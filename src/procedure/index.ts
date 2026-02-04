@@ -2,7 +2,31 @@ import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Proce
 import { type ContractTransactionReceipt, ethers } from 'ethers'
 
 import type { TransactionOptions } from '../organigramClient'
-import { formatSalt } from '../utils'
+import {
+  capitalize,
+  createRandom32BytesHexId,
+  deployedAddresses,
+  predictContractAddress
+} from '../utils'
+import { SourceOrgan, TargetOrgan } from '../organigram'
+
+export type ProcedureJson = {
+  address: string
+  deciders: string
+  typeName: string
+  name?: string
+  description?: string
+  cid?: string
+  salt?: string
+  chainId?: string
+  metadata?: unknown
+  proposers?: string
+  moderators?: string
+  withModeration?: boolean
+  forwarder?: string
+  proposals?: ProcedureProposal[]
+  args?: unknown[]
+}
 
 export type Election = {
   proposalKey: string
@@ -128,6 +152,27 @@ export interface ProposalMetadata {
   cid?: string
 }
 
+export interface ProcedureInput {
+  address?: string
+  deciders: string
+  typeName?: string
+  name?: string
+  description?: string
+  salt?: string
+  chainId?: string
+  cid?: string
+  signerOrProvider?: ethers.Signer | ethers.Provider
+  metadata?: unknown
+  proposers?: string
+  withModeration?: boolean
+  moderators?: string
+  forwarder?: string
+  proposals?: ProcedureProposal[]
+  isDeployed?: boolean
+  sourceOrgans?: SourceOrgan[]
+  targetOrgans?: TargetOrgan[]
+}
+
 export class Procedure {
   static INTERFACE = '0x71dbd330' // Procedure.INTERFACE_ID
 
@@ -225,56 +270,77 @@ export class Procedure {
     }
   ]
 
-  salt?: string
-  isDeployed: boolean
-  cid: string
+  name: string
+  description: string
   address: string
-  chainId: string
-  metadata: unknown
-  proposers: string
-  moderators: string
+  typeName: string
+  cid: string
+  isDeployed: boolean
   deciders: string
+  proposers: string
   withModeration: boolean
+  moderators?: string
+  metadata: unknown
   forwarder: string
   proposals: ProcedureProposal[]
+  _contract: ethers.Contract
+  salt?: string
+  chainId?: string
   signer?: ethers.Signer
   provider?: ethers.Provider
-  _contract: ethers.Contract
-  name?: string
-  description?: string
 
-  constructor(
-    cid: string,
-    address: string,
-    chainId: string,
-    signerOrProvider: ethers.Signer | ethers.Provider,
-    metadata: unknown,
-    proposers: string,
-    moderators: string,
-    deciders: string,
-    withModeration: boolean,
-    forwarder: string,
-    proposals: ProcedureProposal[],
-    isDeployed: boolean,
-    salt?: string,
-    name?: string,
-    description?: string
-  ) {
-    this.cid = cid
+  // Helper variables in the context of an organigram
+  sourceOrgans?: SourceOrgan[]
+  targetOrgans?: TargetOrgan[]
+
+  constructor({
+    address,
+    deciders,
+    typeName,
+    name,
+    description,
+    salt,
+    cid,
+    chainId,
+    signerOrProvider,
+    metadata,
+    proposers,
+    withModeration,
+    forwarder,
+    moderators,
+    proposals,
+    isDeployed,
+    sourceOrgans,
+    targetOrgans
+  }: ProcedureInput) {
+    if (!chainId && (!address || !forwarder)) {
+      throw new Error(
+        'Either chainId or address and forwarder must be provided to procedure constructor.'
+      )
+    }
+    this.salt = salt ?? (isDeployed ? undefined : createRandom32BytesHexId())
+    this.address =
+      address ??
+      predictContractAddress({
+        type: (capitalize(typeName!) + 'Procedure') as 'NominationProcedure',
+        chainId: chainId!,
+        salt: this.salt!
+      })
+    this.deciders = deciders
+    this.typeName = typeName ?? 'Procedure'
+    this.isDeployed = isDeployed ?? false
+    this.cid = cid ?? ''
     this.name = name ?? 'Unnamed procedure'
     this.description = description ?? ''
-    this.isDeployed = isDeployed ?? false
-    this.salt = salt || isDeployed ? undefined : formatSalt()
-    this.address = address
     this.chainId = chainId
     this.metadata = metadata
-    this.proposers = proposers
+    this.proposers = proposers ?? deciders
     this.moderators = moderators
-    this.deciders = deciders
-    this.withModeration = withModeration
-    this.forwarder = forwarder
-    this.proposals = proposals
-    if (signerOrProvider.provider != null) {
+    this.withModeration = withModeration ?? false
+    this.forwarder =
+      forwarder ?? deployedAddresses[chainId as '11155111']?.MetaGasStation
+    this.proposals = proposals ?? []
+    if (signerOrProvider?.provider != null) {
       this.signer = signerOrProvider as ethers.Signer
       this.provider = this.signer.provider as ethers.Provider
     } else {
@@ -294,10 +360,12 @@ export class Procedure {
       } catch (error) {}
     }
     this._contract = new ethers.Contract(
-      address,
+      this.address,
       ProcedureContractABI.abi,
       signerOrProvider
     )
+    this.sourceOrgans = sourceOrgans ?? []
+    this.targetOrgans = targetOrgans ?? []
   }
 
   static async _populateInitialize(
@@ -426,20 +494,20 @@ export class Procedure {
       address,
       signerOrProvider
     )
-    return new Procedure(
-      data.cid,
+    return new Procedure({
+      cid: data.cid,
       address,
       chainId,
       signerOrProvider,
-      data.metadata,
-      data.proposers,
-      data.moderators,
-      data.deciders,
-      data.withModeration,
-      data.forwarder,
+      metadata: data.metadata,
+      proposers: data.proposers,
+      moderators: data.moderators,
+      deciders: data.deciders,
+      withModeration: data.withModeration,
+      forwarder: data.forwarder,
       proposals,
-      true
-    )
+      isDeployed: true
+    })
   }
 
   static _stringifyParamType(type: OperationParamType): string {
