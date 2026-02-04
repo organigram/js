@@ -1,0 +1,1286 @@
+{
+  "name": "For-profit company",
+  "description": "This is the default organigram.",
+  "organs": [
+    {
+      "id": "clf8f94ul000ht8kbgylt9ri2",
+      "name": "Board of directors",
+      "description": "",
+      "cid": "",
+      "address": "",
+      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
+      "organigramClient": null,
+      "network": null,
+      "entries": [],
+      "isTarget": [
+        {
+          "id": "clf8tlvhw005vkbej8tij8yv2",
+          "contractId": null,
+          "permissions": 12,
+          "organAddress": "",
+          "organId": "clf8f94ul000ht8kbgylt9ri2",
+          "procedureId": "clf8kvrl0000bpskb9vq21ml0",
+          "procedureName": "Elect directors",
+          "procedureAddress": ""
+        },
+        {
+          "id": "clf8tqxjw0067kbej79i6vutu",
+          "contractId": null,
+          "permissions": 19,
+          "organAddress": "",
+          "organId": "clf8f94ul000ht8kbgylt9ri2",
+          "procedureId": "clf8sfyb60022ejkb5as78av3",
+          "procedureName": "Amend bylaws",
+          "procedureAddress": ""
+        }
+      ]
+    },
+    {
+      "id": "clf8f94ul000it8kb8osde1r6",
+      "name": "Executive team",
+      "description": "",
+      "cid": "",
+      "address": "",
+      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
+      "organigramClient": null,
+      "network": null,
+      "entries": [],
+      "isTarget": [
+        {
+          "id": "clf8tkuyw005lkbejx0bkmggq",
+          "contractId": null,
+          "permissions": 12,
+          "organAddress": "",
+          "organId": "clf8f94ul000it8kb8osde1r6",
+          "procedureId": "clf8f94ul000jt8kb5mnze3y8",
+          "procedureName": "Elect executive team",
+          "procedureAddress": ""
+        },
+        {
+          "id": "clf8tqxjw0068kbejqxh3dhck",
+          "contractId": null,
+          "permissions": 19,
+          "organAddress": "",
+          "organId": "clf8f94ul000it8kb8osde1r6",
+          "procedureId": "clf8sfyb60022ejkb5as78av3",
+          "procedureName": "Amend bylaws",
+          "procedureAddress": ""
+        }
+      ]
+    },
+    {
+      "id": "clf8fthkc0002kbq7tn9zpz03",
+      "name": "Shareholders",
+      "description": "This organ does not have a description yet. You can edit it by clicking here.",
+      "cid": "",
+      "address": "",
+      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
+      "organigramClient": null,
+      "network": null,
+      "entries": [],
+      "isTarget": [
+        {
+          "id": "clf8tgzdv0059kbejl5cttybd",
+          "contractId": null,
+          "permissions": 12,
+          "organAddress": "",
+          "organId": "clf8fthkc0002kbq7tn9zpz03",
+          "procedureId": "clf8scx3i001qejkb14gq7yz2",
+          "procedureName": "Manage shareholders",
+          "procedureAddress": ""
+        },
+        {
+          "id": "clf8tqxjw0069kbejf8omvu9h",
+          "contractId": null,
+          "permissions": 19,
+          "organAddress": "",
+          "organId": "clf8fthkc0002kbq7tn9zpz03",
+          "procedureId": "clf8sfyb60022ejkb5as78av3",
+          "procedureName": "Amend bylaws",
+          "procedureAddress": ""
+        }
+      ]
+    },
+    {
+      "id": "clf8sel0l001gkbejoxxbbxn8",
+      "name": "Bylaws",
+      "description": "This organ does not have a description yet. You can edit it by clicking here.",
+      "cid": "",
+      "address": "",
+      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
+      "organigramClient": null,
+      "network": null,
+      "entries": [],
+      "isTarget": [
+        {
+          "id": "clf8tqxjw0066kbej8uqj57qf",
+          "contractId": null,
+          "permissions": 31,
+          "organAddress": "",
+          "organId": "clf8sel0l001gkbejoxxbbxn8",
+          "procedureId": "clf8sfyb60022ejkb5as78av3",
+          "procedureName": "Amend bylaws",
+          "procedureAddress": ""
+        }
+      ]
+    },
+    {
+      "id": "clf8skq4i002ckbej2dytdynt",
+      "name": "Meeting minutes",
+      "description": "This organ does not have a description yet. You can edit it by clicking here.",
+      "cid": "",
+      "address": "",
+      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
+      "organigramClient": null,
+      "network": null,
+      "entries": [],
+      "isTarget": [
+        {
+          "id": "clf8tb3ua004rkbejf78qwi7p",
+          "contractId": null,
+          "permissions": 4,
+          "organAddress": "",
+          "organId": "clf8skq4i002ckbej2dytdynt",
+          "procedureId": "clf8sqtiq002iejkb8zvkcy9f",
+          "procedureName": "Shareholders meeting",
+          "procedureAddress": ""
+        },
+        {
+          "id": "clf8tqxjw006akbejbuysizja",
+          "contractId": null,
+          "permissions": 19,
+          "organAddress": "",
+          "organId": "clf8skq4i002ckbej2dytdynt",
+          "procedureId": "clf8sfyb60022ejkb5as78av3",
+          "procedureName": "Amend bylaws",
+          "procedureAddress": ""
+        }
+      ]
+    },
+    {
+      "id": "clf8so2sx002hkbejdzsxsx6t",
+      "name": "Financial statements",
+      "description": "This organ does not have a description yet. You can edit it by clicking here.",
+      "cid": "",
+      "address": "",
+      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
+      "organigramClient": null,
+      "network": null,
+      "entries": [],
+      "isTarget": [
+        {
+          "id": "clf8syalh0046kbejbnsfnken",
+          "contractId": null,
+          "permissions": 4,
+          "organAddress": "",
+          "organId": "clf8so2sx002hkbejdzsxsx6t",
+          "procedureId": "clf8sqtiq002iejkb8zvkcy9f",
+          "procedureName": "Shareholders meeting",
+          "procedureAddress": ""
+        },
+        {
+          "id": "clf8tqxjw006bkbejt6u8croa",
+          "contractId": null,
+          "permissions": 19,
+          "organAddress": "",
+          "organId": "clf8so2sx002hkbejdzsxsx6t",
+          "procedureId": "clf8sfyb60022ejkb5as78av3",
+          "procedureName": "Amend bylaws",
+          "procedureAddress": ""
+        }
+      ]
+    },
+    {
+      "id": "clf8t82jj004kkbejwwt8nf99",
+      "name": "Treasury",
+      "description": "This organ does not have a description yet. You can edit it by clicking here.",
+      "cid": "",
+      "address": "",
+      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
+      "organigramClient": null,
+      "network": null,
+      "entries": [],
+      "isTarget": [
+        {
+          "id": "clf8tbwpg004wkbejmaxdpswx",
+          "contractId": null,
+          "permissions": 2028,
+          "organAddress": "",
+          "organId": "clf8t82jj004kkbejwwt8nf99",
+          "procedureId": "clf8t9kdg003kejkb62d15bga",
+          "procedureName": "Manage treasury",
+          "procedureAddress": ""
+        },
+        {
+          "id": "clf8tgzdv005akbejtfued581",
+          "contractId": null,
+          "permissions": 4,
+          "organAddress": "",
+          "organId": "clf8t82jj004kkbejwwt8nf99",
+          "procedureId": "clf8scx3i001qejkb14gq7yz2",
+          "procedureName": "Manage shareholders",
+          "procedureAddress": ""
+        },
+        {
+          "id": "clf8tqxjw006ckbejv414xmk1",
+          "contractId": null,
+          "permissions": 19,
+          "organAddress": "",
+          "organId": "clf8t82jj004kkbejwwt8nf99",
+          "procedureId": "clf8sfyb60022ejkb5as78av3",
+          "procedureName": "Amend bylaws",
+          "procedureAddress": ""
+        }
+      ]
+    }
+  ],
+  "procedures": [
+    {
+      "id": "clf8f94ul000jt8kb5mnze3y8",
+      "name": "Elect executive team",
+      "description": "This procedure does not have a description yet. You can edit it by clicking here.",
+      "cid": "",
+      "address": "",
+      "typeName": "vote",
+      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
+      "data": "{\"majoritySize\":\"1\",\"quorumSize\":\"1\",\"voteDuration\":\"10\"}",
+      "organigramClient": null,
+      "network": null,
+      "sourceOrgans": [
+        {
+          "id": "clf8tkuyw005kkbejvafdo3h3",
+          "procedureId": "clf8f94ul000jt8kb5mnze3y8",
+          "organId": "clf8f94ul000ht8kbgylt9ri2",
+          "contractId": null,
+          "assetId": null,
+          "types": [
+            {
+              "name": "deciders",
+              "label": "Approve proposals"
+            },
+            {
+              "name": "proposers",
+              "label": "Create proposals"
+            }
+          ],
+          "organ": {
+            "id": "clf8f94ul000ht8kbgylt9ri2",
+            "name": "Board of directors",
+            "description": "",
+            "cid": "",
+            "address": "",
+            "organigramId": "clf8f94ul000gt8kb3mgi81ku",
+            "organigramClient": null,
+            "network": null,
+            "entries": [],
+            "isTarget": [
+              {
+                "id": "clf8tlvhw005vkbej8tij8yv2",
+                "contractId": null,
+                "permissions": 12,
+                "organAddress": "",
+                "organId": "clf8f94ul000ht8kbgylt9ri2",
+                "procedureId": "clf8kvrl0000bpskb9vq21ml0",
+                "procedureName": "Elect directors",
+                "procedureAddress": ""
+              },
+              {
+                "id": "clf8tqxjw0067kbej79i6vutu",
+                "contractId": null,
+                "permissions": 19,
+                "organAddress": "",
+                "organId": "clf8f94ul000ht8kbgylt9ri2",
+                "procedureId": "clf8sfyb60022ejkb5as78av3",
+                "procedureName": "Amend bylaws",
+                "procedureAddress": ""
+              }
+            ]
+          },
+          "asset": null
+        }
+      ],
+      "targetOrgans": [
+        {
+          "id": "clf8tkuyw005lkbejx0bkmggq",
+          "contractId": null,
+          "permissions": 12,
+          "organAddress": "",
+          "organId": "clf8f94ul000it8kb8osde1r6",
+          "procedureId": "clf8f94ul000jt8kb5mnze3y8",
+          "procedureName": "Elect executive team",
+          "procedureAddress": ""
+        }
+      ],
+      "type": {
+        "name": "vote",
+        "label": "Simple Majority Vote",
+        "description": "A vote allows any user in the source organ to vote on proposals to add, edit or replace one or many entries, assets or procedures in the target organ.",
+        "fields": [
+          {
+            "name": "majoritySize",
+            "label": "Majority size",
+            "type": "number",
+            "description": "",
+            "defaultValue": "1",
+            "options": null
+          },
+          {
+            "name": "quorumSize",
+            "label": "Quorum size",
+            "type": "number",
+            "description": "",
+            "defaultValue": "1",
+            "options": null
+          },
+          {
+            "name": "voteDuration",
+            "label": "Vote duration",
+            "type": "number",
+            "description": "Duration of the vote phase, as a number of blocks.",
+            "defaultValue": "8",
+            "options": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "clf8kvrl0000bpskb9vq21ml0",
+      "name": "Elect directors",
+      "description": "This procedure does not have any description yet. You can edit it by clicking here.",
+      "cid": "",
+      "address": "",
+      "typeName": "erc20Vote",
+      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
+      "data": "{\"majoritySize\":\"1\",\"quorumSize\":\"1\",\"voteDuration\":\"10\"}",
+      "organigramClient": null,
+      "network": null,
+      "sourceOrgans": [
+        {
+          "id": "clf8tlvhw005tkbej784j77uo",
+          "procedureId": "clf8kvrl0000bpskb9vq21ml0",
+          "organId": null,
+          "contractId": null,
+          "assetId": "clf8fsqg50000kbq7ps0dl1io",
+          "types": [],
+          "organ": null,
+          "asset": {
+            "id": "clf8fsqg50000kbq7ps0dl1io",
+            "name": "Shares",
+            "symbol": "SHR",
+            "image": null,
+            "contractId": null,
+            "address": null,
+            "networkName": "",
+            "contract": null,
+            "organigrams": [
+              {
+                "id": "clf8f94ul000gt8kb3mgi81ku",
+                "slug": "clf8f934d00003b6rgvfn7y06",
+                "name": "For-profit company",
+                "description": "This is the default organigram.",
+                "workspaceId": "clf8f8g3y000at8kb226l4f49",
+                "isPublic": false,
+                "organigramClient": null,
+                "networkName": ""
+              }
+            ],
+            "network": {
+              "name": "",
+              "clientId": null
+            },
+            "isReferencedIn": [],
+            "isSourceOrgan": [
+              {
+                "id": "clf8sx0lx003kkbejnlnk1qge",
+                "procedureId": "clf8sqtiq002iejkb8zvkcy9f",
+                "organId": null,
+                "contractId": null,
+                "assetId": "clf8fsqg50000kbq7ps0dl1io"
+              },
+              {
+                "id": "clf8tgzdv0057kbej7aane2es",
+                "procedureId": "clf8scx3i001qejkb14gq7yz2",
+                "organId": null,
+                "contractId": null,
+                "assetId": "clf8fsqg50000kbq7ps0dl1io"
+              },
+              {
+                "id": "clf8tlvhw005tkbej784j77uo",
+                "procedureId": "clf8kvrl0000bpskb9vq21ml0",
+                "organId": null,
+                "contractId": null,
+                "assetId": "clf8fsqg50000kbq7ps0dl1io"
+              }
+            ]
+          }
+        },
+        {
+          "id": "clf8tlvhw005ukbejylu5mgnc",
+          "procedureId": "clf8kvrl0000bpskb9vq21ml0",
+          "organId": "clf8fthkc0002kbq7tn9zpz03",
+          "contractId": null,
+          "assetId": null,
+          "types": [
+            {
+              "name": "deciders",
+              "label": "Approve proposals"
+            },
+            {
+              "name": "proposers",
+              "label": "Create proposals"
+            }
+          ],
+          "organ": {
+            "id": "clf8fthkc0002kbq7tn9zpz03",
+            "name": "Shareholders",
+            "description": "This organ does not have a description yet. You can edit it by clicking here.",
+            "cid": "",
+            "address": "",
+            "organigramId": "clf8f94ul000gt8kb3mgi81ku",
+            "organigramClient": null,
+            "network": null,
+            "entries": [],
+            "isTarget": [
+              {
+                "id": "clf8tgzdv0059kbejl5cttybd",
+                "contractId": null,
+                "permissions": 12,
+                "organAddress": "",
+                "organId": "clf8fthkc0002kbq7tn9zpz03",
+                "procedureId": "clf8scx3i001qejkb14gq7yz2",
+                "procedureName": "Manage shareholders",
+                "procedureAddress": ""
+              },
+              {
+                "id": "clf8tqxjw0069kbejf8omvu9h",
+                "contractId": null,
+                "permissions": 19,
+                "organAddress": "",
+                "organId": "clf8fthkc0002kbq7tn9zpz03",
+                "procedureId": "clf8sfyb60022ejkb5as78av3",
+                "procedureName": "Amend bylaws",
+                "procedureAddress": ""
+              }
+            ]
+          },
+          "asset": null
+        }
+      ],
+      "targetOrgans": [
+        {
+          "id": "clf8tlvhw005vkbej8tij8yv2",
+          "contractId": null,
+          "permissions": 12,
+          "organAddress": "",
+          "organId": "clf8f94ul000ht8kbgylt9ri2",
+          "procedureId": "clf8kvrl0000bpskb9vq21ml0",
+          "procedureName": "Elect directors",
+          "procedureAddress": ""
+        }
+      ],
+      "type": {
+        "name": "erc20Vote",
+        "label": "Token-weighted Vote",
+        "description": "A token vote allows any user in the source organ to vote on proposals, where its voting power is based on the amount of tokens it holds.",
+        "fields": [
+          {
+            "name": "erc20",
+            "label": "ERC20 Token",
+            "type": "string",
+            "description": "",
+            "defaultValue": "",
+            "options": null
+          },
+          {
+            "name": "majoritySize",
+            "label": "Majority size",
+            "type": "number",
+            "description": "",
+            "defaultValue": "1",
+            "options": null
+          },
+          {
+            "name": "quorumSize",
+            "label": "Quorum size",
+            "type": "number",
+            "description": "",
+            "defaultValue": "1",
+            "options": null
+          },
+          {
+            "name": "voteDuration",
+            "label": "Vote duration",
+            "type": "number",
+            "description": "Duration of the vote phase, as a number of blocks.",
+            "defaultValue": "8",
+            "options": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "clf8scx3i001qejkb14gq7yz2",
+      "name": "Manage shareholders",
+      "description": "This procedure does not have any description yet. You can edit it by clicking here.",
+      "cid": "",
+      "address": "",
+      "typeName": "erc20Vote",
+      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
+      "data": "{\"majoritySize\":\"1\",\"quorumSize\":\"1\",\"voteDuration\":\"10\"}",
+      "organigramClient": null,
+      "network": null,
+      "sourceOrgans": [
+        {
+          "id": "clf8tgzdv0057kbej7aane2es",
+          "procedureId": "clf8scx3i001qejkb14gq7yz2",
+          "organId": null,
+          "contractId": null,
+          "assetId": "clf8fsqg50000kbq7ps0dl1io",
+          "types": [],
+          "organ": null,
+          "asset": {
+            "id": "clf8fsqg50000kbq7ps0dl1io",
+            "name": "Shares",
+            "symbol": "SHR",
+            "image": null,
+            "contractId": null,
+            "address": null,
+            "networkName": "",
+            "contract": null,
+            "organigrams": [
+              {
+                "id": "clf8f94ul000gt8kb3mgi81ku",
+                "slug": "clf8f934d00003b6rgvfn7y06",
+                "name": "For-profit company",
+                "description": "This is the default organigram.",
+                "workspaceId": "clf8f8g3y000at8kb226l4f49",
+                "isPublic": false,
+                "organigramClient": null,
+                "networkName": ""
+              }
+            ],
+            "network": {
+              "name": "",
+              "clientId": null
+            },
+            "isReferencedIn": [],
+            "isSourceOrgan": [
+              {
+                "id": "clf8sx0lx003kkbejnlnk1qge",
+                "procedureId": "clf8sqtiq002iejkb8zvkcy9f",
+                "organId": null,
+                "contractId": null,
+                "assetId": "clf8fsqg50000kbq7ps0dl1io"
+              },
+              {
+                "id": "clf8tgzdv0057kbej7aane2es",
+                "procedureId": "clf8scx3i001qejkb14gq7yz2",
+                "organId": null,
+                "contractId": null,
+                "assetId": "clf8fsqg50000kbq7ps0dl1io"
+              },
+              {
+                "id": "clf8tlvhw005tkbej784j77uo",
+                "procedureId": "clf8kvrl0000bpskb9vq21ml0",
+                "organId": null,
+                "contractId": null,
+                "assetId": "clf8fsqg50000kbq7ps0dl1io"
+              }
+            ]
+          }
+        },
+        {
+          "id": "clf8tgzdv0058kbej8rn8iohz",
+          "procedureId": "clf8scx3i001qejkb14gq7yz2",
+          "organId": "clf8fthkc0002kbq7tn9zpz03",
+          "contractId": null,
+          "assetId": null,
+          "types": [
+            {
+              "name": "deciders",
+              "label": "Approve proposals"
+            },
+            {
+              "name": "proposers",
+              "label": "Create proposals"
+            }
+          ],
+          "organ": {
+            "id": "clf8fthkc0002kbq7tn9zpz03",
+            "name": "Shareholders",
+            "description": "This organ does not have a description yet. You can edit it by clicking here.",
+            "cid": "",
+            "address": "",
+            "organigramId": "clf8f94ul000gt8kb3mgi81ku",
+            "organigramClient": null,
+            "network": null,
+            "entries": [],
+            "isTarget": [
+              {
+                "id": "clf8tgzdv0059kbejl5cttybd",
+                "contractId": null,
+                "permissions": 12,
+                "organAddress": "",
+                "organId": "clf8fthkc0002kbq7tn9zpz03",
+                "procedureId": "clf8scx3i001qejkb14gq7yz2",
+                "procedureName": "Manage shareholders",
+                "procedureAddress": ""
+              },
+              {
+                "id": "clf8tqxjw0069kbejf8omvu9h",
+                "contractId": null,
+                "permissions": 19,
+                "organAddress": "",
+                "organId": "clf8fthkc0002kbq7tn9zpz03",
+                "procedureId": "clf8sfyb60022ejkb5as78av3",
+                "procedureName": "Amend bylaws",
+                "procedureAddress": ""
+              }
+            ]
+          },
+          "asset": null
+        }
+      ],
+      "targetOrgans": [
+        {
+          "id": "clf8tgzdv0059kbejl5cttybd",
+          "contractId": null,
+          "permissions": 12,
+          "organAddress": "",
+          "organId": "clf8fthkc0002kbq7tn9zpz03",
+          "procedureId": "clf8scx3i001qejkb14gq7yz2",
+          "procedureName": "Manage shareholders",
+          "procedureAddress": ""
+        },
+        {
+          "id": "clf8tgzdv005akbejtfued581",
+          "contractId": null,
+          "permissions": 4,
+          "organAddress": "",
+          "organId": "clf8t82jj004kkbejwwt8nf99",
+          "procedureId": "clf8scx3i001qejkb14gq7yz2",
+          "procedureName": "Manage shareholders",
+          "procedureAddress": ""
+        }
+      ],
+      "type": {
+        "name": "erc20Vote",
+        "label": "Token-weighted Vote",
+        "description": "A token vote allows any user in the source organ to vote on proposals, where its voting power is based on the amount of tokens it holds.",
+        "fields": [
+          {
+            "name": "erc20",
+            "label": "ERC20 Token",
+            "type": "string",
+            "description": "",
+            "defaultValue": "",
+            "options": null
+          },
+          {
+            "name": "majoritySize",
+            "label": "Majority size",
+            "type": "number",
+            "description": "",
+            "defaultValue": "1",
+            "options": null
+          },
+          {
+            "name": "quorumSize",
+            "label": "Quorum size",
+            "type": "number",
+            "description": "",
+            "defaultValue": "1",
+            "options": null
+          },
+          {
+            "name": "voteDuration",
+            "label": "Vote duration",
+            "type": "number",
+            "description": "Duration of the vote phase, as a number of blocks.",
+            "defaultValue": "8",
+            "options": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "clf8sfyb60022ejkb5as78av3",
+      "name": "Amend bylaws",
+      "description": "This procedure does not have any description yet. You can edit it by clicking here.",
+      "cid": "",
+      "address": "",
+      "typeName": "vote",
+      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
+      "data": "{\"majoritySize\":\"1\",\"quorumSize\":\"1\",\"voteDuration\":\"10\"}",
+      "organigramClient": null,
+      "network": null,
+      "sourceOrgans": [
+        {
+          "id": "clf8tqxjw0064kbej51n3vjps",
+          "procedureId": "clf8sfyb60022ejkb5as78av3",
+          "organId": "clf8f94ul000ht8kbgylt9ri2",
+          "contractId": null,
+          "assetId": null,
+          "types": [
+            {
+              "name": "proposers",
+              "label": "Create proposals"
+            }
+          ],
+          "organ": {
+            "id": "clf8f94ul000ht8kbgylt9ri2",
+            "name": "Board of directors",
+            "description": "",
+            "cid": "",
+            "address": "",
+            "organigramId": "clf8f94ul000gt8kb3mgi81ku",
+            "organigramClient": null,
+            "network": null,
+            "entries": [],
+            "isTarget": [
+              {
+                "id": "clf8tlvhw005vkbej8tij8yv2",
+                "contractId": null,
+                "permissions": 12,
+                "organAddress": "",
+                "organId": "clf8f94ul000ht8kbgylt9ri2",
+                "procedureId": "clf8kvrl0000bpskb9vq21ml0",
+                "procedureName": "Elect directors",
+                "procedureAddress": ""
+              },
+              {
+                "id": "clf8tqxjw0067kbej79i6vutu",
+                "contractId": null,
+                "permissions": 19,
+                "organAddress": "",
+                "organId": "clf8f94ul000ht8kbgylt9ri2",
+                "procedureId": "clf8sfyb60022ejkb5as78av3",
+                "procedureName": "Amend bylaws",
+                "procedureAddress": ""
+              }
+            ]
+          },
+          "asset": null
+        },
+        {
+          "id": "clf8tqxjw0065kbejceg8p4ma",
+          "procedureId": "clf8sfyb60022ejkb5as78av3",
+          "organId": "clf8fthkc0002kbq7tn9zpz03",
+          "contractId": null,
+          "assetId": null,
+          "types": [
+            {
+              "name": "deciders",
+              "label": "Approve proposals"
+            }
+          ],
+          "organ": {
+            "id": "clf8fthkc0002kbq7tn9zpz03",
+            "name": "Shareholders",
+            "description": "This organ does not have a description yet. You can edit it by clicking here.",
+            "cid": "",
+            "address": "",
+            "organigramId": "clf8f94ul000gt8kb3mgi81ku",
+            "organigramClient": null,
+            "network": null,
+            "entries": [],
+            "isTarget": [
+              {
+                "id": "clf8tgzdv0059kbejl5cttybd",
+                "contractId": null,
+                "permissions": 12,
+                "organAddress": "",
+                "organId": "clf8fthkc0002kbq7tn9zpz03",
+                "procedureId": "clf8scx3i001qejkb14gq7yz2",
+                "procedureName": "Manage shareholders",
+                "procedureAddress": ""
+              },
+              {
+                "id": "clf8tqxjw0069kbejf8omvu9h",
+                "contractId": null,
+                "permissions": 19,
+                "organAddress": "",
+                "organId": "clf8fthkc0002kbq7tn9zpz03",
+                "procedureId": "clf8sfyb60022ejkb5as78av3",
+                "procedureName": "Amend bylaws",
+                "procedureAddress": ""
+              }
+            ]
+          },
+          "asset": null
+        }
+      ],
+      "targetOrgans": [
+        {
+          "id": "clf8tqxjw0066kbej8uqj57qf",
+          "contractId": null,
+          "permissions": 31,
+          "organAddress": "",
+          "organId": "clf8sel0l001gkbejoxxbbxn8",
+          "procedureId": "clf8sfyb60022ejkb5as78av3",
+          "procedureName": "Amend bylaws",
+          "procedureAddress": ""
+        },
+        {
+          "id": "clf8tqxjw0067kbej79i6vutu",
+          "contractId": null,
+          "permissions": 19,
+          "organAddress": "",
+          "organId": "clf8f94ul000ht8kbgylt9ri2",
+          "procedureId": "clf8sfyb60022ejkb5as78av3",
+          "procedureName": "Amend bylaws",
+          "procedureAddress": ""
+        },
+        {
+          "id": "clf8tqxjw0068kbejqxh3dhck",
+          "contractId": null,
+          "permissions": 19,
+          "organAddress": "",
+          "organId": "clf8f94ul000it8kb8osde1r6",
+          "procedureId": "clf8sfyb60022ejkb5as78av3",
+          "procedureName": "Amend bylaws",
+          "procedureAddress": ""
+        },
+        {
+          "id": "clf8tqxjw0069kbejf8omvu9h",
+          "contractId": null,
+          "permissions": 19,
+          "organAddress": "",
+          "organId": "clf8fthkc0002kbq7tn9zpz03",
+          "procedureId": "clf8sfyb60022ejkb5as78av3",
+          "procedureName": "Amend bylaws",
+          "procedureAddress": ""
+        },
+        {
+          "id": "clf8tqxjw006akbejbuysizja",
+          "contractId": null,
+          "permissions": 19,
+          "organAddress": "",
+          "organId": "clf8skq4i002ckbej2dytdynt",
+          "procedureId": "clf8sfyb60022ejkb5as78av3",
+          "procedureName": "Amend bylaws",
+          "procedureAddress": ""
+        },
+        {
+          "id": "clf8tqxjw006bkbejt6u8croa",
+          "contractId": null,
+          "permissions": 19,
+          "organAddress": "",
+          "organId": "clf8so2sx002hkbejdzsxsx6t",
+          "procedureId": "clf8sfyb60022ejkb5as78av3",
+          "procedureName": "Amend bylaws",
+          "procedureAddress": ""
+        },
+        {
+          "id": "clf8tqxjw006ckbejv414xmk1",
+          "contractId": null,
+          "permissions": 19,
+          "organAddress": "",
+          "organId": "clf8t82jj004kkbejwwt8nf99",
+          "procedureId": "clf8sfyb60022ejkb5as78av3",
+          "procedureName": "Amend bylaws",
+          "procedureAddress": ""
+        }
+      ],
+      "type": {
+        "name": "vote",
+        "label": "Simple Majority Vote",
+        "description": "A vote allows any user in the source organ to vote on proposals to add, edit or replace one or many entries, assets or procedures in the target organ.",
+        "fields": [
+          {
+            "name": "majoritySize",
+            "label": "Majority size",
+            "type": "number",
+            "description": "",
+            "defaultValue": "1",
+            "options": null
+          },
+          {
+            "name": "quorumSize",
+            "label": "Quorum size",
+            "type": "number",
+            "description": "",
+            "defaultValue": "1",
+            "options": null
+          },
+          {
+            "name": "voteDuration",
+            "label": "Vote duration",
+            "type": "number",
+            "description": "Duration of the vote phase, as a number of blocks.",
+            "defaultValue": "8",
+            "options": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "clf8sqtiq002iejkb8zvkcy9f",
+      "name": "Shareholders meeting",
+      "description": "This procedure does not have any description yet. You can edit it by clicking here.",
+      "cid": "",
+      "address": "",
+      "typeName": "erc20Vote",
+      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
+      "data": "{\"majoritySize\":\"1\",\"quorumSize\":\"1\",\"voteDuration\":\"10\"}",
+      "organigramClient": null,
+      "network": null,
+      "sourceOrgans": [
+        {
+          "id": "clf8sx0lx003kkbejnlnk1qge",
+          "procedureId": "clf8sqtiq002iejkb8zvkcy9f",
+          "organId": null,
+          "contractId": null,
+          "assetId": "clf8fsqg50000kbq7ps0dl1io",
+          "types": [],
+          "organ": null,
+          "asset": {
+            "id": "clf8fsqg50000kbq7ps0dl1io",
+            "name": "Shares",
+            "symbol": "SHR",
+            "image": null,
+            "contractId": null,
+            "address": null,
+            "networkName": "",
+            "contract": null,
+            "organigrams": [
+              {
+                "id": "clf8f94ul000gt8kb3mgi81ku",
+                "slug": "clf8f934d00003b6rgvfn7y06",
+                "name": "For-profit company",
+                "description": "This is the default organigram.",
+                "workspaceId": "clf8f8g3y000at8kb226l4f49",
+                "isPublic": false,
+                "organigramClient": null,
+                "networkName": ""
+              }
+            ],
+            "network": {
+              "name": "",
+              "clientId": null
+            },
+            "isReferencedIn": [],
+            "isSourceOrgan": [
+              {
+                "id": "clf8sx0lx003kkbejnlnk1qge",
+                "procedureId": "clf8sqtiq002iejkb8zvkcy9f",
+                "organId": null,
+                "contractId": null,
+                "assetId": "clf8fsqg50000kbq7ps0dl1io"
+              },
+              {
+                "id": "clf8tgzdv0057kbej7aane2es",
+                "procedureId": "clf8scx3i001qejkb14gq7yz2",
+                "organId": null,
+                "contractId": null,
+                "assetId": "clf8fsqg50000kbq7ps0dl1io"
+              },
+              {
+                "id": "clf8tlvhw005tkbej784j77uo",
+                "procedureId": "clf8kvrl0000bpskb9vq21ml0",
+                "organId": null,
+                "contractId": null,
+                "assetId": "clf8fsqg50000kbq7ps0dl1io"
+              }
+            ]
+          }
+        },
+        {
+          "id": "clf8sx0lx003jkbejv6n1p84n",
+          "procedureId": "clf8sqtiq002iejkb8zvkcy9f",
+          "organId": "clf8fthkc0002kbq7tn9zpz03",
+          "contractId": null,
+          "assetId": null,
+          "types": [
+            {
+              "name": "deciders",
+              "label": "Approve proposals"
+            },
+            {
+              "name": "proposers",
+              "label": "Create proposals"
+            }
+          ],
+          "organ": {
+            "id": "clf8fthkc0002kbq7tn9zpz03",
+            "name": "Shareholders",
+            "description": "This organ does not have a description yet. You can edit it by clicking here.",
+            "cid": "",
+            "address": "",
+            "organigramId": "clf8f94ul000gt8kb3mgi81ku",
+            "organigramClient": null,
+            "network": null,
+            "entries": [],
+            "isTarget": [
+              {
+                "id": "clf8tgzdv0059kbejl5cttybd",
+                "contractId": null,
+                "permissions": 12,
+                "organAddress": "",
+                "organId": "clf8fthkc0002kbq7tn9zpz03",
+                "procedureId": "clf8scx3i001qejkb14gq7yz2",
+                "procedureName": "Manage shareholders",
+                "procedureAddress": ""
+              },
+              {
+                "id": "clf8tqxjw0069kbejf8omvu9h",
+                "contractId": null,
+                "permissions": 19,
+                "organAddress": "",
+                "organId": "clf8fthkc0002kbq7tn9zpz03",
+                "procedureId": "clf8sfyb60022ejkb5as78av3",
+                "procedureName": "Amend bylaws",
+                "procedureAddress": ""
+              }
+            ]
+          },
+          "asset": null
+        }
+      ],
+      "targetOrgans": [
+        {
+          "id": "clf8syalh0046kbejbnsfnken",
+          "contractId": null,
+          "permissions": 4,
+          "organAddress": "",
+          "organId": "clf8so2sx002hkbejdzsxsx6t",
+          "procedureId": "clf8sqtiq002iejkb8zvkcy9f",
+          "procedureName": "Shareholders meeting",
+          "procedureAddress": ""
+        },
+        {
+          "id": "clf8tb3ua004rkbejf78qwi7p",
+          "contractId": null,
+          "permissions": 4,
+          "organAddress": "",
+          "organId": "clf8skq4i002ckbej2dytdynt",
+          "procedureId": "clf8sqtiq002iejkb8zvkcy9f",
+          "procedureName": "Shareholders meeting",
+          "procedureAddress": ""
+        }
+      ],
+      "type": {
+        "name": "erc20Vote",
+        "label": "Token-weighted Vote",
+        "description": "A token vote allows any user in the source organ to vote on proposals, where its voting power is based on the amount of tokens it holds.",
+        "fields": [
+          {
+            "name": "erc20",
+            "label": "ERC20 Token",
+            "type": "string",
+            "description": "",
+            "defaultValue": "",
+            "options": null
+          },
+          {
+            "name": "majoritySize",
+            "label": "Majority size",
+            "type": "number",
+            "description": "",
+            "defaultValue": "1",
+            "options": null
+          },
+          {
+            "name": "quorumSize",
+            "label": "Quorum size",
+            "type": "number",
+            "description": "",
+            "defaultValue": "1",
+            "options": null
+          },
+          {
+            "name": "voteDuration",
+            "label": "Vote duration",
+            "type": "number",
+            "description": "Duration of the vote phase, as a number of blocks.",
+            "defaultValue": "8",
+            "options": null
+          }
+        ]
+      }
+    },
+    {
+      "id": "clf8t9kdg003kejkb62d15bga",
+      "name": "Manage treasury",
+      "description": "This procedure does not have any description yet. You can edit it by clicking here.",
+      "cid": "",
+      "address": "",
+      "typeName": "nomination",
+      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
+      "data": "{}",
+      "organigramClient": null,
+      "network": null,
+      "sourceOrgans": [
+        {
+          "id": "clf8tbwpg004ukbej9gq4zma8",
+          "procedureId": "clf8t9kdg003kejkb62d15bga",
+          "organId": "clf8f94ul000ht8kbgylt9ri2",
+          "contractId": null,
+          "assetId": null,
+          "types": [
+            {
+              "name": "moderators",
+              "label": "Filter proposals"
+            }
+          ],
+          "organ": {
+            "id": "clf8f94ul000ht8kbgylt9ri2",
+            "name": "Board of directors",
+            "description": "",
+            "cid": "",
+            "address": "",
+            "organigramId": "clf8f94ul000gt8kb3mgi81ku",
+            "organigramClient": null,
+            "network": null,
+            "entries": [],
+            "isTarget": [
+              {
+                "id": "clf8tlvhw005vkbej8tij8yv2",
+                "contractId": null,
+                "permissions": 12,
+                "organAddress": "",
+                "organId": "clf8f94ul000ht8kbgylt9ri2",
+                "procedureId": "clf8kvrl0000bpskb9vq21ml0",
+                "procedureName": "Elect directors",
+                "procedureAddress": ""
+              },
+              {
+                "id": "clf8tqxjw0067kbej79i6vutu",
+                "contractId": null,
+                "permissions": 19,
+                "organAddress": "",
+                "organId": "clf8f94ul000ht8kbgylt9ri2",
+                "procedureId": "clf8sfyb60022ejkb5as78av3",
+                "procedureName": "Amend bylaws",
+                "procedureAddress": ""
+              }
+            ]
+          },
+          "asset": null
+        },
+        {
+          "id": "clf8tbwpg004vkbejjicaoiyr",
+          "procedureId": "clf8t9kdg003kejkb62d15bga",
+          "organId": "clf8f94ul000it8kb8osde1r6",
+          "contractId": null,
+          "assetId": null,
+          "types": [
+            {
+              "name": "deciders",
+              "label": "Approve proposals"
+            },
+            {
+              "name": "proposers",
+              "label": "Create proposals"
+            }
+          ],
+          "organ": {
+            "id": "clf8f94ul000it8kb8osde1r6",
+            "name": "Executive team",
+            "description": "",
+            "cid": "",
+            "address": "",
+            "organigramId": "clf8f94ul000gt8kb3mgi81ku",
+            "organigramClient": null,
+            "network": null,
+            "entries": [],
+            "isTarget": [
+              {
+                "id": "clf8tkuyw005lkbejx0bkmggq",
+                "contractId": null,
+                "permissions": 12,
+                "organAddress": "",
+                "organId": "clf8f94ul000it8kb8osde1r6",
+                "procedureId": "clf8f94ul000jt8kb5mnze3y8",
+                "procedureName": "Elect executive team",
+                "procedureAddress": ""
+              },
+              {
+                "id": "clf8tqxjw0068kbejqxh3dhck",
+                "contractId": null,
+                "permissions": 19,
+                "organAddress": "",
+                "organId": "clf8f94ul000it8kb8osde1r6",
+                "procedureId": "clf8sfyb60022ejkb5as78av3",
+                "procedureName": "Amend bylaws",
+                "procedureAddress": ""
+              }
+            ]
+          },
+          "asset": null
+        }
+      ],
+      "targetOrgans": [
+        {
+          "id": "clf8tbwpg004wkbejmaxdpswx",
+          "contractId": null,
+          "permissions": 2028,
+          "organAddress": "",
+          "organId": "clf8t82jj004kkbejwwt8nf99",
+          "procedureId": "clf8t9kdg003kejkb62d15bga",
+          "procedureName": "Manage treasury",
+          "procedureAddress": ""
+        }
+      ],
+      "type": {
+        "name": "nomination",
+        "label": "Nomination",
+        "description": "A nomination allows any user in the source organ to directly add, remove or replace one or many entries, assets or procedures in the target organ.",
+        "fields": []
+      }
+    }
+  ],
+  "assets": [
+    {
+      "id": "clf8fsqg50000kbq7ps0dl1io",
+      "name": "Shares",
+      "symbol": "SHR",
+      "image": null,
+      "contractId": null,
+      "address": null,
+      "networkName": "",
+      "contract": null,
+      "organigrams": [
+        {
+          "id": "clf8f94ul000gt8kb3mgi81ku",
+          "slug": "clf8f934d00003b6rgvfn7y06",
+          "name": "For-profit company",
+          "description": "This is the default organigram.",
+          "workspaceId": "clf8f8g3y000at8kb226l4f49",
+          "isPublic": false,
+          "organigramClient": null,
+          "networkName": ""
+        }
+      ],
+      "network": {
+        "name": "",
+        "clientId": null
+      },
+      "isReferencedIn": [],
+      "isSourceOrgan": [
+        {
+          "id": "clf8sx0lx003kkbejnlnk1qge",
+          "procedureId": "clf8sqtiq002iejkb8zvkcy9f",
+          "organId": null,
+          "contractId": null,
+          "assetId": "clf8fsqg50000kbq7ps0dl1io"
+        },
+        {
+          "id": "clf8tgzdv0057kbej7aane2es",
+          "procedureId": "clf8scx3i001qejkb14gq7yz2",
+          "organId": null,
+          "contractId": null,
+          "assetId": "clf8fsqg50000kbq7ps0dl1io"
+        },
+        {
+          "id": "clf8tlvhw005tkbej784j77uo",
+          "procedureId": "clf8kvrl0000bpskb9vq21ml0",
+          "organId": null,
+          "contractId": null,
+          "assetId": "clf8fsqg50000kbq7ps0dl1io"
+        }
+      ]
+    }
+  ],
+  "canEdit": true
+}
