@@ -1,37 +1,32 @@
 import { ethers } from 'ethers';
 import NominationProcedureContractABI from '@organigram/protocol/artifacts/contracts/procedures/Nomination.sol/NominationProcedure.json';
 import { Procedure } from '.';
+import { deployedAddresses } from '../utils';
+export const nomination = {
+    key: 'nomination',
+    address: deployedAddresses[11155111].NominationProcedure,
+    metadata: {
+        label: 'Nomination',
+        description: 'A nomination allows any user in the source organ to directly add, remove or replace one or many entries, assets or procedures in the target organ.'
+    }
+};
 export class NominationProcedure extends Procedure {
     static INTERFACE = '0xc5f28e49';
     contract;
-    constructor({ cid, address, chainId, signerOrProvider, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals, isDeployed, salt, contract, sourceOrgans, targetOrgans }) {
-        super({
-            cid,
-            address,
-            chainId,
-            signerOrProvider,
-            metadata,
-            proposers,
-            moderators,
-            deciders,
-            withModeration,
-            forwarder,
-            proposals,
-            isDeployed,
-            salt,
-            sourceOrgans,
-            targetOrgans
-        });
+    type = nomination;
+    typeName = 'nomination';
+    constructor(procedureInput) {
+        super({ ...procedureInput, typeName: 'nomination', type: nomination });
         this.contract =
-            contract ??
-                new ethers.Contract(this.address, NominationProcedureContractABI.abi, signerOrProvider);
+            procedureInput.contract ??
+                new ethers.Contract(this.address, NominationProcedureContractABI.abi, procedureInput.signerOrProvider);
     }
-    static async _populateInitialize(type, options, cid, proposers, moderators, deciders, _withModeration, forwarder, ..._args) {
-        if (options.signer == null) {
+    static async _populateInitialize(input) {
+        if (input.options?.signer == null) {
             throw new Error('Not connected.');
         }
-        const contract = new ethers.Contract(type, NominationProcedureContractABI.abi, options.signer);
-        return await contract.initialize.populateTransaction(cid, proposers, moderators, deciders, false, forwarder);
+        const contract = new ethers.Contract(nomination.address, NominationProcedureContractABI.abi, input.options.signer);
+        return await contract.initialize.populateTransaction(input.cid ?? 'nomination', input.proposers ?? input.deciders ?? ethers.ZeroAddress, input.moderators ?? ethers.ZeroAddress, input.deciders, input.withModeration ?? false, input.forwarder ?? deployedAddresses[11155111].MetaGasStation);
     }
     static async load(address, signerOrProvider) {
         const procedure = await Procedure.load(address, signerOrProvider);
@@ -56,13 +51,12 @@ export class NominationProcedure extends Procedure {
             proposals: procedure.proposals,
             isDeployed: true,
             salt: procedure.salt,
-            contract
+            contract,
+            typeName: 'nomination'
         });
     }
     async nominate(proposalKey, options) {
-        const tx = await this.contract.nominate(proposalKey, {
-            gasLimit: '1000000'
-        });
+        const tx = await this.contract.nominate(proposalKey);
         if (options?.onTransaction != null) {
             options.onTransaction(tx, 'Initialize Nomination procedure.');
         }

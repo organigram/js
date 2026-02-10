@@ -1,22 +1,57 @@
 import { type ContractTransactionReceipt, ethers } from 'ethers';
 import type { TransactionOptions } from '../organigramClient';
 import { SourceOrgan, TargetOrgan } from '../organigram';
+export declare const procedureMetadata: {
+    _type: string;
+    _generator: string;
+    _generatedAt: number;
+};
+export type ProcedureTypeName = 'erc20Vote' | 'nomination' | 'vote';
+export declare enum ProcedureTypeNameEnum {
+    erc20Vote = "erc20Vote",
+    nomination = "nomination",
+    vote = "vote"
+}
+export interface ProcedureTypeField {
+    name: string;
+    label: string;
+    description: string;
+    defaultValue: string;
+    type: any;
+}
+export interface ProcedureType {
+    key: string;
+    address: string;
+    metadata: {
+        cid?: string;
+        label?: string;
+        description?: string;
+    };
+    fields?: {
+        [key: string]: ProcedureTypeField;
+    };
+}
 export type ProcedureJson = {
+    isDeployed: boolean;
     address: string;
     deciders: string;
     typeName: string;
-    name?: string;
-    description?: string;
-    cid?: string;
-    salt?: string;
-    chainId?: string;
-    metadata?: unknown;
-    proposers?: string;
-    moderators?: string;
-    withModeration?: boolean;
-    forwarder?: string;
+    name: string;
+    description: string;
+    cid: string;
+    salt?: string | null;
+    chainId: string;
+    data: string;
+    metadata?: string;
+    proposers: string;
+    moderators: string;
+    withModeration: boolean;
+    forwarder: string;
     proposals?: ProcedureProposal[];
     args?: unknown[];
+    sourceOrgans?: SourceOrgan[];
+    targetOrgans?: TargetOrgan[];
+    type: ProcedureType;
 };
 export type Election = {
     proposalKey: string;
@@ -84,52 +119,70 @@ export interface ProposalMetadata {
     cid?: string;
 }
 export interface ProcedureInput {
-    address?: string;
+    address?: string | null;
     deciders: string;
-    typeName?: string;
-    name?: string;
-    description?: string;
-    salt?: string;
-    chainId?: string;
-    cid?: string;
-    signerOrProvider?: ethers.Signer | ethers.Provider;
-    metadata?: unknown;
-    proposers?: string;
-    withModeration?: boolean;
-    moderators?: string;
-    forwarder?: string;
-    proposals?: ProcedureProposal[];
-    isDeployed?: boolean;
-    sourceOrgans?: SourceOrgan[];
-    targetOrgans?: TargetOrgan[];
+    typeName: string;
+    type?: ProcedureType;
+    name?: string | null;
+    description?: string | null;
+    salt?: string | null;
+    chainId?: string | null;
+    cid?: string | null;
+    signerOrProvider?: ethers.Signer | ethers.Provider | null;
+    metadata?: string | null;
+    proposers?: string | null;
+    withModeration?: boolean | null;
+    moderators?: string | null;
+    forwarder?: string | null;
+    proposals?: ProcedureProposal[] | null;
+    isDeployed?: boolean | null;
+    sourceOrgans?: SourceOrgan[] | null;
+    targetOrgans?: TargetOrgan[] | null;
+    organigramId?: string | null;
+    data?: string | null;
 }
+export interface PopulateInitializeInput {
+    options?: {
+        signer?: ethers.Signer;
+    } & TransactionOptions;
+    typeName?: ProcedureTypeName;
+    cid: string;
+    proposers: string;
+    moderators: string;
+    deciders: string;
+    withModeration: boolean;
+    forwarder: string;
+    args: unknown[];
+}
+export declare const procedureFunctions: ProcedureProposalOperationFunction[];
 export declare class Procedure {
     static INTERFACE: string;
     static OPERATIONS_FUNCTIONS: ProcedureProposalOperationFunction[];
     name: string;
     description: string;
     address: string;
-    typeName: string;
+    typeName: ProcedureTypeName;
     cid: string;
     isDeployed: boolean;
     deciders: string;
     proposers: string;
     withModeration: boolean;
-    moderators?: string;
-    metadata: unknown;
+    moderators: string;
+    metadata: string;
+    data: string;
     forwarder: string;
     proposals: ProcedureProposal[];
     _contract: ethers.Contract;
     salt?: string;
-    chainId?: string;
+    chainId: string;
     signer?: ethers.Signer;
     provider?: ethers.Provider;
+    organigramId: string;
     sourceOrgans?: SourceOrgan[];
     targetOrgans?: TargetOrgan[];
-    constructor({ address, deciders, typeName, name, description, salt, cid, chainId, signerOrProvider, metadata, proposers, withModeration, forwarder, moderators, proposals, isDeployed, sourceOrgans, targetOrgans }: ProcedureInput);
-    static _populateInitialize(_address: string, _options: {
-        signer: ethers.Signer;
-    } & TransactionOptions, _metadata: string, _proposers: string, _moderators: string, _deciders: string, _withModeration: boolean, _forwarder: string, ..._args: unknown[]): Promise<ethers.ContractTransaction>;
+    type: ProcedureType;
+    constructor({ address, deciders, typeName, name, description, salt, cid, chainId, signerOrProvider, metadata, proposers, withModeration, forwarder, moderators, proposals, isDeployed, sourceOrgans, targetOrgans, type, data, organigramId }: ProcedureInput);
+    static _populateInitialize(_populateInitializeInput: PopulateInitializeInput): Promise<ethers.ContractTransaction>;
     static loadData(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<{
         cid: string;
         metadata?: string;
@@ -149,7 +202,11 @@ export declare class Procedure {
     static isProcedure(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<boolean>;
     updateCid(cid: string, options?: TransactionOptions): Promise<ethers.Transaction>;
     updateAdmin(address: string, options?: TransactionOptions): Promise<ethers.Transaction>;
-    propose(cid: string, operations: ProcedureProposalOperation[], options?: TransactionOptions): Promise<ProcedureProposal>;
+    propose(input: {
+        cid: string;
+        operations: ProcedureProposalOperation[];
+        options?: TransactionOptions;
+    }): Promise<ProcedureProposal>;
     blockProposal(proposalKey: string, reason: string, options?: TransactionOptions): Promise<ContractTransactionReceipt>;
     presentProposal(proposalKey: string, options?: TransactionOptions): Promise<ContractTransactionReceipt>;
     adoptProposal(proposalKey: string, options?: TransactionOptions): Promise<ContractTransactionReceipt>;
@@ -157,4 +214,5 @@ export declare class Procedure {
     reloadProposals(): Promise<Procedure>;
     reloadProposal(proposalKey: string): Promise<Procedure>;
     reloadData(): Promise<Procedure>;
+    toJson(): ProcedureJson;
 }

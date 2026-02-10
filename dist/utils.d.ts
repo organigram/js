@@ -1,21 +1,21 @@
 import deployedAddresses from '@organigram/protocol/deployments.json';
 export { deployedAddresses };
-export declare const EMPTY_ADDRESS = "0x0000000000000000000000000000000000000000";
-export type ContractName = 'Organ' | 'Asset' | 'Erc20VoteProcedure' | 'VoteProcedure' | 'NominationProcedure' | 'OrganigramClient';
+export type ContractName = 'Organ' | 'Asset' | 'ERC20VoteProcedure' | 'VoteProcedure' | 'NominationProcedure' | 'OrganigramClient';
+export declare function cloneInitCodeHash(implementation: string): string;
 export declare const predictContractAddress: ({ type, chainId, salt }: {
     type: Omit<ContractName, "OrganigramClient">;
     chainId: string;
     salt: string;
 }) => string;
 export declare const createRandom32BytesHexId: () => string;
-export declare const formatSalt: (salt?: string) => string;
+export declare const formatSalt: (salt?: string | null) => string;
 export declare const PERMISSIONS: {
     ADMIN: number;
     ALL: number;
-    ALL_PROCEDURES: number;
+    ALL_PERMISSIONS: number;
     ALL_ENTRIES: number;
-    ADD_PROCEDURES: number;
-    REMOVE_PROCEDURES: number;
+    ADD_PERMISSIONS: number;
+    REMOVE_PERMISSIONS: number;
     ADD_ENTRIES: number;
     REMOVE_ENTRIES: number;
     UPDATE_METADATA: number;

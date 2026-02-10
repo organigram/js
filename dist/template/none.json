@@ -1,4 +1,5 @@
 {
+    "name": "Blank project",
     "organs": [
         {
             "salt": "board-salt",
@@ -37,38 +38,7 @@
             "typeName": "vote",
             "data": "{\"majoritySize\":\"1\",\"quorumSize\":\"1\",\"voteDuration\":\"8\"}",
             "deciders": "board-address",
-            "proposers": "board-address",
-            "type": {
-                "name": "vote",
-                "label": "Simple Majority Vote",
-                "description": "A vote allows any user in the source organ to vote on proposals to add, edit or replace one or many entries, assets or procedures in the target organ.",
-                "fields": [
-                    {
-                        "name": "majoritySize",
-                        "label": "Majority size",
-                        "type": "number",
-                        "description": "",
-                        "defaultValue": "1",
-                        "options": null
-                    },
-                    {
-                        "name": "quorumSize",
-                        "label": "Quorum size",
-                        "type": "number",
-                        "description": "",
-                        "defaultValue": "1",
-                        "options": null
-                    },
-                    {
-                        "name": "voteDuration",
-                        "label": "Vote duration",
-                        "type": "number",
-                        "description": "Duration of the vote phase, as a number of blocks.",
-                        "defaultValue": "8",
-                        "options": null
-                    }
-                ]
-            }
+            "proposers": "board-address"
         },
         {
             "salt": "update-permissions-salt",
@@ -77,38 +47,7 @@
             "typeName": "vote",
             "data": "{\"majoritySize\":\"1\",\"quorumSize\":\"1\",\"voteDuration\":\"10\"}",
             "deciders": "board-address",
-            "proposers": "board-address",
-            "type": {
-                "name": "vote",
-                "label": "Simple Majority Vote",
-                "description": "A vote allows any user in the source organ to vote on proposals to add, edit or replace one or many entries, assets or procedures in the target organ.",
-                "fields": [
-                    {
-                        "name": "majoritySize",
-                        "label": "Majority size",
-                        "type": "number",
-                        "description": "",
-                        "defaultValue": "1",
-                        "options": null
-                    },
-                    {
-                        "name": "quorumSize",
-                        "label": "Quorum size",
-                        "type": "number",
-                        "description": "",
-                        "defaultValue": "1",
-                        "options": null
-                    },
-                    {
-                        "name": "voteDuration",
-                        "label": "Vote duration",
-                        "type": "number",
-                        "description": "Duration of the vote phase, as a number of blocks.",
-                        "defaultValue": "8",
-                        "options": null
-                    }
-                ]
-            }
+            "proposers": "board-address"
         }
     ],
     "assets": []

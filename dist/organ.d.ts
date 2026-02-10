@@ -14,32 +14,41 @@ export interface OrganPermission {
     permissionAddress: string;
     permissionValue: number;
 }
-export interface OrganData {
-    address: string;
-    chainId: string;
-    signerOrProvider: ethers.Signer | ethers.Provider;
-    balance: bigint;
-    cid: string;
-    permissions: OrganPermission[];
-    entries: OrganEntry[];
-}
-export interface OrganInput extends Partial<OrganData> {
-    salt?: string;
-    isDeployed?: boolean;
-    name?: string;
-    description?: string;
-    isSource?: SourceOrgan[];
-    isTarget?: TargetOrgan[];
+export interface OrganInput {
+    address?: string | null;
+    chainId?: string | null;
+    signerOrProvider?: ethers.Signer | ethers.Provider | null;
+    balance?: bigint | null;
+    cid?: string | null;
+    permissions?: OrganPermission[] | null;
+    entries?: Array<{
+        index: string;
+        address: string;
+        cid: string;
+    }> | null;
+    salt?: string | null;
+    isDeployed?: boolean | null;
+    name?: string | null;
+    description?: string | null;
+    isSource?: SourceOrgan[] | null;
+    isTarget?: TargetOrgan[] | null;
+    organigramId?: string | null;
+    forwarder?: string | null;
 }
 export interface OrganJson {
     address: string;
-    entries?: OrganEntry[];
-    permissions?: OrganPermission[];
-    name?: string;
-    description?: string;
-    cid?: string;
-    salt?: string;
-    chainId?: string;
+    name: string;
+    isDeployed: boolean;
+    description: string;
+    cid: string;
+    entries: OrganEntry[];
+    permissions: OrganPermission[];
+    salt?: string | null;
+    chainId: string;
+    organigramId: string;
+    isSource: SourceOrgan[];
+    isTarget: TargetOrgan[];
+    balance: bigint;
 }
 export declare enum OrganFunctionName {
     addEntries = 0,
@@ -57,24 +66,26 @@ export declare class Organ {
     name: string;
     description: string;
     address: string;
-    salt?: string;
-    chainId?: string;
+    salt: string | undefined;
+    chainId: string;
     balance: bigint;
     permissions: OrganPermission[];
     cid: string;
     entries: OrganEntry[];
-    signer?: Signer;
-    provider?: ethers.Provider;
+    signer: Signer | undefined;
+    provider: ethers.Provider | undefined;
     contract: ethers.Contract;
     isDeployed: boolean;
+    organigramId: string;
+    forwarder: string;
     isSource: SourceOrgan[];
     isTarget: TargetOrgan[];
-    constructor({ address, chainId, signerOrProvider, balance, permissions, cid, entries, salt, isDeployed, name, description, isSource, isTarget }: OrganInput);
+    constructor({ address, chainId, signerOrProvider, balance, permissions, cid, entries, salt, isDeployed, name, description, isSource, isTarget, organigramId, forwarder }: OrganInput);
     updateCid: (cid: string, options?: TransactionOptions) => Promise<ethers.Transaction>;
     addEntries: (entries: IOrganEntry[], options?: TransactionOptions) => Promise<ethers.Transaction>;
     removeEntries: (indexes: string[], options?: TransactionOptions) => Promise<ethers.Transaction>;
     replaceEntry: (index: number, entry: OrganEntry, options?: TransactionOptions) => Promise<ethers.Transaction>;
-    addPermission: (permission: OrganPermission, options?: TransactionOptions) => Promise<ethers.Transaction>;
+    addPermission: (permission: OrganPermission, options?: TransactionOptions) => Promise<ethers.ContractTransactionReceipt>;
     removePermission: (permission: string, options?: TransactionOptions) => Promise<ethers.Transaction>;
     replacePermission: (oldPermissionAddress: string, newOrganPermission: OrganPermission, options?: TransactionOptions) => Promise<ethers.Transaction>;
     static load(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<Organ>;
@@ -97,5 +108,6 @@ export declare class Organ {
     reloadEntries(): Promise<Organ>;
     reloadPermissions(): Promise<Organ>;
     reloadData(): Promise<Organ>;
+    toJson(): OrganJson;
 }
 export default Organ;

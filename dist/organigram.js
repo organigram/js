@@ -1,18 +1,48 @@
 import { getTemplate, templates } from './template';
+export const sourceOrganTypes = [
+    { label: 'Create proposals', name: 'proposers' },
+    { label: 'Approve proposals', name: 'deciders' },
+    { label: 'Filter proposals', name: 'moderators' }
+];
 export const getProcedureSourcesAndTargets = (procedure, organigram) => {
     if (procedure.sourceOrgans && procedure.targetOrgans) {
         return procedure;
     }
-    const sourceOrgans = [
-        procedure.deciders,
-        procedure.proposers,
-        procedure.moderators
-    ]
-        .filter((address) => address != null)
-        .map(address => ({
-        procedureAddress: procedure.address,
-        organAddress: address
-    }));
+    const sources = Array.from(new Set([procedure.deciders, procedure.proposers, procedure.moderators].filter(Boolean)));
+    const sourceOrgans = sources.reduce((acc, source) => {
+        if (acc.some(sourceOrgan => sourceOrgan.organAddress === source)) {
+            return acc.map(sourceOrgan => {
+                if (sourceOrgan.organAddress === source) {
+                    return {
+                        ...sourceOrgan,
+                        types: [
+                            ...(sourceOrgan.types ?? []),
+                            ...(procedure.proposers === source ? ['proposers'] : []),
+                            ...(procedure.deciders === source ? ['deciders'] : []),
+                            ...(procedure.moderators === source ? ['moderators'] : [])
+                        ]
+                    };
+                }
+                return sourceOrgan;
+            });
+        }
+        const organ = organigram.organs.find(organ => organ.address === source);
+        if (organ) {
+            return [
+                ...acc,
+                {
+                    organAddress: organ.address,
+                    procedureAddress: procedure.address,
+                    types: [
+                        ...(procedure.proposers === source ? ['proposers'] : []),
+                        ...(procedure.deciders === source ? ['deciders'] : []),
+                        ...(procedure.moderators === source ? ['moderators'] : [])
+                    ]
+                }
+            ];
+        }
+        return acc;
+    }, []);
     const targetOrgans = organigram.organs
         .filter(organ => organ.permissions?.some(permission => permission.permissionAddress === procedure.address))
         ?.map(organ => ({
@@ -77,14 +107,16 @@ export const makeOrganigramDeployArgument = (organigram, signer) => {
 };
 export const defaultChainId = '11155111';
 export class Organigram {
-    organs = [];
-    procedures = [];
-    assets = [];
-    chainId;
     id;
+    organs = [];
+    assets = [];
+    procedures = [];
+    chainId;
+    slug;
     name;
     description;
-    client;
+    workspaceId;
+    organigramClient;
     signer;
     constructor(input) {
         let _organigram;
@@ -97,18 +129,20 @@ export class Organigram {
         else if (typeof input === 'object' && Array.isArray(input)) {
         }
         else
-            _organigram = input;
+            _organigram = getSourcesAndTargets(input);
         const initTyped = _organigram;
         this.name = initTyped?.name ?? 'Blank project';
         this.description =
             initTyped?.description ?? 'This is the default organigram.';
-        this.id = initTyped?.id;
-        this.organs = initTyped?.organs;
-        this.procedures = initTyped?.procedures;
-        this.assets = initTyped?.assets;
+        this.id = initTyped?.id ?? crypto.randomUUID();
+        this.slug = initTyped?.slug ?? this.id;
+        this.organs = initTyped?.organs ?? [];
+        this.procedures = initTyped?.procedures ?? [];
+        this.assets = initTyped?.assets ?? [];
         this.chainId = initTyped?.chainId ?? defaultChainId;
-        this.client = initTyped?.client;
+        this.organigramClient = initTyped?.organigramClient;
         this.signer = initTyped?.signer;
+        this.workspaceId = initTyped?.workspaceId;
     }
     editDetails({ name, description }) {
         if (name !== undefined)
@@ -123,20 +157,23 @@ export class Organigram {
         discover: true,
         limit: 100
     }) => {
-        this.client?.loadOrganigram(this, undefined, options);
+        this.organigramClient?.loadOrganigram(this, undefined, options);
     };
-    async deploy(signer) {
-        const deployArgument = makeOrganigramDeployArgument(this, signer);
-        return await this.client
-            ?.deployOrganigram(deployArgument)
-            .then(async () => await this?.load());
+    async deploy() {
+        if (!this.organigramClient) {
+            throw new Error('Organigram client not set.');
+        }
+        return await this.organigramClient.deployOrganigram(this);
     }
-    toJson = () => JSON.stringify({
+    toJson = () => JSON.parse(JSON.stringify({
         id: this.id,
+        slug: this.slug,
+        workspaceId: this.workspaceId,
+        chainId: this.chainId,
         name: this.name,
         description: this.description,
-        organs: this.organs,
-        procedures: this.procedures,
-        assets: this.assets
-    });
+        organs: this.organs.map(organ => organ.toJson?.() ?? organ),
+        assets: this.assets.map(asset => asset.toJson?.() ?? asset),
+        procedures: this.procedures.map(procedure => procedure.toJson?.() ?? procedure)
+    }));
 }

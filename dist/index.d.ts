@@ -6,4 +6,5 @@ export * from './procedure';
 export * from './procedure/nomination';
 export * from './procedure/vote';
 export * from './procedure/erc20Vote';
+export * from './template';
 export * from './utils';

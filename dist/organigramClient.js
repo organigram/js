@@ -1,38 +1,22 @@
 import { ethers } from 'ethers';
-import OrganigramContractABI from '@organigram/protocol/artifacts/contracts/OrganigramClient.sol/OrganigramClient.json';
+import OrganigramClientContractABI from '@organigram/protocol/artifacts/contracts/OrganigramClient.sol/OrganigramClient.json';
 import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json';
-import { formatSalt } from './utils';
+import { createRandom32BytesHexId, deployedAddresses, formatSalt, PERMISSIONS } from './utils';
 import Organ from './organ';
 import { Procedure } from './procedure';
-import { NominationProcedure } from './procedure/nomination';
-import { VoteProcedure } from './procedure/vote';
-import { ERC20VoteProcedure } from './procedure/erc20Vote';
-const procedureMetadata = {
-    description: '',
-    _type: 'procedureType',
-    _generator: 'https://organigram.ai',
-    _generatedAt: 0
+import { erc20Vote, ERC20VoteProcedure } from './procedure/erc20Vote';
+import { nomination, NominationProcedure } from './procedure/nomination';
+import { vote, VoteProcedure } from './procedure/vote';
+export const procedureTypes = {
+    erc20Vote,
+    nomination,
+    vote
 };
-const procedures = [
-    {
-        key: 'nomination',
-        address: '',
-        metadata: { ...procedureMetadata, name: 'Nomination', type: 'nomination' },
-        Class: NominationProcedure
-    },
-    {
-        key: 'vote',
-        address: '',
-        metadata: { ...procedureMetadata, name: 'Vote', type: 'vote' },
-        Class: VoteProcedure
-    },
-    {
-        key: 'erc20Vote',
-        address: '',
-        metadata: { ...procedureMetadata, name: 'ERC20 Vote', type: 'erc20Vote' },
-        Class: ERC20VoteProcedure
-    }
-];
+const _procedureClasses = {
+    erc20Vote: ERC20VoteProcedure,
+    nomination: NominationProcedure,
+    vote: VoteProcedure
+};
 export class OrganigramClient {
     address;
     chainId;
@@ -43,22 +27,25 @@ export class OrganigramClient {
     provider;
     contract;
     signer;
-    constructor(address, chainId, procedureTypes, contract, provider, signer) {
-        this.address = address;
-        this.chainId = chainId;
-        this.procedureTypes = procedureTypes;
+    constructor(input) {
+        this.address =
+            input?.address ??
+                deployedAddresses[input?.chainId]?.OrganigramClient ??
+                '';
+        this.chainId = input?.chainId ?? '11155111';
+        this.procedureTypes = input?.procedureTypes ?? Object.values(procedureTypes);
         this.organs = [];
         this.procedures = [];
         this.cids = [];
-        this.signer = signer;
-        this.provider = provider;
-        this.contract = contract;
+        this.signer = input?.signer;
+        this.provider = input?.provider;
+        this.contract =
+            input?.contract ??
+                new ethers.Contract(input?.address ?? '', OrganigramClientContractABI.abi, input?.signer ?? input?.provider);
     }
     static async loadProcedureType({ addr, cid }, provider) {
         const contract = new ethers.Contract(addr, ProcedureContractABI.abi, provider);
-        let Class;
         let metadata;
-        let name = '';
         if (!(await contract.supportsInterface('0x01ffc9a7'))) {
             throw new Error('Contract does not support interfaces.');
         }
@@ -66,24 +53,20 @@ export class OrganigramClient {
             throw new Error('Contract is not a procedure.');
         }
         if (cid === 'nomination' || cid === 'vote' || cid === 'erc20Vote') {
-            metadata = procedures.find(p => p.key === cid)?.metadata;
-            Class = procedures.find(p => p.key === cid)?.Class;
-            name =
-                metadata?.name != null && metadata.name !== '' ? metadata.name : name;
+            metadata = procedureTypes[cid].metadata;
         }
         return {
-            name,
             key: cid ?? '',
             address: addr,
             metadata: {
                 ...metadata,
                 cid
-            },
-            Class
+            }
         };
     }
-    static async loadProcedureTypes(address, provider) {
-        const contract = new ethers.Contract(address, OrganigramContractABI.abi, provider);
+    static async loadProcedureTypes(provider) {
+        const chainId = await provider.getNetwork().then(n => n.chainId.toString());
+        const contract = new ethers.Contract(deployedAddresses[chainId].OrganigramClient, OrganigramClientContractABI.abi, provider);
         const proceduresRegistryAddress = (await contract.proceduresRegistry()).toString();
         const procedures = await Organ.loadEntries(proceduresRegistryAddress, provider);
         const procedureTypes = await Promise.all(procedures.map(async (procedure) => await OrganigramClient.loadProcedureType({
@@ -92,17 +75,23 @@ export class OrganigramClient {
         }, provider))).then((types) => types.filter(i => i != null));
         return procedureTypes;
     }
-    static async load(address, provider, signer) {
-        if (provider == null && signer == null) {
+    static async load(input) {
+        if (input.provider == null && input.signer == null) {
             throw new Error('No provider or signer.');
         }
-        const contract = new ethers.Contract(address, OrganigramContractABI.abi, signer ?? provider);
-        const procedureTypes = await OrganigramClient.loadProcedureTypes(address, provider);
-        const chainId = await provider
-            ?.getNetwork()
+        const chainId = await input.provider
+            .getNetwork()
             .then(n => n.chainId.toString())
             .catch(() => '');
-        const newOrganigram = new OrganigramClient(address, chainId, procedureTypes, contract, provider, signer);
+        const contract = new ethers.Contract(deployedAddresses[chainId].OrganigramClient, OrganigramClientContractABI.abi, input.signer ?? input.provider);
+        const procedureTypes = await OrganigramClient.loadProcedureTypes(input.provider);
+        const newOrganigram = new OrganigramClient({
+            chainId,
+            procedureTypes,
+            contract,
+            provider: input.provider,
+            signer: input.signer
+        });
         return newOrganigram;
     }
     async getProcedureType(procedureAddress) {
@@ -151,7 +140,7 @@ export class OrganigramClient {
             if (signerOrProvider == null) {
                 throw new Error('Not connected.');
             }
-            const _Class = procedureType.Class;
+            const _Class = _procedureClasses[procedureType.key];
             procedure = await _Class
                 .load(address, signerOrProvider)
                 .then((p) => Object.assign(p, { type: procedureType }))
@@ -160,7 +149,6 @@ export class OrganigramClient {
                 return undefined;
             });
             if (procedure != null) {
-                procedure.type = procedureType;
                 this.procedures.push(procedure);
             }
         }
@@ -169,7 +157,8 @@ export class OrganigramClient {
         }
         return procedure;
     }
-    async deployOrgan({ metadata, permissions, salt, options }) {
+    async deployOrgan(input) {
+        const { cid, permissions, salt, options } = input ?? {};
         if (this.signer == null) {
             throw new Error('Signer not connected.');
         }
@@ -180,16 +169,21 @@ export class OrganigramClient {
         const _salt = formatSalt(salt);
         const _permissionAddresses = [];
         const _permissionValues = [];
-        permissions.forEach((p) => {
+        if (!permissions || permissions.length === 0) {
+            const address = await this.signer.getAddress();
+            _permissionAddresses.push(address);
+            _permissionValues.push(ethers.zeroPadValue(ethers.toBeHex(PERMISSIONS.ADMIN), 2));
+        }
+        permissions?.forEach((p) => {
             _permissionAddresses.push(p.permissionAddress);
-            _permissionValues.push(p.permissionValue);
+            _permissionValues.push(ethers.zeroPadValue(ethers.toBeHex(p.permissionValue), 2));
         });
-        const tx = await this.contract.deployOrgan(_permissionAddresses, _permissionValues, metadata, _salt, {
+        const tx = await this.contract.deployOrgan(_permissionAddresses, _permissionValues, cid ?? '', _salt, {
             nonce,
             customData: options?.customData
         });
         if (options?.onTransaction != null) {
-            options.onTransaction(tx, `Deploy organ with CID ${metadata.toString()}`);
+            options.onTransaction(tx, `Deploy organ with CID ${cid?.toString()}`);
         }
         const receipt = await tx?.wait();
         const eventCreation = receipt?.logs?.find((e) => e.address !== this.address);
@@ -206,15 +200,15 @@ export class OrganigramClient {
         return deployOrgansInput.map(organ => {
             const _permissionAddresses = [];
             const _permissionValues = [];
-            organ.permissions.forEach(p => {
+            organ.permissions?.forEach(p => {
                 _permissionAddresses.push(p.permissionAddress);
-                _permissionValues.push(p.permissionValue);
+                _permissionValues.push(ethers.zeroPadValue(ethers.toBeHex(p.permissionValue), 2));
             });
             return {
                 permissionAddresses: _permissionAddresses,
                 permissionValues: _permissionValues,
-                cid: organ.metadata,
-                salt: formatSalt(organ.salt)
+                cid: organ.cid ?? '',
+                salt: organ.salt ?? createRandom32BytesHexId()
             };
         });
     }
@@ -241,14 +235,7 @@ export class OrganigramClient {
         if (this.signer == null) {
             throw new Error('Signer not connected.');
         }
-        let nonce;
-        if (options?.nonce != null) {
-            nonce = BigInt(options?.nonce);
-        }
-        const tx = await this.contract.deployAsset(name, symbol, initialSupply, formatSalt(salt), {
-            nonce,
-            customData: options?.customData
-        });
+        const tx = await this.contract.deployAsset(name, symbol, initialSupply, formatSalt(salt));
         if (options?.onTransaction != null) {
             options.onTransaction(tx, `Create asset ${name} (${symbol})`);
         }
@@ -270,10 +257,11 @@ export class OrganigramClient {
             salt: formatSalt(asset.salt)
         }));
         const tx = await this.contract.deployAssets(formattedAssets, {
-            customData: options?.customData
+            customData: options?.customData,
+            nonce: options?.nonce != null ? BigInt(options.nonce) : undefined
         });
         if (options?.onTransaction != null) {
-            options.onTransaction(tx, `Create ${assets.length} assets`);
+            options.onTransaction(tx, `Deploy ${assets.length} assets`);
         }
         const receipt = await tx?.wait();
         const eventCreations = receipt?.logs?.filter((e) => e.address !== this.address);
@@ -283,72 +271,103 @@ export class OrganigramClient {
         const addresses = eventCreations.map((eventCreation) => eventCreation.address);
         return addresses;
     }
-    async _deployProcedure({ type, initialize, salt, options }) {
+    async _deployProcedure({ typeAddress, initialize, salt, options }) {
         if (this.signer == null) {
             throw new Error('Signer not connected.');
-        }
-        const procedureType = this.procedureTypes.find((pt) => pt.address.toLowerCase() === type.toLowerCase());
-        if (procedureType?.Class == null) {
-            throw new Error('Procedure type not found.');
         }
         let nonce;
         if (options?.nonce != null) {
             nonce = BigInt(options?.nonce);
         }
         const _salt = formatSalt(salt);
-        const tx = await this.contract.deployProcedure(procedureType.address, initialize?.data, _salt, { nonce, customData: options?.customData });
+        const tx = await this.contract.deployProcedure(typeAddress, initialize?.data, _salt, { nonce, customData: options?.customData });
         if (options?.onTransaction != null) {
-            options.onTransaction(tx, `Deploy procedure of type ${procedureType.name}`);
+            options.onTransaction(tx, `Deploy procedure of type ${this.procedureTypes?.find(pt => pt.address.toLowerCase() === typeAddress.toLowerCase())?.metadata.label ?? typeAddress}.`);
         }
         const receipt = await tx?.wait();
         const address = receipt?.logs?.find((e) => e.address !== this.address).address;
         if (address == null) {
             throw new Error('Procedure deployment failed.');
         }
-        return await this.getProcedure(address, true).catch((error) => {
-            console.error('Unable to load procedure with address ' +
-                address +
-                ' after deploying it.', error.message);
-            return { address };
-        });
+        return address;
     }
-    async _populateInitializeProcedure(type, options, cid, proposers, moderators, deciders, withModeration, forwarder, ...args) {
+    async _populateInitializeProcedure(input) {
         if (this.signer == null) {
             throw new Error('Signer not connected.');
         }
-        const procedureType = this.procedureTypes.find((pt) => pt.address.toLowerCase() === type.toLowerCase());
-        if (procedureType?.Class == null) {
-            throw new Error('Procedure type not found.');
+        const procedureClass = _procedureClasses[input.typeName];
+        if (procedureClass == null) {
+            throw new Error('Populate initialize procedure: Procedure type not found.');
         }
-        const _Class = procedureType.Class;
         try {
-            return await _Class._populateInitialize(type, { ...options, signer: this.signer }, cid, proposers, moderators, deciders, withModeration, forwarder, ...args);
+            return await procedureClass._populateInitialize({
+                options: { ...input.options, signer: this.signer },
+                cid: input.cid ?? input.typeName,
+                proposers: input.proposers ?? input.deciders,
+                moderators: input.moderators ?? ethers.ZeroAddress,
+                deciders: input.deciders,
+                withModeration: input.withModeration ?? false,
+                forwarder: input.forwarder ??
+                    deployedAddresses[this.chainId]?.MetaGasStation,
+                args: input.args
+            });
         }
         catch (error) {
-            console.error('initialize', error.message);
+            console.error('populateInitializeProcedure', error.message);
             throw error;
         }
     }
-    async deployProcedure(type, options, cid, proposers, moderators, deciders, withModeration, forwarder, salt, ...args) {
-        const initializeProcedure = await this._populateInitializeProcedure(type, options, cid, proposers, moderators, deciders, withModeration, forwarder, ...args);
-        const { address } = await this._deployProcedure({
-            type,
+    async deployProcedure(input) {
+        const initializeProcedure = await this._populateInitializeProcedure({
+            typeName: input.typeName,
+            options: input.options ?? {},
+            cid: input.cid ?? input.typeName,
+            deciders: input.deciders,
+            proposers: input.proposers ?? input.deciders,
+            moderators: input.moderators ?? ethers.ZeroAddress,
+            withModeration: input.withModeration ?? false,
+            forwarder: input.forwarder ??
+                deployedAddresses[this.chainId]?.MetaGasStation,
+            args: input.args ?? []
+        });
+        const address = await this._deployProcedure({
+            typeAddress: procedureTypes[input.typeName].address,
             initialize: initializeProcedure,
-            salt,
-            options
+            salt: input.salt ?? createRandom32BytesHexId(),
+            options: input.options ?? {}
         });
         return await this.getProcedure(address, false).catch((error) => {
-            console.error('Unable to load procedure with address ' +
+            throw new Error('Unable to load procedure with address ' +
                 address +
-                ' after creating it.', error.message);
-            return { address };
+                ' after creating it.' +
+                error.message);
         });
     }
     async _prepareDeployProceduresInput(deployProceduresInput) {
         return await Promise.all(deployProceduresInput.map(async (procedure) => {
-            const initialize = await this._populateInitializeProcedure(procedure.type, procedure.options ?? {}, procedure.cid, procedure.proposers, procedure.moderators, procedure.deciders, procedure.withModeration, procedure.forwarder, ...(procedure.args ?? []));
+            if (procedure.typeName !== 'nomination' &&
+                procedure.data == null &&
+                procedure.args == null) {
+                throw new Error('At least one of "data" or "args" fields must be present in ' +
+                    procedure.typeName +
+                    ' procedure input.');
+            }
+            const parsedData = procedure.data ? JSON.parse(procedure.data) : {};
+            const _args = procedure.args ?? Object.values(parsedData);
+            const initialize = await this._populateInitializeProcedure({
+                typeName: procedure.typeName,
+                options: procedure.options ?? {},
+                cid: procedure.cid ?? procedure.typeName,
+                moderators: procedure.moderators ?? ethers.ZeroAddress,
+                deciders: procedure.deciders,
+                proposers: procedure.proposers ?? procedure.deciders,
+                withModeration: procedure.withModeration ?? false,
+                forwarder: deployedAddresses[procedure.chainId]?.MetaGasStation,
+                args: _args
+            });
             return {
-                procedureType: procedure.type,
+                procedureType: procedureTypes[procedure.typeName]
+                    .address,
                 data: initialize.data,
                 salt: formatSalt(procedure.salt),
                 options: procedure.options
@@ -381,10 +400,12 @@ export class OrganigramClient {
             initialSupply: asset.initialSupply,
             salt: formatSalt(asset.salt)
         }));
-        const organsInput = await this._prepareDeployOrgansInput(input.organs);
+        const organsInput = this._prepareDeployOrgansInput(input.organs);
         const proceduresInput = await this._prepareDeployProceduresInput(input.procedures);
+        const deployedAddresses = await this.contract.deployOrganigram.staticCall(organsInput, formattedAssets, proceduresInput);
         const tx = await this.contract.deployOrganigram(organsInput, formattedAssets, proceduresInput);
-        return tx;
+        await tx?.wait();
+        return deployedAddresses;
     }
     loadOrganigram(organigram, cached = true, options = {
         discover: true,

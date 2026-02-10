@@ -1,6 +1,29 @@
 import { ethers } from 'ethers';
-import { Procedure } from '.';
+import { Procedure, procedureMetadata } from '.';
 import ERC20VoteProcedureContractABI from '@organigram/protocol/artifacts/contracts/procedures/ERC20Vote.sol/ERC20VoteProcedure.json';
+import { electionFields } from './vote';
+import { deployedAddresses } from '../utils';
+export const erc20Vote = {
+    address: deployedAddresses[11155111].ERC20VoteProcedure,
+    key: 'erc20Vote',
+    fields: {
+        ...electionFields,
+        erc20: {
+            name: 'erc20',
+            label: 'ERC20 Token',
+            description: 'Address of the ERC20 Token used for weighting the voting power.',
+            defaultValue: '',
+            type: 'string'
+        }
+    },
+    metadata: {
+        ...procedureMetadata,
+        cid: 'erc20Vote',
+        label: 'Token-weighted Vote',
+        description: 'A token vote allows any user in the source organ to vote on proposals, where its voting power is based on the amount of tokens it holds.',
+        type: 'erc20Vote'
+    }
+};
 export class ERC20VoteProcedure extends Procedure {
     static INTERFACE = '0xc9d27afe';
     erc20;
@@ -9,37 +32,24 @@ export class ERC20VoteProcedure extends Procedure {
     majoritySize;
     elections;
     contract;
-    constructor({ cid, salt, address, chainId, signerOrProvider, metadata, proposers, moderators, deciders, withModeration, forwarder, proposals, isDeployed, erc20, quorumSize, voteDuration, majoritySize, elections, sourceOrgans, targetOrgans }) {
-        super({
-            cid,
-            address,
-            chainId,
-            signerOrProvider,
-            metadata,
-            proposers,
-            moderators,
-            deciders,
-            withModeration,
-            forwarder,
-            proposals,
-            isDeployed,
-            salt,
-            sourceOrgans,
-            targetOrgans
-        });
+    type = erc20Vote;
+    typeName = 'erc20Vote';
+    constructor({ erc20, quorumSize, voteDuration, majoritySize, elections, ...procedureArguments }) {
+        super({ ...procedureArguments, typeName: 'erc20Vote', type: erc20Vote });
         this.erc20 = erc20;
         this.quorumSize = quorumSize;
         this.voteDuration = voteDuration;
         this.majoritySize = majoritySize;
         this.elections = elections;
-        this.contract = new ethers.Contract(this.address, ERC20VoteProcedureContractABI.abi, signerOrProvider);
+        this.contract = new ethers.Contract(this.address, ERC20VoteProcedureContractABI.abi, procedureArguments.signerOrProvider);
     }
-    static async _populateInitialize(type, options, cid, proposers, moderators, deciders, withModeration, forwarder, erc20, quorumSize, voteDuration, majoritySize) {
-        if (options.signer == null) {
+    static async _populateInitialize(input) {
+        if (input.options?.signer == null) {
             throw new Error('Not connected.');
         }
-        const contract = new ethers.Contract(type, ERC20VoteProcedureContractABI.abi, options.signer);
-        return await contract.initialize.populateTransaction(cid, proposers, moderators, deciders, withModeration, forwarder, erc20, quorumSize, voteDuration, majoritySize);
+        const [erc20, quorumSize, voteDuration, majoritySize] = input.args;
+        const contract = new ethers.Contract(erc20Vote.address, ERC20VoteProcedureContractABI.abi, input.options.signer);
+        return await contract.initialize.populateTransaction(input.cid, input.proposers, input.moderators, input.deciders, input.withModeration, input.forwarder, erc20, quorumSize, voteDuration, majoritySize);
     }
     static async loadElection(address, proposalKey, signerOrProvider) {
         const contract = new ethers.Contract(address, ERC20VoteProcedureContractABI.abi, signerOrProvider);
@@ -118,7 +128,9 @@ export class ERC20VoteProcedure extends Procedure {
             quorumSize: quorumSize.toString(),
             voteDuration: voteDuration.toString(),
             majoritySize: majoritySize.toString(),
-            elections
+            elections,
+            typeName: 'erc20Vote',
+            type: erc20Vote
         });
     }
     async erc20Balance(account) {

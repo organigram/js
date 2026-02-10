@@ -1,100 +1,112 @@
 import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json';
 import { ethers } from 'ethers';
 import { capitalize, createRandom32BytesHexId, deployedAddresses, predictContractAddress } from '../utils';
+export const procedureMetadata = {
+    _type: 'procedureType',
+    _generator: 'https://organigram.ai',
+    _generatedAt: 0
+};
+export var ProcedureTypeNameEnum;
+(function (ProcedureTypeNameEnum) {
+    ProcedureTypeNameEnum["erc20Vote"] = "erc20Vote";
+    ProcedureTypeNameEnum["nomination"] = "nomination";
+    ProcedureTypeNameEnum["vote"] = "vote";
+})(ProcedureTypeNameEnum || (ProcedureTypeNameEnum = {}));
+export const procedureFunctions = [
+    {
+        funcSig: '0x4d3f8407',
+        key: 'updateCid',
+        signature: 'updateCid(string)',
+        label: 'Update cid',
+        tags: ['cid', 'replace'],
+        params: ['cid'],
+        target: 'organ'
+    },
+    {
+        funcSig: '0xd610b570',
+        key: 'addEntries',
+        signature: 'addEntries(OrganLibrary.Entry[])',
+        label: 'Add entries',
+        tags: ['entries', 'add'],
+        params: ['entries'],
+        target: 'organ'
+    },
+    {
+        funcSig: '0x7615eb81',
+        key: 'removeEntries',
+        signature: 'removeEntries(uint256[])',
+        label: 'Remove entries',
+        tags: ['entries', 'remove'],
+        params: ['indexes'],
+        target: 'organ'
+    },
+    {
+        funcSig: '0x62f7f997',
+        key: 'replaceEntry',
+        signature: 'replaceEntry(uint256,CoreLibrary.Entry)',
+        label: 'Replace entry',
+        tags: ['entries', 'replace'],
+        params: ['index', 'entry'],
+        target: 'organ'
+    },
+    {
+        funcSig: '0x7f0a4e27',
+        key: 'addProcedure',
+        signature: 'addProcedure(address,bytes2)',
+        label: 'Add permission',
+        tags: ['procedures', 'add'],
+        params: ['procedure', 'permissions'],
+        target: 'organ'
+    },
+    {
+        funcSig: '0x19b9404c',
+        key: 'removeProcedure',
+        signature: 'removeProcedure(address)',
+        label: 'Remove permission',
+        tags: ['procedures', 'remove'],
+        params: ['procedure'],
+        target: 'organ'
+    },
+    {
+        funcSig: '0xd0922d4a',
+        key: 'replaceProcedure',
+        signature: 'replaceProcedure(address,address,bytes2)',
+        label: 'Replace permission',
+        tags: ['procedures', 'replace'],
+        params: ['procedure', 'procedure', 'permissions'],
+        target: 'organ'
+    },
+    {
+        funcSig: '0xa9059cbb',
+        key: 'withdrawEther',
+        signature: 'transfer(address,uint256)',
+        label: 'Withdraw ether',
+        tags: ['transfer', 'withdraw', 'ether'],
+        params: ['address', 'amount'],
+        target: 'organ'
+    },
+    {
+        funcSig: '0xf49b5848',
+        key: 'withdrawERC20',
+        signature: 'transferCoins(address,address,address,uint256)',
+        label: 'Withdraw ERC20',
+        tags: ['transfer', 'withdraw', 'coins', 'erc20'],
+        params: ['address', 'address', 'address', 'amount'],
+        target: 'organ'
+    },
+    {
+        funcSig: '0xbdb3e1c4',
+        key: 'withdrawERC721',
+        signature: 'transferCollectible(address,address,address,uint256)',
+        label: 'Withdraw ERC721',
+        tags: ['transfer', 'withdraw', 'collectibles', 'erc721'],
+        params: ['address', 'address', 'address', 'tokenId'],
+        target: 'organ'
+    }
+];
 export class Procedure {
     static INTERFACE = '0x71dbd330';
-    static OPERATIONS_FUNCTIONS = [
-        {
-            funcSig: '0x4d3f8407',
-            key: 'updateCid',
-            signature: 'updateCid(string)',
-            label: 'Update cid',
-            tags: ['cid', 'replace'],
-            params: ['cid'],
-            target: 'organ'
-        },
-        {
-            funcSig: '0xd610b570',
-            key: 'addEntries',
-            signature: 'addEntries(OrganLibrary.Entry[])',
-            label: 'Add entries',
-            tags: ['entries', 'add'],
-            params: ['entries'],
-            target: 'organ'
-        },
-        {
-            funcSig: '0x7615eb81',
-            key: 'removeEntries',
-            signature: 'removeEntries(uint256[])',
-            label: 'Remove entries',
-            tags: ['entries', 'remove'],
-            params: ['indexes'],
-            target: 'organ'
-        },
-        {
-            funcSig: '0x62f7f997',
-            key: 'replaceEntry',
-            signature: 'replaceEntry(uint256,CoreLibrary.Entry)',
-            label: 'Replace entry',
-            tags: ['entries', 'replace'],
-            params: ['index', 'entry'],
-            target: 'organ'
-        },
-        {
-            funcSig: '0x7f0a4e27',
-            key: 'addProcedure',
-            signature: 'addProcedure(address,bytes2)',
-            label: 'Add procedure',
-            tags: ['procedures', 'add'],
-            params: ['procedure', 'permissions'],
-            target: 'organ'
-        },
-        {
-            funcSig: '0x19b9404c',
-            key: 'removeProcedure',
-            signature: 'removeProcedure(address)',
-            label: 'Remove procedure',
-            tags: ['procedures', 'remove'],
-            params: ['procedure'],
-            target: 'organ'
-        },
-        {
-            funcSig: '0xd0922d4a',
-            key: 'replaceProcedure',
-            signature: 'replaceProcedure(address,address,bytes2)',
-            label: 'Replace procedure',
-            tags: ['procedures', 'replace'],
-            params: ['procedure', 'procedure', 'permissions'],
-            target: 'organ'
-        },
-        {
-            funcSig: '0xa9059cbb',
-            key: 'withdrawEther',
-            signature: 'transfer(address,uint256)',
-            label: 'Withdraw ether',
-            tags: ['transfer', 'withdraw', 'ether'],
-            params: ['address', 'amount'],
-            target: 'organ'
-        },
-        {
-            funcSig: '0xf49b5848',
-            key: 'withdrawERC20',
-            signature: 'transferCoins(address,address,address,uint256)',
-            label: 'Withdraw ERC20',
-            tags: ['transfer', 'withdraw', 'coins', 'erc20'],
-            params: ['address', 'address', 'address', 'amount'],
-            target: 'organ'
-        },
-        {
-            funcSig: '0xbdb3e1c4',
-            key: 'withdrawERC721',
-            signature: 'transferCollectible(address,address,address,uint256)',
-            label: 'Withdraw ERC721',
-            tags: ['transfer', 'withdraw', 'collectibles', 'erc721'],
-            params: ['address', 'address', 'address', 'tokenId'],
-            target: 'organ'
-        }
-    ];
+    static OPERATIONS_FUNCTIONS = procedureFunctions;
     name;
     description;
     address;
@@ -106,6 +118,7 @@ export class Procedure {
     withModeration;
     moderators;
     metadata;
+    data;
     forwarder;
     proposals;
     _contract;
@@ -113,11 +126,16 @@ export class Procedure {
     chainId;
     signer;
     provider;
+    organigramId;
     sourceOrgans;
     targetOrgans;
-    constructor({ address, deciders, typeName, name, description, salt, cid, chainId, signerOrProvider, metadata, proposers, withModeration, forwarder, moderators, proposals, isDeployed, sourceOrgans, targetOrgans }) {
-        if (!chainId && (!address || !forwarder)) {
-            throw new Error('Either chainId or address and forwarder must be provided to procedure constructor.');
+    type;
+    constructor({ address, deciders, typeName, name, description, salt, cid, chainId, signerOrProvider, metadata, proposers, withModeration, forwarder, moderators, proposals, isDeployed, sourceOrgans, targetOrgans, type, data, organigramId }) {
+        if (typeName == null || deciders == null) {
+            throw new Error('typeName and deciders are required to create a procedure.');
+        }
+        if (!(typeName in ProcedureTypeNameEnum)) {
+            throw new Error(`typeName must be one of ${Object.values(ProcedureTypeNameEnum).join(', ')}.`);
         }
         this.salt = salt ?? (isDeployed ? undefined : createRandom32BytesHexId());
         this.address =
@@ -128,15 +146,16 @@ export class Procedure {
                     salt: this.salt
                 });
         this.deciders = deciders;
-        this.typeName = typeName ?? 'Procedure';
+        this.typeName = typeName;
         this.isDeployed = isDeployed ?? false;
-        this.cid = cid ?? '';
+        this.cid = cid ?? this.typeName;
         this.name = name ?? 'Unnamed procedure';
         this.description = description ?? '';
-        this.chainId = chainId;
-        this.metadata = metadata;
+        this.chainId = chainId ?? '11155111';
+        this.organigramId = organigramId ?? 'default-organigram-id';
+        this.metadata = metadata ?? '{}';
         this.proposers = proposers ?? deciders;
-        this.moderators = moderators;
+        this.moderators = moderators ?? ethers.ZeroAddress;
         this.withModeration = withModeration ?? false;
         this.forwarder =
             forwarder ?? deployedAddresses[chainId]?.MetaGasStation;
@@ -165,8 +184,10 @@ export class Procedure {
         this._contract = new ethers.Contract(this.address, ProcedureContractABI.abi, signerOrProvider);
         this.sourceOrgans = sourceOrgans ?? [];
         this.targetOrgans = targetOrgans ?? [];
+        this.type = type;
+        this.data = data;
     }
-    static async _populateInitialize(_address, _options, _metadata, _proposers, _moderators, _deciders, _withModeration, _forwarder, ..._args) {
+    static async _populateInitialize(_populateInitializeInput) {
         throw new Error('Procedure cannot be initialized.');
     }
     static async loadData(address, signerOrProvider) {
@@ -234,9 +255,11 @@ export class Procedure {
             moderators: data.moderators,
             deciders: data.deciders,
             withModeration: data.withModeration,
-            forwarder: data.forwarder,
+            forwarder: data.forwarder ??
+                deployedAddresses[chainId]?.MetaGasStation,
             proposals,
-            isDeployed: true
+            isDeployed: true,
+            typeName: 'nomination'
         });
     }
     static _stringifyParamType(type) {
@@ -353,12 +376,12 @@ export class Procedure {
         }
         return tx;
     }
-    async propose(cid, operations, options) {
+    async propose(input) {
         const signerOrProvider = this.signer ?? this.provider;
         if (signerOrProvider == null) {
             throw new Error('Not connected.');
         }
-        const ops = operations.map(operation => {
+        const ops = input.operations.map(operation => {
             return {
                 index: operation?.index != null && operation.index !== ''
                     ? operation.index
@@ -369,9 +392,9 @@ export class Procedure {
                 processed: false
             };
         });
-        const tx = await this._contract.propose(cid, ops);
-        if (options?.onTransaction != null) {
-            options.onTransaction(tx, `Create proposal with CID ${cid} on procedure ${this.address}`);
+        const tx = await this._contract.propose(input.cid, ops);
+        if (input.options?.onTransaction != null) {
+            input.options.onTransaction(tx, `Create proposal with CID ${input.cid} on procedure ${this.address}`);
         }
         const receipt = await tx.wait();
         const proposalKey = receipt.logs[0].topics[2];
@@ -444,5 +467,27 @@ export class Procedure {
         this.deciders = data.deciders;
         this.withModeration = data.withModeration;
         return this;
+    }
+    toJson() {
+        return {
+            chainId: this.chainId,
+            data: this.data,
+            address: this.address,
+            typeName: this.typeName,
+            name: this.name,
+            description: this.description,
+            cid: this.cid,
+            isDeployed: this.isDeployed,
+            deciders: this.deciders,
+            proposers: this.proposers,
+            moderators: this.moderators ?? ethers.ZeroAddress,
+            withModeration: this.withModeration,
+            forwarder: this.forwarder,
+            metadata: this.metadata,
+            proposals: this.proposals,
+            sourceOrgans: this.sourceOrgans,
+            targetOrgans: this.targetOrgans,
+            type: this.type
+        };
     }
 }

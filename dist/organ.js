@@ -1,6 +1,6 @@
 import { ethers } from 'ethers';
 import OrganContractABI from '@organigram/protocol/artifacts/contracts/Organ.sol/Organ.json';
-import { createRandom32BytesHexId, EMPTY_ADDRESS, predictContractAddress } from './utils';
+import { createRandom32BytesHexId, deployedAddresses, predictContractAddress } from './utils';
 export var OrganFunctionName;
 (function (OrganFunctionName) {
     OrganFunctionName[OrganFunctionName["addEntries"] = 0] = "addEntries";
@@ -28,25 +28,27 @@ export class Organ {
     provider;
     contract;
     isDeployed;
+    organigramId;
+    forwarder;
     isSource;
     isTarget;
-    constructor({ address, chainId, signerOrProvider, balance, permissions, cid, entries, salt, isDeployed, name, description, isSource, isTarget }) {
-        if (!address && !chainId) {
-            throw new Error('Either address or chainId must be provided to organ constructor.');
-        }
+    constructor({ address, chainId, signerOrProvider, balance, permissions, cid, entries, salt, isDeployed, name, description, isSource, isTarget, organigramId, forwarder }) {
         this.name = name ?? 'Unnamed Organ';
         this.description = description ?? 'This organ does not have a description.';
         this.isDeployed = isDeployed ?? false;
         this.salt =
-            (salt ?? this.isDeployed) ? undefined : createRandom32BytesHexId();
-        this.chainId = chainId;
+            salt || (this.isDeployed ? undefined : createRandom32BytesHexId());
+        this.chainId = chainId ?? '11155111';
         this.address =
             address ??
                 predictContractAddress({
                     type: 'Organ',
-                    chainId: chainId,
+                    chainId: this.chainId,
                     salt: this.salt
                 });
+        this.organigramId = organigramId ?? 'default-organigram-id';
+        this.forwarder =
+            forwarder ?? deployedAddresses[this.chainId]?.MetaGasStation;
         this.balance = balance ?? 0n;
         this.permissions = permissions ?? [];
         this.cid = cid ?? '';
@@ -85,7 +87,7 @@ export class Organ {
                 return undefined;
             }
             return {
-                addr: e.address ?? EMPTY_ADDRESS,
+                addr: e.address ?? ethers.ZeroAddress,
                 cid: e.cid
             };
         })
@@ -243,7 +245,7 @@ export class Organ {
                     console.warn('Error while loading entry in organ.', address, i.toString(), error.message);
                     return null;
                 });
-                if (entry != null && entry.address !== EMPTY_ADDRESS) {
+                if (entry != null && entry.address !== ethers.ZeroAddress) {
                     return entry;
                 }
             }
@@ -295,6 +297,23 @@ export class Organ {
         const data = await Organ.loadData(this.address, signerOrProvider);
         this.cid = data?.cid;
         return this;
+    }
+    toJson() {
+        return {
+            address: this.address,
+            name: this.name,
+            description: this.description,
+            cid: this.cid,
+            entries: this.entries,
+            permissions: this.permissions,
+            salt: this.salt,
+            chainId: this.chainId ?? '',
+            organigramId: this.organigramId ?? '',
+            isSource: this.isSource,
+            isTarget: this.isTarget,
+            isDeployed: this.isDeployed,
+            balance: this.balance
+        };
     }
 }
 export default Organ;

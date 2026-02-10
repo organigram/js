@@ -4,13 +4,13 @@ export const templates = {
     none
 };
 const renewSalts = (pv, cv) => Object.assign(pv, { [cv.salt]: createRandom32BytesHexId() });
-const renewAddresses = (_, type, chainId) => (pv, cv) => Object.assign(pv, {
+const renewAddresses = (salts, type, chainId) => (pv, cv) => Object.assign(pv, {
     [cv.address]: predictContractAddress({
         type: type === 'Procedure'
             ? (capitalize(cv.typeName) + type)
             : type,
         chainId: cv.chainId ?? chainId,
-        salt: cv.salt
+        salt: salts[cv.salt]
     })
 });
 export const renewSaltsAndAddresses = (organigram, chainId) => {
@@ -33,8 +33,8 @@ export const renewSaltsAndAddresses = (organigram, chainId) => {
     const procedures = organigram.procedures?.map(procedure => ({
         ...procedure,
         salt: newProcedureSalts[procedure.salt],
-        chainId,
         address: newProcedureAddresses[procedure.address],
+        chainId,
         deciders: newOrganAddresses[procedure.deciders],
         proposers: newOrganAddresses[procedure.proposers],
         moderators: procedure.moderators
