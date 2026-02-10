@@ -10,22 +10,61 @@ import {
 } from '../utils'
 import { SourceOrgan, TargetOrgan } from '../organigram'
 
+export const procedureMetadata = {
+  _type: 'procedureType',
+  _generator: 'https://organigram.ai',
+  _generatedAt: 0
+}
+
+export type ProcedureTypeName = 'erc20Vote' | 'nomination' | 'vote'
+export enum ProcedureTypeNameEnum {
+  erc20Vote = 'erc20Vote',
+  nomination = 'nomination',
+  vote = 'vote'
+}
+
+export interface ProcedureTypeField {
+  name: string
+  label: string
+  description: string
+  defaultValue: string
+  type: any
+}
+
+export interface ProcedureType {
+  key: string
+  address: string
+  metadata: {
+    cid?: string
+    label?: string
+    description?: string
+  }
+  fields?: {
+    [key: string]: ProcedureTypeField
+  }
+}
+
 export type ProcedureJson = {
+  isDeployed: boolean
   address: string
   deciders: string
   typeName: string
-  name?: string
-  description?: string
-  cid?: string
-  salt?: string
-  chainId?: string
-  metadata?: unknown
-  proposers?: string
-  moderators?: string
-  withModeration?: boolean
-  forwarder?: string
+  name: string
+  description: string
+  cid: string
+  salt?: string | null
+  chainId: string
+  data: string
+  metadata?: string
+  proposers: string
+  moderators: string
+  withModeration: boolean
+  forwarder: string
   proposals?: ProcedureProposal[]
   args?: unknown[]
+  sourceOrgans?: SourceOrgan[]
+  targetOrgans?: TargetOrgan[]
+  type: ProcedureType
 }
 
 export type Election = {
@@ -153,145 +192,168 @@ export interface ProposalMetadata {
 }
 
 export interface ProcedureInput {
-  address?: string
+  address?: string | null
   deciders: string
-  typeName?: string
-  name?: string
-  description?: string
-  salt?: string
-  chainId?: string
-  cid?: string
-  signerOrProvider?: ethers.Signer | ethers.Provider
-  metadata?: unknown
-  proposers?: string
-  withModeration?: boolean
-  moderators?: string
-  forwarder?: string
-  proposals?: ProcedureProposal[]
-  isDeployed?: boolean
-  sourceOrgans?: SourceOrgan[]
-  targetOrgans?: TargetOrgan[]
+  typeName: string
+  type?: ProcedureType
+  name?: string | null
+  description?: string | null
+  salt?: string | null
+  chainId?: string | null
+  cid?: string | null
+  signerOrProvider?: ethers.Signer | ethers.Provider | null
+  metadata?: string | null
+  proposers?: string | null
+  withModeration?: boolean | null
+  moderators?: string | null
+  forwarder?: string | null
+  proposals?: ProcedureProposal[] | null
+  isDeployed?: boolean | null
+  sourceOrgans?: SourceOrgan[] | null
+  targetOrgans?: TargetOrgan[] | null
+  organigramId?: string | null
+  data?: string | null
 }
 
+export interface PopulateInitializeInput {
+  options?: {
+    signer?: ethers.Signer
+  } & TransactionOptions
+  typeName?: ProcedureTypeName
+  cid: string
+  proposers: string
+  moderators: string
+  deciders: string
+  withModeration: boolean
+  forwarder: string
+  args: unknown[]
+}
+
+// @todo : Generate this list from the ABI of the procedure contract.
+export const procedureFunctions: ProcedureProposalOperationFunction[] = [
+  {
+    funcSig: '0x4d3f8407',
+    key: 'updateCid',
+    signature: 'updateCid(string)',
+    label: 'Update cid',
+    tags: ['cid', 'replace'],
+    params: ['cid'],
+    target: 'organ'
+  },
+  {
+    funcSig: '0xd610b570',
+    key: 'addEntries',
+    signature: 'addEntries(OrganLibrary.Entry[])',
+    label: 'Add entries',
+    tags: ['entries', 'add'],
+    params: ['entries'],
+    target: 'organ'
+  },
+  {
+    funcSig: '0x7615eb81',
+    key: 'removeEntries',
+    signature: 'removeEntries(uint256[])',
+    label: 'Remove entries',
+    tags: ['entries', 'remove'],
+    params: ['indexes'],
+    target: 'organ'
+  },
+  {
+    funcSig: '0x62f7f997',
+    key: 'replaceEntry',
+    signature: 'replaceEntry(uint256,CoreLibrary.Entry)',
+    label: 'Replace entry',
+    tags: ['entries', 'replace'],
+    params: ['index', 'entry'],
+    target: 'organ'
+  },
+  {
+    funcSig: '0x7f0a4e27',
+    key: 'addProcedure',
+    signature: 'addProcedure(address,bytes2)',
+    label: 'Add permission',
+    tags: ['procedures', 'add'],
+    params: ['procedure', 'permissions'],
+    target: 'organ'
+  },
+  {
+    funcSig: '0x19b9404c',
+    key: 'removeProcedure',
+    signature: 'removeProcedure(address)',
+    label: 'Remove permission',
+    tags: ['procedures', 'remove'],
+    params: ['procedure'],
+    target: 'organ'
+  },
+  {
+    funcSig: '0xd0922d4a',
+    key: 'replaceProcedure',
+    signature: 'replaceProcedure(address,address,bytes2)',
+    label: 'Replace permission',
+    tags: ['procedures', 'replace'],
+    params: ['procedure', 'procedure', 'permissions'],
+    target: 'organ'
+  },
+  {
+    funcSig: '0xa9059cbb',
+    key: 'withdrawEther',
+    signature: 'transfer(address,uint256)',
+    label: 'Withdraw ether',
+    tags: ['transfer', 'withdraw', 'ether'],
+    params: ['address', 'amount'],
+    target: 'organ'
+  },
+  {
+    funcSig: '0xf49b5848',
+    key: 'withdrawERC20',
+    signature: 'transferCoins(address,address,address,uint256)',
+    label: 'Withdraw ERC20',
+    tags: ['transfer', 'withdraw', 'coins', 'erc20'],
+    params: ['address', 'address', 'address', 'amount'],
+    target: 'organ'
+  },
+  {
+    funcSig: '0xbdb3e1c4',
+    key: 'withdrawERC721',
+    signature: 'transferCollectible(address,address,address,uint256)',
+    label: 'Withdraw ERC721',
+    tags: ['transfer', 'withdraw', 'collectibles', 'erc721'],
+    params: ['address', 'address', 'address', 'tokenId'],
+    target: 'organ'
+  }
+]
+
 export class Procedure {
-  static INTERFACE = '0x71dbd330' // Procedure.INTERFACE_ID
+  static INTERFACE = '0x71dbd330'
 
   // @todo : Implement a registry.
-  static OPERATIONS_FUNCTIONS: ProcedureProposalOperationFunction[] = [
-    {
-      funcSig: '0x4d3f8407',
-      key: 'updateCid',
-      signature: 'updateCid(string)',
-      label: 'Update cid',
-      tags: ['cid', 'replace'],
-      params: ['cid'],
-      target: 'organ'
-    },
-    {
-      funcSig: '0xd610b570',
-      key: 'addEntries',
-      signature: 'addEntries(OrganLibrary.Entry[])',
-      label: 'Add entries',
-      tags: ['entries', 'add'],
-      params: ['entries'],
-      target: 'organ'
-    },
-    {
-      funcSig: '0x7615eb81',
-      key: 'removeEntries',
-      signature: 'removeEntries(uint256[])',
-      label: 'Remove entries',
-      tags: ['entries', 'remove'],
-      params: ['indexes'],
-      target: 'organ'
-    },
-    {
-      funcSig: '0x62f7f997',
-      key: 'replaceEntry',
-      signature: 'replaceEntry(uint256,CoreLibrary.Entry)',
-      label: 'Replace entry',
-      tags: ['entries', 'replace'],
-      params: ['index', 'entry'],
-      target: 'organ'
-    },
-    {
-      funcSig: '0x7f0a4e27',
-      key: 'addProcedure',
-      signature: 'addProcedure(address,bytes2)',
-      label: 'Add procedure',
-      tags: ['procedures', 'add'],
-      params: ['procedure', 'permissions'],
-      target: 'organ'
-    },
-    {
-      funcSig: '0x19b9404c',
-      key: 'removeProcedure',
-      signature: 'removeProcedure(address)',
-      label: 'Remove procedure',
-      tags: ['procedures', 'remove'],
-      params: ['procedure'],
-      target: 'organ'
-    },
-    {
-      funcSig: '0xd0922d4a',
-      key: 'replaceProcedure',
-      signature: 'replaceProcedure(address,address,bytes2)',
-      label: 'Replace procedure',
-      tags: ['procedures', 'replace'],
-      params: ['procedure', 'procedure', 'permissions'],
-      target: 'organ'
-    },
-    {
-      funcSig: '0xa9059cbb',
-      key: 'withdrawEther',
-      signature: 'transfer(address,uint256)',
-      label: 'Withdraw ether',
-      tags: ['transfer', 'withdraw', 'ether'],
-      params: ['address', 'amount'],
-      target: 'organ'
-    },
-    {
-      funcSig: '0xf49b5848',
-      key: 'withdrawERC20',
-      signature: 'transferCoins(address,address,address,uint256)',
-      label: 'Withdraw ERC20',
-      tags: ['transfer', 'withdraw', 'coins', 'erc20'],
-      params: ['address', 'address', 'address', 'amount'],
-      target: 'organ'
-    },
-    {
-      funcSig: '0xbdb3e1c4',
-      key: 'withdrawERC721',
-      signature: 'transferCollectible(address,address,address,uint256)',
-      label: 'Withdraw ERC721',
-      tags: ['transfer', 'withdraw', 'collectibles', 'erc721'],
-      params: ['address', 'address', 'address', 'tokenId'],
-      target: 'organ'
-    }
-  ]
+  static OPERATIONS_FUNCTIONS: ProcedureProposalOperationFunction[] =
+    procedureFunctions
 
   name: string
   description: string
   address: string
-  typeName: string
+  typeName: ProcedureTypeName
   cid: string
   isDeployed: boolean
   deciders: string
   proposers: string
   withModeration: boolean
-  moderators?: string
-  metadata: unknown
+  moderators: string
+  metadata: string
+  data: string
   forwarder: string
   proposals: ProcedureProposal[]
   _contract: ethers.Contract
   salt?: string
-  chainId?: string
+  chainId: string
   signer?: ethers.Signer
   provider?: ethers.Provider
+  organigramId: string
 
-  // Helper variables in the context of an organigram
   sourceOrgans?: SourceOrgan[]
   targetOrgans?: TargetOrgan[]
+  type: ProcedureType
 
   constructor({
     address,
@@ -311,13 +373,22 @@ export class Procedure {
     proposals,
     isDeployed,
     sourceOrgans,
-    targetOrgans
+    targetOrgans,
+    type,
+    data,
+    organigramId
   }: ProcedureInput) {
-    if (!chainId && (!address || !forwarder)) {
+    if (typeName == null || deciders == null) {
       throw new Error(
-        'Either chainId or address and forwarder must be provided to procedure constructor.'
+        'typeName and deciders are required to create a procedure.'
       )
     }
+    if (!(typeName in ProcedureTypeNameEnum)) {
+      throw new Error(
+        `typeName must be one of ${Object.values(ProcedureTypeNameEnum).join(', ')}.`
+      )
+    }
+
     this.salt = salt ?? (isDeployed ? undefined : createRandom32BytesHexId())
     this.address =
       address ??
@@ -327,15 +398,16 @@ export class Procedure {
         salt: this.salt!
       })
     this.deciders = deciders
-    this.typeName = typeName ?? 'Procedure'
+    this.typeName = typeName as 'nomination'
     this.isDeployed = isDeployed ?? false
-    this.cid = cid ?? ''
+    this.cid = cid ?? this.typeName
     this.name = name ?? 'Unnamed procedure'
     this.description = description ?? ''
-    this.chainId = chainId
-    this.metadata = metadata
+    this.chainId = chainId ?? '11155111'
+    this.organigramId = organigramId ?? 'default-organigram-id'
+    this.metadata = metadata ?? '{}'
     this.proposers = proposers ?? deciders
-    this.moderators = moderators
+    this.moderators = moderators ?? ethers.ZeroAddress
     this.withModeration = withModeration ?? false
     this.forwarder =
       forwarder ?? deployedAddresses[chainId as '11155111']?.MetaGasStation
@@ -366,20 +438,12 @@ export class Procedure {
     )
     this.sourceOrgans = sourceOrgans ?? []
     this.targetOrgans = targetOrgans ?? []
+    this.type = type!
+    this.data = data!
   }
 
   static async _populateInitialize(
-    _address: string,
-    _options: {
-      signer: ethers.Signer
-    } & TransactionOptions,
-    _metadata: string,
-    _proposers: string,
-    _moderators: string,
-    _deciders: string,
-    _withModeration: boolean,
-    _forwarder: string,
-    ..._args: unknown[]
+    _populateInitializeInput: PopulateInitializeInput
   ): Promise<ethers.ContractTransaction> {
     // @dev : initialize() must be overriden in procedure class.
     throw new Error('Procedure cannot be initialized.')
@@ -504,9 +568,12 @@ export class Procedure {
       moderators: data.moderators,
       deciders: data.deciders,
       withModeration: data.withModeration,
-      forwarder: data.forwarder,
+      forwarder:
+        data.forwarder ??
+        deployedAddresses[chainId as '11155111']?.MetaGasStation,
       proposals,
-      isDeployed: true
+      isDeployed: true,
+      typeName: 'nomination'
     })
   }
 
@@ -666,16 +733,16 @@ export class Procedure {
     return tx
   }
 
-  async propose(
-    cid: string,
-    operations: ProcedureProposalOperation[],
+  async propose(input: {
+    cid: string
+    operations: ProcedureProposalOperation[]
     options?: TransactionOptions
-  ): Promise<ProcedureProposal> {
+  }): Promise<ProcedureProposal> {
     const signerOrProvider = this.signer ?? this.provider
     if (signerOrProvider == null) {
       throw new Error('Not connected.')
     }
-    const ops = operations.map(operation => {
+    const ops = input.operations.map(operation => {
       // Format operation for transaction call.
       return {
         index:
@@ -688,11 +755,11 @@ export class Procedure {
         processed: false
       }
     })
-    const tx = await this._contract.propose(cid, ops)
-    if (options?.onTransaction != null) {
-      options.onTransaction(
+    const tx = await this._contract.propose(input.cid, ops)
+    if (input.options?.onTransaction != null) {
+      input.options.onTransaction(
         tx,
-        `Create proposal with CID ${cid} on procedure ${this.address}`
+        `Create proposal with CID ${input.cid} on procedure ${this.address}`
       )
     }
     const receipt = await tx.wait()
@@ -815,5 +882,28 @@ export class Procedure {
     this.deciders = data.deciders
     this.withModeration = data.withModeration
     return this
+  }
+
+  toJson(): ProcedureJson {
+    return {
+      chainId: this.chainId!,
+      data: this.data,
+      address: this.address,
+      typeName: this.typeName,
+      name: this.name,
+      description: this.description,
+      cid: this.cid,
+      isDeployed: this.isDeployed,
+      deciders: this.deciders,
+      proposers: this.proposers,
+      moderators: this.moderators ?? ethers.ZeroAddress,
+      withModeration: this.withModeration,
+      forwarder: this.forwarder,
+      metadata: this.metadata,
+      proposals: this.proposals,
+      sourceOrgans: this.sourceOrgans,
+      targetOrgans: this.targetOrgans,
+      type: this.type
+    }
   }
 }

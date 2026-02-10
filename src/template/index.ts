@@ -7,10 +7,10 @@ import {
   createRandom32BytesHexId,
   predictContractAddress
 } from '../utils'
-import { OrganigramJson } from '../organigram'
-import { OrganJson } from '../organ'
-import { ProcedureJson } from '../procedure'
-import { AssetJson } from '../asset'
+import { OrganigramInput } from '../organigram'
+import { OrganInput } from '../organ'
+import { ProcedureInput } from '../procedure'
+import { AssetInput } from '../asset'
 
 export const templates = {
   // forProfit,
@@ -19,8 +19,8 @@ export const templates = {
   none
 }
 
-const renewSalts = <T extends { salt?: string }>(
-  pv: Record<string, string>,
+const renewSalts = <T extends { salt?: string | null }>(
+  pv: Record<string, any>,
   cv: T
 ): Record<string, string> =>
   Object.assign(pv, { [cv.salt!]: createRandom32BytesHexId() })
@@ -28,38 +28,38 @@ const renewSalts = <T extends { salt?: string }>(
 const renewAddresses =
   <
     T extends {
-      address: string
-      typeName?: string
-      chainId?: string
-      salt?: string
+      address?: string | null
+      salt?: string | null
+      typeName?: string | null
+      chainId?: string | null
     }
   >(
-    _: Record<string, string>,
+    salts: Record<string, string>,
     type: string,
     chainId: string
   ) =>
   (pv: Record<string, string>, cv: T): Record<string, string> =>
     Object.assign(pv, {
-      [cv.address]: predictContractAddress({
+      [cv.address!]: predictContractAddress({
         type:
           type === 'Procedure'
             ? ((capitalize(cv.typeName!) + type) as 'NominationProcedure')
             : (type as 'Organ'),
         chainId: cv.chainId! ?? chainId,
-        salt: cv.salt!
+        salt: salts[cv.salt!]
       })
     })
 
 export const renewSaltsAndAddresses = (
-  organigram: OrganigramJson,
+  organigram: OrganigramInput,
   chainId: string
 ) => {
   const newOrganSalts =
-    organigram.organs?.reduce(renewSalts<OrganJson>, {}) ?? {}
+    organigram.organs?.reduce(renewSalts<OrganInput>, {}) ?? {}
   const newAssetSalts =
-    organigram.assets?.reduce(renewSalts<AssetJson>, {}) ?? {}
+    organigram.assets?.reduce(renewSalts<AssetInput>, {}) ?? {}
   const newProcedureSalts =
-    organigram.procedures?.reduce(renewSalts<ProcedureJson>, {}) ?? {}
+    organigram.procedures?.reduce(renewSalts<ProcedureInput>, {}) ?? {}
   const newOrganAddresses =
     organigram.organs?.reduce(
       renewAddresses(newOrganSalts, 'Organ', chainId),
@@ -103,7 +103,7 @@ export const renewSaltsAndAddresses = (
     ...asset,
     chainId,
     salt: newAssetSalts[asset.salt!],
-    address: newAssetAddresses[asset.address]
+    address: newAssetAddresses[asset.address!]
   }))
 
   return {

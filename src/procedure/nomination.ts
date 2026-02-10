@@ -1,85 +1,61 @@
 import { ethers } from 'ethers'
 import NominationProcedureContractABI from '@organigram/protocol/artifacts/contracts/procedures/Nomination.sol/NominationProcedure.json'
 
-import { Procedure, ProcedureInput } from '.'
+import {
+  PopulateInitializeInput,
+  Procedure,
+  ProcedureInput,
+  ProcedureTypeName
+} from '.'
 import { TransactionOptions } from '../organigramClient'
+import { deployedAddresses } from '../utils'
 
+export const nomination = {
+  key: 'nomination',
+  address: deployedAddresses[11155111].NominationProcedure,
+  metadata: {
+    label: 'Nomination',
+    description:
+      'A nomination allows any user in the source organ to directly add, remove or replace one or many entries, assets or procedures in the target organ.'
+  }
+}
 export class NominationProcedure extends Procedure {
   static INTERFACE = '0xc5f28e49' // nominate() signature.
   contract: ethers.Contract
+  type = nomination
+  typeName = 'nomination' as ProcedureTypeName
 
   // Constructor needs to call Procedure constructor.
-  constructor({
-    cid,
-    address,
-    chainId,
-    signerOrProvider,
-    metadata,
-    proposers,
-    moderators,
-    deciders,
-    withModeration,
-    forwarder,
-    proposals,
-    isDeployed,
-    salt,
-    contract,
-    sourceOrgans,
-    targetOrgans
-  }: ProcedureInput & { contract?: ethers.Contract }) {
-    super({
-      cid,
-      address,
-      chainId,
-      signerOrProvider,
-      metadata,
-      proposers,
-      moderators,
-      deciders,
-      withModeration,
-      forwarder,
-      proposals,
-      isDeployed,
-      salt,
-      sourceOrgans,
-      targetOrgans
-    })
+  constructor(procedureInput: ProcedureInput & { contract?: ethers.Contract }) {
+    super({ ...procedureInput, typeName: 'nomination', type: nomination })
     this.contract =
-      contract ??
+      procedureInput.contract ??
       new ethers.Contract(
         this.address,
         NominationProcedureContractABI.abi,
-        signerOrProvider
+        procedureInput.signerOrProvider
       )
   }
 
   // _populateInitialize() overrides Procedure _populateInitialize.
   static async _populateInitialize(
-    type: string,
-    options: { signer: ethers.Signer } & TransactionOptions,
-    cid: string,
-    proposers: string,
-    moderators: string,
-    deciders: string,
-    _withModeration: Boolean,
-    forwarder: string,
-    ..._args: any[]
+    input: PopulateInitializeInput
   ): Promise<ethers.ContractTransaction> {
-    if (options.signer == null) {
+    if (input.options?.signer == null) {
       throw new Error('Not connected.')
     }
     const contract = new ethers.Contract(
-      type,
+      nomination.address,
       NominationProcedureContractABI.abi,
-      options.signer
+      input.options.signer
     )
     return await contract.initialize.populateTransaction(
-      cid,
-      proposers,
-      moderators,
-      deciders,
-      false,
-      forwarder
+      input.cid ?? 'nomination',
+      input.proposers ?? input.deciders ?? ethers.ZeroAddress,
+      input.moderators ?? ethers.ZeroAddress,
+      input.deciders,
+      input.withModeration ?? false,
+      input.forwarder ?? deployedAddresses[11155111].MetaGasStation
     )
   }
 
@@ -113,7 +89,8 @@ export class NominationProcedure extends Procedure {
       proposals: procedure.proposals,
       isDeployed: true,
       salt: procedure.salt,
-      contract
+      contract,
+      typeName: 'nomination'
     })
   }
 
@@ -122,9 +99,7 @@ export class NominationProcedure extends Procedure {
     options?: TransactionOptions
   ): Promise<boolean> {
     // @todo Check gasLimit amount
-    const tx = await this.contract.nominate(proposalKey, {
-      gasLimit: '1000000'
-    })
+    const tx = await this.contract.nominate(proposalKey)
     if (options?.onTransaction != null) {
       options.onTransaction(tx, 'Initialize Nomination procedure.')
     }

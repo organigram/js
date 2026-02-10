@@ -3,7 +3,7 @@ import OrganContractABI from '@organigram/protocol/artifacts/contracts/Organ.sol
 
 import {
   createRandom32BytesHexId,
-  EMPTY_ADDRESS,
+  deployedAddresses,
   predictContractAddress
 } from './utils'
 import type { TransactionOptions } from './organigramClient'
@@ -25,34 +25,42 @@ export interface OrganPermission {
   permissionValue: number
 }
 
-export interface OrganData {
-  address: string
-  chainId: string
-  signerOrProvider: ethers.Signer | ethers.Provider
-  balance: bigint
-  cid: string
-  permissions: OrganPermission[]
-  entries: OrganEntry[]
-}
-
-export interface OrganInput extends Partial<OrganData> {
-  salt?: string
-  isDeployed?: boolean
-  name?: string
-  description?: string
-  isSource?: SourceOrgan[]
-  isTarget?: TargetOrgan[]
+export interface OrganInput {
+  address?: string | null
+  chainId?: string | null
+  signerOrProvider?: ethers.Signer | ethers.Provider | null
+  balance?: bigint | null
+  cid?: string | null
+  permissions?: OrganPermission[] | null
+  entries?: Array<{
+    index: string
+    address: string
+    cid: string
+  }> | null
+  salt?: string | null
+  isDeployed?: boolean | null
+  name?: string | null
+  description?: string | null
+  isSource?: SourceOrgan[] | null
+  isTarget?: TargetOrgan[] | null
+  organigramId?: string | null
+  forwarder?: string | null
 }
 
 export interface OrganJson {
   address: string
-  entries?: OrganEntry[]
-  permissions?: OrganPermission[]
-  name?: string
-  description?: string
-  cid?: string
-  salt?: string
-  chainId?: string
+  name: string
+  isDeployed: boolean
+  description: string
+  cid: string
+  entries: OrganEntry[]
+  permissions: OrganPermission[]
+  salt?: string | null
+  chainId: string
+  organigramId: string
+  isSource: SourceOrgan[]
+  isTarget: TargetOrgan[]
+  balance: bigint
 }
 
 export enum OrganFunctionName {
@@ -72,16 +80,18 @@ export class Organ {
   name: string
   description: string
   address: string
-  salt?: string
-  chainId?: string
+  salt: string | undefined
+  chainId: string
   balance: bigint
   permissions: OrganPermission[] = []
   cid: string
   entries: OrganEntry[] = []
-  signer?: Signer
-  provider?: ethers.Provider
+  signer: Signer | undefined
+  provider: ethers.Provider | undefined
   contract: ethers.Contract
   isDeployed: boolean
+  organigramId: string
+  forwarder: string
 
   // State variables that are helpful in the context of an organigram
   isSource: SourceOrgan[]
@@ -100,24 +110,26 @@ export class Organ {
     name,
     description,
     isSource,
-    isTarget
+    isTarget,
+    organigramId,
+    forwarder
   }: OrganInput) {
-    if (!address && !chainId) {
-      throw new Error('Either address or chainId must be provided to organ constructor.')
-    }
     this.name = name ?? 'Unnamed Organ'
     this.description = description ?? 'This organ does not have a description.'
     this.isDeployed = isDeployed ?? false
     this.salt =
-      (salt ?? this.isDeployed) ? undefined : createRandom32BytesHexId()
-    this.chainId = chainId
+      salt || (this.isDeployed ? undefined : createRandom32BytesHexId())
+    this.chainId = chainId ?? '11155111'
     this.address =
       address ??
       predictContractAddress({
         type: 'Organ',
-        chainId: chainId!,
+        chainId: this.chainId,
         salt: this.salt!
       })
+    this.organigramId = organigramId ?? 'default-organigram-id'
+    this.forwarder =
+      forwarder ?? deployedAddresses[this.chainId as '11155111']?.MetaGasStation
     this.balance = balance ?? 0n
     this.permissions = permissions ?? []
     this.cid = cid ?? ''
@@ -177,7 +189,7 @@ export class Organ {
           return undefined
         }
         return {
-          addr: e.address ?? EMPTY_ADDRESS,
+          addr: e.address ?? ethers.ZeroAddress,
           cid: e.cid
         }
       })
@@ -233,7 +245,7 @@ export class Organ {
   public addPermission = async (
     permission: OrganPermission,
     options?: TransactionOptions
-  ): Promise<ethers.Transaction> => {
+  ): Promise<ethers.ContractTransactionReceipt> => {
     const permissions = `0x${permission.permissionValue
       .toString(16)
       .padStart(4, '0')}`
@@ -498,7 +510,7 @@ export class Organ {
             )
             return null
           })
-          if (entry != null && entry.address !== EMPTY_ADDRESS) {
+          if (entry != null && entry.address !== ethers.ZeroAddress) {
             return entry
           }
         }
@@ -582,6 +594,24 @@ export class Organ {
     const data = await Organ.loadData(this.address, signerOrProvider)
     this.cid = data?.cid
     return this
+  }
+
+  toJson(): OrganJson {
+    return {
+      address: this.address,
+      name: this.name,
+      description: this.description,
+      cid: this.cid,
+      entries: this.entries,
+      permissions: this.permissions,
+      salt: this.salt,
+      chainId: this.chainId ?? '',
+      organigramId: this.organigramId ?? '',
+      isSource: this.isSource,
+      isTarget: this.isTarget,
+      isDeployed: this.isDeployed,
+      balance: this.balance
+    }
   }
 }
 

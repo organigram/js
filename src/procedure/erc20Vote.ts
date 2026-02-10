@@ -1,7 +1,40 @@
 import { ethers } from 'ethers'
-import { Procedure, type Election, ProcedureInput } from '.'
+import {
+  Procedure,
+  type Election,
+  ProcedureInput,
+  procedureMetadata,
+  PopulateInitializeInput,
+  ProcedureTypeName
+} from '.'
 import ERC20VoteProcedureContractABI from '@organigram/protocol/artifacts/contracts/procedures/ERC20Vote.sol/ERC20VoteProcedure.json'
 import { TransactionOptions } from '../organigramClient'
+import { electionFields } from './vote'
+import { deployedAddresses } from '../utils'
+
+export const erc20Vote = {
+  address: deployedAddresses[11155111].ERC20VoteProcedure,
+  key: 'erc20Vote',
+  fields: {
+    ...electionFields,
+    erc20: {
+      name: 'erc20',
+      label: 'ERC20 Token',
+      description:
+        'Address of the ERC20 Token used for weighting the voting power.',
+      defaultValue: '',
+      type: 'string'
+    }
+  },
+  metadata: {
+    ...procedureMetadata,
+    cid: 'erc20Vote',
+    label: 'Token-weighted Vote',
+    description:
+      'A token vote allows any user in the source organ to vote on proposals, where its voting power is based on the amount of tokens it holds.',
+    type: 'erc20Vote'
+  }
+}
 
 export type ERC20VoteProcedureInput = ProcedureInput & {
   erc20: string
@@ -19,47 +52,19 @@ export class ERC20VoteProcedure extends Procedure {
   majoritySize: string
   elections: Election[]
   contract: ethers.Contract
+  type = erc20Vote
+  typeName = 'erc20Vote' as ProcedureTypeName
 
   // Constructor needs to call Procedure constructor.
   constructor({
-    cid,
-    salt,
-    address,
-    chainId,
-    signerOrProvider,
-    metadata,
-    proposers,
-    moderators,
-    deciders,
-    withModeration,
-    forwarder,
-    proposals,
-    isDeployed,
     erc20,
     quorumSize,
     voteDuration,
     majoritySize,
     elections,
-    sourceOrgans,
-    targetOrgans
+    ...procedureArguments
   }: ERC20VoteProcedureInput) {
-    super({
-      cid,
-      address,
-      chainId,
-      signerOrProvider,
-      metadata,
-      proposers,
-      moderators,
-      deciders,
-      withModeration,
-      forwarder,
-      proposals,
-      isDeployed,
-      salt,
-      sourceOrgans,
-      targetOrgans
-    })
+    super({ ...procedureArguments, typeName: 'erc20Vote', type: erc20Vote })
     this.erc20 = erc20
     this.quorumSize = quorumSize
     this.voteDuration = voteDuration
@@ -68,40 +73,30 @@ export class ERC20VoteProcedure extends Procedure {
     this.contract = new ethers.Contract(
       this.address,
       ERC20VoteProcedureContractABI.abi,
-      signerOrProvider
+      procedureArguments.signerOrProvider
     )
   }
 
-  // _populateInitialize() overrides Procedure _populateInitialize.
   static async _populateInitialize(
-    type: string,
-    options: { signer: ethers.Signer } & TransactionOptions,
-    cid: string,
-    proposers: string,
-    moderators: string,
-    deciders: string,
-    withModeration: boolean,
-    forwarder: string,
-    erc20: string,
-    quorumSize: string,
-    voteDuration: string,
-    majoritySize: string
+    input: PopulateInitializeInput
   ): Promise<ethers.ContractTransaction> {
-    if (options.signer == null) {
+    if (input.options?.signer == null) {
       throw new Error('Not connected.')
     }
+    const [erc20, quorumSize, voteDuration, majoritySize] =
+      input.args as string[]
     const contract = new ethers.Contract(
-      type,
+      erc20Vote.address,
       ERC20VoteProcedureContractABI.abi,
-      options.signer
+      input.options.signer
     )
     return await contract.initialize.populateTransaction(
-      cid,
-      proposers,
-      moderators,
-      deciders,
-      withModeration,
-      forwarder,
+      input.cid,
+      input.proposers,
+      input.moderators,
+      input.deciders,
+      input.withModeration,
+      input.forwarder,
       erc20,
       quorumSize,
       voteDuration,
@@ -227,7 +222,9 @@ export class ERC20VoteProcedure extends Procedure {
       quorumSize: quorumSize.toString(),
       voteDuration: voteDuration.toString(),
       majoritySize: majoritySize.toString(),
-      elections
+      elections,
+      typeName: 'erc20Vote',
+      type: erc20Vote
     })
   }
 

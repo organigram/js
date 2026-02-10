@@ -1,27 +1,59 @@
 import { ethers } from 'ethers'
-import { Procedure, type ProcedureProposal, type Election } from '../procedure'
+import {
+  Procedure,
+  type ProcedureProposal,
+  type Election,
+  ProcedureInput,
+  ProcedureTypeName,
+  PopulateInitializeInput
+} from '../procedure'
 import VoteProcedureContractABI from '@organigram/protocol/artifacts/contracts/procedures/Vote.sol/VoteProcedure.json'
 import { type TransactionOptions } from '../organigramClient'
-import { predictContractAddress } from '../utils'
+import { deployedAddresses, predictContractAddress } from '../utils'
 
-export type VoteProcedureInput = {
-  cid: string
-  address?: string
-  chainId: string
-  signerOrProvider: ethers.Signer | ethers.Provider
-  metadata: unknown
-  proposers: string
-  moderators?: string
-  deciders: string
-  withModeration: boolean
-  forwarder: string
-  proposals: ProcedureProposal[]
-  isDeployed: boolean
+export const electionFields = {
+  quorumSize: {
+    name: 'quorumSize',
+    label: 'Quorum size',
+    description:
+      'Size of the quorum required to start a vote. Accepts a percentage of the total of voters, with three decimals precision. Default: 20.001%',
+    defaultValue: '20001',
+    type: 'number'
+  },
+  voteDuration: {
+    name: 'voteDuration',
+    label: 'Vote duration',
+    description:
+      'Duration of the vote phase, as a number of seconds. Default: 3600 seconds (1 hour)',
+    defaultValue: '3600',
+    type: 'number'
+  },
+  majoritySize: {
+    name: 'majoritySize',
+    label: 'Majority size',
+    description:
+      'Size of the majority required to pass a proposal. Accepts a percentage of the total of voters, with three decimals precision. Default: 50.001%',
+    defaultValue: '50001',
+    type: 'number'
+  }
+}
+
+export const vote = {
+  key: 'vote',
+  address: deployedAddresses[11155111].VoteProcedure,
+  metadata: {
+    label: 'Simple Majority Vote',
+    description:
+      'A vote allows any user in the source organ to vote on proposals to add, edit or replace one or many entries, assets or procedures in the target organ.'
+  },
+  fields: electionFields
+}
+
+export type VoteProcedureInput = ProcedureInput & {
   quorumSize: string
   voteDuration: string
   majoritySize: string
   elections: Election[]
-  salt?: string
 }
 export class VoteProcedure extends Procedure {
   static INTERFACE = '0xc9d27afe' // vote() signature.
@@ -30,47 +62,28 @@ export class VoteProcedure extends Procedure {
   voteDuration: string
   majoritySize: string
   elections: Election[]
+  typeName: ProcedureTypeName = 'vote'
+  type = vote
 
   // Constructor needs to call Procedure constructor.
   constructor({
-    cid,
-    address,
-    chainId,
-    signerOrProvider,
-    metadata,
-    proposers,
-    moderators,
-    deciders,
-    withModeration,
-    forwarder,
-    proposals,
-    isDeployed,
     quorumSize,
     voteDuration,
     majoritySize,
     elections,
-    salt
+    salt,
+    ...procedureInput
   }: VoteProcedureInput) {
     super({
-      cid,
-      address,
-      chainId,
-      signerOrProvider,
-      metadata,
-      proposers,
-      moderators,
-      deciders,
-      withModeration,
-      forwarder,
-      proposals,
-      isDeployed,
-      salt
+      ...procedureInput,
+      typeName: 'vote',
+      type: vote
     })
     this.address =
-      address ??
+      procedureInput.address ??
       predictContractAddress({
         type: 'VoteProcedure',
-        chainId,
+        chainId: procedureInput.chainId!,
         salt: this.salt as string
       })
     this.quorumSize = quorumSize
@@ -80,44 +93,48 @@ export class VoteProcedure extends Procedure {
     this.contract = new ethers.Contract(
       this.address,
       VoteProcedureContractABI.abi,
-      signerOrProvider
+      procedureInput.signerOrProvider
     )
   }
 
   // _populateInitialize() overrides Procedure _populateInitialize.
   // @ts-ignore
   static async _populateInitialize(
-    type: string,
-    options: { signer: ethers.Signer } & TransactionOptions,
-    cid: string,
-    proposers: string,
-    moderators: string,
-    deciders: string,
-    withModeration: boolean,
-    forwarder: string,
-    quorumSize: string,
-    voteDuration: string,
-    majoritySize: string
+    input: PopulateInitializeInput
   ): Promise<ethers.ContractTransaction> {
-    if (options.signer == null) {
+    if (input.options?.signer == null) {
       throw new Error('Not connected.')
     }
+    const [quorumSize, voteDuration, majoritySize] = input.args as string[]
+    if (!quorumSize || !voteDuration || !majoritySize) {
+      throw new Error(
+        'Missing some required election parameters. Received:' +
+          input.args.join(',')
+      )
+    }
     const contract = new ethers.Contract(
-      type,
+      vote.address,
       VoteProcedureContractABI.abi,
-      options.signer
+      input.options.signer
     )
-    return await contract.initialize.populateTransaction(
-      cid,
-      proposers,
-      moderators,
-      deciders,
-      withModeration,
-      forwarder,
-      quorumSize,
-      voteDuration,
-      majoritySize
-    )
+
+    const chainId = await input.options.signer.provider
+      ?.getNetwork()
+      .then(n => n.chainId.toString())
+    const args = [
+      input.cid ?? 'vote',
+      input.proposers,
+      input.moderators ?? ethers.ZeroAddress,
+      input.deciders,
+      input.withModeration ?? false,
+      input.forwarder ??
+        deployedAddresses[(chainId ?? '11155111') as '11155111'].MetaGasStation,
+      parseInt(quorumSize, 16),
+      parseInt(voteDuration, 16),
+      parseInt(majoritySize, 16),
+      input.options
+    ]
+    return await contract.initialize.populateTransaction(...args)
   }
 
   static async loadElection(
@@ -223,7 +240,7 @@ export class VoteProcedure extends Procedure {
       cid: procedure.cid,
       address: procedure.address,
       chainId: chainId?.toString()!,
-      signerOrProvider,
+      signerOrProvider: signerOrProvider as ethers.Signer,
       metadata: procedure.metadata,
       proposers: procedure.proposers,
       moderators: procedure.moderators,
@@ -235,7 +252,9 @@ export class VoteProcedure extends Procedure {
       quorumSize: quorumSize.toString(),
       voteDuration: voteDuration.toString(),
       majoritySize: majoritySize.toString(),
-      elections
+      elections,
+      typeName: 'vote',
+      type: vote
     })
   }
 
