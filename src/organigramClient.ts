@@ -8,7 +8,7 @@ import {
   PERMISSIONS
 } from './utils'
 
-import Organ, { OrganPermission } from './organ'
+import Organ, { OrganEntry, OrganPermission } from './organ'
 import {
   PopulateInitializeInput,
   Procedure,
@@ -23,6 +23,7 @@ import { vote, VoteProcedure } from './procedure/vote'
 export interface DeployOrganInput {
   cid?: string
   permissions?: OrganPermission[]
+  entries?: OrganEntry[]
   salt?: string
   options?: TransactionOptions
 }
@@ -350,7 +351,7 @@ export class OrganigramClient {
 
   // Create and load an organ.
   async deployOrgan(input?: DeployOrganInput): Promise<Organ> {
-    const { cid, permissions, salt, options } = input ?? {}
+    const { cid, permissions, salt, entries, options } = input ?? {}
     if (this.signer == null) {
       throw new Error('Signer not connected.')
     }
@@ -374,10 +375,16 @@ export class OrganigramClient {
         ethers.zeroPadValue(ethers.toBeHex(p.permissionValue), 2)
       )
     })
+    const _entries =
+      entries?.map((e: OrganEntry) => ({
+        addr: e.address,
+        cid: e.cid ?? ''
+      })) ?? []
     const tx = await this.contract.deployOrgan(
       _permissionAddresses,
       _permissionValues,
       cid ?? '',
+      _entries,
       _salt,
       {
         nonce,
@@ -417,10 +424,16 @@ export class OrganigramClient {
           ethers.zeroPadValue(ethers.toBeHex(p.permissionValue), 2)
         )
       })
+      const entries =
+        organ.entries?.map((e: OrganEntry) => ({
+          addr: e.address,
+          cid: e.cid ?? ''
+        })) ?? []
       return {
         permissionAddresses: _permissionAddresses,
         permissionValues: _permissionValues,
         cid: organ.cid ?? '',
+        entries,
         salt: organ.salt ?? createRandom32BytesHexId()
       }
     })
@@ -574,47 +587,6 @@ export class OrganigramClient {
     }
     return address
   }
-
-  // async _initializeProcedure(
-  //   address: string,
-  //   type: string,
-  //   options: TransactionOptions,
-  //   metadata: string,
-  //   proposers: string,
-  //   moderators: string,
-  //   deciders: string,
-  //   withModeration: boolean,
-  //   forwarder: string,
-  //   ...args: unknown[]
-  // ): Promise<Procedure> {
-  //   if (this.signer == null) {
-  //     throw new Error('Signer not connected.')
-  //   }
-  //   const initialize = await this._populateInitializeProcedure(
-  //     type,
-  //     options,
-  //     metadata,
-  //     proposers,
-  //     moderators,
-  //     deciders,
-  //     withModeration,
-  //     forwarder,
-  //     ...args
-  //   )
-  //   if (initialize?.data == null) {
-  //     throw new Error('Could not initialize procedure.')
-  //   }
-  //   const tx = await this.signer.sendTransaction({
-  //     from: this.signer.getAddress(),
-  //     to: address,
-  //     data: initialize.data
-  //   })
-  //   if (options?.onTransaction != null) {
-  //     options.onTransaction(tx, `Initialize procedure ${address}`)
-  //   }
-  //   await tx.wait()
-  //   return await this.getProcedure(address, true)
-  // }
 
   async _populateInitializeProcedure(
     input: PopulateInitializeInput
