@@ -33,8 +33,8 @@ export const renewSaltsAndAddresses = (organigram, chainId) => {
     const procedures = organigram.procedures?.map(procedure => ({
         ...procedure,
         salt: newProcedureSalts[procedure.salt],
-        address: newProcedureAddresses[procedure.address],
         chainId,
+        address: newProcedureAddresses[procedure.address],
         deciders: newOrganAddresses[procedure.deciders],
         proposers: newOrganAddresses[procedure.proposers],
         moderators: procedure.moderators

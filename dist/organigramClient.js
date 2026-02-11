@@ -158,7 +158,7 @@ export class OrganigramClient {
         return procedure;
     }
     async deployOrgan(input) {
-        const { cid, permissions, salt, options } = input ?? {};
+        const { cid, permissions, salt, entries, options } = input ?? {};
         if (this.signer == null) {
             throw new Error('Signer not connected.');
         }
@@ -178,7 +178,11 @@ export class OrganigramClient {
             _permissionAddresses.push(p.permissionAddress);
             _permissionValues.push(ethers.zeroPadValue(ethers.toBeHex(p.permissionValue), 2));
         });
-        const tx = await this.contract.deployOrgan(_permissionAddresses, _permissionValues, cid ?? '', _salt, {
+        const _entries = entries?.map((e) => ({
+            addr: e.address,
+            cid: e.cid ?? ''
+        })) ?? [];
+        const tx = await this.contract.deployOrgan(_permissionAddresses, _permissionValues, cid ?? '', _entries, _salt, {
             nonce,
             customData: options?.customData
         });

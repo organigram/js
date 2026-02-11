@@ -1,10 +1,11 @@
 import { ethers, type ContractTransaction } from 'ethers';
-import Organ, { OrganPermission } from './organ';
+import Organ, { OrganEntry, OrganPermission } from './organ';
 import { PopulateInitializeInput, Procedure, ProcedureType, ProcedureTypeName } from './procedure';
 import { Organigram } from './organigram';
 export interface DeployOrganInput {
     cid?: string;
     permissions?: OrganPermission[];
+    entries?: OrganEntry[];
     salt?: string;
     options?: TransactionOptions;
 }

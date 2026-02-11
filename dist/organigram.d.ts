@@ -82,6 +82,6 @@ export declare class Organigram {
         discover: boolean;
         limit: number;
     }) => Promise<void>;
-    deploy(): Promise<import("ethers").ContractTransaction>;
+    deploy(): Promise<void>;
     toJson: () => OrganigramJson;
 }

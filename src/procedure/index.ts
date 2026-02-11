@@ -64,7 +64,7 @@ export type ProcedureJson = {
   args?: unknown[]
   sourceOrgans?: SourceOrgan[]
   targetOrgans?: TargetOrgan[]
-  type: ProcedureType
+  type: ProcedureType,
 }
 
 export type Election = {
@@ -903,7 +903,7 @@ export class Procedure {
       proposals: this.proposals,
       sourceOrgans: this.sourceOrgans,
       targetOrgans: this.targetOrgans,
-      type: this.type
+      type: this.type,
     }
   }
 }

@@ -163,9 +163,9 @@ export class VoteProcedure extends Procedure {
             forwarder: procedure.forwarder,
             proposals,
             isDeployed: true,
-            quorumSize: quorumSize.toString(),
-            voteDuration: voteDuration.toString(),
-            majoritySize: majoritySize.toString(),
+            quorumSize: quorumSize?.toString(),
+            voteDuration: voteDuration?.toString(),
+            majoritySize: majoritySize?.toString(),
             elections,
             typeName: 'vote',
             type: vote

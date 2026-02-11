@@ -487,7 +487,7 @@ export class Procedure {
             proposals: this.proposals,
             sourceOrgans: this.sourceOrgans,
             targetOrgans: this.targetOrgans,
-            type: this.type
+            type: this.type,
         };
     }
 }

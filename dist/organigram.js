@@ -163,7 +163,9 @@ export class Organigram {
         if (!this.organigramClient) {
             throw new Error('Organigram client not set.');
         }
-        return await this.organigramClient.deployOrganigram(this);
+        return await this.organigramClient
+            .deployOrganigram(this)
+            .then(async () => await this?.load());
     }
     toJson = () => JSON.parse(JSON.stringify({
         id: this.id,

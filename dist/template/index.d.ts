@@ -52,8 +52,8 @@ export declare const renewSaltsAndAddresses: (organigram: OrganigramInput, chain
     }[];
     procedures: {
         salt: string;
-        address: string;
         chainId: string;
+        address: string;
         deciders: string;
         proposers: string;
         moderators: string | undefined;
@@ -125,8 +125,8 @@ export declare const getTemplate: (templateName: keyof typeof templates, chainId
     }[];
     procedures: {
         salt: string;
-        address: string;
         chainId: string;
+        address: string;
         deciders: string;
         proposers: string;
         moderators: string | undefined;
