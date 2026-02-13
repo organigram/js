@@ -2,7 +2,7 @@ import { Signer } from 'ethers';
 import { Asset, AssetInput, AssetJson } from './asset';
 import Organ, { OrganInput, OrganJson } from './organ';
 import { Procedure, ProcedureInput, ProcedureJson } from './procedure';
-import OrganigramClient, { DeployOrganigramInput } from './organigramClient';
+import OrganigramClient from './organigramClient';
 import { templates } from './template';
 export type SourceOrganTypeName = 'proposers' | 'moderators' | 'deciders' | 'target';
 export type SourceOrgan = {
@@ -41,7 +41,6 @@ export declare const getProcedureSourcesAndTargets: (procedure: ProcedureInput, 
 export declare const getOrganSourcesAndTargets: (organ: OrganInput, organigram: Organigram) => OrganJson;
 export declare const getAssetSourcesAndTargets: (asset: Asset, organigram: Organigram) => Asset;
 export declare const getSourcesAndTargets: (initialOrganigram: OrganigramInput) => OrganigramJson;
-export declare const makeOrganigramDeployArgument: (organigram: Organigram, signer?: Signer) => DeployOrganigramInput;
 export type OrganigramInput = {
     id?: string | null;
     slug?: string | null;
@@ -78,10 +77,9 @@ export declare class Organigram {
     setOrgans(organs: Organ[]): void;
     setAssets(assets: Asset[]): void;
     setProcedures(procedures: Procedure[]): void;
-    load: (options?: {
-        discover: boolean;
-        limit: number;
-    }) => Promise<void>;
-    deploy(): Promise<void>;
+    load: (input?: {
+        signer?: Signer | null;
+    }) => Promise<Organigram>;
+    deploy(): Promise<Organigram>;
     toJson: () => OrganigramJson;
 }

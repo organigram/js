@@ -227,7 +227,7 @@ export class Procedure {
         }
         return proposals;
     }
-    static async load(address, signerOrProvider) {
+    static async load(address, signerOrProvider, initialProcedure) {
         const provider = signerOrProvider.provider ?? signerOrProvider;
         if (provider == null) {
             throw new Error('No provider found.');
@@ -246,6 +246,8 @@ export class Procedure {
         const data = await Procedure.loadData(address, signerOrProvider);
         const proposals = await Procedure.loadProposals(address, signerOrProvider);
         return new Procedure({
+            ...initialProcedure,
+            typeName: initialProcedure?.typeName ?? 'nomination',
             cid: data.cid,
             address,
             chainId,
@@ -257,9 +259,7 @@ export class Procedure {
             withModeration: data.withModeration,
             forwarder: data.forwarder ??
                 deployedAddresses[chainId]?.MetaGasStation,
-            proposals,
-            isDeployed: true,
-            typeName: 'nomination'
+            proposals
         });
     }
     static _stringifyParamType(type) {
@@ -487,7 +487,7 @@ export class Procedure {
             proposals: this.proposals,
             sourceOrgans: this.sourceOrgans,
             targetOrgans: this.targetOrgans,
-            type: this.type,
+            type: this.type
         };
     }
 }

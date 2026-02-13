@@ -107,7 +107,7 @@ export declare class ERC20VoteProcedure extends Procedure {
     static _populateInitialize(input: PopulateInitializeInput): Promise<ethers.ContractTransaction>;
     static loadElection(address: string, proposalKey: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<Election>;
     static loadElections(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<Election[]>;
-    static load(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<ERC20VoteProcedure>;
+    static load(address: string, signerOrProvider: ethers.Signer | ethers.Provider, initialProcedure?: ProcedureInput): Promise<ERC20VoteProcedure>;
     erc20Balance(account?: string): Promise<bigint>;
     vote(proposalKey: string, approval: boolean, options: TransactionOptions): Promise<boolean>;
     count(proposalKey: string): Promise<boolean>;

@@ -25,6 +25,6 @@ export declare class NominationProcedure extends Procedure {
         contract?: ethers.Contract;
     });
     static _populateInitialize(input: PopulateInitializeInput): Promise<ethers.ContractTransaction>;
-    static load(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<NominationProcedure>;
+    static load(address: string, signerOrProvider: ethers.Signer | ethers.Provider, initialProcedure?: ProcedureInput): Promise<NominationProcedure>;
     nominate(proposalKey: string, options?: TransactionOptions): Promise<boolean>;
 }

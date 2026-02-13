@@ -1,6 +1,6 @@
 import { ethers, type ContractTransaction } from 'ethers';
-import Organ, { OrganEntry, OrganPermission } from './organ';
-import { PopulateInitializeInput, Procedure, ProcedureType, ProcedureTypeName } from './procedure';
+import Organ, { OrganEntry, OrganInput, OrganPermission } from './organ';
+import { Procedure, ProcedureInput, ProcedureType, ProcedureTypeName } from './procedure';
 import { Organigram } from './organigram';
 export interface DeployOrganInput {
     cid?: string;
@@ -45,90 +45,6 @@ export interface File {
     cid: string;
     data: unknown;
 }
-export declare const procedureTypes: {
-    erc20Vote: {
-        address: string;
-        key: string;
-        fields: {
-            erc20: {
-                name: string;
-                label: string;
-                description: string;
-                defaultValue: string;
-                type: string;
-            };
-            quorumSize: {
-                name: string;
-                label: string;
-                description: string;
-                defaultValue: string;
-                type: string;
-            };
-            voteDuration: {
-                name: string;
-                label: string;
-                description: string;
-                defaultValue: string;
-                type: string;
-            };
-            majoritySize: {
-                name: string;
-                label: string;
-                description: string;
-                defaultValue: string;
-                type: string;
-            };
-        };
-        metadata: {
-            cid: string;
-            label: string;
-            description: string;
-            type: string;
-            _type: string;
-            _generator: string;
-            _generatedAt: number;
-        };
-    };
-    nomination: {
-        key: string;
-        address: string;
-        metadata: {
-            label: string;
-            description: string;
-        };
-    };
-    vote: {
-        key: string;
-        address: string;
-        metadata: {
-            label: string;
-            description: string;
-        };
-        fields: {
-            quorumSize: {
-                name: string;
-                label: string;
-                description: string;
-                defaultValue: string;
-                type: string;
-            };
-            voteDuration: {
-                name: string;
-                label: string;
-                description: string;
-                defaultValue: string;
-                type: string;
-            };
-            majoritySize: {
-                name: string;
-                label: string;
-                description: string;
-                defaultValue: string;
-                type: string;
-            };
-        };
-    };
-};
 export declare class OrganigramClient {
     address: string;
     chainId: string;
@@ -151,43 +67,27 @@ export declare class OrganigramClient {
         addr: string;
         cid?: string;
     }, provider: ethers.Provider): Promise<ProcedureType>;
-    static loadProcedureTypes(provider: ethers.Provider): Promise<ProcedureType[]>;
+    static loadProcedureTypes({ address, provider }: {
+        provider: ethers.Provider;
+        address?: string;
+    }): Promise<ProcedureType[]>;
     static load(input: {
+        address?: string;
         provider: ethers.Provider;
         signer?: ethers.Signer;
     }): Promise<OrganigramClient>;
     getProcedureType(procedureAddress: string): Promise<ProcedureType | null>;
-    getOrgan(address: string, cached?: boolean): Promise<Organ>;
-    getProcedure(address: string, cached?: boolean): Promise<Procedure>;
+    getOrgan(address: string, cached?: boolean, initialOrgan?: OrganInput): Promise<Organ>;
+    getProcedure(address: string, cached?: boolean, initialProcedure?: ProcedureInput): Promise<Procedure>;
     deployOrgan(input?: DeployOrganInput): Promise<Organ>;
-    _prepareDeployOrgansInput(deployOrgansInput: DeployOrganInput[]): {
-        permissionAddresses: string[];
-        permissionValues: string[];
-        cid: string;
-        salt: string;
-    }[];
     deployOrgans(deployOrgansInput: DeployOrganInput[]): Promise<Organ[]>;
     deployAsset(name: string, symbol: string, initialSupply: number, salt?: string, options?: TransactionOptions): Promise<string>;
     deployAssets(assets: DeployAssetInput[], options?: TransactionOptions): Promise<string[]>;
-    _deployProcedure({ typeAddress, initialize, salt, options }: {
-        typeAddress: string;
-        initialize: ethers.ContractTransaction;
-        salt?: string;
-        options?: TransactionOptions;
-    }): Promise<string | null>;
-    _populateInitializeProcedure(input: PopulateInitializeInput): Promise<ContractTransaction>;
     deployProcedure(input: DeployProceduresInput): Promise<Procedure>;
-    _prepareDeployProceduresInput(deployProceduresInput: DeployProceduresInput[]): Promise<{
-        procedureType: string;
-        data: string;
-        salt: string;
-        options: TransactionOptions | undefined;
-    }[]>;
     deployProcedures(deployProceduresInput: DeployProceduresInput[]): Promise<Procedure[]>;
     deployOrganigram(input: DeployOrganigramInput): Promise<ContractTransaction>;
-    loadOrganigram(organigram: Organigram, cached?: boolean, options?: {
-        discover: boolean;
-        limit: number;
-    }): Organigram;
+    loadContract(address: string, cached?: boolean): Promise<Organ | Procedure | null>;
+    loadContracts(contractAddresses: string[]): Promise<Organigram>;
+    loadOrganigram(organigram: Organigram, cached?: boolean): Promise<Organigram>;
 }
 export default OrganigramClient;

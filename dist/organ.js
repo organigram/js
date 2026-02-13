@@ -49,7 +49,7 @@ export class Organ {
         this.organigramId = organigramId ?? 'default-organigram-id';
         this.forwarder =
             forwarder ?? deployedAddresses[this.chainId]?.MetaGasStation;
-        this.balance = balance ?? 0n;
+        this.balance = balance ?? '0n';
         this.permissions = permissions ?? [];
         this.cid = cid ?? '';
         this.entries = entries ?? [];
@@ -145,29 +145,35 @@ export class Organ {
         }
         return await tx.wait();
     };
-    static async load(address, signerOrProvider) {
+    static async load(address, signerOrProvider, initialOrgan) {
         const provider = signerOrProvider.provider ?? signerOrProvider;
         const network = signerOrProvider.provider != null ? await provider?.getNetwork() : null;
         const chainId = network?.chainId.toString() ?? '1';
         if (chainId == null) {
-            throw new Error('No chainId found.');
+            throw new Error('Cannot load organ: No chainId found.');
+        }
+        if (!address) {
+            throw new Error('Cannot load organ: No address provided.');
         }
         const data = await Organ.loadData(address, signerOrProvider);
-        const balance = (await provider?.getBalance(address).catch(() => 0n)) ?? 0n;
+        const balance = await provider
+            ?.getBalance(address)
+            .then(balance => balance.toString())
+            .catch(() => '0n');
         const permissions = await Organ.loadPermissions(address, signerOrProvider);
         const entries = await Organ.loadEntries(address, signerOrProvider).catch((error) => {
             console.warn(error.message);
             return [];
         });
         return new Organ({
+            ...initialOrgan,
             address,
             chainId,
             signerOrProvider,
             balance,
             permissions,
             cid: data?.cid,
-            entries,
-            isDeployed: true
+            entries
         });
     }
     static async isOrgan(address, signerOrProvider) {
@@ -298,22 +304,20 @@ export class Organ {
         this.cid = data?.cid;
         return this;
     }
-    toJson() {
-        return {
-            address: this.address,
-            name: this.name,
-            description: this.description,
-            cid: this.cid,
-            entries: this.entries,
-            permissions: this.permissions,
-            salt: this.salt,
-            chainId: this.chainId ?? '',
-            organigramId: this.organigramId ?? '',
-            isSource: this.isSource,
-            isTarget: this.isTarget,
-            isDeployed: this.isDeployed,
-            balance: this.balance
-        };
-    }
+    toJson = () => JSON.parse(JSON.stringify({
+        address: this.address,
+        name: this.name,
+        description: this.description,
+        cid: this.cid,
+        entries: this.entries,
+        permissions: this.permissions,
+        salt: this.salt,
+        chainId: this.chainId ?? '',
+        organigramId: this.organigramId ?? '',
+        isSource: this.isSource,
+        isTarget: this.isTarget,
+        isDeployed: this.isDeployed,
+        balance: this.balance.toString() + 'n'
+    }));
 }
 export default Organ;

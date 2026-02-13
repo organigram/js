@@ -195,7 +195,7 @@ export declare class Procedure {
     }>;
     static loadProposal(address: string, proposalKey: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<ProcedureProposal>;
     static loadProposals(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<ProcedureProposal[]>;
-    static load(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<Procedure>;
+    static load(address: string, signerOrProvider: ethers.Signer | ethers.Provider, initialProcedure?: ProcedureInput): Promise<Procedure>;
     static _stringifyParamType(type: OperationParamType): string;
     static _extractParams(types: OperationParamType[], operation?: ProcedureProposalOperation): OperationParam[];
     static parseOperation(_operation: unknown): ProcedureProposalOperation;

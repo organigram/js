@@ -1,6 +1,12 @@
 import deployedAddresses from '@organigram/protocol/deployments.json';
 import { ethers } from 'ethers';
 export { deployedAddresses };
+export const handleJsonBigInt = (key, value) => {
+    if (typeof value === 'bigint') {
+        return value.toString() + 'n';
+    }
+    return value;
+};
 export function cloneInitCodeHash(implementation) {
     const impl = implementation.toLowerCase().replace(/^0x/, '');
     const initCode = '0x3d602d80600a3d3981f3' +

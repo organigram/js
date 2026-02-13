@@ -28,7 +28,7 @@ export class NominationProcedure extends Procedure {
         const contract = new ethers.Contract(nomination.address, NominationProcedureContractABI.abi, input.options.signer);
         return await contract.initialize.populateTransaction(input.cid ?? 'nomination', input.proposers ?? input.deciders ?? ethers.ZeroAddress, input.moderators ?? ethers.ZeroAddress, input.deciders, input.withModeration ?? false, input.forwarder ?? deployedAddresses[11155111].MetaGasStation);
     }
-    static async load(address, signerOrProvider) {
+    static async load(address, signerOrProvider, initialProcedure) {
         const procedure = await Procedure.load(address, signerOrProvider);
         if (!procedure)
             throw new Error('Not a valid procedure.');
@@ -38,6 +38,7 @@ export class NominationProcedure extends Procedure {
                 .then(n => n.chainId));
         const contract = new ethers.Contract(address, NominationProcedureContractABI.abi, signerOrProvider);
         return new NominationProcedure({
+            ...initialProcedure,
             cid: procedure.cid,
             address: procedure.address,
             chainId: chainId?.toString(),
@@ -49,7 +50,6 @@ export class NominationProcedure extends Procedure {
             withModeration: procedure.withModeration,
             forwarder: procedure.forwarder,
             proposals: procedure.proposals,
-            isDeployed: true,
             salt: procedure.salt,
             contract,
             typeName: 'nomination'

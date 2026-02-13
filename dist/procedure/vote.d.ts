@@ -104,7 +104,7 @@ export declare class VoteProcedure extends Procedure {
     static _populateInitialize(input: PopulateInitializeInput): Promise<ethers.ContractTransaction>;
     static loadElection(address: string, proposalKey: string, signer: ethers.Signer): Promise<Election>;
     static loadElections(address: string, signer: ethers.Signer): Promise<Election[]>;
-    static load(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<VoteProcedure>;
+    static load(address: string, signerOrProvider: ethers.Signer | ethers.Provider, initialProcedure?: ProcedureInput): Promise<VoteProcedure>;
     vote(proposalKey: string, approval: boolean, options?: TransactionOptions): Promise<boolean>;
     count(proposalKey: string): Promise<boolean>;
 }

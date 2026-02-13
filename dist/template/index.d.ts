@@ -35,7 +35,7 @@ export declare const renewSaltsAndAddresses: (organigram: OrganigramInput, chain
             permissionValue: number;
         }[] | undefined;
         signerOrProvider?: import("ethers").Signer | import("ethers").Provider | null;
-        balance?: bigint | null;
+        balance?: string | null;
         cid?: string | null;
         entries?: Array<{
             index: string;
@@ -108,7 +108,7 @@ export declare const getTemplate: (templateName: keyof typeof templates, chainId
             permissionValue: number;
         }[] | undefined;
         signerOrProvider?: import("ethers").Signer | import("ethers").Provider | null;
-        balance?: bigint | null;
+        balance?: string | null;
         cid?: string | null;
         entries?: Array<{
             index: string;

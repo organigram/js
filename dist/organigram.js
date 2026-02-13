@@ -1,3 +1,4 @@
+import OrganigramClient from './organigramClient';
 import { getTemplate, templates } from './template';
 export const sourceOrganTypes = [
     { label: 'Create proposals', name: 'proposers' },
@@ -102,9 +103,6 @@ export const getSourcesAndTargets = (initialOrganigram) => {
     const assets = initialOrganigram.assets?.map(asset => getAssetSourcesAndTargets(asset, initialOrganigram));
     return { ...initialOrganigram, organs, procedures, assets };
 };
-export const makeOrganigramDeployArgument = (organigram, signer) => {
-    return {};
-};
 export const defaultChainId = '11155111';
 export class Organigram {
     id;
@@ -153,11 +151,20 @@ export class Organigram {
     setOrgans(organs) { }
     setAssets(assets) { }
     setProcedures(procedures) { }
-    load = async (options = {
-        discover: true,
-        limit: 100
-    }) => {
-        this.organigramClient?.loadOrganigram(this, undefined, options);
+    load = async (input) => {
+        const { signer } = input ?? {};
+        if (!this.organigramClient && !this.signer && !signer) {
+            throw new Error('Cannot load organigram: neither Organigram client or signer are set.');
+        }
+        if ([...this.procedures, ...this.organs].every(item => item.isDeployed !== true)) {
+            return this;
+        }
+        const client = this.organigramClient ??
+            new OrganigramClient({
+                signer: signer ?? this.signer,
+                provider: signer?.provider ?? this.signer?.provider
+            });
+        return await client.loadOrganigram(this, false);
     };
     async deploy() {
         if (!this.organigramClient) {

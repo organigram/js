@@ -18,7 +18,7 @@ export interface OrganInput {
     address?: string | null;
     chainId?: string | null;
     signerOrProvider?: ethers.Signer | ethers.Provider | null;
-    balance?: bigint | null;
+    balance?: string | null;
     cid?: string | null;
     permissions?: OrganPermission[] | null;
     entries?: Array<{
@@ -48,7 +48,7 @@ export interface OrganJson {
     organigramId: string;
     isSource: SourceOrgan[];
     isTarget: TargetOrgan[];
-    balance: bigint;
+    balance: string;
 }
 export declare enum OrganFunctionName {
     addEntries = 0,
@@ -68,7 +68,7 @@ export declare class Organ {
     address: string;
     salt: string | undefined;
     chainId: string;
-    balance: bigint;
+    balance: string;
     permissions: OrganPermission[];
     cid: string;
     entries: OrganEntry[];
@@ -88,7 +88,7 @@ export declare class Organ {
     addPermission: (permission: OrganPermission, options?: TransactionOptions) => Promise<ethers.ContractTransactionReceipt>;
     removePermission: (permission: string, options?: TransactionOptions) => Promise<ethers.Transaction>;
     replacePermission: (oldPermissionAddress: string, newOrganPermission: OrganPermission, options?: TransactionOptions) => Promise<ethers.Transaction>;
-    static load(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<Organ>;
+    static load(address: string, signerOrProvider: ethers.Signer | ethers.Provider, initialOrgan?: OrganInput): Promise<Organ>;
     static isOrgan(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<boolean>;
     static getBalance(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<bigint>;
     static loadData(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<{
@@ -108,6 +108,6 @@ export declare class Organ {
     reloadEntries(): Promise<Organ>;
     reloadPermissions(): Promise<Organ>;
     reloadData(): Promise<Organ>;
-    toJson(): OrganJson;
+    toJson: () => OrganJson;
 }
 export default Organ;

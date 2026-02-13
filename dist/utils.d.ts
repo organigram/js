@@ -1,6 +1,7 @@
 import deployedAddresses from '@organigram/protocol/deployments.json';
 export { deployedAddresses };
 export type ContractName = 'Organ' | 'Asset' | 'ERC20VoteProcedure' | 'VoteProcedure' | 'NominationProcedure' | 'OrganigramClient';
+export declare const handleJsonBigInt: (key: string, value: any) => any;
 export declare function cloneInitCodeHash(implementation: string): string;
 export declare const predictContractAddress: ({ type, chainId, salt }: {
     type: Omit<ContractName, "OrganigramClient">;
