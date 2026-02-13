@@ -64,7 +64,7 @@ export type ProcedureJson = {
   args?: unknown[]
   sourceOrgans?: SourceOrgan[]
   targetOrgans?: TargetOrgan[]
-  type: ProcedureType,
+  type: ProcedureType
 }
 
 export type Election = {
@@ -532,7 +532,8 @@ export class Procedure {
 
   static async load(
     address: string,
-    signerOrProvider: ethers.Signer | ethers.Provider
+    signerOrProvider: ethers.Signer | ethers.Provider,
+    initialProcedure?: ProcedureInput
   ): Promise<Procedure> {
     const provider =
       signerOrProvider.provider ?? (signerOrProvider as ethers.Provider)
@@ -559,6 +560,8 @@ export class Procedure {
       signerOrProvider
     )
     return new Procedure({
+      ...initialProcedure,
+      typeName: initialProcedure?.typeName ?? 'nomination',
       cid: data.cid,
       address,
       chainId,
@@ -571,9 +574,7 @@ export class Procedure {
       forwarder:
         data.forwarder ??
         deployedAddresses[chainId as '11155111']?.MetaGasStation,
-      proposals,
-      isDeployed: true,
-      typeName: 'nomination'
+      proposals
     })
   }
 
@@ -903,7 +904,7 @@ export class Procedure {
       proposals: this.proposals,
       sourceOrgans: this.sourceOrgans,
       targetOrgans: this.targetOrgans,
-      type: this.type,
+      type: this.type
     }
   }
 }

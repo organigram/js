@@ -200,7 +200,8 @@ export class VoteProcedure extends Procedure {
 
   static async load(
     address: string,
-    signerOrProvider: ethers.Signer | ethers.Provider
+    signerOrProvider: ethers.Signer | ethers.Provider,
+    initialProcedure?: ProcedureInput
   ): Promise<VoteProcedure> {
     const procedure = await Procedure.load(address, signerOrProvider)
     if (!procedure) throw new Error('Not a valid procedure.')
@@ -237,6 +238,7 @@ export class VoteProcedure extends Procedure {
         .getNetwork()
         .then(n => n.chainId))
     return new VoteProcedure({
+      ...initialProcedure,
       cid: procedure.cid,
       address: procedure.address,
       chainId: chainId?.toString()!,
@@ -248,7 +250,6 @@ export class VoteProcedure extends Procedure {
       withModeration: procedure.withModeration,
       forwarder: procedure.forwarder,
       proposals,
-      isDeployed: true,
       quorumSize: quorumSize?.toString(),
       voteDuration: voteDuration?.toString(),
       majoritySize: majoritySize?.toString(),

@@ -29,7 +29,7 @@ export interface OrganInput {
   address?: string | null
   chainId?: string | null
   signerOrProvider?: ethers.Signer | ethers.Provider | null
-  balance?: bigint | null
+  balance?: string | null
   cid?: string | null
   permissions?: OrganPermission[] | null
   entries?: Array<{
@@ -60,7 +60,7 @@ export interface OrganJson {
   organigramId: string
   isSource: SourceOrgan[]
   isTarget: TargetOrgan[]
-  balance: bigint
+  balance: string
 }
 
 export enum OrganFunctionName {
@@ -82,7 +82,7 @@ export class Organ {
   address: string
   salt: string | undefined
   chainId: string
-  balance: bigint
+  balance: string
   permissions: OrganPermission[] = []
   cid: string
   entries: OrganEntry[] = []
@@ -130,7 +130,7 @@ export class Organ {
     this.organigramId = organigramId ?? 'default-organigram-id'
     this.forwarder =
       forwarder ?? deployedAddresses[this.chainId as '11155111']?.MetaGasStation
-    this.balance = balance ?? 0n
+    this.balance = balance ?? '0n'
     this.permissions = permissions ?? []
     this.cid = cid ?? ''
     this.entries = entries ?? []
@@ -305,7 +305,8 @@ export class Organ {
   /* Static API */
   static async load(
     address: string,
-    signerOrProvider: ethers.Signer | ethers.Provider
+    signerOrProvider: ethers.Signer | ethers.Provider,
+    initialOrgan?: OrganInput
   ): Promise<Organ> {
     const provider =
       signerOrProvider.provider ?? (signerOrProvider as ethers.Provider)
@@ -313,14 +314,20 @@ export class Organ {
       signerOrProvider.provider != null ? await provider?.getNetwork() : null
     const chainId = network?.chainId.toString() ?? '1'
     if (chainId == null) {
-      throw new Error('No chainId found.')
+      throw new Error('Cannot load organ: No chainId found.')
+    }
+    if (!address) {
+      throw new Error('Cannot load organ: No address provided.')
     }
     // const isOrgan: boolean = await Organ.isOrgan(address, signerOrProvider)
     // if (!isOrgan) {
     //   throw new Error('Contract at address is not an Organ.')
     // }
     const data = await Organ.loadData(address, signerOrProvider)
-    const balance = (await provider?.getBalance(address).catch(() => 0n)) ?? 0n
+    const balance = await provider
+      ?.getBalance(address)
+      .then(balance => balance.toString())
+      .catch(() => '0n')
     const permissions: OrganPermission[] = await Organ.loadPermissions(
       address,
       signerOrProvider
@@ -333,14 +340,14 @@ export class Organ {
     )
 
     return new Organ({
+      ...initialOrgan,
       address,
       chainId,
       signerOrProvider,
       balance,
       permissions,
       cid: data?.cid,
-      entries,
-      isDeployed: true
+      entries
     })
   }
 
@@ -596,23 +603,24 @@ export class Organ {
     return this
   }
 
-  toJson(): OrganJson {
-    return {
-      address: this.address,
-      name: this.name,
-      description: this.description,
-      cid: this.cid,
-      entries: this.entries,
-      permissions: this.permissions,
-      salt: this.salt,
-      chainId: this.chainId ?? '',
-      organigramId: this.organigramId ?? '',
-      isSource: this.isSource,
-      isTarget: this.isTarget,
-      isDeployed: this.isDeployed,
-      balance: this.balance
-    }
-  }
+  toJson = (): OrganJson =>
+    JSON.parse(
+      JSON.stringify({
+        address: this.address,
+        name: this.name,
+        description: this.description,
+        cid: this.cid,
+        entries: this.entries,
+        permissions: this.permissions,
+        salt: this.salt,
+        chainId: this.chainId ?? '',
+        organigramId: this.organigramId ?? '',
+        isSource: this.isSource,
+        isTarget: this.isTarget,
+        isDeployed: this.isDeployed,
+        balance: this.balance.toString() + 'n'
+      })
+    )
 }
 
 export default Organ

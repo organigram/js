@@ -61,7 +61,8 @@ export class NominationProcedure extends Procedure {
 
   static async load(
     address: string,
-    signerOrProvider: ethers.Signer | ethers.Provider
+    signerOrProvider: ethers.Signer | ethers.Provider,
+    initialProcedure?: ProcedureInput
   ): Promise<NominationProcedure> {
     const procedure = await Procedure.load(address, signerOrProvider)
     if (!procedure) throw new Error('Not a valid procedure.')
@@ -76,6 +77,7 @@ export class NominationProcedure extends Procedure {
       signerOrProvider
     )
     return new NominationProcedure({
+      ...initialProcedure,
       cid: procedure.cid,
       address: procedure.address,
       chainId: chainId?.toString()!,
@@ -87,7 +89,7 @@ export class NominationProcedure extends Procedure {
       withModeration: procedure.withModeration,
       forwarder: procedure.forwarder,
       proposals: procedure.proposals,
-      isDeployed: true,
+      // isDeployed: true,
       salt: procedure.salt,
       contract,
       typeName: 'nomination'

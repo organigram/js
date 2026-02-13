@@ -3,7 +3,7 @@ import { Signer } from 'ethers'
 import { Asset, AssetInput, AssetJson } from './asset'
 import Organ, { OrganInput, OrganJson } from './organ'
 import { Procedure, ProcedureInput, ProcedureJson } from './procedure'
-import OrganigramClient, { DeployOrganigramInput } from './organigramClient'
+import OrganigramClient from './organigramClient'
 import { getTemplate, templates } from './template'
 
 export type SourceOrganTypeName =
@@ -194,13 +194,6 @@ export const getSourcesAndTargets = (
   return { ...initialOrganigram, organs, procedures, assets } as OrganigramJson
 }
 
-export const makeOrganigramDeployArgument = (
-  organigram: Organigram,
-  signer?: Signer
-): DeployOrganigramInput => {
-  return {} as DeployOrganigramInput
-}
-
 export type OrganigramInput = {
   id?: string | null
   slug?: string | null
@@ -272,14 +265,30 @@ export class Organigram {
   setAssets(assets: Asset[]) {}
   setProcedures(procedures: Procedure[]) {}
 
-  load = async (
-    options: { discover: boolean; limit: number } = {
-      discover: true,
-      limit: 100
+  load = async (input?: {
+    signer?: Signer | null
+    // options?: { discover: boolean; limit: number }
+  }): Promise<Organigram> => {
+    const { signer } = input ?? {}
+    if (!this.organigramClient && !this.signer && !signer) {
+      throw new Error(
+        'Cannot load organigram: neither Organigram client or signer are set.'
+      )
     }
-  ) => {
-    // If no argument, reload organigram
-    this.organigramClient?.loadOrganigram(this, undefined, options)
+    if (
+      [...this.procedures, ...this.organs].every(
+        item => item.isDeployed !== true
+      )
+    ) {
+      return this
+    }
+    const client =
+      this.organigramClient ??
+      new OrganigramClient({
+        signer: signer ?? this.signer!,
+        provider: signer?.provider ?? this.signer?.provider!
+      })
+    return await client.loadOrganigram(this, false)!
   }
 
   async deploy() {

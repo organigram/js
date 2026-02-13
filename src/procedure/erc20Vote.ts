@@ -167,7 +167,8 @@ export class ERC20VoteProcedure extends Procedure {
 
   static async load(
     address: string,
-    signerOrProvider: ethers.Signer | ethers.Provider
+    signerOrProvider: ethers.Signer | ethers.Provider,
+    initialProcedure?: ProcedureInput
   ): Promise<ERC20VoteProcedure> {
     const procedure = await Procedure.load(address, signerOrProvider)
     if (!procedure) throw new Error('Not a valid procedure.')
@@ -206,6 +207,7 @@ export class ERC20VoteProcedure extends Procedure {
       ?.getNetwork()
       .then(n => n.chainId)
     return new ERC20VoteProcedure({
+      ...initialProcedure,
       cid: procedure.cid,
       address: procedure.address,
       chainId: chainId?.toString()!,
@@ -217,7 +219,7 @@ export class ERC20VoteProcedure extends Procedure {
       withModeration: procedure.withModeration,
       forwarder: procedure.forwarder,
       proposals,
-      isDeployed: true,
+      // isDeployed: true,
       erc20: erc20?.toString(),
       quorumSize: quorumSize?.toString(),
       voteDuration: voteDuration?.toString(),

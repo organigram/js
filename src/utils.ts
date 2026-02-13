@@ -11,6 +11,13 @@ export type ContractName =
   | 'NominationProcedure'
   | 'OrganigramClient'
 
+export const handleJsonBigInt = (key: string, value: any) => {
+  if (typeof value === 'bigint') {
+    return value.toString() + 'n'
+  }
+  return value
+}
+
 export function cloneInitCodeHash(implementation: string): string {
   const impl = implementation.toLowerCase().replace(/^0x/, '')
 
