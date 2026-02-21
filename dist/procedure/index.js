@@ -1,17 +1,7 @@
 import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json';
 import { ethers } from 'ethers';
-import { capitalize, createRandom32BytesHexId, deployedAddresses, predictContractAddress } from '../utils';
-export const procedureMetadata = {
-    _type: 'procedureType',
-    _generator: 'https://organigram.ai',
-    _generatedAt: 0
-};
-export var ProcedureTypeNameEnum;
-(function (ProcedureTypeNameEnum) {
-    ProcedureTypeNameEnum["erc20Vote"] = "erc20Vote";
-    ProcedureTypeNameEnum["nomination"] = "nomination";
-    ProcedureTypeNameEnum["vote"] = "vote";
-})(ProcedureTypeNameEnum || (ProcedureTypeNameEnum = {}));
+import { capitalize, createRandom32BytesHexId, deployedAddresses, handleJsonBigInt, predictContractAddress } from '../utils';
+import { ProcedureTypeNameEnum, procedureTypes } from './utils';
 export const procedureFunctions = [
     {
         funcSig: '0x4d3f8407',
@@ -51,29 +41,29 @@ export const procedureFunctions = [
     },
     {
         funcSig: '0x7f0a4e27',
-        key: 'addProcedure',
-        signature: 'addProcedure(address,bytes2)',
+        key: 'addPermission',
+        signature: 'addPermission(address,bytes2)',
         label: 'Add permission',
-        tags: ['procedures', 'add'],
-        params: ['procedure', 'permissions'],
+        tags: ['permissions', 'add'],
+        params: ['permissionAddress', 'permissionValue'],
         target: 'organ'
     },
     {
         funcSig: '0x19b9404c',
-        key: 'removeProcedure',
-        signature: 'removeProcedure(address)',
+        key: 'removePermission',
+        signature: 'removePermission(address)',
         label: 'Remove permission',
-        tags: ['procedures', 'remove'],
-        params: ['procedure'],
+        tags: ['permissions', 'remove'],
+        params: ['permissionAddress'],
         target: 'organ'
     },
     {
         funcSig: '0xd0922d4a',
-        key: 'replaceProcedure',
-        signature: 'replaceProcedure(address,address,bytes2)',
+        key: 'replacePermission',
+        signature: 'replacePermission(address,address,bytes2)',
         label: 'Replace permission',
-        tags: ['procedures', 'replace'],
-        params: ['procedure', 'procedure', 'permissions'],
+        tags: ['permissions', 'replace'],
+        params: ['oldPermissionAddress', 'newPermissionAddress', 'permissionValue'],
         target: 'organ'
     },
     {
@@ -142,7 +132,7 @@ export class Procedure {
             address ??
                 predictContractAddress({
                     type: (capitalize(typeName) + 'Procedure'),
-                    chainId: chainId,
+                    chainId: chainId ?? '11155111',
                     salt: this.salt
                 });
         this.deciders = deciders;
@@ -184,7 +174,8 @@ export class Procedure {
         this._contract = new ethers.Contract(this.address, ProcedureContractABI.abi, signerOrProvider);
         this.sourceOrgans = sourceOrgans ?? [];
         this.targetOrgans = targetOrgans ?? [];
-        this.type = type;
+        this.type =
+            type ?? procedureTypes[this.typeName];
         this.data = data;
     }
     static async _populateInitialize(_populateInitializeInput) {
@@ -270,7 +261,7 @@ export class Procedure {
                 return 'uint256';
             case 'indexes':
                 return 'uint256[]';
-            case 'permissions':
+            case 'permissionValue':
                 return 'bytes2';
             case 'addresses':
                 return 'address[]';
@@ -278,7 +269,11 @@ export class Procedure {
                 return 'address';
             case 'organ':
                 return 'address';
-            case 'procedure':
+            case 'permissionAddress':
+                return 'address';
+            case 'oldPermissionAddress':
+                return 'address';
+            case 'newPermissionAddress':
                 return 'address';
             case 'proposal':
                 return 'uint256';
@@ -468,26 +463,25 @@ export class Procedure {
         this.withModeration = data.withModeration;
         return this;
     }
-    toJson() {
-        return {
-            chainId: this.chainId,
-            data: this.data,
-            address: this.address,
-            typeName: this.typeName,
-            name: this.name,
-            description: this.description,
-            cid: this.cid,
-            isDeployed: this.isDeployed,
-            deciders: this.deciders,
-            proposers: this.proposers,
-            moderators: this.moderators ?? ethers.ZeroAddress,
-            withModeration: this.withModeration,
-            forwarder: this.forwarder,
-            metadata: this.metadata,
-            proposals: this.proposals,
-            sourceOrgans: this.sourceOrgans,
-            targetOrgans: this.targetOrgans,
-            type: this.type
-        };
-    }
+    toJson = () => JSON.parse(JSON.stringify({
+        address: this.address,
+        salt: this.salt,
+        chainId: this.chainId,
+        data: this.data,
+        typeName: this.typeName,
+        name: this.name,
+        description: this.description,
+        cid: this.cid,
+        isDeployed: this.isDeployed,
+        deciders: this.deciders,
+        proposers: this.proposers,
+        moderators: this.moderators ?? ethers.ZeroAddress,
+        withModeration: this.withModeration,
+        forwarder: this.forwarder,
+        metadata: this.metadata,
+        proposals: this.proposals,
+        sourceOrgans: this.sourceOrgans,
+        targetOrgans: this.targetOrgans,
+        type: this.type
+    }, handleJsonBigInt));
 }

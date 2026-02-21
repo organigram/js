@@ -1,39 +1,8 @@
 import { ethers } from 'ethers';
 import { Procedure } from '../procedure';
 import VoteProcedureContractABI from '@organigram/protocol/artifacts/contracts/procedures/Vote.sol/VoteProcedure.json';
-import { deployedAddresses, predictContractAddress } from '../utils';
-export const electionFields = {
-    quorumSize: {
-        name: 'quorumSize',
-        label: 'Quorum size',
-        description: 'Size of the quorum required to start a vote. Accepts a percentage of the total of voters, with three decimals precision. Default: 20.001%',
-        defaultValue: '20001',
-        type: 'number'
-    },
-    voteDuration: {
-        name: 'voteDuration',
-        label: 'Vote duration',
-        description: 'Duration of the vote phase, as a number of seconds. Default: 3600 seconds (1 hour)',
-        defaultValue: '3600',
-        type: 'number'
-    },
-    majoritySize: {
-        name: 'majoritySize',
-        label: 'Majority size',
-        description: 'Size of the majority required to pass a proposal. Accepts a percentage of the total of voters, with three decimals precision. Default: 50.001%',
-        defaultValue: '50001',
-        type: 'number'
-    }
-};
-export const vote = {
-    key: 'vote',
-    address: deployedAddresses[11155111].VoteProcedure,
-    metadata: {
-        label: 'Simple Majority Vote',
-        description: 'A vote allows any user in the source organ to vote on proposals to add, edit or replace one or many entries, assets or procedures in the target organ.'
-    },
-    fields: electionFields
-};
+import { deployedAddresses, handleJsonBigInt } from '../utils';
+import { vote } from './utils';
 export class VoteProcedure extends Procedure {
     static INTERFACE = '0xc9d27afe';
     contract;
@@ -43,19 +12,12 @@ export class VoteProcedure extends Procedure {
     elections;
     typeName = 'vote';
     type = vote;
-    constructor({ quorumSize, voteDuration, majoritySize, elections, salt, ...procedureInput }) {
+    constructor({ quorumSize, voteDuration, majoritySize, elections, ...procedureInput }) {
         super({
             ...procedureInput,
             typeName: 'vote',
             type: vote
         });
-        this.address =
-            procedureInput.address ??
-                predictContractAddress({
-                    type: 'VoteProcedure',
-                    chainId: procedureInput.chainId,
-                    salt: this.salt
-                });
         this.quorumSize = quorumSize;
         this.voteDuration = voteDuration;
         this.majoritySize = majoritySize;
@@ -96,12 +58,19 @@ export class VoteProcedure extends Procedure {
         if (!election.start)
             throw new Error('Election not found.');
         const voteDuration = await contract.voteDuration();
-        const approved = parseInt(voteDuration) + parseInt(election.start) < Date.now() / 1000
-            ? await contract.count(proposalKey).catch((error) => {
-                console.warn('Error while counting votes.', address, proposalKey, error.message);
-                return false;
-            })
-            : false;
+        const hasEnded = parseInt(voteDuration) + parseInt(election.start) < Date.now() / 1000;
+        let approved;
+        try {
+            approved = hasEnded
+                ? election.votesCount !== BigInt(0)
+                    ? await contract.count(proposalKey)
+                    : false
+                : false;
+        }
+        catch (error) {
+            console.warn('Error while counting votes.', address, proposalKey, error);
+            approved = false;
+        }
         return {
             proposalKey,
             start: election.start.toString(),
@@ -110,13 +79,13 @@ export class VoteProcedure extends Procedure {
             approved
         };
     }
-    static async loadElections(address, signer) {
-        const data = await Procedure.loadData(address, signer);
+    static async loadElections(address, signerOrProvider) {
+        const data = await Procedure.loadData(address, signerOrProvider);
         const proposalsLength = BigInt(data.proposalsLength);
         const elections = [];
         for (let i = 0; i < proposalsLength; i++) {
             const key = i.toString();
-            const election = await VoteProcedure.loadElection(address, key, signer).catch((error) => {
+            const election = await VoteProcedure.loadElection(address, key, signerOrProvider).catch((error) => {
                 console.warn('Error while loading election in vote procedure.', address, key, error.message);
                 return null;
             });
@@ -189,4 +158,29 @@ export class VoteProcedure extends Procedure {
             return false;
         });
     }
+    toJson = () => JSON.parse(JSON.stringify({
+        address: this.address,
+        chainId: this.chainId,
+        salt: this.salt,
+        data: this.data,
+        typeName: this.typeName,
+        name: this.name,
+        description: this.description,
+        cid: this.cid,
+        isDeployed: this.isDeployed,
+        deciders: this.deciders,
+        proposers: this.proposers,
+        moderators: this.moderators ?? ethers.ZeroAddress,
+        withModeration: this.withModeration,
+        forwarder: this.forwarder,
+        metadata: this.metadata,
+        proposals: this.proposals,
+        sourceOrgans: this.sourceOrgans,
+        targetOrgans: this.targetOrgans,
+        type: this.type,
+        quorumSize: this.quorumSize,
+        voteDuration: this.voteDuration,
+        majoritySize: this.majoritySize,
+        elections: this.elections
+    }, handleJsonBigInt));
 }

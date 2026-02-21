@@ -1,17 +1,80 @@
 import { ethers } from 'ethers';
-import { erc20Vote, ERC20VoteProcedure } from './erc20Vote';
-import { nomination, NominationProcedure } from './nomination';
-import { vote, VoteProcedure } from './vote';
 import { createRandom32BytesHexId, deployedAddresses, formatSalt } from '../utils';
+export var ProcedureTypeNameEnum;
+(function (ProcedureTypeNameEnum) {
+    ProcedureTypeNameEnum["erc20Vote"] = "erc20Vote";
+    ProcedureTypeNameEnum["nomination"] = "nomination";
+    ProcedureTypeNameEnum["vote"] = "vote";
+})(ProcedureTypeNameEnum || (ProcedureTypeNameEnum = {}));
+export const nomination = {
+    key: 'nomination',
+    address: deployedAddresses[11155111].NominationProcedure,
+    metadata: {
+        label: 'Nomination',
+        description: 'A nomination allows any user in the source organ to directly add, remove or replace one or many entries, assets or permissions in the target organ.'
+    }
+};
+export const electionFields = {
+    quorumSize: {
+        name: 'quorumSize',
+        label: 'Quorum size',
+        description: 'Size of the quorum required to start a vote. Accepts a percentage of the total of voters, with three decimals precision. Default: 20.001%',
+        defaultValue: '20001',
+        type: 'number'
+    },
+    voteDuration: {
+        name: 'voteDuration',
+        label: 'Vote duration',
+        description: 'Duration of the vote phase, as a number of seconds. Default: 3600 seconds (1 hour)',
+        defaultValue: '3600',
+        type: 'number'
+    },
+    majoritySize: {
+        name: 'majoritySize',
+        label: 'Majority size',
+        description: 'Size of the majority required to pass a proposal. Accepts a percentage of the total of voters, with three decimals precision. Default: 50.001%',
+        defaultValue: '50001',
+        type: 'number'
+    }
+};
+export const vote = {
+    key: 'vote',
+    address: deployedAddresses[11155111].VoteProcedure,
+    metadata: {
+        label: 'Simple Majority Vote',
+        description: 'A vote allows any user in the source organ to vote on proposals to add, edit or replace one or many entries, assets or permissions in the target organ.'
+    },
+    fields: electionFields
+};
+export const procedureMetadata = {
+    _type: 'procedureType',
+    _generator: 'https://organigram.ai',
+    _generatedAt: 0
+};
+export const erc20Vote = {
+    address: deployedAddresses[11155111].ERC20VoteProcedure,
+    key: 'erc20Vote',
+    fields: {
+        ...electionFields,
+        erc20: {
+            name: 'erc20',
+            label: 'ERC20 Token',
+            description: 'Address of the ERC20 Token used for weighting the voting power.',
+            defaultValue: '',
+            type: 'string'
+        }
+    },
+    metadata: {
+        ...procedureMetadata,
+        label: 'Token-weighted Vote',
+        description: 'A token vote allows any user in the source organ to vote on proposals, where its voting power is based on the amount of tokens it holds.',
+        type: 'erc20Vote'
+    }
+};
 export const procedureTypes = {
     erc20Vote,
     nomination,
     vote
-};
-export const procedureClasses = {
-    erc20Vote: ERC20VoteProcedure,
-    nomination: NominationProcedure,
-    vote: VoteProcedure
 };
 export const prepareDeployOrgansInput = (deployOrgansInput) => deployOrgansInput.map(organ => {
     const _permissionAddresses = [];
@@ -45,14 +108,18 @@ export const prepareDeployProceduresInput = async (deployProceduresInput, signer
     const initialize = await populateInitializeProcedure({
         typeName: procedure.typeName,
         options: procedure.options ?? {},
-        cid: procedure.cid ?? procedure.typeName,
+        cid: procedure.cid ?? '',
         moderators: procedure.moderators ?? ethers.ZeroAddress,
         deciders: procedure.deciders,
         proposers: procedure.proposers ?? procedure.deciders,
         withModeration: procedure.withModeration ?? false,
         forwarder: procedure.forwarder ??
             deployedAddresses[procedure.chainId]?.MetaGasStation,
-        args: _args
+        args: _args.map(arg => typeof arg === 'string'
+            ? ethers.isHexString(arg)
+                ? arg
+                : ethers.toBeHex(arg)
+            : arg)
     }, signer);
     return {
         procedureType: procedureTypes[procedure.typeName]
@@ -62,14 +129,34 @@ export const prepareDeployProceduresInput = async (deployProceduresInput, signer
         options: procedure.options
     };
 }));
+export const getProcedureClass = async (typeName) => {
+    try {
+        let procedureClass;
+        switch (typeName) {
+            case 'erc20Vote':
+                procedureClass = (await import('./erc20Vote')).ERC20VoteProcedure;
+                break;
+            case 'nomination':
+                procedureClass = (await import('./nomination')).NominationProcedure;
+                break;
+            case 'vote':
+                procedureClass = (await import('./vote')).VoteProcedure;
+                break;
+            default:
+                throw new Error('Procedure type not found: ' + typeName);
+        }
+        return procedureClass;
+    }
+    catch (error) {
+        console.error('getProcedureClass', error.message);
+        throw error;
+    }
+};
 export const populateInitializeProcedure = async (input, signer) => {
     if (signer == null) {
         throw new Error('Signer not connected.');
     }
-    const procedureClass = procedureClasses[input.typeName];
-    if (procedureClass == null) {
-        throw new Error('Populate initialize procedure: Procedure type not found.');
-    }
+    const procedureClass = await getProcedureClass(input.typeName);
     try {
         const chainId = await signer.provider
             ?.getNetwork()

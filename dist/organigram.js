@@ -1,5 +1,6 @@
 import OrganigramClient from './organigramClient';
 import { getTemplate, templates } from './template';
+import { handleJsonBigInt } from './utils';
 export const sourceOrganTypes = [
     { label: 'Create proposals', name: 'proposers' },
     { label: 'Approve proposals', name: 'deciders' },
@@ -164,7 +165,7 @@ export class Organigram {
                 signer: signer ?? this.signer,
                 provider: signer?.provider ?? this.signer?.provider
             });
-        return await client.loadOrganigram(this, false);
+        return await client.loadOrganigram(this);
     };
     async deploy() {
         if (!this.organigramClient) {
@@ -184,5 +185,5 @@ export class Organigram {
         organs: this.organs.map(organ => organ.toJson?.() ?? organ),
         assets: this.assets.map(asset => asset.toJson?.() ?? asset),
         procedures: this.procedures.map(procedure => procedure.toJson?.() ?? procedure)
-    }));
+    }, handleJsonBigInt));
 }

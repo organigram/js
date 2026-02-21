@@ -5,6 +5,7 @@ import Organ, { OrganInput, OrganJson } from './organ'
 import { Procedure, ProcedureInput, ProcedureJson } from './procedure'
 import OrganigramClient from './organigramClient'
 import { getTemplate, templates } from './template'
+import { handleJsonBigInt } from './utils'
 
 export type SourceOrganTypeName =
   | 'proposers'
@@ -288,7 +289,7 @@ export class Organigram {
         signer: signer ?? this.signer!,
         provider: signer?.provider ?? this.signer?.provider!
       })
-    return await client.loadOrganigram(this, false)!
+    return await client.loadOrganigram(this)!
   }
 
   async deploy() {
@@ -302,18 +303,21 @@ export class Organigram {
 
   toJson = (): OrganigramJson =>
     JSON.parse(
-      JSON.stringify({
-        id: this.id,
-        slug: this.slug,
-        workspaceId: this.workspaceId,
-        chainId: this.chainId,
-        name: this.name,
-        description: this.description,
-        organs: this.organs.map(organ => organ.toJson?.() ?? organ),
-        assets: this.assets.map(asset => asset.toJson?.() ?? asset),
-        procedures: this.procedures.map(
-          procedure => procedure.toJson?.() ?? procedure
-        )
-      })
+      JSON.stringify(
+        {
+          id: this.id,
+          slug: this.slug,
+          workspaceId: this.workspaceId,
+          chainId: this.chainId,
+          name: this.name,
+          description: this.description,
+          organs: this.organs.map(organ => organ.toJson?.() ?? organ),
+          assets: this.assets.map(asset => asset.toJson?.() ?? asset),
+          procedures: this.procedures.map(
+            procedure => procedure.toJson?.() ?? procedure
+          )
+        },
+        handleJsonBigInt
+      )
     )
 }

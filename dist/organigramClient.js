@@ -5,7 +5,7 @@ import { deployedAddresses, formatSalt, PERMISSIONS } from './utils';
 import Organ from './organ';
 import { Procedure } from './procedure';
 import { Organigram } from './organigram';
-import { populateInitializeProcedure, prepareDeployOrgansInput, prepareDeployProceduresInput, procedureClasses, procedureTypes } from './procedure/utils';
+import { getProcedureClass, populateInitializeProcedure, prepareDeployOrgansInput, prepareDeployProceduresInput, procedureTypes } from './procedure/utils';
 export class OrganigramClient {
     address;
     chainId;
@@ -85,14 +85,14 @@ export class OrganigramClient {
         return newOrganigramClient;
     }
     async getProcedureType(procedureAddress) {
-        if (this.provider == null) {
-            throw new Error('No provider.');
+        if (this.provider == null || this.signer == null) {
+            throw new Error('No provider or signer.');
         }
-        const code = await this.provider.getCode(procedureAddress);
-        const type = `0x${code.substring(22, 62)}`.toLowerCase();
+        const code = await (this.provider ?? this.signer.provider)?.getCode(procedureAddress);
+        const type = `0x${code?.substring(22, 62)}`.toLowerCase();
         const procedureType = this.procedureTypes.find((pt) => pt.address.toLowerCase() === type);
         if (procedureType == null) {
-            throw new Error('Procedure not supported.');
+            throw new Error('getProcedureType: Procedure not supported.');
         }
         return procedureType;
     }
@@ -119,21 +119,25 @@ export class OrganigramClient {
         }
         return organ;
     }
-    async getProcedure(address, cached = true, initialProcedure) {
-        const procedureType = await this.getProcedureType(address).catch((e) => {
-            console.error(e.message);
-            return null;
-        });
+    async getDeployedProcedure(address, cached = true, initialProcedure) {
+        const procedureType = initialProcedure?.type ??
+            procedureTypes[initialProcedure?.typeName] ??
+            (await this.getProcedureType(address).catch((e) => {
+                console.error(e.message);
+                return null;
+            }));
         if (procedureType == null) {
-            throw new Error('Procedure not supported.');
+            throw new Error('getDeployedProcedure: Procedure not supported.');
         }
-        let procedure = cached && this.procedures.find(c => c.address === address);
-        if (procedure == null || procedure === false) {
+        let procedure = cached
+            ? this.procedures.find(c => c.address === address)
+            : undefined;
+        if (procedure == null) {
             const signerOrProvider = this.signer ?? this.provider;
             if (signerOrProvider == null) {
                 throw new Error('Not connected.');
             }
-            const _Class = procedureClasses[procedureType?.key];
+            const _Class = await getProcedureClass(procedureType.key);
             procedure = await _Class
                 .load(address, signerOrProvider, initialProcedure)
                 .then((p) => Object.assign(p, { type: procedureType }))
@@ -283,7 +287,7 @@ export class OrganigramClient {
         if (address == null) {
             throw new Error('Procedure deployment failed.');
         }
-        return await this.getProcedure(address, false).catch((error) => {
+        return await this.getDeployedProcedure(address, false).catch((error) => {
             throw new Error('Unable to load procedure with address ' +
                 address +
                 ' after creating it.' +
@@ -302,7 +306,7 @@ export class OrganigramClient {
             throw new Error('Procedure batch creations failed.');
         }
         const addresses = eventCreations.map((eventCreation) => eventCreation.address);
-        return await Promise.all(addresses.map(async (address) => await this.getProcedure(address, false).catch((error) => {
+        return await Promise.all(addresses.map(async (address) => await this.getDeployedProcedure(address, false).catch((error) => {
             console.error('Unable to load procedure with address ' +
                 address +
                 ' after creating it.', error.message);
@@ -328,7 +332,7 @@ export class OrganigramClient {
     }
     async loadContract(address, cached = true) {
         return ((await this.getOrgan(address, cached)) ??
-            (await this.getProcedure(address, cached)));
+            (await this.getDeployedProcedure(address, cached)));
     }
     async loadContracts(contractAddresses) {
         const organs = [];
@@ -340,7 +344,7 @@ export class OrganigramClient {
                     organs.push(organ);
                     continue;
                 }
-                const procedure = await this.getProcedure(address);
+                const procedure = await this.getDeployedProcedure(address);
                 if (procedure != null) {
                     procedures.push(procedure);
                     continue;
@@ -365,10 +369,7 @@ export class OrganigramClient {
             if (!organ.isDeployed)
                 deployedOrgans.push(organ);
             else {
-                const deployed = await this.getOrgan(organ.address, cached, organ).catch((error) => {
-                    console.error('Error loading organ ' + organ.address, error.message);
-                    return undefined;
-                });
+                const deployed = await this.getOrgan(organ.address, cached, organ);
                 if (deployed != null) {
                     deployedOrgans.push(deployed);
                 }
@@ -376,17 +377,11 @@ export class OrganigramClient {
         }
         const deployedProcedures = [];
         for (const procedure of organigram.procedures) {
-            if (!procedure.isDeployed)
-                deployedProcedures.push(procedure);
-            else {
-                const deployed = await this.getProcedure(procedure.address, cached, procedure).catch((error) => {
-                    console.error('Error loading deployed ' + procedure.address, error.message);
-                    return undefined;
-                });
-                if (deployed != null) {
-                    deployedProcedures.push(deployed);
-                }
-            }
+            deployedProcedures.push(!procedure.isDeployed
+                ? procedure
+                : (this.procedures.find(p => p.address === procedure.address) ??
+                    (await this.getDeployedProcedure(procedure.address, cached, procedure)) ??
+                    procedure));
         }
         const newOrganigram = {
             ...organigram,

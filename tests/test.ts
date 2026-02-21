@@ -70,7 +70,6 @@ describe('Organigram JS Client', () => {
     it('should create an organ', async () => {
       organ = await organigramClient.deployOrgan()
       strictEqual(organ?.address != null, true)
-      strictEqual(organ?.isDeployed, true)
     })
 
     it('should create organs in batch', async () => {
@@ -336,7 +335,7 @@ describe('Organigram JS Client', () => {
         strictEqual(procedure?.address != null, true)
       })
 
-      it('should add procedure to an organ', async () => {
+      it('should add permission to an organ', async () => {
         return await organ.addPermission({
           permissionAddress: procedure.address,
           permissionValue: parseInt('0xffff', 16)

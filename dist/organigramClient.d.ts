@@ -1,7 +1,8 @@
 import { ethers, type ContractTransaction } from 'ethers';
 import Organ, { OrganEntry, OrganInput, OrganPermission } from './organ';
-import { Procedure, ProcedureInput, ProcedureType, ProcedureTypeName } from './procedure';
+import { Procedure, ProcedureInput, ProcedureType } from './procedure';
 import { Organigram } from './organigram';
+import { ProcedureTypeName } from './procedure/utils';
 export interface DeployOrganInput {
     cid?: string;
     permissions?: OrganPermission[];
@@ -78,7 +79,7 @@ export declare class OrganigramClient {
     }): Promise<OrganigramClient>;
     getProcedureType(procedureAddress: string): Promise<ProcedureType | null>;
     getOrgan(address: string, cached?: boolean, initialOrgan?: OrganInput): Promise<Organ>;
-    getProcedure(address: string, cached?: boolean, initialProcedure?: ProcedureInput): Promise<Procedure>;
+    getDeployedProcedure(address: string, cached?: boolean, initialProcedure?: ProcedureInput): Promise<Procedure>;
     deployOrgan(input?: DeployOrganInput): Promise<Organ>;
     deployOrgans(deployOrgansInput: DeployOrganInput[]): Promise<Organ[]>;
     deployAsset(name: string, symbol: string, initialSupply: number, salt?: string, options?: TransactionOptions): Promise<string>;

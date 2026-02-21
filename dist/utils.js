@@ -8,7 +8,7 @@ export const handleJsonBigInt = (key, value) => {
     return value;
 };
 export function cloneInitCodeHash(implementation) {
-    const impl = implementation.toLowerCase().replace(/^0x/, '');
+    const impl = implementation?.toLowerCase()?.replace(/^0x/, '');
     const initCode = '0x3d602d80600a3d3981f3' +
         '363d3d373d3d3d363d73' +
         impl +

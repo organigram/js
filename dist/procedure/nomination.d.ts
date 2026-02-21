@@ -1,14 +1,7 @@
 import { ethers } from 'ethers';
-import { PopulateInitializeInput, Procedure, ProcedureInput, ProcedureTypeName } from '.';
+import { Procedure, ProcedureInput } from '.';
 import { TransactionOptions } from '../organigramClient';
-export declare const nomination: {
-    key: string;
-    address: string;
-    metadata: {
-        label: string;
-        description: string;
-    };
-};
+import { PopulateInitializeInput, ProcedureTypeName } from './utils';
 export declare class NominationProcedure extends Procedure {
     static INTERFACE: string;
     contract: ethers.Contract;

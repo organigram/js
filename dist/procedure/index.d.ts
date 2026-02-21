@@ -1,17 +1,7 @@
 import { type ContractTransactionReceipt, ethers } from 'ethers';
 import type { TransactionOptions } from '../organigramClient';
 import { SourceOrgan, TargetOrgan } from '../organigram';
-export declare const procedureMetadata: {
-    _type: string;
-    _generator: string;
-    _generatedAt: number;
-};
-export type ProcedureTypeName = 'erc20Vote' | 'nomination' | 'vote';
-export declare enum ProcedureTypeNameEnum {
-    erc20Vote = "erc20Vote",
-    nomination = "nomination",
-    vote = "vote"
-}
+import { PopulateInitializeInput, ProcedureTypeName } from './utils';
 export interface ProcedureTypeField {
     name: string;
     label: string;
@@ -65,8 +55,8 @@ export type AccountInOrgans = {
     proposers?: boolean;
     deciders?: boolean;
 };
-export type OperationTag = 'cid' | 'entries' | 'procedures' | 'coins' | 'collectibles' | 'erc721' | 'erc20' | 'erc1155' | 'ether' | 'add' | 'replace' | 'remove' | 'deposit' | 'withdraw' | 'transfer';
-export type OperationParamType = 'cid' | 'entry' | 'entries' | 'address' | 'addresses' | 'index' | 'indexes' | 'organ' | 'procedure' | 'permissions' | 'proposal' | 'proposals' | 'amount' | 'tokenId';
+export type OperationTag = 'cid' | 'entries' | 'permissions' | 'coins' | 'collectibles' | 'erc721' | 'erc20' | 'erc1155' | 'ether' | 'add' | 'replace' | 'remove' | 'deposit' | 'withdraw' | 'transfer';
+export type OperationParamType = 'cid' | 'entry' | 'entries' | 'address' | 'addresses' | 'index' | 'indexes' | 'organ' | 'oldPermissionAddress' | 'newPermissionAddress' | 'permissionAddress' | 'permissionValue' | 'proposal' | 'proposals' | 'amount' | 'tokenId';
 export type OperationParamAction = 'select' | 'create' | 'update' | 'delete' | 'withdraw' | 'deposit' | 'transfer' | 'block';
 export interface OperationParam {
     type: OperationParamType;
@@ -109,7 +99,7 @@ export interface ProcedureProposal {
     operations: ProcedureProposalOperation[];
     metadata?: ProposalMetadata;
 }
-export type ProposalKey = 'addEntries' | 'removeEntries' | 'replaceEntry' | 'addProcedure' | 'removeProcedure' | 'replaceProcedure' | 'updateMetadata' | 'transfer' | string;
+export type ProposalKey = 'addEntries' | 'removeEntries' | 'replaceEntry' | 'addPermission' | 'removePermission' | 'replacePermission' | 'updateMetadata' | 'transfer' | string;
 export interface ProposalMetadata {
     title: string;
     subtitle?: string;
@@ -140,19 +130,6 @@ export interface ProcedureInput {
     targetOrgans?: TargetOrgan[] | null;
     organigramId?: string | null;
     data?: string | null;
-}
-export interface PopulateInitializeInput {
-    options?: {
-        signer?: ethers.Signer;
-    } & TransactionOptions;
-    typeName?: ProcedureTypeName;
-    cid: string;
-    proposers: string;
-    moderators: string;
-    deciders: string;
-    withModeration: boolean;
-    forwarder: string;
-    args: unknown[];
 }
 export declare const procedureFunctions: ProcedureProposalOperationFunction[];
 export declare class Procedure {
@@ -214,5 +191,5 @@ export declare class Procedure {
     reloadProposals(): Promise<Procedure>;
     reloadProposal(proposalKey: string): Promise<Procedure>;
     reloadData(): Promise<Procedure>;
-    toJson(): ProcedureJson;
+    toJson: () => ProcedureJson;
 }
