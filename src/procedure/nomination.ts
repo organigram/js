@@ -1,24 +1,11 @@
 import { ethers } from 'ethers'
 import NominationProcedureContractABI from '@organigram/protocol/artifacts/contracts/procedures/Nomination.sol/NominationProcedure.json'
 
-import {
-  PopulateInitializeInput,
-  Procedure,
-  ProcedureInput,
-  ProcedureTypeName
-} from '.'
+import { Procedure, ProcedureInput } from '.'
 import { TransactionOptions } from '../organigramClient'
 import { deployedAddresses } from '../utils'
+import { nomination, PopulateInitializeInput, ProcedureTypeName } from './utils'
 
-export const nomination = {
-  key: 'nomination',
-  address: deployedAddresses[11155111].NominationProcedure,
-  metadata: {
-    label: 'Nomination',
-    description:
-      'A nomination allows any user in the source organ to directly add, remove or replace one or many entries, assets or procedures in the target organ.'
-  }
-}
 export class NominationProcedure extends Procedure {
   static INTERFACE = '0xc5f28e49' // nominate() signature.
   contract: ethers.Contract
@@ -64,8 +51,7 @@ export class NominationProcedure extends Procedure {
     signerOrProvider: ethers.Signer | ethers.Provider,
     initialProcedure?: ProcedureInput
   ): Promise<NominationProcedure> {
-    const procedure = await Procedure.load(address, signerOrProvider)
-    if (!procedure) throw new Error('Not a valid procedure.')
+    const procedure = await Procedure.load(address, signerOrProvider, initialProcedure)
     const chainId =
       (await signerOrProvider.provider?.getNetwork().then(n => n.chainId)) ??
       (await (signerOrProvider as ethers.Provider)
@@ -89,7 +75,7 @@ export class NominationProcedure extends Procedure {
       withModeration: procedure.withModeration,
       forwarder: procedure.forwarder,
       proposals: procedure.proposals,
-      // isDeployed: true,
+      isDeployed: true,
       salt: procedure.salt,
       contract,
       typeName: 'nomination'

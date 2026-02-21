@@ -6,22 +6,16 @@ import {
   capitalize,
   createRandom32BytesHexId,
   deployedAddresses,
+  handleJsonBigInt,
   predictContractAddress
 } from '../utils'
 import { SourceOrgan, TargetOrgan } from '../organigram'
-
-export const procedureMetadata = {
-  _type: 'procedureType',
-  _generator: 'https://organigram.ai',
-  _generatedAt: 0
-}
-
-export type ProcedureTypeName = 'erc20Vote' | 'nomination' | 'vote'
-export enum ProcedureTypeNameEnum {
-  erc20Vote = 'erc20Vote',
-  nomination = 'nomination',
-  vote = 'vote'
-}
+import {
+  PopulateInitializeInput,
+  ProcedureTypeName,
+  ProcedureTypeNameEnum,
+  procedureTypes
+} from './utils'
 
 export interface ProcedureTypeField {
   name: string
@@ -85,7 +79,7 @@ export type AccountInOrgans = {
 export type OperationTag =
   | 'cid'
   | 'entries'
-  | 'procedures'
+  | 'permissions'
   | 'coins'
   | 'collectibles'
   | 'erc721'
@@ -108,8 +102,10 @@ export type OperationParamType =
   | 'index'
   | 'indexes'
   | 'organ'
-  | 'procedure'
-  | 'permissions'
+  | 'oldPermissionAddress'
+  | 'newPermissionAddress'
+  | 'permissionAddress'
+  | 'permissionValue'
   | 'proposal'
   | 'proposals'
   | 'amount'
@@ -175,9 +171,9 @@ export type ProposalKey =
   | 'addEntries'
   | 'removeEntries'
   | 'replaceEntry'
-  | 'addProcedure'
-  | 'removeProcedure'
-  | 'replaceProcedure'
+  | 'addPermission'
+  | 'removePermission'
+  | 'replacePermission'
   | 'updateMetadata'
   | 'transfer'
   | string
@@ -213,20 +209,6 @@ export interface ProcedureInput {
   targetOrgans?: TargetOrgan[] | null
   organigramId?: string | null
   data?: string | null
-}
-
-export interface PopulateInitializeInput {
-  options?: {
-    signer?: ethers.Signer
-  } & TransactionOptions
-  typeName?: ProcedureTypeName
-  cid: string
-  proposers: string
-  moderators: string
-  deciders: string
-  withModeration: boolean
-  forwarder: string
-  args: unknown[]
 }
 
 // @todo : Generate this list from the ABI of the procedure contract.
@@ -269,29 +251,29 @@ export const procedureFunctions: ProcedureProposalOperationFunction[] = [
   },
   {
     funcSig: '0x7f0a4e27',
-    key: 'addProcedure',
-    signature: 'addProcedure(address,bytes2)',
+    key: 'addPermission',
+    signature: 'addPermission(address,bytes2)',
     label: 'Add permission',
-    tags: ['procedures', 'add'],
-    params: ['procedure', 'permissions'],
+    tags: ['permissions', 'add'],
+    params: ['permissionAddress', 'permissionValue'],
     target: 'organ'
   },
   {
     funcSig: '0x19b9404c',
-    key: 'removeProcedure',
-    signature: 'removeProcedure(address)',
+    key: 'removePermission',
+    signature: 'removePermission(address)',
     label: 'Remove permission',
-    tags: ['procedures', 'remove'],
-    params: ['procedure'],
+    tags: ['permissions', 'remove'],
+    params: ['permissionAddress'],
     target: 'organ'
   },
   {
     funcSig: '0xd0922d4a',
-    key: 'replaceProcedure',
-    signature: 'replaceProcedure(address,address,bytes2)',
+    key: 'replacePermission',
+    signature: 'replacePermission(address,address,bytes2)',
     label: 'Replace permission',
-    tags: ['procedures', 'replace'],
-    params: ['procedure', 'procedure', 'permissions'],
+    tags: ['permissions', 'replace'],
+    params: ['oldPermissionAddress', 'newPermissionAddress', 'permissionValue'],
     target: 'organ'
   },
   {
@@ -388,13 +370,12 @@ export class Procedure {
         `typeName must be one of ${Object.values(ProcedureTypeNameEnum).join(', ')}.`
       )
     }
-
     this.salt = salt ?? (isDeployed ? undefined : createRandom32BytesHexId())
     this.address =
       address ??
       predictContractAddress({
         type: (capitalize(typeName!) + 'Procedure') as 'NominationProcedure',
-        chainId: chainId!,
+        chainId: chainId ?? '11155111',
         salt: this.salt!
       })
     this.deciders = deciders
@@ -438,7 +419,8 @@ export class Procedure {
     )
     this.sourceOrgans = sourceOrgans ?? []
     this.targetOrgans = targetOrgans ?? []
-    this.type = type!
+    this.type =
+      type ?? procedureTypes[this.typeName as keyof typeof procedureTypes]
     this.data = data!
   }
 
@@ -586,7 +568,7 @@ export class Procedure {
         return 'uint256'
       case 'indexes':
         return 'uint256[]'
-      case 'permissions':
+      case 'permissionValue':
         return 'bytes2'
       case 'addresses':
         return 'address[]'
@@ -594,7 +576,11 @@ export class Procedure {
         return 'address'
       case 'organ':
         return 'address'
-      case 'procedure':
+      case 'permissionAddress':
+        return 'address'
+      case 'oldPermissionAddress':
+        return 'address'
+      case 'newPermissionAddress':
         return 'address'
       case 'proposal':
         return 'uint256'
@@ -661,9 +647,13 @@ export class Procedure {
   }
 
   static parseOperation(_operation: unknown): ProcedureProposalOperation {
-    // @todo : Fix type or testing _operation as iterable.
-    // @ts-expect-error How to check if _operation is iterable?
-    const [index, target, data, value, processed] = _operation
+    const [index, target, data, value, processed] = _operation as [
+      string,
+      string,
+      string,
+      string,
+      boolean
+    ]
     const functionSelector: string = data.toString().slice(0, 10)
     const operation: ProcedureProposalOperation = {
       index,
@@ -885,26 +875,31 @@ export class Procedure {
     return this
   }
 
-  toJson(): ProcedureJson {
-    return {
-      chainId: this.chainId!,
-      data: this.data,
-      address: this.address,
-      typeName: this.typeName,
-      name: this.name,
-      description: this.description,
-      cid: this.cid,
-      isDeployed: this.isDeployed,
-      deciders: this.deciders,
-      proposers: this.proposers,
-      moderators: this.moderators ?? ethers.ZeroAddress,
-      withModeration: this.withModeration,
-      forwarder: this.forwarder,
-      metadata: this.metadata,
-      proposals: this.proposals,
-      sourceOrgans: this.sourceOrgans,
-      targetOrgans: this.targetOrgans,
-      type: this.type
-    }
-  }
+  toJson = (): ProcedureJson =>
+    JSON.parse(
+      JSON.stringify(
+        {
+          address: this.address,
+          salt: this.salt,
+          chainId: this.chainId!,
+          data: this.data,
+          typeName: this.typeName,
+          name: this.name,
+          description: this.description,
+          cid: this.cid,
+          isDeployed: this.isDeployed,
+          deciders: this.deciders,
+          proposers: this.proposers,
+          moderators: this.moderators ?? ethers.ZeroAddress,
+          withModeration: this.withModeration,
+          forwarder: this.forwarder,
+          metadata: this.metadata,
+          proposals: this.proposals,
+          sourceOrgans: this.sourceOrgans,
+          targetOrgans: this.targetOrgans,
+          type: this.type
+        },
+        handleJsonBigInt
+      )
+    )
 }

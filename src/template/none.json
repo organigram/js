@@ -36,7 +36,7 @@
       "address": "elect-executive-team-address",
       "name": "Elect executive team",
       "typeName": "vote",
-      "data": "{\"majoritySize\":\"1\",\"quorumSize\":\"1\",\"voteDuration\":\"8\"}",
+      "data": "{\"quorumSize\":\"20001\",\"voteDuration\":\"3600\",\"majoritySize\":\"50001\"}",
       "deciders": "board-address",
       "proposers": "board-address"
     },
@@ -45,7 +45,7 @@
       "address": "update-permissions-address",
       "name": "Update permissions",
       "typeName": "vote",
-      "data": "{\"majoritySize\":\"1\",\"quorumSize\":\"1\",\"voteDuration\":\"10\"}",
+      "data": "{\"quorumSize\":\"20001\",\"voteDuration\":\"3600\",\"majoritySize\":\"50001\"}",
       "deciders": "board-address",
       "proposers": "board-address"
     }

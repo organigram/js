@@ -1,79 +1,37 @@
 import { ethers } from 'ethers'
-import {
-  Procedure,
-  type Election,
-  ProcedureInput,
-  procedureMetadata,
-  PopulateInitializeInput,
-  ProcedureTypeName
-} from '.'
+import { Procedure, ProcedureInput, ProcedureJson } from '.'
 import ERC20VoteProcedureContractABI from '@organigram/protocol/artifacts/contracts/procedures/ERC20Vote.sol/ERC20VoteProcedure.json'
 import { TransactionOptions } from '../organigramClient'
-import { electionFields } from './vote'
-import { deployedAddresses } from '../utils'
+import { erc20Vote, PopulateInitializeInput, ProcedureTypeName } from './utils'
+import { VoteProcedure, VoteProcedureInput } from './vote'
+import { handleJsonBigInt } from '../utils'
 
-export const erc20Vote = {
-  address: deployedAddresses[11155111].ERC20VoteProcedure,
-  key: 'erc20Vote',
-  fields: {
-    ...electionFields,
-    erc20: {
-      name: 'erc20',
-      label: 'ERC20 Token',
-      description:
-        'Address of the ERC20 Token used for weighting the voting power.',
-      defaultValue: '',
-      type: 'string'
-    }
-  },
-  metadata: {
-    ...procedureMetadata,
-    cid: 'erc20Vote',
-    label: 'Token-weighted Vote',
-    description:
-      'A token vote allows any user in the source organ to vote on proposals, where its voting power is based on the amount of tokens it holds.',
-    type: 'erc20Vote'
-  }
-}
-
-export type ERC20VoteProcedureInput = ProcedureInput & {
+export type ERC20VoteProcedureInput = Omit<
+  VoteProcedureInput,
+  'type' | 'typeName'
+> & {
   erc20: string
-  quorumSize: string
-  voteDuration: string
-  majoritySize: string
-  elections: Election[]
 }
 
-export class ERC20VoteProcedure extends Procedure {
+export class ERC20VoteProcedure extends VoteProcedure {
   static INTERFACE = '0xc9d27afe' // vote() signature.
   erc20: string
-  quorumSize: string
-  voteDuration: string
-  majoritySize: string
-  elections: Election[]
   contract: ethers.Contract
   type = erc20Vote
   typeName = 'erc20Vote' as ProcedureTypeName
 
   // Constructor needs to call Procedure constructor.
-  constructor({
-    erc20,
-    quorumSize,
-    voteDuration,
-    majoritySize,
-    elections,
-    ...procedureArguments
-  }: ERC20VoteProcedureInput) {
-    super({ ...procedureArguments, typeName: 'erc20Vote', type: erc20Vote })
+  constructor({ erc20, ...voteProcedureArguments }: ERC20VoteProcedureInput) {
+    super({
+      ...voteProcedureArguments,
+      typeName: 'erc20Vote',
+      type: erc20Vote
+    })
     this.erc20 = erc20
-    this.quorumSize = quorumSize
-    this.voteDuration = voteDuration
-    this.majoritySize = majoritySize
-    this.elections = elections
     this.contract = new ethers.Contract(
       this.address,
       ERC20VoteProcedureContractABI.abi,
-      procedureArguments.signerOrProvider
+      voteProcedureArguments.signerOrProvider
     )
   }
 
@@ -102,67 +60,6 @@ export class ERC20VoteProcedure extends Procedure {
       voteDuration,
       majoritySize
     )
-  }
-
-  static async loadElection(
-    address: string,
-    proposalKey: string,
-    signerOrProvider: ethers.Signer | ethers.Provider
-  ): Promise<Election> {
-    const contract = new ethers.Contract(
-      address,
-      ERC20VoteProcedureContractABI.abi,
-      signerOrProvider
-    )
-    const election = await contract.getElection(proposalKey)
-    if (!election.start) throw new Error('Election not found.')
-    const voteDuration = await contract.voteDuration()
-    const approved =
-      parseInt(voteDuration) + parseInt(election.start) < Date.now() / 1000
-        ? await contract.count(proposalKey).catch((error: Error) => {
-            console.warn(
-              'Error while counting votes.',
-              address,
-              proposalKey,
-              error.message
-            )
-            return false
-          })
-        : false
-    return {
-      proposalKey,
-      start: election.start.toString(),
-      votesCount: election.votesCount.toString(),
-      hasVoted: election.hasVoted,
-      approved
-    }
-  }
-
-  static async loadElections(
-    address: string,
-    signerOrProvider: ethers.Signer | ethers.Provider
-  ): Promise<Election[]> {
-    const data = await Procedure.loadData(address, signerOrProvider)
-    const proposalsLength = BigInt(data.proposalsLength)
-    const elections: Election[] = []
-    for (let i = 0; i < proposalsLength; i++) {
-      const key: string = i.toString()
-      const election: Election | null = await ERC20VoteProcedure.loadElection(
-        address,
-        key,
-        signerOrProvider
-      ).catch((error: Error) => {
-        console.warn(
-          'Error while loading election in ERC20 vote procedure.',
-          address,
-          key,
-          error.message
-        )
-        return null
-      })
-      if (election) elections.push(election)
-    }
-    return elections
   }
 
   static async load(
@@ -201,9 +98,7 @@ export class ERC20VoteProcedure extends Procedure {
       return proposal
     })
 
-    const chainId = await (
-      signerOrProvider.provider ? signerOrProvider : signerOrProvider.provider
-    )?.provider
+    const chainId = await signerOrProvider?.provider
       ?.getNetwork()
       .then(n => n.chainId)
     return new ERC20VoteProcedure({
@@ -219,14 +114,12 @@ export class ERC20VoteProcedure extends Procedure {
       withModeration: procedure.withModeration,
       forwarder: procedure.forwarder,
       proposals,
-      // isDeployed: true,
+      isDeployed: true,
       erc20: erc20?.toString(),
       quorumSize: quorumSize?.toString(),
       voteDuration: voteDuration?.toString(),
       majoritySize: majoritySize?.toString(),
-      elections,
-      typeName: 'erc20Vote',
-      type: erc20Vote
+      elections
     })
   }
 
@@ -289,15 +182,36 @@ export class ERC20VoteProcedure extends Procedure {
     return await tx.wait()
   }
 
-  async count(proposalKey: string): Promise<boolean> {
-    return this.contract.count(proposalKey).catch((error: Error) => {
-      console.error(
-        'Error while voting.',
-        this.address,
-        proposalKey,
-        error.message
+  toJson = (): ProcedureJson =>
+    JSON.parse(
+      JSON.stringify(
+        {
+          address: this.address,
+          salt: this.salt,
+          chainId: this.chainId!,
+          data: this.data,
+          typeName: this.typeName,
+          name: this.name,
+          description: this.description,
+          cid: this.cid,
+          isDeployed: this.isDeployed,
+          deciders: this.deciders,
+          proposers: this.proposers,
+          moderators: this.moderators ?? ethers.ZeroAddress,
+          withModeration: this.withModeration,
+          forwarder: this.forwarder,
+          metadata: this.metadata,
+          proposals: this.proposals,
+          sourceOrgans: this.sourceOrgans,
+          targetOrgans: this.targetOrgans,
+          type: this.type,
+          erc20: this.erc20,
+          quorumSize: this.quorumSize,
+          voteDuration: this.voteDuration,
+          majoritySize: this.majoritySize,
+          elections: this.elections
+        },
+        handleJsonBigInt
       )
-      return false
-    })
-  }
+    )
 }
