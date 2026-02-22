@@ -45,9 +45,11 @@ export const predictContractAddress = ({
     cloneInitCodeHash(
       type === 'Organ'
         ? deployedAddresses[chainId as '11155111']?.CloneableOrgan
-        : deployedAddresses[chainId as '11155111']?.[
-            type.replace('Erc', 'ERC') as ContractName
-          ]
+        : type === 'Asset'
+          ? deployedAddresses[chainId as '11155111']?.CloneableAsset
+          : deployedAddresses[chainId as '11155111']?.[
+              type.replace('Erc', 'ERC') as ContractName
+            ]
     )
   )
 }

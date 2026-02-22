@@ -93,13 +93,11 @@ describe('Organigram JS Client', () => {
         [
           {
             name: 'ERC20_1',
-            symbol: 'ERC',
-            initialSupply: ERC20_INITIAL_SUPPLY
+            symbol: 'ERC'
           },
           {
             name: 'ERC20_2',
-            symbol: 'ERC',
-            initialSupply: ERC20_INITIAL_SUPPLY
+            symbol: 'ERC'
           }
         ],
         txOptions
@@ -162,6 +160,9 @@ describe('Organigram JS Client', () => {
       const salt = createRandom32BytesHexId()
       const salt2 = createRandom32BytesHexId()
       const salt3 = createRandom32BytesHexId()
+      const salt4 = createRandom32BytesHexId()
+      const salt5 = createRandom32BytesHexId()
+      const salt6 = createRandom32BytesHexId()
 
       const predictedAddress = predictContractAddress({
         type: 'Organ',
@@ -177,6 +178,21 @@ describe('Organigram JS Client', () => {
         type: 'NominationProcedure',
         chainId: '11155111',
         salt: salt3
+      })
+      const predictedAddress4 = predictContractAddress({
+        type: 'ERC20VoteProcedure',
+        chainId: '11155111',
+        salt: salt4
+      })
+      const predictedAddress5 = predictContractAddress({
+        type: 'VoteProcedure',
+        chainId: '11155111',
+        salt: salt5
+      })
+      const predictedAddress6 = predictContractAddress({
+        type: 'Asset',
+        chainId: '11155111',
+        salt: salt6
       })
       const organigram = {
         organs: [
@@ -194,25 +210,53 @@ describe('Organigram JS Client', () => {
         procedures: [
           {
             typeName: 'nomination' as const,
-            cid: '',
             proposers: predictedAddress,
             moderators: predictedAddress,
             deciders: predictedAddress,
             withModeration: false,
             forwarder: deployedAddresses['11155111'].MetaGasStation,
             salt: salt3
+          },
+          {
+            typeName: 'erc20Vote' as const,
+            proposers: predictedAddress,
+            moderators: predictedAddress,
+            deciders: predictedAddress,
+            withModeration: false,
+            forwarder: deployedAddresses['11155111'].MetaGasStation,
+            salt: salt4,
+            args: [ERC20_EXAMPLE, '1', '8', '1']
+          },
+          {
+            typeName: 'vote' as const,
+            proposers: predictedAddress,
+            moderators: predictedAddress,
+            deciders: predictedAddress,
+            withModeration: false,
+            forwarder: deployedAddresses['11155111'].MetaGasStation,
+            salt: salt5,
+            args: ['1', '8', '1']
           }
         ],
-        assets: []
+        assets: [
+          {
+            name: 'ERC20_2',
+            symbol: 'ERC',
+            salt: salt6
+          }
+        ]
       }
       const deployed = (await organigramClient.deployOrganigram(
         organigram
       )) as unknown as string[][][]
-      const [organs, , procedures] = deployed
+      const [organs, assets, procedures] = deployed
 
       strictEqual(organs[0], predictedAddress)
       strictEqual(organs[1], predictedAddress2)
       strictEqual(procedures[0], predictedAddress3)
+      strictEqual(procedures[1], predictedAddress4)
+      strictEqual(procedures[2], predictedAddress5)
+      strictEqual(assets[0], predictedAddress6)
     })
 
     describe('Nomination', () => {

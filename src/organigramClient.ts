@@ -14,6 +14,7 @@ import {
   ProcedureTypeName,
   procedureTypes
 } from './procedure/utils'
+import { ERC20_INITIAL_SUPPLY } from './asset'
 
 export interface DeployOrganInput {
   cid?: string
@@ -464,7 +465,7 @@ export class OrganigramClient {
     const tx = await this.contract.deployAsset(
       name,
       symbol,
-      initialSupply,
+      initialSupply ?? ERC20_INITIAL_SUPPLY,
       formatSalt(salt)
       // {
       //   nonce,
@@ -494,7 +495,7 @@ export class OrganigramClient {
     const formattedAssets = assets.map(asset => ({
       name: asset.name,
       symbol: asset.symbol,
-      initialSupply: asset.initialSupply,
+      initialSupply: asset.initialSupply ?? ERC20_INITIAL_SUPPLY,
       salt: formatSalt(asset.salt)
     }))
     const tx = await this.contract.deployAssets(formattedAssets, {
@@ -513,9 +514,11 @@ export class OrganigramClient {
       throw new Error('Asset batch deployments failed.')
     }
 
-    const addresses: string[] = eventCreations.map(
-      (eventCreation: EventLog) => eventCreation.address
-    )
+    const addresses: string[] = [
+      ...new Set<string>(
+        eventCreations.map((eventCreation: EventLog) => eventCreation.address)
+      )
+    ]
     return addresses
   }
 
@@ -527,7 +530,7 @@ export class OrganigramClient {
       {
         typeName: input.typeName,
         options: input.options ?? {},
-        cid: input.cid ?? input.typeName,
+        cid: input.cid ?? '',
         deciders: input.deciders,
         proposers: input.proposers ?? input.deciders,
         moderators: input.moderators ?? ethers.ZeroAddress,
@@ -636,7 +639,7 @@ export class OrganigramClient {
     const formattedAssets = input.assets.map(asset => ({
       name: asset.name,
       symbol: asset.symbol,
-      initialSupply: asset.initialSupply,
+      initialSupply: asset.initialSupply ?? ERC20_INITIAL_SUPPLY,
       salt: formatSalt(asset.salt)
     }))
     const organsInput = prepareDeployOrgansInput(input.organs)

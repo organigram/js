@@ -7,7 +7,6 @@ import {
   formatEther
 } from 'ethers'
 import { SourceOrgan } from './organigram'
-import { Contract } from 'ethers'
 import { createRandom32BytesHexId, predictContractAddress } from './utils'
 
 export const ERC20_INITIAL_SUPPLY = 10_000_000 // 10 million tokens.
@@ -17,12 +16,13 @@ export interface AssetJson {
   isDeployed: boolean
   name: string
   symbol: string
-  totalSupply: string
+  initialSupply: number
   chainId: string
   salt?: string | null
   image?: string | null
   isSourceOrgan: SourceOrgan[]
   userBalance: string
+  organigramId?: string | null
 }
 
 export interface AssetInput {
@@ -31,7 +31,7 @@ export interface AssetInput {
   address?: string | null
   contract?: EthersContract | null
   symbol?: string | null
-  totalSupply?: string | null
+  initialSupply?: number | null
   chainId?: string | null
   salt?: string | null
   isSourceOrgan?: SourceOrgan[]
@@ -46,13 +46,14 @@ export class Asset {
   name: string
   description: string
   symbol: string
-  totalSupply: string
+  initialSupply: number
   chainId: string
   salt?: string | null
   isSourceOrgan: SourceOrgan[]
   image?: string | null
   isDeployed: boolean
   userBalance: string
+  organigramId?: string | null
 
   constructor(input: AssetInput) {
     if (!input.address && !input.chainId) {
@@ -74,10 +75,11 @@ export class Asset {
         salt: this.salt!
       })
     this.symbol = input.symbol ?? 'ASSET'
-    this.totalSupply = input.totalSupply ?? (10_000_000).toString()
+    this.initialSupply = input.initialSupply ?? ERC20_INITIAL_SUPPLY
     this.isSourceOrgan = input.isSourceOrgan ?? []
     this.image = input.image ?? undefined
     this.userBalance = input.userBalance ?? '0'
+    this.organigramId = input.organigramId ?? null
   }
 
   load = async (
@@ -87,9 +89,8 @@ export class Asset {
     const contract = new ethers.Contract(this.address, erc777Interface, signer)
     const name = await contract.name()
     const symbol = await contract.symbol()
-    const _totalSupply = await contract.totalSupply()
-    let totalSupply = formatEther(_totalSupply)
-    totalSupply = (+totalSupply).toFixed(0)
+    const _initialSupply = await contract.initialSupply()
+    const initialSupply = parseInt((+formatEther(_initialSupply)).toFixed(0))
     const _userBalance = await contract.balanceOf(await signer?.getAddress())
     let userBalance = formatEther(_userBalance)
     userBalance = (+userBalance).toFixed(0)
@@ -99,7 +100,7 @@ export class Asset {
         contract,
         name,
         symbol,
-        totalSupply,
+        initialSupply,
         userBalance,
         chainId: (await signer?.provider?.getNetwork())?.chainId.toString()!,
         isDeployed: true
@@ -107,31 +108,19 @@ export class Asset {
     }
   }
 
-  deploy = async (signer?: Signer | null): Promise<Contract> => {
-    const erc777Interface = new ethers.Interface(AssetContract.abi)
-    const factory = new ethers.ContractFactory(
-      erc777Interface,
-      AssetContract.bytecode,
-      signer
-    )
-    const contract = await factory.deploy(BigInt(ERC20_INITIAL_SUPPLY))
-
-    await contract.waitForDeployment()
-    return contract as Contract
-  }
-
   toJson(): AssetJson {
     return {
       address: this.address,
       name: this.name,
       symbol: this.symbol,
-      totalSupply: this.totalSupply,
+      initialSupply: this.initialSupply,
       chainId: this.chainId!,
       salt: this.salt,
       image: this.image,
       isDeployed: this.isDeployed,
       isSourceOrgan: this.isSourceOrgan,
-      userBalance: this.userBalance
+      userBalance: this.userBalance,
+      organigramId: this.organigramId
     }
   }
 }
