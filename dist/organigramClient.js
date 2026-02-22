@@ -6,6 +6,7 @@ import Organ from './organ';
 import { Procedure } from './procedure';
 import { Organigram } from './organigram';
 import { getProcedureClass, populateInitializeProcedure, prepareDeployOrgansInput, prepareDeployProceduresInput, procedureTypes } from './procedure/utils';
+import { ERC20_INITIAL_SUPPLY } from './asset';
 export class OrganigramClient {
     address;
     chainId;
@@ -220,7 +221,7 @@ export class OrganigramClient {
         if (this.signer == null) {
             throw new Error('Signer not connected.');
         }
-        const tx = await this.contract.deployAsset(name, symbol, initialSupply, formatSalt(salt));
+        const tx = await this.contract.deployAsset(name, symbol, initialSupply ?? ERC20_INITIAL_SUPPLY, formatSalt(salt));
         if (options?.onTransaction != null) {
             options.onTransaction(tx, `Create asset ${name} (${symbol})`);
         }
@@ -238,7 +239,7 @@ export class OrganigramClient {
         const formattedAssets = assets.map(asset => ({
             name: asset.name,
             symbol: asset.symbol,
-            initialSupply: asset.initialSupply,
+            initialSupply: asset.initialSupply ?? ERC20_INITIAL_SUPPLY,
             salt: formatSalt(asset.salt)
         }));
         const tx = await this.contract.deployAssets(formattedAssets, {
@@ -253,7 +254,9 @@ export class OrganigramClient {
         if (eventCreations == null || eventCreations.length === 0) {
             throw new Error('Asset batch deployments failed.');
         }
-        const addresses = eventCreations.map((eventCreation) => eventCreation.address);
+        const addresses = [
+            ...new Set(eventCreations.map((eventCreation) => eventCreation.address))
+        ];
         return addresses;
     }
     async deployProcedure(input) {
@@ -263,7 +266,7 @@ export class OrganigramClient {
         const initializeProcedure = await populateInitializeProcedure({
             typeName: input.typeName,
             options: input.options ?? {},
-            cid: input.cid ?? input.typeName,
+            cid: input.cid ?? '',
             deciders: input.deciders,
             proposers: input.proposers ?? input.deciders,
             moderators: input.moderators ?? ethers.ZeroAddress,
@@ -320,7 +323,7 @@ export class OrganigramClient {
         const formattedAssets = input.assets.map(asset => ({
             name: asset.name,
             symbol: asset.symbol,
-            initialSupply: asset.initialSupply,
+            initialSupply: asset.initialSupply ?? ERC20_INITIAL_SUPPLY,
             salt: formatSalt(asset.salt)
         }));
         const organsInput = prepareDeployOrgansInput(input.organs);

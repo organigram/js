@@ -81,7 +81,7 @@ export declare const renewSaltsAndAddresses: (organigram: OrganigramInput, chain
         description?: string | null;
         contract?: import("ethers").Contract | null;
         symbol?: string | null;
-        totalSupply?: string | null;
+        initialSupply?: number | null;
         isSourceOrgan?: import("..").SourceOrgan[];
         image?: string | null;
         isDeployed?: boolean;
@@ -154,7 +154,7 @@ export declare const getTemplate: (templateName: keyof typeof templates, chainId
         description?: string | null;
         contract?: import("ethers").Contract | null;
         symbol?: string | null;
-        totalSupply?: string | null;
+        initialSupply?: number | null;
         isSourceOrgan?: import("..").SourceOrgan[];
         image?: string | null;
         isDeployed?: boolean;

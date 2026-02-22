@@ -26,6 +26,7 @@ export declare const nomination: {
         label: string;
         description: string;
     };
+    fields: {};
 };
 export declare const electionFields: {
     quorumSize: {
@@ -178,6 +179,7 @@ export declare const procedureTypes: {
             label: string;
             description: string;
         };
+        fields: {};
     };
     vote: {
         key: string;

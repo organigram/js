@@ -18,7 +18,9 @@ export function cloneInitCodeHash(implementation) {
 export const predictContractAddress = ({ type, chainId, salt }) => {
     return ethers.getCreate2Address(deployedAddresses[chainId]?.OrganigramClient, ethers.zeroPadValue(salt, 32), cloneInitCodeHash(type === 'Organ'
         ? deployedAddresses[chainId]?.CloneableOrgan
-        : deployedAddresses[chainId]?.[type.replace('Erc', 'ERC')]));
+        : type === 'Asset'
+            ? deployedAddresses[chainId]?.CloneableAsset
+            : deployedAddresses[chainId]?.[type.replace('Erc', 'ERC')]));
 };
 export const createRandom32BytesHexId = () => ethers.hexlify(ethers.randomBytes(32));
 export const formatSalt = (salt) => {

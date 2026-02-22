@@ -41,8 +41,9 @@ export const nomination = {
   metadata: {
     label: 'Nomination',
     description:
-      'A nomination allows any user in the source organ to directly add, remove or replace one or many entries, assets or permissions in the target organ.'
-  }
+      'A nomination allows any member in the source organ to directly edit entries, assets or permissions in the target organ.'
+  },
+  fields: {}
 }
 
 export const electionFields = {
@@ -107,7 +108,7 @@ export const erc20Vote = {
     ...procedureMetadata,
     label: 'Token-weighted Vote',
     description:
-      'A token vote allows any user in the source organ to vote on proposals, where its voting power is based on the amount of tokens it holds.',
+      'A token vote allows any member in the source organ to vote on proposals, where their voting power is based on the amount of tokens they hold.',
     type: 'erc20Vote'
   }
 }
@@ -234,7 +235,7 @@ export const populateInitializeProcedure = async (
       .then(n => n.chainId.toString())
     return await procedureClass._populateInitialize({
       options: { ...input.options, signer },
-      cid: input.cid ?? input.typeName,
+      cid: input.cid ?? '',
       proposers: input.proposers ?? input.deciders,
       moderators: input.moderators ?? ethers.ZeroAddress,
       deciders: input.deciders,

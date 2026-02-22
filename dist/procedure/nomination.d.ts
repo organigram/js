@@ -12,6 +12,7 @@ export declare class NominationProcedure extends Procedure {
             label: string;
             description: string;
         };
+        fields: {};
     };
     typeName: ProcedureTypeName;
     constructor(procedureInput: ProcedureInput & {

@@ -7,13 +7,14 @@ export class Asset {
     name;
     description;
     symbol;
-    totalSupply;
+    initialSupply;
     chainId;
     salt;
     isSourceOrgan;
     image;
     isDeployed;
     userBalance;
+    organigramId;
     constructor(input) {
         if (!input.address && !input.chainId) {
             throw new Error('Either address or chainId must be provided to organ constructor.');
@@ -32,19 +33,19 @@ export class Asset {
                     salt: this.salt
                 });
         this.symbol = input.symbol ?? 'ASSET';
-        this.totalSupply = input.totalSupply ?? (10_000_000).toString();
+        this.initialSupply = input.initialSupply ?? ERC20_INITIAL_SUPPLY;
         this.isSourceOrgan = input.isSourceOrgan ?? [];
         this.image = input.image ?? undefined;
         this.userBalance = input.userBalance ?? '0';
+        this.organigramId = input.organigramId ?? null;
     }
     load = async (signer) => {
         const erc777Interface = new Interface(AssetContract.abi);
         const contract = new ethers.Contract(this.address, erc777Interface, signer);
         const name = await contract.name();
         const symbol = await contract.symbol();
-        const _totalSupply = await contract.totalSupply();
-        let totalSupply = formatEther(_totalSupply);
-        totalSupply = (+totalSupply).toFixed(0);
+        const _initialSupply = await contract.initialSupply();
+        const initialSupply = parseInt((+formatEther(_initialSupply)).toFixed(0));
         const _userBalance = await contract.balanceOf(await signer?.getAddress());
         let userBalance = formatEther(_userBalance);
         userBalance = (+userBalance).toFixed(0);
@@ -54,32 +55,26 @@ export class Asset {
                 contract,
                 name,
                 symbol,
-                totalSupply,
+                initialSupply,
                 userBalance,
                 chainId: (await signer?.provider?.getNetwork())?.chainId.toString(),
                 isDeployed: true
             });
         }
     };
-    deploy = async (signer) => {
-        const erc777Interface = new ethers.Interface(AssetContract.abi);
-        const factory = new ethers.ContractFactory(erc777Interface, AssetContract.bytecode, signer);
-        const contract = await factory.deploy(BigInt(ERC20_INITIAL_SUPPLY));
-        await contract.waitForDeployment();
-        return contract;
-    };
     toJson() {
         return {
             address: this.address,
             name: this.name,
             symbol: this.symbol,
-            totalSupply: this.totalSupply,
+            initialSupply: this.initialSupply,
             chainId: this.chainId,
             salt: this.salt,
             image: this.image,
             isDeployed: this.isDeployed,
             isSourceOrgan: this.isSourceOrgan,
-            userBalance: this.userBalance
+            userBalance: this.userBalance,
+            organigramId: this.organigramId
         };
     }
 }
