@@ -1,372 +1,181 @@
 {
-  "name": "For-profit company",
-  "description": "This is the default organigram.",
-  "organs": [
-    {
-      "id": "clf8f94ul000ht8kbgylt9ri2",
-      "name": "Board of directors",
-      "description": "",
-      "cid": "",
-      "address": "",
-      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
-      "organigramClient": null,
-      "network": null,
-      "entries": []
-    },
-    {
-      "id": "clf8f94ul000it8kb8osde1r6",
-      "name": "Executive team",
-      "description": "",
-      "cid": "",
-      "address": "",
-      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
-      "organigramClient": null,
-      "network": null,
-      "entries": []
-    },
-    {
-      "id": "clf8fthkc0002kbq7tn9zpz03",
-      "name": "Shareholders",
-      "description": "This organ does not have a description yet. You can edit it by clicking here.",
-      "cid": "",
-      "address": "",
-      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
-      "organigramClient": null,
-      "network": null,
-      "entries": []
-    },
-    {
-      "id": "clf8sel0l001gkbejoxxbbxn8",
-      "name": "Bylaws",
-      "description": "This organ does not have a description yet. You can edit it by clicking here.",
-      "cid": "",
-      "address": "",
-      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
-      "organigramClient": null,
-      "network": null,
-      "entries": []
-    },
-    {
-      "id": "clf8skq4i002ckbej2dytdynt",
-      "name": "Meeting minutes",
-      "description": "This organ does not have a description yet. You can edit it by clicking here.",
-      "cid": "",
-      "address": "",
-      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
-      "organigramClient": null,
-      "network": null,
-      "entries": []
-    },
-    {
-      "id": "clf8so2sx002hkbejdzsxsx6t",
-      "name": "Financial statements",
-      "description": "This organ does not have a description yet. You can edit it by clicking here.",
-      "cid": "",
-      "address": "",
-      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
-      "organigramClient": null,
-      "network": null,
-      "entries": []
-    },
-    {
-      "id": "clf8t82jj004kkbejwwt8nf99",
-      "name": "Treasury",
-      "description": "This organ does not have a description yet. You can edit it by clicking here.",
-      "cid": "",
-      "address": "",
-      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
-      "organigramClient": null,
-      "network": null,
-      "entries": []
-    }
-  ],
-  "procedures": [
-    {
-      "id": "clf8f94ul000jt8kb5mnze3y8",
-      "name": "Elect executive team",
-      "description": "This procedure does not have a description yet. You can edit it by clicking here.",
-      "cid": "",
-      "address": "",
-      "typeName": "vote",
-      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
-      "data": "{\"majoritySize\":\"1\",\"quorumSize\":\"1\",\"voteDuration\":\"10\"}",
-      "organigramClient": null,
-      "network": null,
-      "type": {
-        "name": "vote",
-        "label": "Simple Majority Vote",
-        "description": "A vote allows any user in the source organ to vote on proposals to add, edit or replace one or many entries, assets or procedures in the target organ.",
-        "fields": [
-          {
-            "name": "majoritySize",
-            "label": "Majority size",
-            "type": "number",
-            "description": "",
-            "defaultValue": "1",
-            "options": null
-          },
-          {
-            "name": "quorumSize",
-            "label": "Quorum size",
-            "type": "number",
-            "description": "",
-            "defaultValue": "1",
-            "options": null
-          },
-          {
-            "name": "voteDuration",
-            "label": "Vote duration",
-            "type": "number",
-            "description": "Duration of the vote phase, as a number of blocks.",
-            "defaultValue": "8",
-            "options": null
-          }
-        ]
-      }
-    },
-    {
-      "id": "clf8kvrl0000bpskb9vq21ml0",
-      "name": "Elect directors",
-      "description": "This procedure does not have any description yet. You can edit it by clicking here.",
-      "cid": "",
-      "address": "",
-      "typeName": "erc20Vote",
-      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
-      "data": "{\"majoritySize\":\"1\",\"quorumSize\":\"1\",\"voteDuration\":\"10\"}",
-      "organigramClient": null,
-      "network": null,
-      "type": {
-        "name": "erc20Vote",
-        "label": "Token-weighted Vote",
-        "description": "A token vote allows any user in the source organ to vote on proposals, where its voting power is based on the amount of tokens it holds.",
-        "fields": [
-          {
-            "name": "erc20",
-            "label": "ERC20 Token",
-            "type": "string",
-            "description": "",
-            "defaultValue": "",
-            "options": null
-          },
-          {
-            "name": "majoritySize",
-            "label": "Majority size",
-            "type": "number",
-            "description": "",
-            "defaultValue": "1",
-            "options": null
-          },
-          {
-            "name": "quorumSize",
-            "label": "Quorum size",
-            "type": "number",
-            "description": "",
-            "defaultValue": "1",
-            "options": null
-          },
-          {
-            "name": "voteDuration",
-            "label": "Vote duration",
-            "type": "number",
-            "description": "Duration of the vote phase, as a number of blocks.",
-            "defaultValue": "8",
-            "options": null
-          }
-        ]
-      }
-    },
-    {
-      "id": "clf8scx3i001qejkb14gq7yz2",
-      "name": "Manage shareholders",
-      "description": "This procedure does not have any description yet. You can edit it by clicking here.",
-      "cid": "",
-      "address": "",
-      "typeName": "erc20Vote",
-      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
-      "data": "{\"majoritySize\":\"1\",\"quorumSize\":\"1\",\"voteDuration\":\"10\"}",
-      "organigramClient": null,
-      "network": null,
-      "type": {
-        "name": "erc20Vote",
-        "label": "Token-weighted Vote",
-        "description": "A token vote allows any user in the source organ to vote on proposals, where its voting power is based on the amount of tokens it holds.",
-        "fields": [
-          {
-            "name": "erc20",
-            "label": "ERC20 Token",
-            "type": "string",
-            "description": "",
-            "defaultValue": "",
-            "options": null
-          },
-          {
-            "name": "majoritySize",
-            "label": "Majority size",
-            "type": "number",
-            "description": "",
-            "defaultValue": "1",
-            "options": null
-          },
-          {
-            "name": "quorumSize",
-            "label": "Quorum size",
-            "type": "number",
-            "description": "",
-            "defaultValue": "1",
-            "options": null
-          },
-          {
-            "name": "voteDuration",
-            "label": "Vote duration",
-            "type": "number",
-            "description": "Duration of the vote phase, as a number of blocks.",
-            "defaultValue": "8",
-            "options": null
-          }
-        ]
-      }
-    },
-    {
-      "id": "clf8sfyb60022ejkb5as78av3",
-      "name": "Amend bylaws",
-      "description": "This procedure does not have any description yet. You can edit it by clicking here.",
-      "cid": "",
-      "address": "",
-      "typeName": "vote",
-      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
-      "data": "{\"majoritySize\":\"1\",\"quorumSize\":\"1\",\"voteDuration\":\"10\"}",
-      "organigramClient": null,
-      "network": null,
-      "type": {
-        "name": "vote",
-        "label": "Simple Majority Vote",
-        "description": "A vote allows any user in the source organ to vote on proposals to add, edit or replace one or many entries, assets or procedures in the target organ.",
-        "fields": [
-          {
-            "name": "majoritySize",
-            "label": "Majority size",
-            "type": "number",
-            "description": "",
-            "defaultValue": "1",
-            "options": null
-          },
-          {
-            "name": "quorumSize",
-            "label": "Quorum size",
-            "type": "number",
-            "description": "",
-            "defaultValue": "1",
-            "options": null
-          },
-          {
-            "name": "voteDuration",
-            "label": "Vote duration",
-            "type": "number",
-            "description": "Duration of the vote phase, as a number of blocks.",
-            "defaultValue": "8",
-            "options": null
-          }
-        ]
-      }
-    },
-    {
-      "id": "clf8sqtiq002iejkb8zvkcy9f",
-      "name": "Shareholders meeting",
-      "description": "This procedure does not have any description yet. You can edit it by clicking here.",
-      "cid": "",
-      "address": "",
-      "typeName": "erc20Vote",
-      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
-      "data": "{\"majoritySize\":\"1\",\"quorumSize\":\"1\",\"voteDuration\":\"10\"}",
-      "organigramClient": null,
-      "network": null,
-      "type": {
-        "name": "erc20Vote",
-        "label": "Token-weighted Vote",
-        "description": "A token vote allows any user in the source organ to vote on proposals, where its voting power is based on the amount of tokens it holds.",
-        "fields": [
-          {
-            "name": "erc20",
-            "label": "ERC20 Token",
-            "type": "string",
-            "description": "",
-            "defaultValue": "",
-            "options": null
-          },
-          {
-            "name": "majoritySize",
-            "label": "Majority size",
-            "type": "number",
-            "description": "",
-            "defaultValue": "1",
-            "options": null
-          },
-          {
-            "name": "quorumSize",
-            "label": "Quorum size",
-            "type": "number",
-            "description": "",
-            "defaultValue": "1",
-            "options": null
-          },
-          {
-            "name": "voteDuration",
-            "label": "Vote duration",
-            "type": "number",
-            "description": "Duration of the vote phase, as a number of blocks.",
-            "defaultValue": "8",
-            "options": null
-          }
-        ]
-      }
-    },
-    {
-      "id": "clf8t9kdg003kejkb62d15bga",
-      "name": "Manage treasury",
-      "description": "This procedure does not have any description yet. You can edit it by clicking here.",
-      "cid": "",
-      "address": "",
-      "typeName": "nomination",
-      "organigramId": "clf8f94ul000gt8kb3mgi81ku",
-      "data": "{}",
-      "organigramClient": null,
-      "network": null,
-      "type": {
-        "name": "nomination",
-        "label": "Nomination",
-        "description": "A nomination allows any user in the source organ to directly add, remove or replace one or many entries, assets or procedures in the target organ.",
-        "fields": []
-      }
-    }
-  ],
-  "assets": [
-    {
-      "id": "clf8fsqg50000kbq7ps0dl1io",
-      "name": "Shares",
-      "symbol": "SHR",
-      "image": null,
-      "contractId": null,
-      "address": null,
-      "networkName": "",
-      "contract": null,
-      "organigrams": [
+    "name": "For-profit company",
+    "organs": [
         {
-          "id": "clf8f94ul000gt8kb3mgi81ku",
-          "slug": "clf8f934d00003b6rgvfn7y06",
-          "name": "For-profit company",
-          "description": "This is the default organigram.",
-          "workspaceId": "clf8f8g3y000at8kb226l4f49",
-          "isPublic": false,
-          "organigramClient": null,
-          "networkName": ""
+            "salt": "board-of-directors-salt",
+            "address": "board-of-directors-address",
+            "name": "Board of directors",
+            "entries": [],
+            "permissions": [
+                {
+                    "permissionAddress": "elect-directors-address",
+                    "permissionValue": 12
+                },
+                {
+                    "permissionAddress": "amend-bylaws-address",
+                    "permissionValue": 19
+                }
+            ]
+        },
+        {
+            "salt": "executive-team-salt",
+            "address": "executive-team-address",
+            "name": "Executive team",
+            "entries": [],
+            "permissions": [
+                {
+                    "permissionAddress": "elect-executive-team-address",
+                    "permissionValue": 12
+                },
+                {
+                    "permissionAddress": "amend-bylaws-address",
+                    "permissionValue": 19
+                }
+            ]
+        },
+        {
+            "salt": "shareholders-salt",
+            "address": "shareholders-address",
+            "name": "Shareholders",
+            "entries": [],
+            "permissions": [
+                {
+                    "permissionAddress": "manage-shareholders-address",
+                    "permissionValue": 12
+                },
+                {
+                    "permissionAddress": "amend-bylaws-address",
+                    "permissionValue": 19
+                }
+            ]
+        },
+        {
+            "salt": "bylaws-salt",
+            "address": "bylaws-address",
+            "name": "Bylaws",
+            "entries": [],
+            "permissions": [
+                {
+                    "permissionAddress": "amend-bylaws-address",
+                    "permissionValue": 31
+                }
+            ]
+        },
+        {
+            "salt": "meeting-minutes-salt",
+            "address": "meeting-minutes-address",
+            "name": "Meeting minutes",
+            "entries": [],
+            "permissions": [
+                {
+                    "permissionAddress": "shareholders-meeting-address",
+                    "permissionValue": 4
+                },
+                {
+                    "permissionAddress": "amend-bylaws-address",
+                    "permissionValue": 19
+                }
+            ]
+        },
+        {
+            "salt": "financial-statements-salt",
+            "address": "financial-statements-address",
+            "name": "Financial statements",
+            "entries": [],
+            "permissions": [
+                {
+                    "permissionAddress": "shareholders-meeting-address",
+                    "permissionValue": 4
+                },
+                {
+                    "permissionAddress": "amend-bylaws-address",
+                    "permissionValue": 19
+                }
+            ]
+        },
+        {
+            "salt": "treasury-salt",
+            "address": "treasury-address",
+            "name": "Treasury",
+            "entries": [],
+            "permissions": [
+                {
+                    "permissionAddress": "manage-treasury-address",
+                    "permissionValue": 2028
+                },
+                {
+                    "permissionAddress": "manage-shareholders-address",
+                    "permissionValue": 4
+                },
+                {
+                    "permissionAddress": "amend-bylaws-address",
+                    "permissionValue": 19
+                }
+            ]
         }
-      ],
-      "network": {
-        "name": "",
-        "clientId": null
-      },
-      "isReferencedIn": []
-    }
-  ],
-  "canEdit": true
+    ],
+    "procedures": [
+        {
+            "salt": "elect-executive-team-salt",
+            "address": "elect-executive-team-address",
+            "name": "Elect executive team",
+            "typeName": "vote",
+            "data": "{\"majoritySize\":\"1\",\"quorumSize\":\"1\",\"voteDuration\":\"10\"}",
+            "deciders": "board-of-directors-address",
+            "proposers": "board-of-directors-address"
+        },
+        {
+            "salt": "elect-directors-salt",
+            "address": "elect-directors-address",
+            "name": "Elect directors",
+            "typeName": "erc20Vote",
+            "data": "{\"majoritySize\":\"1\",\"quorumSize\":\"1\",\"voteDuration\":\"10\",\"erc20\":\"shares-address\"}",
+            "deciders": "shareholders-address",
+            "proposers": "shareholders-address"
+        },
+        {
+            "salt": "manage-shareholders-salt",
+            "address": "manage-shareholders-address",
+            "name": "Manage shareholders",
+            "typeName": "erc20Vote",
+            "data": "{\"majoritySize\":\"1\",\"quorumSize\":\"1\",\"voteDuration\":\"10\",\"erc20\":\"shares-address\"}",
+            "deciders": "shareholders-address",
+            "proposers": "shareholders-address"
+        },
+        {
+            "salt": "amend-bylaws-salt",
+            "address": "amend-bylaws-address",
+            "name": "Amend bylaws",
+            "typeName": "vote",
+            "data": "{\"majoritySize\":\"1\",\"quorumSize\":\"1\",\"voteDuration\":\"10\"}",
+            "deciders": "shareholders-address",
+            "proposers": "board-of-directors-address"
+        },
+        {
+            "salt": "shareholders-meeting-salt",
+            "address": "shareholders-meeting-address",
+            "name": "Shareholders meeting",
+            "typeName": "erc20Vote",
+            "data": "{\"majoritySize\":\"1\",\"quorumSize\":\"1\",\"voteDuration\":\"10\",\"erc20\":\"shares-address\"}",
+            "deciders": "shareholders-address",
+            "proposers": "shareholders-address"
+        },
+        {
+            "salt": "manage-treasury-salt",
+            "address": "manage-treasury-address",
+            "name": "Manage treasury",
+            "typeName": "nomination",
+            "data": "{}",
+            "deciders": "executive-team-address",
+            "proposers": "executive-team-address"
+        }
+    ],
+    "assets": [
+        {
+            "salt": "shares-salt",
+            "address": "shares-address",
+            "name": "Shares",
+            "symbol": "SHR"
+        }
+    ]
 }

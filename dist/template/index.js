@@ -1,6 +1,12 @@
+import forProfit from './for-profit.json';
+import nonProfit from './non-profit.json';
+import openSource from './open-source.json';
 import none from './none.json';
 import { capitalize, createRandom32BytesHexId, predictContractAddress } from '../utils';
 export const templates = {
+    forProfit,
+    nonProfit,
+    openSource,
     none
 };
 const renewSalts = (pv, cv) => Object.assign(pv, { [cv.salt]: createRandom32BytesHexId() });

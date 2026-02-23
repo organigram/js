@@ -1,5 +1,84 @@
 import { OrganigramInput } from '../organigram';
 export declare const templates: {
+    forProfit: {
+        name: string;
+        organs: {
+            salt: string;
+            address: string;
+            name: string;
+            entries: never[];
+            permissions: {
+                permissionAddress: string;
+                permissionValue: number;
+            }[];
+        }[];
+        procedures: {
+            salt: string;
+            address: string;
+            name: string;
+            typeName: string;
+            data: string;
+            deciders: string;
+            proposers: string;
+        }[];
+        assets: {
+            salt: string;
+            address: string;
+            name: string;
+            symbol: string;
+        }[];
+    };
+    nonProfit: {
+        name: string;
+        organs: {
+            salt: string;
+            address: string;
+            name: string;
+            entries: never[];
+            permissions: {
+                permissionAddress: string;
+                permissionValue: number;
+            }[];
+        }[];
+        procedures: {
+            salt: string;
+            address: string;
+            name: string;
+            typeName: string;
+            data: string;
+            deciders: string;
+            proposers: string;
+        }[];
+        assets: {
+            salt: string;
+            address: string;
+            name: string;
+            symbol: string;
+        }[];
+    };
+    openSource: {
+        name: string;
+        organs: {
+            salt: string;
+            address: string;
+            name: string;
+            entries: never[];
+            permissions: {
+                permissionAddress: string;
+                permissionValue: number;
+            }[];
+        }[];
+        procedures: {
+            salt: string;
+            address: string;
+            name: string;
+            typeName: string;
+            data: string;
+            deciders: string;
+            proposers: string;
+        }[];
+        assets: never[];
+    };
     none: {
         name: string;
         organs: {
