@@ -146,14 +146,17 @@ export class Organ {
         return await tx.wait();
     };
     static async load(address, signerOrProvider, initialOrgan) {
+        if (!address) {
+            throw new Error('Cannot load organ: No address provided.');
+        }
+        if (!signerOrProvider) {
+            throw new Error('Cannot load organ: No signer or provider provided.');
+        }
         const provider = signerOrProvider.provider ?? signerOrProvider;
         const network = signerOrProvider.provider != null ? await provider?.getNetwork() : null;
         const chainId = network?.chainId.toString() ?? '1';
         if (chainId == null) {
             throw new Error('Cannot load organ: No chainId found.');
-        }
-        if (!address) {
-            throw new Error('Cannot load organ: No address provided.');
         }
         const data = await Organ.loadData(address, signerOrProvider);
         const balance = await provider

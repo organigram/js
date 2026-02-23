@@ -1,5 +1,5 @@
 import AssetContract from '@organigram/protocol/artifacts/contracts/Asset.sol/Asset.json';
-import { ethers, Interface, formatEther } from 'ethers';
+import { ethers, formatEther } from 'ethers';
 import { createRandom32BytesHexId, predictContractAddress } from './utils';
 export const ERC20_INITIAL_SUPPLY = 10_000_000;
 export class Asset {
@@ -23,7 +23,7 @@ export class Asset {
         this.description = input.description ?? 'This asset has no description.';
         this.isDeployed = input.isDeployed ?? false;
         this.salt =
-            (input.salt ?? this.isDeployed) ? undefined : createRandom32BytesHexId();
+            input.salt || (this.isDeployed ? undefined : createRandom32BytesHexId());
         this.chainId = input.chainId ?? '11155111';
         this.address =
             input.address ??
@@ -39,19 +39,28 @@ export class Asset {
         this.userBalance = input.userBalance ?? '0';
         this.organigramId = input.organigramId ?? null;
     }
-    load = async (signer) => {
-        const erc777Interface = new Interface(AssetContract.abi);
-        const contract = new ethers.Contract(this.address, erc777Interface, signer);
+    static load = async (address, signer, initilAsset) => {
+        if (!address) {
+            throw new Error('Cannot load asset: No address provided.');
+        }
+        const contract = new ethers.Contract(address, AssetContract.abi, signer);
         const name = await contract.name();
         const symbol = await contract.symbol();
-        const _initialSupply = await contract.initialSupply();
+        const _initialSupply = await contract.totalSupply();
+        console.log('initial supply', _initialSupply.toString());
+        console.log('formatted initial supply', formatEther(_initialSupply));
+        console.log('name', name);
+        console.log('symbol', symbol);
+        console.log(parseInt((+formatEther(_initialSupply)).toFixed(0)));
         const initialSupply = parseInt((+formatEther(_initialSupply)).toFixed(0));
-        const _userBalance = await contract.balanceOf(await signer?.getAddress());
+        const _userBalance = (await contract.balanceOf(await signer?.getAddress())) ?? 0;
+        console.log('user balance', _userBalance.toString());
         let userBalance = formatEther(_userBalance);
         userBalance = (+userBalance).toFixed(0);
         if (contract != null) {
             return new Asset({
-                address: this.address,
+                ...initilAsset,
+                address,
                 contract,
                 name,
                 symbol,

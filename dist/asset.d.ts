@@ -43,7 +43,7 @@ export declare class Asset {
     userBalance: string;
     organigramId?: string | null;
     constructor(input: AssetInput);
-    load: (signer?: Signer | null) => Promise<(Asset & {
+    static load: (address: string, signer?: Signer | null, initilAsset?: AssetInput) => Promise<(Asset & {
         userBalance: string;
     }) | undefined>;
     toJson(): AssetJson;

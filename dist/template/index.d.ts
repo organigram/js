@@ -30,8 +30,22 @@ export declare const renewSaltsAndAddresses: (organigram: OrganigramInput, chain
         salt: string;
         address: string;
         chainId: string;
+        isDeployed: boolean;
         permissions: {
             permissionAddress: string;
+            permissionValue: number;
+        }[] | undefined;
+        isSource: {
+            organAddress: string;
+            procedureAddress: string;
+            assetAddress?: string | null;
+            types?: import("..").SourceOrganTypeName[];
+        }[] | undefined;
+        isTarget: {
+            organAddress: string;
+            procedureAddress: string;
+            assetAddress?: string | null;
+            types?: import("..").SourceOrganTypeName[];
             permissionValue: number;
         }[] | undefined;
         signerOrProvider?: import("ethers").Signer | import("ethers").Provider | null;
@@ -42,17 +56,29 @@ export declare const renewSaltsAndAddresses: (organigram: OrganigramInput, chain
             address: string;
             cid: string;
         }> | null;
-        isDeployed?: boolean | null;
         name?: string | null;
         description?: string | null;
-        isSource?: import("..").SourceOrgan[] | null;
-        isTarget?: import("..").TargetOrgan[] | null;
         organigramId?: string | null;
         forwarder?: string | null;
     }[];
     procedures: {
         salt: string;
         chainId: string;
+        data: string | null | undefined;
+        isDeployed: boolean;
+        sourceOrgans: {
+            procedureAddress: string;
+            organAddress: string;
+            assetAddress?: string | null;
+            types?: import("..").SourceOrganTypeName[];
+        }[] | undefined;
+        targetOrgans: {
+            procedureAddress: string;
+            organAddress: string;
+            assetAddress?: string | null;
+            types?: import("..").SourceOrganTypeName[];
+            permissionValue: number;
+        }[] | undefined;
         address: string;
         deciders: string;
         proposers: string;
@@ -67,14 +93,11 @@ export declare const renewSaltsAndAddresses: (organigram: OrganigramInput, chain
         withModeration?: boolean | null;
         forwarder?: string | null;
         proposals?: import("..").ProcedureProposal[] | null;
-        isDeployed?: boolean | null;
-        sourceOrgans?: import("..").SourceOrgan[] | null;
-        targetOrgans?: import("..").TargetOrgan[] | null;
         organigramId?: string | null;
-        data?: string | null;
     }[];
     assets: {
         chainId: string;
+        isDeployed: boolean;
         salt: string;
         address: string;
         name?: string | null;
@@ -84,7 +107,6 @@ export declare const renewSaltsAndAddresses: (organigram: OrganigramInput, chain
         initialSupply?: number | null;
         isSourceOrgan?: import("..").SourceOrgan[];
         image?: string | null;
-        isDeployed?: boolean;
         userBalance?: string | null;
         organigramId?: string | null;
     }[];
@@ -103,8 +125,22 @@ export declare const getTemplate: (templateName: keyof typeof templates, chainId
         salt: string;
         address: string;
         chainId: string;
+        isDeployed: boolean;
         permissions: {
             permissionAddress: string;
+            permissionValue: number;
+        }[] | undefined;
+        isSource: {
+            organAddress: string;
+            procedureAddress: string;
+            assetAddress?: string | null;
+            types?: import("..").SourceOrganTypeName[];
+        }[] | undefined;
+        isTarget: {
+            organAddress: string;
+            procedureAddress: string;
+            assetAddress?: string | null;
+            types?: import("..").SourceOrganTypeName[];
             permissionValue: number;
         }[] | undefined;
         signerOrProvider?: import("ethers").Signer | import("ethers").Provider | null;
@@ -115,17 +151,29 @@ export declare const getTemplate: (templateName: keyof typeof templates, chainId
             address: string;
             cid: string;
         }> | null;
-        isDeployed?: boolean | null;
         name?: string | null;
         description?: string | null;
-        isSource?: import("..").SourceOrgan[] | null;
-        isTarget?: import("..").TargetOrgan[] | null;
         organigramId?: string | null;
         forwarder?: string | null;
     }[];
     procedures: {
         salt: string;
         chainId: string;
+        data: string | null | undefined;
+        isDeployed: boolean;
+        sourceOrgans: {
+            procedureAddress: string;
+            organAddress: string;
+            assetAddress?: string | null;
+            types?: import("..").SourceOrganTypeName[];
+        }[] | undefined;
+        targetOrgans: {
+            procedureAddress: string;
+            organAddress: string;
+            assetAddress?: string | null;
+            types?: import("..").SourceOrganTypeName[];
+            permissionValue: number;
+        }[] | undefined;
         address: string;
         deciders: string;
         proposers: string;
@@ -140,14 +188,11 @@ export declare const getTemplate: (templateName: keyof typeof templates, chainId
         withModeration?: boolean | null;
         forwarder?: string | null;
         proposals?: import("..").ProcedureProposal[] | null;
-        isDeployed?: boolean | null;
-        sourceOrgans?: import("..").SourceOrgan[] | null;
-        targetOrgans?: import("..").TargetOrgan[] | null;
         organigramId?: string | null;
-        data?: string | null;
     }[];
     assets: {
         chainId: string;
+        isDeployed: boolean;
         salt: string;
         address: string;
         name?: string | null;
@@ -157,7 +202,6 @@ export declare const getTemplate: (templateName: keyof typeof templates, chainId
         initialSupply?: number | null;
         isSourceOrgan?: import("..").SourceOrgan[];
         image?: string | null;
-        isDeployed?: boolean;
         userBalance?: string | null;
         organigramId?: string | null;
     }[];

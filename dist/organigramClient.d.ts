@@ -3,6 +3,7 @@ import Organ, { OrganEntry, OrganInput, OrganPermission } from './organ';
 import { Procedure, ProcedureInput, ProcedureType } from './procedure';
 import { Organigram } from './organigram';
 import { ProcedureTypeName } from './procedure/utils';
+import { Asset } from './asset';
 export interface DeployOrganInput {
     cid?: string;
     permissions?: OrganPermission[];
@@ -52,6 +53,7 @@ export declare class OrganigramClient {
     procedureTypes: ProcedureType[];
     organs: Organ[];
     procedures: Procedure[];
+    assets: Asset[];
     cids: File[];
     provider: ethers.Provider;
     contract: ethers.Contract;
@@ -78,7 +80,8 @@ export declare class OrganigramClient {
         signer?: ethers.Signer;
     }): Promise<OrganigramClient>;
     getProcedureType(procedureAddress: string): Promise<ProcedureType | null>;
-    getOrgan(address: string, cached?: boolean, initialOrgan?: OrganInput): Promise<Organ>;
+    getDeployedOrgan(address: string, cached?: boolean, initialOrgan?: OrganInput): Promise<Organ>;
+    getDeployedAsset(address: string, cached?: boolean, initialAsset?: Asset): Promise<Asset>;
     getDeployedProcedure(address: string, cached?: boolean, initialProcedure?: ProcedureInput): Promise<Procedure>;
     deployOrgan(input?: DeployOrganInput): Promise<Organ>;
     deployOrgans(deployOrgansInput: DeployOrganInput[]): Promise<Organ[]>;

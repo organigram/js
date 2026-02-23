@@ -25,15 +25,59 @@ export const renewSaltsAndAddresses = (organigram, chainId) => {
         salt: newOrganSalts[organ.salt],
         address: newOrganAddresses[organ.address],
         chainId,
-        permissions: organ.permissions?.map(permission => ({
+        isDeployed: false,
+        permissions: organ.permissions
+            ?.map(permission => ({
             ...permission,
             permissionAddress: newProcedureAddresses[permission.permissionAddress]
         }))
+            .filter(permission => permission.permissionAddress !== undefined),
+        isSource: organ.isSource?.map(source => ({
+            ...source,
+            organAddress: newOrganAddresses[source.organAddress],
+            procedureAddress: newProcedureAddresses[source.procedureAddress] ??
+                source.procedureAddress ??
+                undefined
+        })),
+        isTarget: organ.isTarget
+            ?.map(target => ({
+            ...target,
+            organAddress: newOrganAddresses[target.organAddress],
+            procedureAddress: newProcedureAddresses[target.procedureAddress] ??
+                target.procedureAddress ??
+                undefined
+        }))
+            .filter(target => target.procedureAddress !== undefined)
     }));
     const procedures = organigram.procedures?.map(procedure => ({
         ...procedure,
         salt: newProcedureSalts[procedure.salt],
         chainId,
+        data: JSON.parse(procedure.data).erc20
+            ? JSON.stringify({
+                erc20: newAssetAddresses[JSON.parse(procedure.data).erc20],
+                quorumSize: JSON.parse(procedure.data).quorumSize,
+                voteDuration: JSON.parse(procedure.data).voteDuration,
+                majoritySize: JSON.parse(procedure.data).majoritySize
+            })
+            : procedure.data,
+        isDeployed: false,
+        sourceOrgans: procedure.sourceOrgans
+            ?.map(sourceOrgan => ({
+            ...sourceOrgan,
+            procedureAddress: newProcedureAddresses[sourceOrgan.procedureAddress],
+            organAddress: newOrganAddresses[sourceOrgan.organAddress]
+        }))
+            .filter(sourceOrgan => newProcedureAddresses[sourceOrgan.procedureAddress] !== undefined &&
+            newOrganAddresses[sourceOrgan.organAddress] !== undefined),
+        targetOrgans: procedure.targetOrgans
+            ?.map(targetOrgan => ({
+            ...targetOrgan,
+            procedureAddress: newProcedureAddresses[targetOrgan.procedureAddress],
+            organAddress: newOrganAddresses[targetOrgan.organAddress]
+        }))
+            .filter(targetOrgan => newProcedureAddresses[targetOrgan.procedureAddress] !== undefined &&
+            newOrganAddresses[targetOrgan.organAddress] !== undefined),
         address: newProcedureAddresses[procedure.address],
         deciders: newOrganAddresses[procedure.deciders],
         proposers: newOrganAddresses[procedure.proposers],
@@ -44,6 +88,7 @@ export const renewSaltsAndAddresses = (organigram, chainId) => {
     const assets = organigram.assets?.map(asset => ({
         ...asset,
         chainId,
+        isDeployed: false,
         salt: newAssetSalts[asset.salt],
         address: newAssetAddresses[asset.address]
     }));
