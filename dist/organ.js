@@ -30,9 +30,7 @@ export class Organ {
     isDeployed;
     organigramId;
     forwarder;
-    isSource;
-    isTarget;
-    constructor({ address, chainId, signerOrProvider, balance, permissions, cid, entries, salt, isDeployed, name, description, isSource, isTarget, organigramId, forwarder }) {
+    constructor({ address, chainId, signerOrProvider, balance, permissions, cid, entries, salt, isDeployed, name, description, organigramId, forwarder }) {
         this.name = name ?? 'Unnamed Organ';
         this.description = description ?? 'This organ does not have a description.';
         this.isDeployed = isDeployed ?? false;
@@ -69,8 +67,6 @@ export class Organ {
             });
         }
         this.contract = new ethers.Contract(this.address, OrganContractABI.abi, signerOrProvider);
-        this.isSource = isSource ?? [];
-        this.isTarget = isTarget ?? [];
     }
     updateCid = async (cid, options) => {
         const tx = await this.contract.updateCid(cid, { nonce: options?.nonce });
@@ -317,10 +313,7 @@ export class Organ {
         salt: this.salt,
         chainId: this.chainId ?? '',
         organigramId: this.organigramId ?? '',
-        isSource: this.isSource,
-        isTarget: this.isTarget,
         isDeployed: this.isDeployed,
         balance: this.balance.toString() + 'n'
     }));
 }
-export default Organ;

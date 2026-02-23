@@ -1,31 +1,14 @@
 import { Signer } from 'ethers';
-import { Asset, AssetInput, AssetJson } from './asset';
-import Organ, { OrganInput, OrganJson } from './organ';
-import { Procedure, ProcedureInput, ProcedureJson } from './procedure';
+import { Asset, type AssetInput, type AssetJson } from './asset';
+import { Organ, type OrganInput, type OrganJson } from './organ';
+import { Procedure, type ProcedureInput, type ProcedureJson } from './procedure';
 import OrganigramClient from './organigramClient';
 import { templates } from './template';
-export type SourceOrganTypeName = 'proposers' | 'moderators' | 'deciders' | 'target';
-export type SourceOrgan = {
-    organAddress?: string | null;
-    procedureAddress?: string | null;
-    assetAddress?: string | null;
-    types?: SourceOrganTypeName[];
-};
-export declare const sourceOrganTypes: {
+export type ProcedureRoleTypeName = 'proposers' | 'moderators' | 'deciders';
+export declare const procedureRoleTypes: {
     label: string;
     name: string;
 }[];
-export type SourcesAndTargets = {
-    isSourceOrgan: SourceOrgan[];
-    isTargetOrgan: TargetOrgan[];
-};
-export type ProcedureSourcesAndTargets = {
-    targetOrgans: TargetOrgan[];
-    sourceOrgans: SourceOrgan[];
-};
-export type TargetOrgan = SourceOrgan & {
-    permissionValue: number;
-};
 export type OrganigramJson = {
     id: string;
     slug: string;
@@ -37,10 +20,6 @@ export type OrganigramJson = {
     assets: AssetJson[];
     workspaceId?: string | null;
 };
-export declare const getProcedureSourcesAndTargets: (procedure: ProcedureInput, organigram: OrganigramJson) => ProcedureJson;
-export declare const getOrganSourcesAndTargets: (organ: OrganInput, organigram: Organigram) => OrganJson;
-export declare const getAssetSourcesAndTargets: (asset: Asset, organigram: Organigram) => Asset;
-export declare const getSourcesAndTargets: (initialOrganigram: OrganigramInput) => OrganigramJson;
 export type OrganigramInput = {
     id?: string | null;
     slug?: string | null;

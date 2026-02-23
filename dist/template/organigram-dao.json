@@ -1,159 +1,237 @@
 {
-  "id": null,
-  "slug": null,
-  "name": "Open-source project",
+  "name": "organigram-dao",
   "description": "This is the default organigram.",
-  "workspaceId": "clf8f8g3y000at8kb226l4f49",
-  "isPublic": false,
-  "organigramClient": null,
-  "networkName": "",
   "organs": [
     {
-      "id": "clfbr1rkl000hadkbhpb0bg0f",
+      "id": "clnavsmda009t8ywghhya08rw",
       "name": "Project founders",
       "description": "This organ does not have a description",
       "cid": "",
       "address": "",
-      "organigramId": "clfbr1rkv000vkbadb4pv8czh",
+      "organigramId": "clnavsmdg00bfwg8yjkrrydio",
       "organigramClient": null,
       "network": null,
-      "entries": []
+      "chainId": "",
+      "entries": [
+        {
+          "id": "clnavz5eh00c8wg8y26zutw8k",
+          "address": "0xE1C7eb2f5Da0F5b8662b3c9a11464Fa703d5ed5e",
+          "contractId": null,
+          "cid": null,
+          "organizationId": null,
+          "workspaceId": null,
+          "organigramId": null,
+          "index": null,
+          "organId": null,
+          "isInOrganId": "clnavsmda009t8ywghhya08rw",
+          "deployed": null,
+          "assetId": null
+        }
+      ]
     },
     {
-      "id": "clfbr1rkl000kadkb83ay9d76",
+      "id": "clnavsmda009u8ywggmg9f772",
       "name": "Project's Constitution",
       "description": "This organ does not have a description yet. You can edit it by clicking here.",
       "cid": "",
       "address": "",
-      "organigramId": "clfbr1rkv000vkbadb4pv8czh",
+      "organigramId": "clnavsmdg00bfwg8yjkrrydio",
       "organigramClient": null,
       "network": null,
+      "chainId": "",
       "entries": []
     },
     {
-      "id": "clfbr1rkl000nadkbg1px75pl",
+      "id": "clnavsmda009v8ywg30f69zdb",
       "name": "Treasury",
       "description": "This organ does not have a description yet. You can edit it by clicking here.",
       "cid": "",
       "address": "",
-      "organigramId": "clfbr1rkv000vkbadb4pv8czh",
+      "organigramId": "clnavsmdg00bfwg8yjkrrydio",
       "organigramClient": null,
       "network": null,
+      "chainId": "",
       "entries": []
     },
     {
-      "id": "clfbr50tq0024kbadj2dpwb0g",
-      "name": "Contributors",
+      "id": "clnavsmda009w8ywg3hajabyb",
+      "name": "Core Contributors",
       "description": "This organ does not have a description yet. You can edit it by clicking here.",
       "cid": "",
       "address": "",
-      "organigramId": "clfbr1rkv000vkbadb4pv8czh",
+      "organigramId": "clnavsmdg00bfwg8yjkrrydio",
       "organigramClient": null,
       "network": null,
+      "chainId": "",
+      "entries": [
+        {
+          "id": "clnavzavh00ccwg8ybnf5byhv",
+          "address": "0xE1C7eb2f5Da0F5b8662b3c9a11464Fa703d5ed5e",
+          "contractId": null,
+          "cid": null,
+          "organizationId": null,
+          "workspaceId": null,
+          "organigramId": null,
+          "index": null,
+          "organId": null,
+          "isInOrganId": "clnavsmda009w8ywg3hajabyb",
+          "deployed": null,
+          "assetId": null
+        }
+      ]
+    },
+    {
+      "id": "clnavsmda009x8ywg7qh4g31s",
+      "name": "Procedures registry",
+      "description": "This organ does not have a description yet. You can edit it by clicking here.",
+      "cid": "",
+      "address": "",
+      "organigramId": "clnavsmdg00bfwg8yjkrrydio",
+      "organigramClient": null,
+      "network": null,
+      "chainId": "",
       "entries": []
     },
     {
-      "id": "clfbr5lxj0025kbadnlagrukz",
-      "name": "Codebase",
+      "id": "clnavxunb00bywg8yxvny89ds",
+      "name": "Organigram Certified Solo Users",
       "description": "This organ does not have a description yet. You can edit it by clicking here.",
       "cid": "",
       "address": "",
-      "organigramId": "clfbr1rkv000vkbadb4pv8czh",
+      "organigramId": "clnavsmdg00bfwg8yjkrrydio",
       "organigramClient": null,
       "network": null,
+      "chainId": "",
+      "entries": [
+        {
+          "id": "clnavxunc00c0wg8yq20ss59t",
+          "address": "0xE1C7eb2f5Da0F5b8662b3c9a11464Fa703d5ed5e",
+          "contractId": null,
+          "cid": null,
+          "organizationId": null,
+          "workspaceId": null,
+          "organigramId": null,
+          "index": "0",
+          "organId": null,
+          "isInOrganId": "clnavxunb00bywg8yxvny89ds",
+          "deployed": null,
+          "assetId": null
+        }
+      ]
+    },
+    {
+      "id": "clnavybid00c1wg8yk2n03ywz",
+      "name": "Gas Station Main Whitelist",
+      "description": "This organ does not have a description yet. You can edit it by clicking here.",
+      "cid": "",
+      "address": "",
+      "organigramId": "clnavsmdg00bfwg8yjkrrydio",
+      "organigramClient": null,
+      "network": null,
+      "chainId": "",
       "entries": []
     }
   ],
   "procedures": [
     {
-      "id": "clfbr1rkl000padkb7r7s8aph",
+      "id": "clnavsmda009y8ywg6ec1baoq",
       "name": "Manage founders",
       "description": "This procedure does not have any description yet. You can edit it by clicking here.",
       "cid": "",
       "address": "",
       "typeName": "nomination",
-      "organigramId": "clfbr1rkv000vkbadb4pv8czh",
+      "organigramId": "clnavsmdg00bfwg8yjkrrydio",
       "data": null,
       "organigramClient": null,
       "network": null,
+      "chainId": "",
       "type": {
         "name": "nomination",
         "label": "Nomination",
         "description": "A nomination allows any user in the source organ to directly add, remove or replace one or many entries, assets or procedures in the target organ.",
         "fields": []
-      }
+      },
+      "certified": []
     },
     {
-      "id": "clfbr1rkl000radkbhygahc3m",
+      "id": "clnavsmda009z8ywg4g2mcxd7",
       "name": "Amend Constitution",
       "description": "This procedure does not have any description yet. You can edit it by clicking here.",
       "cid": "",
       "address": "",
       "typeName": "nomination",
-      "organigramId": "clfbr1rkv000vkbadb4pv8czh",
+      "organigramId": "clnavsmdg00bfwg8yjkrrydio",
       "data": null,
       "organigramClient": null,
       "network": null,
+      "chainId": "",
       "type": {
         "name": "nomination",
         "label": "Nomination",
         "description": "A nomination allows any user in the source organ to directly add, remove or replace one or many entries, assets or procedures in the target organ.",
         "fields": []
-      }
+      },
+      "certified": []
     },
     {
-      "id": "clfbr1rkl000tadkbaonlhx79",
+      "id": "clnavsmda00a08ywg91fg2m8e",
       "name": "Manage treasury",
       "description": "This procedure does not have any description yet. You can edit it by clicking here.",
       "cid": "",
       "address": "",
       "typeName": "nomination",
-      "organigramId": "clfbr1rkv000vkbadb4pv8czh",
+      "organigramId": "clnavsmdg00bfwg8yjkrrydio",
       "data": null,
       "organigramClient": null,
       "network": null,
+      "chainId": "",
       "type": {
         "name": "nomination",
         "label": "Nomination",
         "description": "A nomination allows any user in the source organ to directly add, remove or replace one or many entries, assets or procedures in the target organ.",
         "fields": []
-      }
+      },
+      "certified": []
     },
     {
-      "id": "clfbr6rck0014adkb993u57pu",
-      "name": "Manage codebase",
+      "id": "clnavsmda00a18ywgblcz782x",
+      "name": "Manage operations",
       "description": "This procedure does not have any description yet. You can edit it by clicking here.",
       "cid": "",
       "address": "",
       "typeName": "nomination",
-      "organigramId": "clfbr1rkv000vkbadb4pv8czh",
-      "data": "{}",
+      "organigramId": "clnavsmdg00bfwg8yjkrrydio",
+      "data": null,
       "organigramClient": null,
       "network": null,
+      "chainId": "",
       "type": {
         "name": "nomination",
         "label": "Nomination",
         "description": "A nomination allows any user in the source organ to directly add, remove or replace one or many entries, assets or procedures in the target organ.",
         "fields": []
-      }
+      },
+      "certified": []
     },
     {
-      "id": "clfbr80ht0017adkb19fd50ve",
+      "id": "clnavsmda00a28ywg3f54gulo",
       "name": "Manage contributors",
       "description": "This procedure does not have any description yet. You can edit it by clicking here.",
       "cid": "",
       "address": "",
       "typeName": "nomination",
-      "organigramId": "clfbr1rkv000vkbadb4pv8czh",
-      "data": "{}",
+      "organigramId": "clnavsmdg00bfwg8yjkrrydio",
+      "data": null,
       "organigramClient": null,
       "network": null,
+      "chainId": "",
       "type": {
         "name": "nomination",
         "label": "Nomination",
         "description": "A nomination allows any user in the source organ to directly add, remove or replace one or many entries, assets or procedures in the target organ.",
         "fields": []
-      }
+      },
+      "certified": []
     }
   ],
   "assets": [],

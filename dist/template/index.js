@@ -31,23 +31,7 @@ export const renewSaltsAndAddresses = (organigram, chainId) => {
             ...permission,
             permissionAddress: newProcedureAddresses[permission.permissionAddress]
         }))
-            .filter(permission => permission.permissionAddress !== undefined),
-        isSource: organ.isSource?.map(source => ({
-            ...source,
-            organAddress: newOrganAddresses[source.organAddress],
-            procedureAddress: newProcedureAddresses[source.procedureAddress] ??
-                source.procedureAddress ??
-                undefined
-        })),
-        isTarget: organ.isTarget
-            ?.map(target => ({
-            ...target,
-            organAddress: newOrganAddresses[target.organAddress],
-            procedureAddress: newProcedureAddresses[target.procedureAddress] ??
-                target.procedureAddress ??
-                undefined
-        }))
-            .filter(target => target.procedureAddress !== undefined)
+            .filter(permission => permission.permissionAddress !== undefined)
     }));
     const procedures = organigram.procedures?.map(procedure => ({
         ...procedure,
@@ -62,22 +46,6 @@ export const renewSaltsAndAddresses = (organigram, chainId) => {
             })
             : procedure.data,
         isDeployed: false,
-        sourceOrgans: procedure.sourceOrgans
-            ?.map(sourceOrgan => ({
-            ...sourceOrgan,
-            procedureAddress: newProcedureAddresses[sourceOrgan.procedureAddress],
-            organAddress: newOrganAddresses[sourceOrgan.organAddress]
-        }))
-            .filter(sourceOrgan => newProcedureAddresses[sourceOrgan.procedureAddress] !== undefined &&
-            newOrganAddresses[sourceOrgan.organAddress] !== undefined),
-        targetOrgans: procedure.targetOrgans
-            ?.map(targetOrgan => ({
-            ...targetOrgan,
-            procedureAddress: newProcedureAddresses[targetOrgan.procedureAddress],
-            organAddress: newOrganAddresses[targetOrgan.organAddress]
-        }))
-            .filter(targetOrgan => newProcedureAddresses[targetOrgan.procedureAddress] !== undefined &&
-            newOrganAddresses[targetOrgan.organAddress] !== undefined),
         address: newProcedureAddresses[procedure.address],
         deciders: newOrganAddresses[procedure.deciders],
         proposers: newOrganAddresses[procedure.proposers],

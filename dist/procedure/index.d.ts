@@ -1,6 +1,5 @@
 import { type ContractTransactionReceipt, ethers } from 'ethers';
 import type { TransactionOptions } from '../organigramClient';
-import { SourceOrgan, TargetOrgan } from '../organigram';
 import { PopulateInitializeInput, ProcedureTypeName } from './utils';
 export interface ProcedureTypeField {
     name: string;
@@ -39,9 +38,8 @@ export type ProcedureJson = {
     forwarder: string;
     proposals?: ProcedureProposal[];
     args?: unknown[];
-    sourceOrgans?: SourceOrgan[];
-    targetOrgans?: TargetOrgan[];
     type: ProcedureType;
+    organigramId?: string | null;
 };
 export type Election = {
     proposalKey: string;
@@ -126,8 +124,6 @@ export interface ProcedureInput {
     forwarder?: string | null;
     proposals?: ProcedureProposal[] | null;
     isDeployed?: boolean | null;
-    sourceOrgans?: SourceOrgan[] | null;
-    targetOrgans?: TargetOrgan[] | null;
     organigramId?: string | null;
     data?: string | null;
 }
@@ -155,10 +151,8 @@ export declare class Procedure {
     signer?: ethers.Signer;
     provider?: ethers.Provider;
     organigramId: string;
-    sourceOrgans?: SourceOrgan[];
-    targetOrgans?: TargetOrgan[];
     type: ProcedureType;
-    constructor({ address, deciders, typeName, name, description, salt, cid, chainId, signerOrProvider, metadata, proposers, withModeration, forwarder, moderators, proposals, isDeployed, sourceOrgans, targetOrgans, type, data, organigramId }: ProcedureInput);
+    constructor({ address, deciders, typeName, name, description, salt, cid, chainId, signerOrProvider, metadata, proposers, withModeration, forwarder, moderators, proposals, isDeployed, type, data, organigramId }: ProcedureInput);
     static _populateInitialize(_populateInitializeInput: PopulateInitializeInput): Promise<ethers.ContractTransaction>;
     static loadData(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<{
         cid: string;

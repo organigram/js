@@ -1,5 +1,5 @@
 import { ethers, type ContractTransaction } from 'ethers';
-import Organ, { OrganEntry, OrganInput, OrganPermission } from './organ';
+import { Organ, OrganEntry, OrganInput, OrganPermission } from './organ';
 import { Procedure, ProcedureInput, ProcedureType } from './procedure';
 import { Organigram } from './organigram';
 import { ProcedureTypeName } from './procedure/utils';

@@ -2,7 +2,7 @@ import { ethers, parseEther } from 'ethers';
 import OrganigramClientContractABI from '@organigram/protocol/artifacts/contracts/OrganigramClient.sol/OrganigramClient.json';
 import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json';
 import { deployedAddresses, formatSalt, PERMISSIONS } from './utils';
-import Organ from './organ';
+import { Organ } from './organ';
 import { Procedure } from './procedure';
 import { Organigram } from './organigram';
 import { getProcedureClass, populateInitializeProcedure, prepareDeployOrgansInput, prepareDeployProceduresInput, procedureTypes } from './procedure/utils';

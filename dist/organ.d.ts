@@ -1,6 +1,5 @@
 import { ethers, type Signer } from 'ethers';
 import type { TransactionOptions } from './organigramClient';
-import { SourceOrgan, TargetOrgan } from './organigram';
 export interface OrganEntry {
     index: string;
     address: string;
@@ -30,8 +29,6 @@ export interface OrganInput {
     isDeployed?: boolean | null;
     name?: string | null;
     description?: string | null;
-    isSource?: SourceOrgan[] | null;
-    isTarget?: TargetOrgan[] | null;
     organigramId?: string | null;
     forwarder?: string | null;
 }
@@ -46,8 +43,6 @@ export interface OrganJson {
     salt?: string | null;
     chainId: string;
     organigramId: string;
-    isSource: SourceOrgan[];
-    isTarget: TargetOrgan[];
     balance: string;
 }
 export declare enum OrganFunctionName {
@@ -78,9 +73,7 @@ export declare class Organ {
     isDeployed: boolean;
     organigramId: string;
     forwarder: string;
-    isSource: SourceOrgan[];
-    isTarget: TargetOrgan[];
-    constructor({ address, chainId, signerOrProvider, balance, permissions, cid, entries, salt, isDeployed, name, description, isSource, isTarget, organigramId, forwarder }: OrganInput);
+    constructor({ address, chainId, signerOrProvider, balance, permissions, cid, entries, salt, isDeployed, name, description, organigramId, forwarder }: OrganInput);
     updateCid: (cid: string, options?: TransactionOptions) => Promise<ethers.Transaction>;
     addEntries: (entries: IOrganEntry[], options?: TransactionOptions) => Promise<ethers.Transaction>;
     removeEntries: (indexes: string[], options?: TransactionOptions) => Promise<ethers.Transaction>;
@@ -110,4 +103,3 @@ export declare class Organ {
     reloadData(): Promise<Organ>;
     toJson: () => OrganJson;
 }
-export default Organ;

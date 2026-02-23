@@ -1,5 +1,4 @@
 import { type Contract as EthersContract, type Signer } from 'ethers';
-import { SourceOrgan } from './organigram';
 export declare const ERC20_INITIAL_SUPPLY = 10000000;
 export interface AssetJson {
     address: string;
@@ -10,7 +9,6 @@ export interface AssetJson {
     chainId: string;
     salt?: string | null;
     image?: string | null;
-    isSourceOrgan: SourceOrgan[];
     userBalance: string;
     organigramId?: string | null;
 }
@@ -23,7 +21,6 @@ export interface AssetInput {
     initialSupply?: number | null;
     chainId?: string | null;
     salt?: string | null;
-    isSourceOrgan?: SourceOrgan[];
     image?: string | null;
     isDeployed?: boolean;
     userBalance?: string | null;
@@ -37,7 +34,6 @@ export declare class Asset {
     initialSupply: number;
     chainId: string;
     salt?: string | null;
-    isSourceOrgan: SourceOrgan[];
     image?: string | null;
     isDeployed: boolean;
     userBalance: string;

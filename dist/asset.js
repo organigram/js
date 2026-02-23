@@ -10,7 +10,6 @@ export class Asset {
     initialSupply;
     chainId;
     salt;
-    isSourceOrgan;
     image;
     isDeployed;
     userBalance;
@@ -34,7 +33,6 @@ export class Asset {
                 });
         this.symbol = input.symbol ?? 'ASSET';
         this.initialSupply = input.initialSupply ?? ERC20_INITIAL_SUPPLY;
-        this.isSourceOrgan = input.isSourceOrgan ?? [];
         this.image = input.image ?? undefined;
         this.userBalance = input.userBalance ?? '0';
         this.organigramId = input.organigramId ?? null;
@@ -47,14 +45,8 @@ export class Asset {
         const name = await contract.name();
         const symbol = await contract.symbol();
         const _initialSupply = await contract.totalSupply();
-        console.log('initial supply', _initialSupply.toString());
-        console.log('formatted initial supply', formatEther(_initialSupply));
-        console.log('name', name);
-        console.log('symbol', symbol);
-        console.log(parseInt((+formatEther(_initialSupply)).toFixed(0)));
         const initialSupply = parseInt((+formatEther(_initialSupply)).toFixed(0));
         const _userBalance = (await contract.balanceOf(await signer?.getAddress())) ?? 0;
-        console.log('user balance', _userBalance.toString());
         let userBalance = formatEther(_userBalance);
         userBalance = (+userBalance).toFixed(0);
         if (contract != null) {
@@ -81,7 +73,6 @@ export class Asset {
             salt: this.salt,
             image: this.image,
             isDeployed: this.isDeployed,
-            isSourceOrgan: this.isSourceOrgan,
             userBalance: this.userBalance,
             organigramId: this.organigramId
         };
