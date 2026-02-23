@@ -7,7 +7,6 @@ import {
   predictContractAddress
 } from './utils'
 import type { TransactionOptions } from './organigramClient'
-import { SourceOrgan, TargetOrgan } from './organigram'
 
 export interface OrganEntry {
   index: string
@@ -41,8 +40,6 @@ export interface OrganInput {
   isDeployed?: boolean | null
   name?: string | null
   description?: string | null
-  isSource?: SourceOrgan[] | null
-  isTarget?: TargetOrgan[] | null
   organigramId?: string | null
   forwarder?: string | null
 }
@@ -58,8 +55,6 @@ export interface OrganJson {
   salt?: string | null
   chainId: string
   organigramId: string
-  isSource: SourceOrgan[]
-  isTarget: TargetOrgan[]
   balance: string
 }
 
@@ -93,10 +88,6 @@ export class Organ {
   organigramId: string
   forwarder: string
 
-  // State variables that are helpful in the context of an organigram
-  isSource: SourceOrgan[]
-  isTarget: TargetOrgan[]
-
   public constructor({
     address,
     chainId,
@@ -109,8 +100,6 @@ export class Organ {
     isDeployed,
     name,
     description,
-    isSource,
-    isTarget,
     organigramId,
     forwarder
   }: OrganInput) {
@@ -156,8 +145,6 @@ export class Organ {
       OrganContractABI.abi,
       signerOrProvider
     )
-    this.isSource = isSource ?? []
-    this.isTarget = isTarget ?? []
   }
 
   /* Organ API */
@@ -618,12 +605,8 @@ export class Organ {
         salt: this.salt,
         chainId: this.chainId ?? '',
         organigramId: this.organigramId ?? '',
-        isSource: this.isSource,
-        isTarget: this.isTarget,
         isDeployed: this.isDeployed,
         balance: this.balance.toString() + 'n'
       })
     )
 }
-
-export default Organ

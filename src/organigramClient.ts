@@ -8,7 +8,7 @@ import OrganigramClientContractABI from '@organigram/protocol/artifacts/contract
 import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json'
 import { deployedAddresses, formatSalt, PERMISSIONS } from './utils'
 
-import Organ, { OrganEntry, OrganInput, OrganPermission } from './organ'
+import { Organ, OrganEntry, OrganInput, OrganPermission } from './organ'
 import { Procedure, ProcedureInput, ProcedureType } from './procedure'
 import { Organigram } from './organigram'
 import {

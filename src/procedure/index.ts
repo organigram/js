@@ -9,7 +9,6 @@ import {
   handleJsonBigInt,
   predictContractAddress
 } from '../utils'
-import { SourceOrgan, TargetOrgan } from '../organigram'
 import {
   PopulateInitializeInput,
   ProcedureTypeName,
@@ -56,9 +55,8 @@ export type ProcedureJson = {
   forwarder: string
   proposals?: ProcedureProposal[]
   args?: unknown[]
-  sourceOrgans?: SourceOrgan[]
-  targetOrgans?: TargetOrgan[]
   type: ProcedureType
+  organigramId?: string | null
 }
 
 export type Election = {
@@ -205,8 +203,6 @@ export interface ProcedureInput {
   forwarder?: string | null
   proposals?: ProcedureProposal[] | null
   isDeployed?: boolean | null
-  sourceOrgans?: SourceOrgan[] | null
-  targetOrgans?: TargetOrgan[] | null
   organigramId?: string | null
   data?: string | null
 }
@@ -332,9 +328,6 @@ export class Procedure {
   signer?: ethers.Signer
   provider?: ethers.Provider
   organigramId: string
-
-  sourceOrgans?: SourceOrgan[]
-  targetOrgans?: TargetOrgan[]
   type: ProcedureType
 
   constructor({
@@ -354,8 +347,6 @@ export class Procedure {
     moderators,
     proposals,
     isDeployed,
-    sourceOrgans,
-    targetOrgans,
     type,
     data,
     organigramId
@@ -417,8 +408,6 @@ export class Procedure {
       ProcedureContractABI.abi,
       signerOrProvider
     )
-    this.sourceOrgans = sourceOrgans ?? []
-    this.targetOrgans = targetOrgans ?? []
     this.type =
       type ?? procedureTypes[this.typeName as keyof typeof procedureTypes]
     this.data = data!
@@ -884,6 +873,7 @@ export class Procedure {
         {
           address: this.address,
           salt: this.salt,
+          organigramId: this.organigramId,
           chainId: this.chainId!,
           data: this.data,
           typeName: this.typeName,
@@ -898,8 +888,6 @@ export class Procedure {
           forwarder: this.forwarder,
           metadata: this.metadata,
           proposals: this.proposals,
-          sourceOrgans: this.sourceOrgans,
-          targetOrgans: this.targetOrgans,
           type: this.type
         },
         handleJsonBigInt

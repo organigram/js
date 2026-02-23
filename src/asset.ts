@@ -5,7 +5,6 @@ import {
   type Signer,
   formatEther
 } from 'ethers'
-import { SourceOrgan } from './organigram'
 import { createRandom32BytesHexId, predictContractAddress } from './utils'
 
 export const ERC20_INITIAL_SUPPLY = 10_000_000 // 10 million tokens.
@@ -19,7 +18,6 @@ export interface AssetJson {
   chainId: string
   salt?: string | null
   image?: string | null
-  isSourceOrgan: SourceOrgan[]
   userBalance: string
   organigramId?: string | null
 }
@@ -33,7 +31,6 @@ export interface AssetInput {
   initialSupply?: number | null
   chainId?: string | null
   salt?: string | null
-  isSourceOrgan?: SourceOrgan[]
   image?: string | null
   isDeployed?: boolean
   userBalance?: string | null
@@ -48,7 +45,6 @@ export class Asset {
   initialSupply: number
   chainId: string
   salt?: string | null
-  isSourceOrgan: SourceOrgan[]
   image?: string | null
   isDeployed: boolean
   userBalance: string
@@ -75,7 +71,6 @@ export class Asset {
       })
     this.symbol = input.symbol ?? 'ASSET'
     this.initialSupply = input.initialSupply ?? ERC20_INITIAL_SUPPLY
-    this.isSourceOrgan = input.isSourceOrgan ?? []
     this.image = input.image ?? undefined
     this.userBalance = input.userBalance ?? '0'
     this.organigramId = input.organigramId ?? null
@@ -123,7 +118,6 @@ export class Asset {
       salt: this.salt,
       image: this.image,
       isDeployed: this.isDeployed,
-      isSourceOrgan: this.isSourceOrgan,
       userBalance: this.userBalance,
       organigramId: this.organigramId
     }

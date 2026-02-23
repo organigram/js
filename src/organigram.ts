@@ -1,42 +1,19 @@
 import { Signer } from 'ethers'
 
-import { Asset, AssetInput, AssetJson } from './asset'
-import Organ, { OrganInput, OrganJson } from './organ'
-import { Procedure, ProcedureInput, ProcedureJson } from './procedure'
+import { Asset, type AssetInput, type AssetJson } from './asset'
+import { Organ, type OrganInput, type OrganJson } from './organ'
+import { Procedure, type ProcedureInput, type ProcedureJson } from './procedure'
 import OrganigramClient from './organigramClient'
 import { getTemplate, templates } from './template'
 import { handleJsonBigInt } from './utils'
 
-export type SourceOrganTypeName =
-  | 'proposers'
-  | 'moderators'
-  | 'deciders'
-  | 'target'
+export type ProcedureRoleTypeName = 'proposers' | 'moderators' | 'deciders'
 
-export type SourceOrgan = {
-  organAddress?: string | null
-  procedureAddress?: string | null
-  assetAddress?: string | null
-  types?: SourceOrganTypeName[]
-}
-
-export const sourceOrganTypes = [
+export const procedureRoleTypes = [
   { label: 'Create proposals', name: 'proposers' },
   { label: 'Approve proposals', name: 'deciders' },
   { label: 'Filter proposals', name: 'moderators' }
 ]
-
-export type SourcesAndTargets = {
-  isSourceOrgan: SourceOrgan[]
-  isTargetOrgan: TargetOrgan[]
-}
-
-export type ProcedureSourcesAndTargets = {
-  targetOrgans: TargetOrgan[]
-  sourceOrgans: SourceOrgan[]
-}
-
-export type TargetOrgan = SourceOrgan & { permissionValue: number }
 
 export type OrganigramJson = {
   id: string
@@ -48,151 +25,6 @@ export type OrganigramJson = {
   procedures: ProcedureJson[]
   assets: AssetJson[]
   workspaceId?: string | null
-}
-
-export const getProcedureSourcesAndTargets = (
-  procedure: ProcedureInput,
-  organigram: OrganigramJson
-): ProcedureJson => {
-  if (procedure.sourceOrgans && procedure.targetOrgans) {
-    return procedure as ProcedureJson
-  }
-
-  const sources = Array.from(
-    new Set(
-      [procedure.deciders, procedure.proposers, procedure.moderators].filter(
-        Boolean
-      ) as string[]
-    )
-  )
-  const sourceOrgans = sources.reduce((acc, source) => {
-    // If the source is already in the list, update its types
-    if (acc.some(sourceOrgan => sourceOrgan.organAddress === source)) {
-      return acc.map(sourceOrgan => {
-        if (sourceOrgan.organAddress === source) {
-          return {
-            ...sourceOrgan,
-            types: [
-              ...(sourceOrgan.types ?? []),
-              ...(procedure.proposers === source ? ['proposers'] : []),
-              ...(procedure.deciders === source ? ['deciders'] : []),
-              ...(procedure.moderators === source ? ['moderators'] : [])
-            ] as SourceOrganTypeName[]
-          }
-        }
-        return sourceOrgan
-      })
-    }
-    const organ = organigram.organs.find(organ => organ.address === source)
-    if (organ) {
-      return [
-        ...acc,
-        {
-          organAddress: organ.address!,
-          procedureAddress: procedure.address,
-          types: [
-            ...(procedure.proposers === source ? ['proposers'] : []),
-            ...(procedure.deciders === source ? ['deciders'] : []),
-            ...(procedure.moderators === source ? ['moderators'] : [])
-          ] as SourceOrganTypeName[]
-        }
-      ]
-    }
-    return acc
-  }, [] as SourceOrgan[])
-
-  const targetOrgans = organigram.organs
-    .filter(organ =>
-      organ.permissions?.some(
-        permission => permission.permissionAddress === procedure.address
-      )
-    )
-    ?.map(organ => ({
-      permissionValue: organ.permissions!.find(
-        permission => permission.permissionAddress === procedure.address
-      )!.permissionValue,
-      procedureAddress: procedure.address,
-      organAddress: organ.address!
-    }))
-
-  return {
-    ...procedure,
-    sourceOrgans,
-    targetOrgans
-  } as ProcedureJson
-}
-
-export const getOrganSourcesAndTargets = (
-  organ: OrganInput,
-  organigram: Organigram
-): OrganJson => {
-  if (organ.isSource || organ.isTarget) {
-    return organ as OrganJson
-  }
-  const isSource = organigram.procedures
-    .filter(
-      procedure =>
-        procedure.deciders === organ.address ||
-        procedure.proposers === organ.address ||
-        procedure.moderators === organ.address
-    )
-    .map(procedure => ({
-      procedureAddress: procedure.address,
-      organAddress: organ.address!
-    }))
-  const isTarget = organ.permissions?.map(permission => ({
-    permissionValue: permission.permissionValue,
-    procedureAddress: permission.permissionAddress,
-    organAddress: organ.address!
-  }))
-  return {
-    ...organ,
-    isSource,
-    isTarget
-  } as OrganJson
-}
-
-export const getAssetSourcesAndTargets = (
-  asset: Asset,
-  organigram: Organigram
-): Asset => {
-  if (asset.isSourceOrgan) {
-    return asset as Asset
-  }
-  const isSource = organigram.procedures
-    .filter(
-      procedure =>
-        procedure.deciders === asset.address ||
-        procedure.proposers === asset.address ||
-        procedure.moderators === asset.address
-    )
-    .map(procedure => ({
-      procedureAddress: procedure.address,
-      assetAddress: asset.address
-    }))
-  return {
-    ...asset,
-    isSourceOrgan: isSource
-  } as Asset
-}
-
-export const getSourcesAndTargets = (
-  initialOrganigram: OrganigramInput
-): OrganigramJson => {
-  const organs = initialOrganigram.organs?.map(organ =>
-    getOrganSourcesAndTargets(organ, initialOrganigram as Organigram)
-  )
-  const procedures = initialOrganigram.procedures?.map(procedure =>
-    getProcedureSourcesAndTargets(
-      procedure as Procedure,
-      initialOrganigram as OrganigramJson
-    )
-  )
-  const assets = initialOrganigram.assets?.map(asset =>
-    getAssetSourcesAndTargets(asset as Asset, initialOrganigram as Organigram)
-  )
-
-  return { ...initialOrganigram, organs, procedures, assets } as OrganigramJson
 }
 
 export type OrganigramInput = {
@@ -233,7 +65,7 @@ export class Organigram {
       _organigram = getTemplate(input, defaultChainId)
     } else if (typeof input === 'object' && Array.isArray(input)) {
       // Load all contracts at these addresses
-    } else _organigram = getSourcesAndTargets(input as OrganigramInput)
+    } else _organigram = input as OrganigramInput
 
     const initTyped = _organigram as Organigram
     this.name = initTyped?.name ?? 'Blank project'
