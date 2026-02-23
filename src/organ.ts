@@ -308,6 +308,12 @@ export class Organ {
     signerOrProvider: ethers.Signer | ethers.Provider,
     initialOrgan?: OrganInput
   ): Promise<Organ> {
+    if (!address) {
+      throw new Error('Cannot load organ: No address provided.')
+    }
+    if (!signerOrProvider) {
+      throw new Error('Cannot load organ: No signer or provider provided.')
+    }
     const provider =
       signerOrProvider.provider ?? (signerOrProvider as ethers.Provider)
     const network =
@@ -315,9 +321,6 @@ export class Organ {
     const chainId = network?.chainId.toString() ?? '1'
     if (chainId == null) {
       throw new Error('Cannot load organ: No chainId found.')
-    }
-    if (!address) {
-      throw new Error('Cannot load organ: No address provided.')
     }
     // const isOrgan: boolean = await Organ.isOrgan(address, signerOrProvider)
     // if (!isOrgan) {

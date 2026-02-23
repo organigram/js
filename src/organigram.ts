@@ -277,18 +277,24 @@ export class Organigram {
       )
     }
     if (
-      [...this.procedures, ...this.organs].every(
+      [...this.procedures, ...this.organs, ...this.assets].every(
         item => item.isDeployed !== true
       )
     ) {
       return this
     }
+    const provider = signer?.provider ?? this.signer?.provider
+    if (provider == null) {
+      throw new Error(
+        'Cannot load organigram: signer/provider is missing a provider.'
+      )
+    }
     const client =
       this.organigramClient ??
-      new OrganigramClient({
+      (await OrganigramClient.load({
         signer: signer ?? this.signer!,
-        provider: signer?.provider ?? this.signer?.provider!
-      })
+        provider
+      }))
     return await client.loadOrganigram(this)!
   }
 

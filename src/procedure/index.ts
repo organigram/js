@@ -522,6 +522,9 @@ export class Procedure {
     if (provider == null) {
       throw new Error('No provider found.')
     }
+    if (!address) {
+      throw new Error('No address provided.')
+    }
     const chainId = await provider
       .getNetwork()
       .then(({ chainId }) => chainId.toString())
