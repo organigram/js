@@ -1,923 +1,179 @@
 {
   "name": "organigram-dao",
-  "description": "This is the default organigram.",
   "organs": [
     {
-      "id": "clnavsmda009t8ywghhya08rw",
+      "salt": "project-founders-salt",
+      "address": "project-founders-address",
       "name": "Project founders",
-      "description": "This organ does not have a description",
-      "cid": "",
-      "address": "",
-      "organigramId": "clnavsmdg00bfwg8yjkrrydio",
-      "organigramClient": null,
-      "network": null,
-      "chainId": "",
       "entries": [
         {
-          "id": "clnavz5eh00c8wg8y26zutw8k",
-          "address": "0xE1C7eb2f5Da0F5b8662b3c9a11464Fa703d5ed5e",
-          "contractId": null,
-          "cid": null,
-          "organizationId": null,
-          "workspaceId": null,
-          "organigramId": null,
-          "index": null,
-          "organId": null,
-          "isInOrganId": "clnavsmda009t8ywghhya08rw",
-          "deployed": null,
-          "assetId": null
-        }
-      ],
-      "isTarget": [
-        {
-          "id": "clnavz5eh00c9wg8yoa91s8cp",
-          "contractId": null,
-          "permissions": 12,
-          "organAddress": "",
-          "organId": "clnavsmda009t8ywghhya08rw",
-          "procedureId": "clnavsmda009y8ywg6ec1baoq",
-          "procedureName": "Manage founders",
-          "procedureAddress": ""
-        },
-        {
-          "id": "clnaw0anf00cjwg8yedjvoikf",
-          "contractId": null,
-          "permissions": 19,
-          "organAddress": "",
-          "organId": "clnavsmda009t8ywghhya08rw",
-          "procedureId": "clnavsmda009z8ywg4g2mcxd7",
-          "procedureName": "Amend Constitution",
-          "procedureAddress": ""
-        }
-      ]
-    },
-    {
-      "id": "clnavsmda009u8ywggmg9f772",
-      "name": "Project's Constitution",
-      "description": "This organ does not have a description yet. You can edit it by clicking here.",
-      "cid": "",
-      "address": "",
-      "organigramId": "clnavsmdg00bfwg8yjkrrydio",
-      "organigramClient": null,
-      "network": null,
-      "chainId": "",
-      "entries": [],
-      "isTarget": [
-        {
-          "id": "clnaw0anf00ciwg8yboc02jl6",
-          "contractId": null,
-          "permissions": 31,
-          "organAddress": "",
-          "organId": "clnavsmda009u8ywggmg9f772",
-          "procedureId": "clnavsmda009z8ywg4g2mcxd7",
-          "procedureName": "Amend Constitution",
-          "procedureAddress": ""
-        }
-      ]
-    },
-    {
-      "id": "clnavsmda009v8ywg30f69zdb",
-      "name": "Treasury",
-      "description": "This organ does not have a description yet. You can edit it by clicking here.",
-      "cid": "",
-      "address": "",
-      "organigramId": "clnavsmdg00bfwg8yjkrrydio",
-      "organigramClient": null,
-      "network": null,
-      "chainId": "",
-      "entries": [],
-      "isTarget": [
-        {
-          "id": "clnavsmdi00bpwg8yrkdi143s",
-          "contractId": null,
-          "permissions": 2028,
-          "organAddress": "",
-          "organId": "clnavsmda009v8ywg30f69zdb",
-          "procedureId": "clnavsmda00a08ywg91fg2m8e",
-          "procedureName": "Manage treasury",
-          "procedureAddress": ""
-        },
-        {
-          "id": "clnaw0anf00chwg8y0xwbpa62",
-          "contractId": null,
-          "permissions": 19,
-          "organAddress": "",
-          "organId": "clnavsmda009v8ywg30f69zdb",
-          "procedureId": "clnavsmda009z8ywg4g2mcxd7",
-          "procedureName": "Amend Constitution",
-          "procedureAddress": ""
-        }
-      ]
-    },
-    {
-      "id": "clnavsmda009w8ywg3hajabyb",
-      "name": "Core Contributors",
-      "description": "This organ does not have a description yet. You can edit it by clicking here.",
-      "cid": "",
-      "address": "",
-      "organigramId": "clnavsmdg00bfwg8yjkrrydio",
-      "organigramClient": null,
-      "network": null,
-      "chainId": "",
-      "entries": [
-        {
-          "id": "clnavzavh00ccwg8ybnf5byhv",
-          "address": "0xE1C7eb2f5Da0F5b8662b3c9a11464Fa703d5ed5e",
-          "contractId": null,
-          "cid": null,
-          "organizationId": null,
-          "workspaceId": null,
-          "organigramId": null,
-          "index": null,
-          "organId": null,
-          "isInOrganId": "clnavsmda009w8ywg3hajabyb",
-          "deployed": null,
-          "assetId": null
-        }
-      ],
-      "isTarget": [
-        {
-          "id": "clnavzavh00cdwg8ybgpf0py2",
-          "contractId": null,
-          "permissions": 12,
-          "organAddress": "",
-          "organId": "clnavsmda009w8ywg3hajabyb",
-          "procedureId": "clnavsmda00a28ywg3f54gulo",
-          "procedureName": "Manage contributors",
-          "procedureAddress": ""
-        },
-        {
-          "id": "clnaw0anf00ckwg8yds9zo19c",
-          "contractId": null,
-          "permissions": 19,
-          "organAddress": "",
-          "organId": "clnavsmda009w8ywg3hajabyb",
-          "procedureId": "clnavsmda009z8ywg4g2mcxd7",
-          "procedureName": "Amend Constitution",
-          "procedureAddress": ""
-        }
-      ]
-    },
-    {
-      "id": "clnavsmda009x8ywg7qh4g31s",
-      "name": "Procedures registry",
-      "description": "This organ does not have a description yet. You can edit it by clicking here.",
-      "cid": "",
-      "address": "",
-      "organigramId": "clnavsmdg00bfwg8yjkrrydio",
-      "organigramClient": null,
-      "network": null,
-      "chainId": "",
-      "entries": [],
-      "isTarget": [
-        {
-          "id": "clnavyrkx00c4wg8ybimieelc",
-          "contractId": null,
-          "permissions": 12,
-          "organAddress": "",
-          "organId": "clnavsmda009x8ywg7qh4g31s",
-          "procedureId": "clnavsmda00a18ywgblcz782x",
-          "procedureName": "Manage operations",
-          "procedureAddress": ""
-        },
-        {
-          "id": "clnaw0anf00clwg8yufkqsciy",
-          "contractId": null,
-          "permissions": 19,
-          "organAddress": "",
-          "organId": "clnavsmda009x8ywg7qh4g31s",
-          "procedureId": "clnavsmda009z8ywg4g2mcxd7",
-          "procedureName": "Amend Constitution",
-          "procedureAddress": ""
-        }
-      ]
-    },
-    {
-      "id": "clnavxunb00bywg8yxvny89ds",
-      "name": "Organigram Certified Solo Users",
-      "description": "This organ does not have a description yet. You can edit it by clicking here.",
-      "cid": "",
-      "address": "",
-      "organigramId": "clnavsmdg00bfwg8yjkrrydio",
-      "organigramClient": null,
-      "network": null,
-      "chainId": "",
-      "entries": [
-        {
-          "id": "clnavxunc00c0wg8yq20ss59t",
-          "address": "0xE1C7eb2f5Da0F5b8662b3c9a11464Fa703d5ed5e",
-          "contractId": null,
-          "cid": null,
-          "organizationId": null,
-          "workspaceId": null,
-          "organigramId": null,
           "index": "0",
-          "organId": null,
-          "isInOrganId": "clnavxunb00bywg8yxvny89ds",
-          "deployed": null,
-          "assetId": null
+          "address": "0xE1C7eb2f5Da0F5b8662b3c9a11464Fa703d5ed5e",
+          "cid": ""
         }
       ],
-      "isTarget": [
+      "permissions": [
         {
-          "id": "clnavyrky00c5wg8ybtzf8gtv",
-          "contractId": null,
-          "permissions": 12,
-          "organAddress": "",
-          "organId": "clnavxunb00bywg8yxvny89ds",
-          "procedureId": "clnavsmda00a18ywgblcz782x",
-          "procedureName": "Manage operations",
-          "procedureAddress": ""
+          "permissionAddress": "manage-founders-address",
+          "permissionValue": 12
         },
         {
-          "id": "clnaw0anf00cmwg8yvuokgifv",
-          "contractId": null,
-          "permissions": 19,
-          "organAddress": "",
-          "organId": "clnavxunb00bywg8yxvny89ds",
-          "procedureId": "clnavsmda009z8ywg4g2mcxd7",
-          "procedureName": "Amend Constitution",
-          "procedureAddress": ""
+          "permissionAddress": "amend-constitution-address",
+          "permissionValue": 19
         }
       ]
     },
     {
-      "id": "clnavybid00c1wg8yk2n03ywz",
-      "name": "Gas Station Main Whitelist",
-      "description": "This organ does not have a description yet. You can edit it by clicking here.",
-      "cid": "",
-      "address": "",
-      "organigramId": "clnavsmdg00bfwg8yjkrrydio",
-      "organigramClient": null,
-      "network": null,
-      "chainId": "",
+      "salt": "project-s-constitution-salt",
+      "address": "project-s-constitution-address",
+      "name": "Project's Constitution",
       "entries": [],
-      "isTarget": [
+      "permissions": [
         {
-          "id": "clnavyrky00c6wg8yxrpesvd8",
-          "contractId": null,
-          "permissions": 12,
-          "organAddress": "",
-          "organId": "clnavybid00c1wg8yk2n03ywz",
-          "procedureId": "clnavsmda00a18ywgblcz782x",
-          "procedureName": "Manage operations",
-          "procedureAddress": ""
+          "permissionAddress": "amend-constitution-address",
+          "permissionValue": 31
+        }
+      ]
+    },
+    {
+      "salt": "treasury-salt",
+      "address": "treasury-address",
+      "name": "Treasury",
+      "entries": [],
+      "permissions": [
+        {
+          "permissionAddress": "manage-treasury-address",
+          "permissionValue": 2028
         },
         {
-          "id": "clnaw0anf00cnwg8y0hisp6i0",
-          "contractId": null,
-          "permissions": 19,
-          "organAddress": "",
-          "organId": "clnavybid00c1wg8yk2n03ywz",
-          "procedureId": "clnavsmda009z8ywg4g2mcxd7",
-          "procedureName": "Amend Constitution",
-          "procedureAddress": ""
+          "permissionAddress": "amend-constitution-address",
+          "permissionValue": 19
+        }
+      ]
+    },
+    {
+      "salt": "core-contributors-salt",
+      "address": "core-contributors-address",
+      "name": "Core Contributors",
+      "entries": [
+        {
+          "index": "0",
+          "address": "0xE1C7eb2f5Da0F5b8662b3c9a11464Fa703d5ed5e",
+          "cid": ""
+        }
+      ],
+      "permissions": [
+        {
+          "permissionAddress": "manage-contributors-address",
+          "permissionValue": 12
+        },
+        {
+          "permissionAddress": "amend-constitution-address",
+          "permissionValue": 19
+        }
+      ]
+    },
+    {
+      "salt": "procedures-registry-salt",
+      "address": "procedures-registry-address",
+      "name": "Procedures registry",
+      "entries": [],
+      "permissions": [
+        {
+          "permissionAddress": "manage-operations-address",
+          "permissionValue": 12
+        },
+        {
+          "permissionAddress": "amend-constitution-address",
+          "permissionValue": 19
+        }
+      ]
+    },
+    {
+      "salt": "organigram-certified-solo-users-salt",
+      "address": "organigram-certified-solo-users-address",
+      "name": "Organigram Certified Solo Users",
+      "entries": [
+        {
+          "index": "0",
+          "address": "0xE1C7eb2f5Da0F5b8662b3c9a11464Fa703d5ed5e",
+          "cid": ""
+        }
+      ],
+      "permissions": [
+        {
+          "permissionAddress": "manage-operations-address",
+          "permissionValue": 12
+        },
+        {
+          "permissionAddress": "amend-constitution-address",
+          "permissionValue": 19
+        }
+      ]
+    },
+    {
+      "salt": "gas-station-main-whitelist-salt",
+      "address": "gas-station-main-whitelist-address",
+      "name": "Gas Station Main Whitelist",
+      "entries": [],
+      "permissions": [
+        {
+          "permissionAddress": "manage-operations-address",
+          "permissionValue": 12
+        },
+        {
+          "permissionAddress": "amend-constitution-address",
+          "permissionValue": 19
         }
       ]
     }
   ],
   "procedures": [
     {
-      "id": "clnavsmda009y8ywg6ec1baoq",
+      "salt": "manage-founders-salt",
+      "address": "manage-founders-address",
       "name": "Manage founders",
-      "description": "This procedure does not have any description yet. You can edit it by clicking here.",
-      "cid": "",
-      "address": "",
       "typeName": "nomination",
-      "organigramId": "clnavsmdg00bfwg8yjkrrydio",
-      "data": null,
-      "organigramClient": null,
-      "network": null,
-      "chainId": "",
-      "sourceOrgans": [
-        {
-          "id": "clnavsmdh00bhwg8yb35niofb",
-          "procedureId": "clnavsmda009y8ywg6ec1baoq",
-          "organId": "clnavsmda009t8ywghhya08rw",
-          "contractId": null,
-          "assetId": null,
-          "types": [
-            {
-              "name": "deciders",
-              "label": "Approve proposals"
-            },
-            {
-              "name": "proposers",
-              "label": "Create proposals"
-            }
-          ],
-          "organ": {
-            "id": "clnavsmda009t8ywghhya08rw",
-            "name": "Project founders",
-            "description": "This organ does not have a description",
-            "cid": "",
-            "address": "",
-            "organigramId": "clnavsmdg00bfwg8yjkrrydio",
-            "organigramClient": null,
-            "network": null,
-            "chainId": "",
-            "entries": [
-              {
-                "id": "clnavz5eh00c8wg8y26zutw8k",
-                "address": "0xE1C7eb2f5Da0F5b8662b3c9a11464Fa703d5ed5e",
-                "contractId": null,
-                "cid": null,
-                "organizationId": null,
-                "workspaceId": null,
-                "organigramId": null,
-                "index": null,
-                "organId": null,
-                "isInOrganId": "clnavsmda009t8ywghhya08rw",
-                "deployed": null,
-                "assetId": null
-              }
-            ],
-            "isTarget": [
-              {
-                "id": "clnavz5eh00c9wg8yoa91s8cp",
-                "contractId": null,
-                "permissions": 12,
-                "organAddress": "",
-                "organId": "clnavsmda009t8ywghhya08rw",
-                "procedureId": "clnavsmda009y8ywg6ec1baoq",
-                "procedureName": "Manage founders",
-                "procedureAddress": ""
-              },
-              {
-                "id": "clnaw0anf00cjwg8yedjvoikf",
-                "contractId": null,
-                "permissions": 19,
-                "organAddress": "",
-                "organId": "clnavsmda009t8ywghhya08rw",
-                "procedureId": "clnavsmda009z8ywg4g2mcxd7",
-                "procedureName": "Amend Constitution",
-                "procedureAddress": ""
-              }
-            ]
-          },
-          "asset": null
-        }
-      ],
-      "targetOrgans": [
-        {
-          "id": "clnavz5eh00c9wg8yoa91s8cp",
-          "contractId": null,
-          "permissions": 12,
-          "organAddress": "",
-          "organId": "clnavsmda009t8ywghhya08rw",
-          "procedureId": "clnavsmda009y8ywg6ec1baoq",
-          "procedureName": "Manage founders",
-          "procedureAddress": ""
-        }
-      ],
-      "type": {
-        "name": "nomination",
-        "label": "Nomination",
-        "description": "A nomination allows any user in the source organ to directly add, remove or replace one or many entries, assets or procedures in the target organ.",
-        "fields": []
-      },
-      "certified": []
+      "data": "{}",
+      "deciders": "project-founders-address",
+      "proposers": "project-founders-address"
     },
     {
-      "id": "clnavsmda009z8ywg4g2mcxd7",
+      "salt": "amend-constitution-salt",
+      "address": "amend-constitution-address",
       "name": "Amend Constitution",
-      "description": "This procedure does not have any description yet. You can edit it by clicking here.",
-      "cid": "",
-      "address": "",
       "typeName": "nomination",
-      "organigramId": "clnavsmdg00bfwg8yjkrrydio",
-      "data": null,
-      "organigramClient": null,
-      "network": null,
-      "chainId": "",
-      "sourceOrgans": [
-        {
-          "id": "clnaw0anf00cfwg8ynsbzx9nv",
-          "procedureId": "clnavsmda009z8ywg4g2mcxd7",
-          "organId": "clnavsmda009t8ywghhya08rw",
-          "contractId": null,
-          "assetId": null,
-          "types": [
-            {
-              "name": "deciders",
-              "label": "Approve proposals"
-            }
-          ],
-          "organ": {
-            "id": "clnavsmda009t8ywghhya08rw",
-            "name": "Project founders",
-            "description": "This organ does not have a description",
-            "cid": "",
-            "address": "",
-            "organigramId": "clnavsmdg00bfwg8yjkrrydio",
-            "organigramClient": null,
-            "network": null,
-            "chainId": "",
-            "entries": [
-              {
-                "id": "clnavz5eh00c8wg8y26zutw8k",
-                "address": "0xE1C7eb2f5Da0F5b8662b3c9a11464Fa703d5ed5e",
-                "contractId": null,
-                "cid": null,
-                "organizationId": null,
-                "workspaceId": null,
-                "organigramId": null,
-                "index": null,
-                "organId": null,
-                "isInOrganId": "clnavsmda009t8ywghhya08rw",
-                "deployed": null,
-                "assetId": null
-              }
-            ],
-            "isTarget": [
-              {
-                "id": "clnavz5eh00c9wg8yoa91s8cp",
-                "contractId": null,
-                "permissions": 12,
-                "organAddress": "",
-                "organId": "clnavsmda009t8ywghhya08rw",
-                "procedureId": "clnavsmda009y8ywg6ec1baoq",
-                "procedureName": "Manage founders",
-                "procedureAddress": ""
-              },
-              {
-                "id": "clnaw0anf00cjwg8yedjvoikf",
-                "contractId": null,
-                "permissions": 19,
-                "organAddress": "",
-                "organId": "clnavsmda009t8ywghhya08rw",
-                "procedureId": "clnavsmda009z8ywg4g2mcxd7",
-                "procedureName": "Amend Constitution",
-                "procedureAddress": ""
-              }
-            ]
-          },
-          "asset": null
-        },
-        {
-          "id": "clnaw0anf00cgwg8yf5w5tas0",
-          "procedureId": "clnavsmda009z8ywg4g2mcxd7",
-          "organId": "clnavsmda009w8ywg3hajabyb",
-          "contractId": null,
-          "assetId": null,
-          "types": [
-            {
-              "name": "proposers",
-              "label": "Create proposals"
-            }
-          ],
-          "organ": {
-            "id": "clnavsmda009w8ywg3hajabyb",
-            "name": "Contributors",
-            "description": "This organ does not have a description yet. You can edit it by clicking here.",
-            "cid": "",
-            "address": "",
-            "organigramId": "clnavsmdg00bfwg8yjkrrydio",
-            "organigramClient": null,
-            "network": null,
-            "chainId": "",
-            "entries": [
-              {
-                "id": "clnavzavh00ccwg8ybnf5byhv",
-                "address": "0xE1C7eb2f5Da0F5b8662b3c9a11464Fa703d5ed5e",
-                "contractId": null,
-                "cid": null,
-                "organizationId": null,
-                "workspaceId": null,
-                "organigramId": null,
-                "index": null,
-                "organId": null,
-                "isInOrganId": "clnavsmda009w8ywg3hajabyb",
-                "deployed": null,
-                "assetId": null
-              }
-            ],
-            "isTarget": [
-              {
-                "id": "clnavzavh00cdwg8ybgpf0py2",
-                "contractId": null,
-                "permissions": 12,
-                "organAddress": "",
-                "organId": "clnavsmda009w8ywg3hajabyb",
-                "procedureId": "clnavsmda00a28ywg3f54gulo",
-                "procedureName": "Manage contributors",
-                "procedureAddress": ""
-              },
-              {
-                "id": "clnaw0anf00ckwg8yds9zo19c",
-                "contractId": null,
-                "permissions": 19,
-                "organAddress": "",
-                "organId": "clnavsmda009w8ywg3hajabyb",
-                "procedureId": "clnavsmda009z8ywg4g2mcxd7",
-                "procedureName": "Amend Constitution",
-                "procedureAddress": ""
-              }
-            ]
-          },
-          "asset": null
-        }
-      ],
-      "targetOrgans": [
-        {
-          "id": "clnaw0anf00chwg8y0xwbpa62",
-          "contractId": null,
-          "permissions": 19,
-          "organAddress": "",
-          "organId": "clnavsmda009v8ywg30f69zdb",
-          "procedureId": "clnavsmda009z8ywg4g2mcxd7",
-          "procedureName": "Amend Constitution",
-          "procedureAddress": ""
-        },
-        {
-          "id": "clnaw0anf00ciwg8yboc02jl6",
-          "contractId": null,
-          "permissions": 31,
-          "organAddress": "",
-          "organId": "clnavsmda009u8ywggmg9f772",
-          "procedureId": "clnavsmda009z8ywg4g2mcxd7",
-          "procedureName": "Amend Constitution",
-          "procedureAddress": ""
-        },
-        {
-          "id": "clnaw0anf00cjwg8yedjvoikf",
-          "contractId": null,
-          "permissions": 19,
-          "organAddress": "",
-          "organId": "clnavsmda009t8ywghhya08rw",
-          "procedureId": "clnavsmda009z8ywg4g2mcxd7",
-          "procedureName": "Amend Constitution",
-          "procedureAddress": ""
-        },
-        {
-          "id": "clnaw0anf00ckwg8yds9zo19c",
-          "contractId": null,
-          "permissions": 19,
-          "organAddress": "",
-          "organId": "clnavsmda009w8ywg3hajabyb",
-          "procedureId": "clnavsmda009z8ywg4g2mcxd7",
-          "procedureName": "Amend Constitution",
-          "procedureAddress": ""
-        },
-        {
-          "id": "clnaw0anf00clwg8yufkqsciy",
-          "contractId": null,
-          "permissions": 19,
-          "organAddress": "",
-          "organId": "clnavsmda009x8ywg7qh4g31s",
-          "procedureId": "clnavsmda009z8ywg4g2mcxd7",
-          "procedureName": "Amend Constitution",
-          "procedureAddress": ""
-        },
-        {
-          "id": "clnaw0anf00cmwg8yvuokgifv",
-          "contractId": null,
-          "permissions": 19,
-          "organAddress": "",
-          "organId": "clnavxunb00bywg8yxvny89ds",
-          "procedureId": "clnavsmda009z8ywg4g2mcxd7",
-          "procedureName": "Amend Constitution",
-          "procedureAddress": ""
-        },
-        {
-          "id": "clnaw0anf00cnwg8y0hisp6i0",
-          "contractId": null,
-          "permissions": 19,
-          "organAddress": "",
-          "organId": "clnavybid00c1wg8yk2n03ywz",
-          "procedureId": "clnavsmda009z8ywg4g2mcxd7",
-          "procedureName": "Amend Constitution",
-          "procedureAddress": ""
-        }
-      ],
-      "type": {
-        "name": "nomination",
-        "label": "Nomination",
-        "description": "A nomination allows any user in the source organ to directly add, remove or replace one or many entries, assets or procedures in the target organ.",
-        "fields": []
-      },
-      "certified": []
+      "data": "{}",
+      "deciders": "project-founders-address",
+      "proposers": "core-contributors-address"
     },
     {
-      "id": "clnavsmda00a08ywg91fg2m8e",
+      "salt": "manage-treasury-salt",
+      "address": "manage-treasury-address",
       "name": "Manage treasury",
-      "description": "This procedure does not have any description yet. You can edit it by clicking here.",
-      "cid": "",
-      "address": "",
       "typeName": "nomination",
-      "organigramId": "clnavsmdg00bfwg8yjkrrydio",
-      "data": null,
-      "organigramClient": null,
-      "network": null,
-      "chainId": "",
-      "sourceOrgans": [
-        {
-          "id": "clnavsmdh00bowg8y9e218gh7",
-          "procedureId": "clnavsmda00a08ywg91fg2m8e",
-          "organId": "clnavsmda009t8ywghhya08rw",
-          "contractId": null,
-          "assetId": null,
-          "types": [
-            {
-              "name": "moderators",
-              "label": "Filter proposals"
-            }
-          ],
-          "organ": {
-            "id": "clnavsmda009t8ywghhya08rw",
-            "name": "Project founders",
-            "description": "This organ does not have a description",
-            "cid": "",
-            "address": "",
-            "organigramId": "clnavsmdg00bfwg8yjkrrydio",
-            "organigramClient": null,
-            "network": null,
-            "chainId": "",
-            "entries": [
-              {
-                "id": "clnavz5eh00c8wg8y26zutw8k",
-                "address": "0xE1C7eb2f5Da0F5b8662b3c9a11464Fa703d5ed5e",
-                "contractId": null,
-                "cid": null,
-                "organizationId": null,
-                "workspaceId": null,
-                "organigramId": null,
-                "index": null,
-                "organId": null,
-                "isInOrganId": "clnavsmda009t8ywghhya08rw",
-                "deployed": null,
-                "assetId": null
-              }
-            ],
-            "isTarget": [
-              {
-                "id": "clnavz5eh00c9wg8yoa91s8cp",
-                "contractId": null,
-                "permissions": 12,
-                "organAddress": "",
-                "organId": "clnavsmda009t8ywghhya08rw",
-                "procedureId": "clnavsmda009y8ywg6ec1baoq",
-                "procedureName": "Manage founders",
-                "procedureAddress": ""
-              },
-              {
-                "id": "clnaw0anf00cjwg8yedjvoikf",
-                "contractId": null,
-                "permissions": 19,
-                "organAddress": "",
-                "organId": "clnavsmda009t8ywghhya08rw",
-                "procedureId": "clnavsmda009z8ywg4g2mcxd7",
-                "procedureName": "Amend Constitution",
-                "procedureAddress": ""
-              }
-            ]
-          },
-          "asset": null
-        }
-      ],
-      "targetOrgans": [
-        {
-          "id": "clnavsmdi00bpwg8yrkdi143s",
-          "contractId": null,
-          "permissions": 2028,
-          "organAddress": "",
-          "organId": "clnavsmda009v8ywg30f69zdb",
-          "procedureId": "clnavsmda00a08ywg91fg2m8e",
-          "procedureName": "Manage treasury",
-          "procedureAddress": ""
-        }
-      ],
-      "type": {
-        "name": "nomination",
-        "label": "Nomination",
-        "description": "A nomination allows any user in the source organ to directly add, remove or replace one or many entries, assets or procedures in the target organ.",
-        "fields": []
-      },
-      "certified": []
+      "data": "{}",
+      "deciders": "project-founders-address",
+      "proposers": "project-founders-address"
     },
     {
-      "id": "clnavsmda00a18ywgblcz782x",
+      "salt": "manage-operations-salt",
+      "address": "manage-operations-address",
       "name": "Manage operations",
-      "description": "This procedure does not have any description yet. You can edit it by clicking here.",
-      "cid": "",
-      "address": "",
       "typeName": "nomination",
-      "organigramId": "clnavsmdg00bfwg8yjkrrydio",
-      "data": null,
-      "organigramClient": null,
-      "network": null,
-      "chainId": "",
-      "sourceOrgans": [
-        {
-          "id": "clnavyrkx00c3wg8y9ngsplhu",
-          "procedureId": "clnavsmda00a18ywgblcz782x",
-          "organId": "clnavsmda009w8ywg3hajabyb",
-          "contractId": null,
-          "assetId": null,
-          "types": [
-            {
-              "name": "deciders",
-              "label": "Approve proposals"
-            },
-            {
-              "name": "proposers",
-              "label": "Create proposals"
-            }
-          ],
-          "organ": {
-            "id": "clnavsmda009w8ywg3hajabyb",
-            "name": "Contributors",
-            "description": "This organ does not have a description yet. You can edit it by clicking here.",
-            "cid": "",
-            "address": "",
-            "organigramId": "clnavsmdg00bfwg8yjkrrydio",
-            "organigramClient": null,
-            "network": null,
-            "chainId": "",
-            "entries": [
-              {
-                "id": "clnavzavh00ccwg8ybnf5byhv",
-                "address": "0xE1C7eb2f5Da0F5b8662b3c9a11464Fa703d5ed5e",
-                "contractId": null,
-                "cid": null,
-                "organizationId": null,
-                "workspaceId": null,
-                "organigramId": null,
-                "index": null,
-                "organId": null,
-                "isInOrganId": "clnavsmda009w8ywg3hajabyb",
-                "deployed": null,
-                "assetId": null
-              }
-            ],
-            "isTarget": [
-              {
-                "id": "clnavzavh00cdwg8ybgpf0py2",
-                "contractId": null,
-                "permissions": 12,
-                "organAddress": "",
-                "organId": "clnavsmda009w8ywg3hajabyb",
-                "procedureId": "clnavsmda00a28ywg3f54gulo",
-                "procedureName": "Manage contributors",
-                "procedureAddress": ""
-              },
-              {
-                "id": "clnaw0anf00ckwg8yds9zo19c",
-                "contractId": null,
-                "permissions": 19,
-                "organAddress": "",
-                "organId": "clnavsmda009w8ywg3hajabyb",
-                "procedureId": "clnavsmda009z8ywg4g2mcxd7",
-                "procedureName": "Amend Constitution",
-                "procedureAddress": ""
-              }
-            ]
-          },
-          "asset": null
-        }
-      ],
-      "targetOrgans": [
-        {
-          "id": "clnavyrkx00c4wg8ybimieelc",
-          "contractId": null,
-          "permissions": 12,
-          "organAddress": "",
-          "organId": "clnavsmda009x8ywg7qh4g31s",
-          "procedureId": "clnavsmda00a18ywgblcz782x",
-          "procedureName": "Manage operations",
-          "procedureAddress": ""
-        },
-        {
-          "id": "clnavyrky00c5wg8ybtzf8gtv",
-          "contractId": null,
-          "permissions": 12,
-          "organAddress": "",
-          "organId": "clnavxunb00bywg8yxvny89ds",
-          "procedureId": "clnavsmda00a18ywgblcz782x",
-          "procedureName": "Manage operations",
-          "procedureAddress": ""
-        },
-        {
-          "id": "clnavyrky00c6wg8yxrpesvd8",
-          "contractId": null,
-          "permissions": 12,
-          "organAddress": "",
-          "organId": "clnavybid00c1wg8yk2n03ywz",
-          "procedureId": "clnavsmda00a18ywgblcz782x",
-          "procedureName": "Manage operations",
-          "procedureAddress": ""
-        }
-      ],
-      "type": {
-        "name": "nomination",
-        "label": "Nomination",
-        "description": "A nomination allows any user in the source organ to directly add, remove or replace one or many entries, assets or procedures in the target organ.",
-        "fields": []
-      },
-      "certified": []
+      "data": "{}",
+      "deciders": "core-contributors-address",
+      "proposers": "core-contributors-address"
     },
     {
-      "id": "clnavsmda00a28ywg3f54gulo",
+      "salt": "manage-contributors-salt",
+      "address": "manage-contributors-address",
       "name": "Manage contributors",
-      "description": "This procedure does not have any description yet. You can edit it by clicking here.",
-      "cid": "",
-      "address": "",
       "typeName": "nomination",
-      "organigramId": "clnavsmdg00bfwg8yjkrrydio",
-      "data": null,
-      "organigramClient": null,
-      "network": null,
-      "chainId": "",
-      "sourceOrgans": [
-        {
-          "id": "clnavsmdi00bswg8ygkf5ls1v",
-          "procedureId": "clnavsmda00a28ywg3f54gulo",
-          "organId": "clnavsmda009t8ywghhya08rw",
-          "contractId": null,
-          "assetId": null,
-          "types": [
-            {
-              "name": "deciders",
-              "label": "Approve proposals"
-            },
-            {
-              "name": "proposers",
-              "label": "Create proposals"
-            }
-          ],
-          "organ": {
-            "id": "clnavsmda009t8ywghhya08rw",
-            "name": "Project founders",
-            "description": "This organ does not have a description",
-            "cid": "",
-            "address": "",
-            "organigramId": "clnavsmdg00bfwg8yjkrrydio",
-            "organigramClient": null,
-            "network": null,
-            "chainId": "",
-            "entries": [
-              {
-                "id": "clnavz5eh00c8wg8y26zutw8k",
-                "address": "0xE1C7eb2f5Da0F5b8662b3c9a11464Fa703d5ed5e",
-                "contractId": null,
-                "cid": null,
-                "organizationId": null,
-                "workspaceId": null,
-                "organigramId": null,
-                "index": null,
-                "organId": null,
-                "isInOrganId": "clnavsmda009t8ywghhya08rw",
-                "deployed": null,
-                "assetId": null
-              }
-            ],
-            "isTarget": [
-              {
-                "id": "clnavz5eh00c9wg8yoa91s8cp",
-                "contractId": null,
-                "permissions": 12,
-                "organAddress": "",
-                "organId": "clnavsmda009t8ywghhya08rw",
-                "procedureId": "clnavsmda009y8ywg6ec1baoq",
-                "procedureName": "Manage founders",
-                "procedureAddress": ""
-              },
-              {
-                "id": "clnaw0anf00cjwg8yedjvoikf",
-                "contractId": null,
-                "permissions": 19,
-                "organAddress": "",
-                "organId": "clnavsmda009t8ywghhya08rw",
-                "procedureId": "clnavsmda009z8ywg4g2mcxd7",
-                "procedureName": "Amend Constitution",
-                "procedureAddress": ""
-              }
-            ]
-          },
-          "asset": null
-        }
-      ],
-      "targetOrgans": [
-        {
-          "id": "clnavzavh00cdwg8ybgpf0py2",
-          "contractId": null,
-          "permissions": 12,
-          "organAddress": "",
-          "organId": "clnavsmda009w8ywg3hajabyb",
-          "procedureId": "clnavsmda00a28ywg3f54gulo",
-          "procedureName": "Manage contributors",
-          "procedureAddress": ""
-        }
-      ],
-      "type": {
-        "name": "nomination",
-        "label": "Nomination",
-        "description": "A nomination allows any user in the source organ to directly add, remove or replace one or many entries, assets or procedures in the target organ.",
-        "fields": []
-      },
-      "certified": []
+      "data": "{}",
+      "deciders": "project-founders-address",
+      "proposers": "project-founders-address"
     }
   ],
-  "assets": [],
-  "canEdit": true
+  "assets": []
 }

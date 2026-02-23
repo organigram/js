@@ -1,6 +1,6 @@
-// import forProfit from './for-profit.json'
-// import nonProfit from './non-profit.json'
-// import openSource from './open-source.json'
+import forProfit from './for-profit.json'
+import nonProfit from './non-profit.json'
+import openSource from './open-source.json'
 import none from './none.json'
 import {
   capitalize,
@@ -13,9 +13,9 @@ import { ProcedureInput } from '../procedure'
 import { AssetInput } from '../asset'
 
 export const templates = {
-  // forProfit,
-  // nonProfit,
-  // openSource,
+  forProfit,
+  nonProfit,
+  openSource,
   none
 }
 
