@@ -3,7 +3,6 @@ import {
   type Contract as EthersContract,
   ethers,
   type Signer,
-  Interface,
   formatEther
 } from 'ethers'
 import { SourceOrgan } from './organigram'
@@ -65,7 +64,7 @@ export class Asset {
     this.description = input.description ?? 'This asset has no description.'
     this.isDeployed = input.isDeployed ?? false
     this.salt =
-      (input.salt ?? this.isDeployed) ? undefined : createRandom32BytesHexId()
+      input.salt || (this.isDeployed ? undefined : createRandom32BytesHexId())
     this.chainId = input.chainId ?? '11155111'
     this.address =
       input.address ??
@@ -82,21 +81,27 @@ export class Asset {
     this.organigramId = input.organigramId ?? null
   }
 
-  load = async (
-    signer?: Signer | null
+  static load = async (
+    address: string,
+    signer?: Signer | null,
+    initilAsset?: AssetInput
   ): Promise<(Asset & { userBalance: string }) | undefined> => {
-    const erc777Interface = new Interface(AssetContract.abi)
-    const contract = new ethers.Contract(this.address, erc777Interface, signer)
+    if (!address) {
+      throw new Error('Cannot load asset: No address provided.')
+    }
+    const contract = new ethers.Contract(address, AssetContract.abi, signer)
     const name = await contract.name()
     const symbol = await contract.symbol()
-    const _initialSupply = await contract.initialSupply()
+    const _initialSupply = await contract.totalSupply()
     const initialSupply = parseInt((+formatEther(_initialSupply)).toFixed(0))
-    const _userBalance = await contract.balanceOf(await signer?.getAddress())
+    const _userBalance =
+      (await contract.balanceOf(await signer?.getAddress())) ?? 0
     let userBalance = formatEther(_userBalance)
     userBalance = (+userBalance).toFixed(0)
     if (contract != null) {
       return new Asset({
-        address: this.address,
+        ...initilAsset,
+        address,
         contract,
         name,
         symbol,

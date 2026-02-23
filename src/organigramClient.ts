@@ -1,4 +1,9 @@
-import { ethers, type EventLog, type ContractTransaction } from 'ethers'
+import {
+  ethers,
+  type EventLog,
+  type ContractTransaction,
+  parseEther
+} from 'ethers'
 import OrganigramClientContractABI from '@organigram/protocol/artifacts/contracts/OrganigramClient.sol/OrganigramClient.json'
 import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json'
 import { deployedAddresses, formatSalt, PERMISSIONS } from './utils'
@@ -14,7 +19,7 @@ import {
   ProcedureTypeName,
   procedureTypes
 } from './procedure/utils'
-import { ERC20_INITIAL_SUPPLY } from './asset'
+import { Asset, ERC20_INITIAL_SUPPLY } from './asset'
 
 export interface DeployOrganInput {
   cid?: string
@@ -69,6 +74,7 @@ export class OrganigramClient {
   procedureTypes: ProcedureType[]
   organs: Organ[]
   procedures: Procedure[]
+  assets: Asset[]
   cids: File[]
   provider: ethers.Provider
   contract: ethers.Contract
@@ -91,21 +97,28 @@ export class OrganigramClient {
     contract?: ethers.Contract
     signer?: ethers.Signer
   }) {
-    this.address =
+    const resolvedAddress =
       input?.address ??
-      deployedAddresses[input?.chainId as '11155111']?.OrganigramClient ??
-      ''
+      (input?.contract?.target as string | undefined) ??
+      deployedAddresses[input?.chainId as '11155111']?.OrganigramClient
+    if (input?.contract == null && !resolvedAddress) {
+      throw new Error(
+        'OrganigramClient address not configured. Provide an address or a chainId with deployments.'
+      )
+    }
+    this.address = resolvedAddress ?? ''
     this.chainId = input?.chainId ?? '11155111'
     this.procedureTypes = input?.procedureTypes ?? Object.values(procedureTypes)
     this.organs = []
     this.procedures = []
+    this.assets = []
     this.cids = []
     this.signer = input?.signer
     this.provider = input?.provider
     this.contract =
       input?.contract ??
       new ethers.Contract(
-        input?.address ?? '',
+        resolvedAddress!,
         OrganigramClientContractABI.abi,
         input?.signer ?? input?.provider
       )
@@ -267,7 +280,7 @@ export class OrganigramClient {
   }
 
   // Get or load organ data.
-  async getOrgan(
+  async getDeployedOrgan(
     address: string,
     cached = true,
     initialOrgan?: OrganInput
@@ -277,8 +290,7 @@ export class OrganigramClient {
         c.address.toLowerCase() === address.toLowerCase() &&
         c.chainId === this.chainId
     )
-    let organ =
-      cached && index > 0 ? this.organs[parseInt(index.toString())] : undefined
+    let organ = cached && index > 0 ? this.organs[index] : undefined
     if (organ == null && this.provider != null) {
       organ = await Organ.load(
         address,
@@ -290,7 +302,7 @@ export class OrganigramClient {
       })
       if (organ != null) {
         if (index >= 0) {
-          this.organs[parseInt(index.toString())] = organ
+          this.organs[index] = organ
         } else {
           this.organs.push(organ)
         }
@@ -300,6 +312,38 @@ export class OrganigramClient {
       throw new Error('Organ not found.')
     }
     return organ
+  }
+
+  async getDeployedAsset(
+    address: string,
+    cached = true,
+    initialAsset?: Asset
+  ): Promise<Asset> {
+    const index = this.assets.findIndex(
+      c =>
+        c.address.toLowerCase() === address.toLowerCase() &&
+        c.chainId === this.chainId
+    )
+    let asset = cached && index > 0 ? this.assets[index] : undefined
+    if (asset == null && this.provider != null) {
+      asset = await Asset.load(address, this.signer, initialAsset).catch(
+        (error: Error) => {
+          console.error('Error loading asset ', address, error.message)
+          return undefined
+        }
+      )
+      if (asset != null) {
+        if (index >= 0) {
+          this.assets[index] = asset
+        } else {
+          this.assets.push(asset)
+        }
+      }
+    }
+    if (asset == null) {
+      throw new Error('Asset not found.')
+    }
+    return asset
   }
 
   // Get or load procedure data.
@@ -403,7 +447,7 @@ export class OrganigramClient {
       throw new Error('Organ creation failed.')
     }
     const address: string = eventCreation.address
-    return await this.getOrgan(address, false).catch((error: Error) => {
+    return await this.getDeployedOrgan(address, false).catch((error: Error) => {
       console.error(
         'Unable to load organ with address ' + address + ' after creating it.',
         error.message
@@ -435,7 +479,7 @@ export class OrganigramClient {
     return await Promise.all(
       addresses.map(
         async address =>
-          await this.getOrgan(address, false).catch((error: Error) => {
+          await this.getDeployedOrgan(address, false).catch((error: Error) => {
             console.error(
               'Unable to load organ with address ' +
                 address +
@@ -465,7 +509,7 @@ export class OrganigramClient {
     const tx = await this.contract.deployAsset(
       name,
       symbol,
-      initialSupply ?? ERC20_INITIAL_SUPPLY,
+      parseEther(initialSupply.toString() ?? ERC20_INITIAL_SUPPLY.toString()),
       formatSalt(salt)
       // {
       //   nonce,
@@ -495,7 +539,9 @@ export class OrganigramClient {
     const formattedAssets = assets.map(asset => ({
       name: asset.name,
       symbol: asset.symbol,
-      initialSupply: asset.initialSupply ?? ERC20_INITIAL_SUPPLY,
+      initialSupply: parseEther(
+        asset.initialSupply?.toString() ?? ERC20_INITIAL_SUPPLY.toString()
+      ),
       salt: formatSalt(asset.salt)
     }))
     const tx = await this.contract.deployAssets(formattedAssets, {
@@ -639,7 +685,9 @@ export class OrganigramClient {
     const formattedAssets = input.assets.map(asset => ({
       name: asset.name,
       symbol: asset.symbol,
-      initialSupply: asset.initialSupply ?? ERC20_INITIAL_SUPPLY,
+      initialSupply: parseEther(
+        asset.initialSupply?.toString() ?? ERC20_INITIAL_SUPPLY.toString()
+      ),
       salt: formatSalt(asset.salt)
     }))
     const organsInput = prepareDeployOrgansInput(input.organs)
@@ -670,7 +718,7 @@ export class OrganigramClient {
     cached = true
   ): Promise<Organ | Procedure | null> {
     return (
-      (await this.getOrgan(address, cached)) ??
+      (await this.getDeployedOrgan(address, cached)) ??
       (await this.getDeployedProcedure(address, cached))
     )
   }
@@ -678,10 +726,10 @@ export class OrganigramClient {
   async loadContracts(contractAddresses: string[]): Promise<Organigram> {
     const organs: Organ[] = []
     const procedures: Procedure[] = []
-    // const assets: Asset[] = []
+    const assets: Asset[] = []
     for (const address of contractAddresses) {
       try {
-        const organ = await this.getOrgan(address)
+        const organ = await this.getDeployedOrgan(address)
         if (organ != null) {
           organs.push(organ)
           continue
@@ -691,12 +739,11 @@ export class OrganigramClient {
           procedures.push(procedure)
           continue
         }
-        // @todo : implement getAsset and load assets.
-        // const asset = await this.getAsset(address)
-        // if (asset != null) {
-        //   assets.push(asset)
-        //   continue
-        // }
+        const asset = await this.getDeployedAsset(address)
+        if (asset != null) {
+          assets.push(asset)
+          continue
+        }
         console.warn(
           'Contract with address ' +
             address +
@@ -712,7 +759,7 @@ export class OrganigramClient {
     return new Organigram({
       organs,
       procedures,
-      assets: []
+      assets
     })
   }
 
@@ -727,9 +774,20 @@ export class OrganigramClient {
     // Load organs
     const deployedOrgans = []
     for (const organ of organigram.organs) {
-      if (!organ.isDeployed) deployedOrgans.push(organ)
-      else {
-        const deployed = await this.getOrgan(organ.address, cached, organ)
+      if (
+        !organ.isDeployed ||
+        !organ.address ||
+        !ethers.isAddress(organ.address)
+      ) {
+        deployedOrgans.push(organ)
+        continue
+      }
+      {
+        const deployed = await this.getDeployedOrgan(
+          organ.address,
+          cached,
+          organ
+        )
         if (deployed != null) {
           deployedOrgans.push(deployed)
         }
@@ -740,7 +798,9 @@ export class OrganigramClient {
     // @todo : implement pagination with limit and offset.
     for (const procedure of organigram.procedures) {
       deployedProcedures.push(
-        !procedure.isDeployed
+        !procedure.isDeployed ||
+          !procedure.address ||
+          !ethers.isAddress(procedure.address)
           ? procedure
           : (this.procedures.find(p => p.address === procedure.address) ??
               (await this.getDeployedProcedure(
@@ -751,10 +811,28 @@ export class OrganigramClient {
               procedure)
       )
     }
+    // Load assets
+    const deployedAssets = []
+    for (const asset of organigram.assets) {
+      if (
+        !asset.isDeployed ||
+        !asset.address ||
+        !ethers.isAddress(asset.address)
+      ) {
+        deployedAssets.push(asset)
+        continue
+      }
+      const deployed = await this.getDeployedAsset(asset.address, cached, asset)
+      if (deployed != null) {
+        deployedAssets.push(deployed)
+      }
+    }
+
     const newOrganigram = {
       ...organigram,
       organs: deployedOrgans,
-      procedures: deployedProcedures
+      procedures: deployedProcedures,
+      assets: deployedAssets
     }
 
     return new Organigram(newOrganigram)
