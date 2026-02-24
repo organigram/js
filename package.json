@@ -47,6 +47,8 @@
     "docs": "sudo node ./scripts/docs.js",
     "build": "tsc --pretty",
     "test": "jest",
+    "test:coverage": "jest --coverage",
+    "test:watch": "jest --watch",
     "typecheck": "tsc --noEmit --incremental false"
   }
 }

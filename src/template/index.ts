@@ -1,7 +1,7 @@
+import none from './none.json'
 import forProfit from './for-profit.json'
 import nonProfit from './non-profit.json'
 import openSource from './open-source.json'
-import none from './none.json'
 import {
   capitalize,
   createRandom32BytesHexId,
@@ -13,10 +13,10 @@ import { ProcedureInput } from '../procedure'
 import { AssetInput } from '../asset'
 
 export const templates = {
+  none,
   forProfit,
   nonProfit,
-  openSource,
-  none
+  openSource
 }
 
 const renewSalts = <T extends { salt?: string | null }>(

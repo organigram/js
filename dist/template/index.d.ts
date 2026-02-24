@@ -1,5 +1,28 @@
 import { OrganigramInput } from '../organigram';
 export declare const templates: {
+    none: {
+        name: string;
+        organs: {
+            salt: string;
+            address: string;
+            name: string;
+            entries: never[];
+            permissions: {
+                permissionAddress: string;
+                permissionValue: number;
+            }[];
+        }[];
+        procedures: {
+            salt: string;
+            address: string;
+            name: string;
+            typeName: string;
+            data: string;
+            deciders: string;
+            proposers: string;
+        }[];
+        assets: never[];
+    };
     forProfit: {
         name: string;
         organs: {
@@ -57,29 +80,6 @@ export declare const templates: {
         }[];
     };
     openSource: {
-        name: string;
-        organs: {
-            salt: string;
-            address: string;
-            name: string;
-            entries: never[];
-            permissions: {
-                permissionAddress: string;
-                permissionValue: number;
-            }[];
-        }[];
-        procedures: {
-            salt: string;
-            address: string;
-            name: string;
-            typeName: string;
-            data: string;
-            deciders: string;
-            proposers: string;
-        }[];
-        assets: never[];
-    };
-    none: {
         name: string;
         organs: {
             salt: string;
