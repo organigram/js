@@ -165,7 +165,6 @@
             "address": "manage-treasury-address",
             "name": "Manage treasury",
             "typeName": "nomination",
-            "data": "{}",
             "deciders": "executive-team-address",
             "proposers": "executive-team-address"
         }

@@ -120,7 +120,7 @@
             "address": "elect-executive-team-address",
             "name": "Elect executive team",
             "typeName": "vote",
-            "data": "{\"majoritySize\":\"1\",\"quorumSize\":\"1\",\"voteDuration\":\"10\"}",
+            "data": "{\"quorumSize\":\"20001\",\"voteDuration\":\"3600\",\"majoritySize\":\"50001\"}",
             "deciders": "board-of-directors-address",
             "proposers": "board-of-directors-address"
         },
@@ -129,7 +129,7 @@
             "address": "elect-directors-address",
             "name": "Elect directors",
             "typeName": "erc20Vote",
-            "data": "{\"majoritySize\":\"1\",\"quorumSize\":\"1\",\"voteDuration\":\"10\",\"erc20\":\"shares-address\"}",
+            "data": "{\"erc20\":\"shares-address\",\"quorumSize\":\"20001\",\"voteDuration\":\"3600\",\"majoritySize\":\"50001\"}",
             "deciders": "shareholders-address",
             "proposers": "shareholders-address"
         },
@@ -138,7 +138,7 @@
             "address": "manage-shareholders-address",
             "name": "Manage shareholders",
             "typeName": "erc20Vote",
-            "data": "{\"majoritySize\":\"1\",\"quorumSize\":\"1\",\"voteDuration\":\"10\",\"erc20\":\"shares-address\"}",
+            "data": "{\"erc20\":\"shares-address\",\"quorumSize\":\"20001\",\"voteDuration\":\"3600\",\"majoritySize\":\"50001\"}",
             "deciders": "shareholders-address",
             "proposers": "shareholders-address"
         },
@@ -147,7 +147,7 @@
             "address": "amend-bylaws-address",
             "name": "Amend bylaws",
             "typeName": "vote",
-            "data": "{\"majoritySize\":\"1\",\"quorumSize\":\"1\",\"voteDuration\":\"10\"}",
+            "data": "{\"quorumSize\":\"20001\",\"voteDuration\":\"3600\",\"majoritySize\":\"50001\"}",
             "deciders": "shareholders-address",
             "proposers": "board-of-directors-address"
         },
@@ -156,7 +156,7 @@
             "address": "shareholders-meeting-address",
             "name": "Shareholders meeting",
             "typeName": "erc20Vote",
-            "data": "{\"majoritySize\":\"1\",\"quorumSize\":\"1\",\"voteDuration\":\"10\",\"erc20\":\"shares-address\"}",
+            "data": "{\"erc20\":\"shares-address\",\"quorumSize\":\"20001\",\"voteDuration\":\"3600\",\"majoritySize\":\"50001\"}",
             "deciders": "shareholders-address",
             "proposers": "shareholders-address"
         },

@@ -134,7 +134,6 @@
       "address": "manage-founders-address",
       "name": "Manage founders",
       "typeName": "nomination",
-      "data": "{}",
       "deciders": "project-founders-address",
       "proposers": "project-founders-address"
     },
@@ -143,7 +142,6 @@
       "address": "amend-constitution-address",
       "name": "Amend Constitution",
       "typeName": "nomination",
-      "data": "{}",
       "deciders": "project-founders-address",
       "proposers": "core-contributors-address"
     },
@@ -152,7 +150,6 @@
       "address": "manage-treasury-address",
       "name": "Manage treasury",
       "typeName": "nomination",
-      "data": "{}",
       "deciders": "project-founders-address",
       "proposers": "project-founders-address"
     },
@@ -161,7 +158,6 @@
       "address": "manage-operations-address",
       "name": "Manage operations",
       "typeName": "nomination",
-      "data": "{}",
       "deciders": "core-contributors-address",
       "proposers": "core-contributors-address"
     },
@@ -170,7 +166,6 @@
       "address": "manage-contributors-address",
       "name": "Manage contributors",
       "typeName": "nomination",
-      "data": "{}",
       "deciders": "project-founders-address",
       "proposers": "project-founders-address"
     }

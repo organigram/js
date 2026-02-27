@@ -94,14 +94,14 @@ export const renewSaltsAndAddresses = (
     ...procedure,
     salt: newProcedureSalts[procedure.salt!],
     chainId,
-    data: JSON.parse(procedure.data!).erc20
+    data: JSON.parse(procedure.data ?? '{}').erc20
       ? JSON.stringify({
           erc20: newAssetAddresses[JSON.parse(procedure.data!).erc20],
           quorumSize: JSON.parse(procedure.data!).quorumSize,
           voteDuration: JSON.parse(procedure.data!).voteDuration,
           majoritySize: JSON.parse(procedure.data!).majoritySize
         })
-      : procedure.data,
+      : (procedure.data ?? '{}'),
     isDeployed: false,
     address: newProcedureAddresses[procedure.address!],
     deciders: newOrganAddresses[procedure.deciders!],

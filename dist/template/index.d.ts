@@ -63,7 +63,7 @@ export declare const templates: {
                 permissionValue: number;
             }[];
         }[];
-        procedures: {
+        procedures: ({
             salt: string;
             address: string;
             name: string;
@@ -71,7 +71,15 @@ export declare const templates: {
             data: string;
             deciders: string;
             proposers: string;
-        }[];
+        } | {
+            salt: string;
+            address: string;
+            name: string;
+            typeName: string;
+            deciders: string;
+            proposers: string;
+            data?: undefined;
+        })[];
         assets: {
             salt: string;
             address: string;
@@ -96,7 +104,6 @@ export declare const templates: {
             address: string;
             name: string;
             typeName: string;
-            data: string;
             deciders: string;
             proposers: string;
         }[];
@@ -130,7 +137,7 @@ export declare const renewSaltsAndAddresses: (organigram: OrganigramInput, chain
     procedures: {
         salt: string;
         chainId: string;
-        data: string | null | undefined;
+        data: string;
         isDeployed: boolean;
         address: string;
         deciders: string;
@@ -198,7 +205,7 @@ export declare const getTemplate: (templateName: keyof typeof templates, chainId
     procedures: {
         salt: string;
         chainId: string;
-        data: string | null | undefined;
+        data: string;
         isDeployed: boolean;
         address: string;
         deciders: string;
