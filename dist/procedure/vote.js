@@ -145,7 +145,7 @@ export class VoteProcedure extends Procedure {
             .vote(proposalKey, approval)
             .catch((error) => {
             console.error('Error while voting.', this.address, proposalKey, error.message);
-            return false;
+            throw error;
         });
         if (options?.onTransaction != null) {
             options.onTransaction(tx, 'Initialize Nomination procedure.');

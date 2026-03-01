@@ -228,7 +228,7 @@ export class VoteProcedure extends Procedure {
           proposalKey,
           error.message
         )
-        return false
+        throw error
       })
     if (options?.onTransaction != null) {
       options.onTransaction(tx, 'Initialize Nomination procedure.')

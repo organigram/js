@@ -106,7 +106,7 @@ export class ERC20VoteProcedure extends VoteProcedure {
             .vote(proposalKey, approval)
             .catch((error) => {
             console.error('Error while voting.', this.address, proposalKey, error.message);
-            return false;
+            throw error;
         });
         if (options?.onTransaction != null) {
             options.onTransaction(tx, 'Initialize ERC20 Vote procedure.');

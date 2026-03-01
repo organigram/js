@@ -174,7 +174,7 @@ export class ERC20VoteProcedure extends VoteProcedure {
           proposalKey,
           error.message
         )
-        return false
+        throw error
       })
     if (options?.onTransaction != null) {
       options.onTransaction(tx, 'Initialize ERC20 Vote procedure.')
