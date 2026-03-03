@@ -141,6 +141,31 @@ export class Organ {
         }
         return await tx.wait();
     };
+    withdrawEther = async (to, value, options) => {
+        const tx = await this.contract.transfer(to, value, {
+            ...(options?.nonce != null ? { nonce: options.nonce } : {})
+        });
+        if (options?.onTransaction != null) {
+            options.onTransaction(tx, `Withdraw ${value.toString()} wei from organ ${this.address} to ${to}.`);
+        }
+        return await tx.wait();
+    };
+    withdrawERC20 = async (token, to, amount, options) => {
+        const tx = await this.contract.transferCoins(token, this.address, to, amount, {
+            ...(options?.nonce != null ? { nonce: options.nonce } : {})
+        });
+        if (options?.onTransaction != null) {
+            options.onTransaction(tx, `Withdraw ${amount.toString()} ERC20 units from organ ${this.address} to ${to}.`);
+        }
+        return await tx.wait();
+    };
+    withdrawERC721 = async (token, to, tokenId, options) => {
+        const tx = await this.contract.transferCollectible(token, this.address, to, tokenId, { ...(options?.nonce != null ? { nonce: options.nonce } : {}) });
+        if (options?.onTransaction != null) {
+            options.onTransaction(tx, `Withdraw ERC721 token ${tokenId.toString()} from organ ${this.address} to ${to}.`);
+        }
+        return await tx.wait();
+    };
     static async load(address, signerOrProvider, initialOrgan) {
         if (!address) {
             throw new Error('Cannot load organ: No address provided.');

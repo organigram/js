@@ -81,6 +81,9 @@ export declare class Organ {
     addPermission: (permission: OrganPermission, options?: TransactionOptions) => Promise<ethers.ContractTransactionReceipt>;
     removePermission: (permission: string, options?: TransactionOptions) => Promise<ethers.Transaction>;
     replacePermission: (oldPermissionAddress: string, newOrganPermission: OrganPermission, options?: TransactionOptions) => Promise<ethers.Transaction>;
+    withdrawEther: (to: string, value: ethers.BigNumberish, options?: TransactionOptions) => Promise<ethers.ContractTransactionReceipt | null>;
+    withdrawERC20: (token: string, to: string, amount: ethers.BigNumberish, options?: TransactionOptions) => Promise<ethers.ContractTransactionReceipt | null>;
+    withdrawERC721: (token: string, to: string, tokenId: ethers.BigNumberish, options?: TransactionOptions) => Promise<ethers.ContractTransactionReceipt | null>;
     static load(address: string, signerOrProvider: ethers.Signer | ethers.Provider, initialOrgan?: OrganInput): Promise<Organ>;
     static isOrgan(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<boolean>;
     static getBalance(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<bigint>;

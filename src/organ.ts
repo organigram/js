@@ -289,6 +289,69 @@ export class Organ {
     return await tx.wait()
   }
 
+  public withdrawEther = async (
+    to: string,
+    value: ethers.BigNumberish,
+    options?: TransactionOptions
+  ): Promise<ethers.ContractTransactionReceipt | null> => {
+    const tx = await this.contract.transfer(to, value, {
+      ...(options?.nonce != null ? { nonce: options.nonce } : {})
+    })
+    if (options?.onTransaction != null) {
+      options.onTransaction(
+        tx,
+        `Withdraw ${value.toString()} wei from organ ${this.address} to ${to}.`
+      )
+    }
+    return await tx.wait()
+  }
+
+  public withdrawERC20 = async (
+    token: string,
+    to: string,
+    amount: ethers.BigNumberish,
+    options?: TransactionOptions
+  ): Promise<ethers.ContractTransactionReceipt | null> => {
+    const tx = await this.contract.transferCoins(
+      token,
+      this.address,
+      to,
+      amount,
+      {
+        ...(options?.nonce != null ? { nonce: options.nonce } : {})
+      }
+    )
+    if (options?.onTransaction != null) {
+      options.onTransaction(
+        tx,
+        `Withdraw ${amount.toString()} ERC20 units from organ ${this.address} to ${to}.`
+      )
+    }
+    return await tx.wait()
+  }
+
+  public withdrawERC721 = async (
+    token: string,
+    to: string,
+    tokenId: ethers.BigNumberish,
+    options?: TransactionOptions
+  ): Promise<ethers.ContractTransactionReceipt | null> => {
+    const tx = await this.contract.transferCollectible(
+      token,
+      this.address,
+      to,
+      tokenId,
+      { ...(options?.nonce != null ? { nonce: options.nonce } : {}) }
+    )
+    if (options?.onTransaction != null) {
+      options.onTransaction(
+        tx,
+        `Withdraw ERC721 token ${tokenId.toString()} from organ ${this.address} to ${to}.`
+      )
+    }
+    return await tx.wait()
+  }
+
   /* Static API */
   static async load(
     address: string,
