@@ -1,12 +1,34 @@
 import { ethers, parseEther } from 'ethers';
+import OrganLibraryContractABI from '@organigram/protocol/artifacts/contracts/libraries/OrganLibrary.sol/OrganLibrary.json';
 import OrganigramClientContractABI from '@organigram/protocol/artifacts/contracts/OrganigramClient.sol/OrganigramClient.json';
 import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json';
-import { deployedAddresses, formatSalt, PERMISSIONS } from './utils';
+import { createRandom32BytesHexId, deployedAddresses, formatSalt, PERMISSIONS } from './utils';
 import { Organ } from './organ';
 import { Procedure } from './procedure';
 import { Organigram } from './organigram';
 import { getProcedureClass, populateInitializeProcedure, prepareDeployOrgansInput, prepareDeployProceduresInput, procedureTypes } from './procedure/utils';
 import { Asset, ERC20_INITIAL_SUPPLY } from './asset';
+const linkContractBytecode = (bytecode, linkReferences, libraries) => {
+    let linkedBytecode = bytecode;
+    for (const contracts of Object.values(linkReferences)) {
+        for (const [name, references] of Object.entries(contracts)) {
+            const address = libraries[name];
+            if (address == null) {
+                throw new Error(`Missing linked library address for ${name}.`);
+            }
+            const normalizedAddress = address.toLowerCase().slice(2);
+            for (const reference of references) {
+                const start = 2 + reference.start * 2;
+                const end = start + reference.length * 2;
+                linkedBytecode =
+                    linkedBytecode.slice(0, start) +
+                        normalizedAddress +
+                        linkedBytecode.slice(end);
+            }
+        }
+    }
+    return linkedBytecode;
+};
 export class OrganigramClient {
     address;
     chainId;
@@ -37,6 +59,25 @@ export class OrganigramClient {
         this.contract =
             input?.contract ??
                 new ethers.Contract(resolvedAddress, OrganigramClientContractABI.abi, input?.signer ?? input?.provider);
+    }
+    static async deployClient(signer) {
+        const network = await signer.provider?.getNetwork();
+        const organLibraryFactory = new ethers.ContractFactory(OrganLibraryContractABI.abi, OrganLibraryContractABI.bytecode, signer);
+        const organLibrary = await organLibraryFactory.deploy();
+        await organLibrary.waitForDeployment();
+        const linkedBytecode = linkContractBytecode(OrganigramClientContractABI.bytecode, OrganigramClientContractABI.linkReferences, {
+            OrganLibrary: await organLibrary.getAddress()
+        });
+        const factory = new ethers.ContractFactory(OrganigramClientContractABI.abi, linkedBytecode, signer);
+        const contract = await factory.deploy('', ethers.ZeroAddress, createRandom32BytesHexId());
+        await contract.waitForDeployment();
+        const clientContract = new ethers.Contract(await contract.getAddress(), OrganigramClientContractABI.abi, signer);
+        return new OrganigramClient({
+            provider: signer.provider,
+            signer,
+            chainId: network?.chainId.toString(),
+            contract: clientContract
+        });
     }
     static async loadProcedureType({ addr, cid }, provider) {
         const contract = new ethers.Contract(addr, ProcedureContractABI.abi, provider);

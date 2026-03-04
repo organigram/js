@@ -66,6 +66,7 @@ export declare class OrganigramClient {
         contract?: ethers.Contract;
         signer?: ethers.Signer;
     });
+    static deployClient(signer: ethers.Signer): Promise<OrganigramClient>;
     static loadProcedureType({ addr, cid }: {
         addr: string;
         cid?: string;

@@ -151,7 +151,11 @@ export class Organ {
         return await tx.wait();
     };
     withdrawERC20 = async (token, to, amount, options) => {
-        const tx = await this.contract.transferCoins(token, this.address, to, amount, {
+        const from = await this.signer?.getAddress();
+        if (from == null) {
+            throw new Error('Signer not connected.');
+        }
+        const tx = await this.contract.transferCoins(token, from, to, amount, {
             ...(options?.nonce != null ? { nonce: options.nonce } : {})
         });
         if (options?.onTransaction != null) {
@@ -160,7 +164,11 @@ export class Organ {
         return await tx.wait();
     };
     withdrawERC721 = async (token, to, tokenId, options) => {
-        const tx = await this.contract.transferCollectible(token, this.address, to, tokenId, { ...(options?.nonce != null ? { nonce: options.nonce } : {}) });
+        const from = await this.signer?.getAddress();
+        if (from == null) {
+            throw new Error('Signer not connected.');
+        }
+        const tx = await this.contract.transferCollectible(token, from, to, tokenId, { ...(options?.nonce != null ? { nonce: options.nonce } : {}) });
         if (options?.onTransaction != null) {
             options.onTransaction(tx, `Withdraw ERC721 token ${tokenId.toString()} from organ ${this.address} to ${to}.`);
         }
