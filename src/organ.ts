@@ -312,15 +312,13 @@ export class Organ {
     amount: ethers.BigNumberish,
     options?: TransactionOptions
   ): Promise<ethers.ContractTransactionReceipt | null> => {
-    const tx = await this.contract.transferCoins(
-      token,
-      this.address,
-      to,
-      amount,
-      {
-        ...(options?.nonce != null ? { nonce: options.nonce } : {})
-      }
-    )
+    const from = await this.signer?.getAddress()
+    if (from == null) {
+      throw new Error('Signer not connected.')
+    }
+    const tx = await this.contract.transferCoins(token, from, to, amount, {
+      ...(options?.nonce != null ? { nonce: options.nonce } : {})
+    })
     if (options?.onTransaction != null) {
       options.onTransaction(
         tx,
@@ -336,9 +334,13 @@ export class Organ {
     tokenId: ethers.BigNumberish,
     options?: TransactionOptions
   ): Promise<ethers.ContractTransactionReceipt | null> => {
+    const from = await this.signer?.getAddress()
+    if (from == null) {
+      throw new Error('Signer not connected.')
+    }
     const tx = await this.contract.transferCollectible(
       token,
-      this.address,
+      from,
       to,
       tokenId,
       { ...(options?.nonce != null ? { nonce: options.nonce } : {}) }

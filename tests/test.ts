@@ -1,16 +1,17 @@
 import { strictEqual } from 'assert'
 import deployedAddresses from '@organigram/protocol/deployments.json'
+import AssetContractABI from '@organigram/protocol/artifacts/contracts/Asset.sol/Asset.json'
 import { ethers, isAddress, JsonRpcProvider, Signer } from 'ethers'
+
 import {
   ERC20_INITIAL_SUPPLY,
+  Organ,
   OrganigramClient,
   predictContractAddress,
-  ProcedureProposalOperation,
-  type Organ
+  ProcedureProposalOperation
 } from '../src'
 import { type TransactionOptions } from '../src/organigramClient'
 import { createRandom32BytesHexId, PERMISSIONS } from '../src/utils'
-
 import { NominationProcedure } from '../src/procedure/nomination'
 import { VoteProcedure } from '../src/procedure/vote'
 import { ERC20VoteProcedure } from '../src/procedure/erc20Vote'
@@ -26,10 +27,13 @@ describe('Organigram JS Client', () => {
   let signer: Signer
   // let ipfs: IPFS.IPFS
   let organ: Organ
+  let asset: string
 
   beforeEach(async () => {
     // ipfs = await loadIpfs()
-    provider = new JsonRpcProvider(process.env.ETHEREUM_PROVIDER as string)
+    provider = new JsonRpcProvider(
+      process.env.ETHEREUM_PROVIDER ?? 'http://127.0.0.1:8545/'
+    )
     signer = await provider.getSigner(0)
     await Promise.resolve()
   })
@@ -78,7 +82,7 @@ describe('Organigram JS Client', () => {
     })
 
     it('should deploy an ERC20 asset', async () => {
-      const asset = await organigramClient.deployAsset(
+      asset = await organigramClient.deployAsset(
         'ERC20',
         'ERC',
         ERC20_INITIAL_SUPPLY,
@@ -104,6 +108,54 @@ describe('Organigram JS Client', () => {
       )
       strictEqual(assets?.length === 2, true)
       strictEqual(isAddress(assets[0]), true)
+    })
+
+    it('should deposit ether into an organ', async () => {
+      const amount = ethers.parseEther('0.01')
+
+      await (
+        await signer.sendTransaction({ to: organ.address, value: amount })
+      ).wait()
+
+      strictEqual(await provider.getBalance(organ.address), amount)
+    })
+
+    it('should withdraw ether from an organ', async () => {
+      const amount = ethers.parseEther('0.01')
+      const recipientAddress = ethers.Wallet.createRandom().address
+      const receipt = await organ.withdrawEther(
+        recipientAddress,
+        amount,
+        txOptions
+      )
+
+      strictEqual(
+        await provider.getBalance(organ.address, receipt!.blockNumber),
+        0n
+      )
+      strictEqual(
+        await provider.getBalance(recipientAddress, receipt!.blockNumber),
+        amount
+      )
+    })
+
+    it('should withdraw ERC20 tokens from an organ', async () => {
+      const recipientAddress = ethers.Wallet.createRandom().address
+      const amount = ethers.parseEther('15')
+      const assetContract = new ethers.Contract(
+        asset,
+        AssetContractABI.abi,
+        signer
+      )
+
+      await (await assetContract.transfer(organ.address, amount)).wait()
+
+      strictEqual(await assetContract.balanceOf(organ.address), amount)
+
+      await organ.withdrawERC20(asset, recipientAddress, amount, txOptions)
+
+      strictEqual(await assetContract.balanceOf(organ.address), 0n)
+      strictEqual(await assetContract.balanceOf(recipientAddress), amount)
     })
 
     it('should deploy procedures in batch', async () => {
