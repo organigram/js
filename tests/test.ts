@@ -31,9 +31,7 @@ describe('Organigram JS Client', () => {
 
   beforeEach(async () => {
     // ipfs = await loadIpfs()
-    provider = new JsonRpcProvider(
-      process.env.ETHEREUM_PROVIDER ?? 'http://127.0.0.1:8545/'
-    )
+    provider = new JsonRpcProvider('http://127.0.0.1:8545/')
     signer = await provider.getSigner(0)
     await Promise.resolve()
   })
