@@ -36,7 +36,7 @@
     "ethers": "^6.16.0"
   },
   "dependencies": {
-    "@organigram/protocol": "workspace:^",
+    "@organigram/protocol": "^0.1.0",
     "js-sha3": "^0.9.3",
     "openpgp": "^5.11.2",
     "typedoc": "^0.26.5",
@@ -50,5 +50,6 @@
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watch",
     "typecheck": "tsc --noEmit --incremental false"
-  }
+  },
+  "gitHead": "c5cdc1e6588185086b0803170f1fa38ad958e2e0"
 }
