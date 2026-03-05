@@ -46,25 +46,25 @@
       ]
     },
     {
-      "salt": "contributors-salt",
-      "address": "contributors-address",
-      "name": "Contributors",
+      "salt": "maintainers-salt",
+      "address": "maintainers-address",
+      "name": "Maintainers",
       "entries": [],
       "permissions": [
         {
-          "permissionAddress": "manage-contributors-address",
+          "permissionAddress": "manage-maintainers-address",
           "permissionValue": 12
         }
       ]
     },
     {
-      "salt": "codebase-salt",
-      "address": "codebase-address",
-      "name": "Codebase",
+      "salt": "code-releases-salt",
+      "address": "code-releases-address",
+      "name": "Code releases",
       "entries": [],
       "permissions": [
         {
-          "permissionAddress": "manage-codebase-address",
+          "permissionAddress": "manage-code-releases-address",
           "permissionValue": 12
         }
       ]
@@ -85,7 +85,7 @@
       "name": "Amend Constitution",
       "typeName": "nomination",
       "deciders": "project-founders-address",
-      "proposers": "contributors-address"
+      "proposers": "maintainers-address"
     },
     {
       "salt": "manage-treasury-salt",
@@ -96,17 +96,17 @@
       "proposers": "project-founders-address"
     },
     {
-      "salt": "manage-codebase-salt",
-      "address": "manage-codebase-address",
-      "name": "Manage codebase",
+      "salt": "manage-code-releases-salt",
+      "address": "manage-code-releases-address",
+      "name": "Publish code-releases",
       "typeName": "nomination",
-      "deciders": "contributors-address",
-      "proposers": "contributors-address"
+      "deciders": "maintainers-address",
+      "proposers": "maintainers-address"
     },
     {
-      "salt": "manage-contributors-salt",
-      "address": "manage-contributors-address",
-      "name": "Manage contributors",
+      "salt": "manage-maintainers-salt",
+      "address": "manage-maintainers-address",
+      "name": "Manage maintainers",
       "typeName": "nomination",
       "deciders": "project-founders-address",
       "proposers": "project-founders-address"
