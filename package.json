@@ -12,9 +12,6 @@
     "url": "ssh://git@github.com:organigram/organigram.git",
     "directory": "packages/js"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
-  },
   "main": "dist/index.js",
   "type": "module",
   "devDependencies": {
