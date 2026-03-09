@@ -365,7 +365,7 @@ export class OrganigramClient {
         c.address.toLowerCase() === address.toLowerCase() &&
         c.chainId === this.chainId
     )
-    let organ = cached && index > 0 ? this.organs[index] : undefined
+    let organ = cached && index >= 0 ? this.organs[index] : undefined
     if (organ == null && this.provider != null) {
       organ = await Organ.load(
         address,
@@ -399,7 +399,7 @@ export class OrganigramClient {
         c.address.toLowerCase() === address.toLowerCase() &&
         c.chainId === this.chainId
     )
-    let asset = cached && index > 0 ? this.assets[index] : undefined
+    let asset = cached && index >= 0 ? this.assets[index] : undefined
     if (asset == null && this.provider != null) {
       asset = await Asset.load(address, this.signer, initialAsset).catch(
         (error: Error) => {
