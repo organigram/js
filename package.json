@@ -13,7 +13,7 @@
     "directory": "packages/js"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "access": "public"
   },
   "main": "dist/index.js",
   "type": "module",
@@ -36,7 +36,7 @@
     "ethers": "^6.16.0"
   },
   "dependencies": {
-    "@organigram/protocol": "workspace:^",
+    "@organigram/protocol": "^0.1.0",
     "js-sha3": "^0.9.3",
     "openpgp": "^5.11.2",
     "typedoc": "^0.26.5",
@@ -50,5 +50,6 @@
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watch",
     "typecheck": "tsc --noEmit --incremental false"
-  }
+  },
+  "gitHead": "5aeceb89fcac23a06b21969c01c8bfdd36cea896"
 }
