@@ -36,7 +36,7 @@
     "ethers": "^6.16.0"
   },
   "dependencies": {
-    "@organigram/protocol": "^0.1.0",
+    "@organigram/protocol": "workspace:^",
     "js-sha3": "^0.9.3",
     "openpgp": "^5.11.2",
     "typedoc": "^0.26.5",
