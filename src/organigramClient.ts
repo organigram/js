@@ -334,6 +334,29 @@ export class OrganigramClient {
    * Instance API.
    */
 
+  private async mapWithConcurrencyLimit<T, U>(
+    values: T[],
+    limit: number,
+    callback: (value: T, index: number) => Promise<U>
+  ): Promise<U[]> {
+    const results: U[] = new Array(values.length)
+    let nextIndex = 0
+
+    const workers = Array.from({
+      length: Math.max(1, Math.min(limit, values.length))
+    }).map(async () => {
+      while (nextIndex < values.length) {
+        const currentIndex = nextIndex
+        nextIndex += 1
+        results[currentIndex] = await callback(values[currentIndex], currentIndex)
+      }
+    })
+
+    await Promise.all(workers)
+
+    return results
+  }
+
   // Get master procedure data.
   async getProcedureType(
     procedureAddress: string
@@ -401,7 +424,11 @@ export class OrganigramClient {
     )
     let asset = cached && index >= 0 ? this.assets[index] : undefined
     if (asset == null && this.provider != null) {
-      asset = await Asset.load(address, this.signer, initialAsset).catch(
+      asset = await Asset.load(
+        address,
+        this.signer ?? this.provider,
+        initialAsset
+      ).catch(
         (error: Error) => {
           console.error('Error loading asset ', address, error.message)
           return undefined
@@ -846,62 +873,68 @@ export class OrganigramClient {
     //   limit: 100
     // }
   ): Promise<Organigram> {
-    // Load organs
-    const deployedOrgans = []
-    for (const organ of organigram.organs) {
-      if (
-        !organ.isDeployed ||
-        !organ.address ||
-        !ethers.isAddress(organ.address)
-      ) {
-        deployedOrgans.push(organ)
-        continue
-      }
-      {
-        const deployed = await this.getDeployedOrgan(
-          organ.address,
-          cached,
-          organ
-        )
-        if (deployed != null) {
-          deployedOrgans.push(deployed)
+    const loadConcurrency = 4
+
+    const deployedOrgans = (
+      await this.mapWithConcurrencyLimit(
+        organigram.organs,
+        loadConcurrency,
+        async organ => {
+          if (
+            !organ.isDeployed ||
+            !organ.address ||
+            !ethers.isAddress(organ.address)
+          ) {
+            return organ
+          }
+          return (
+            (await this.getDeployedOrgan(organ.address, cached, organ)) ?? organ
+          )
         }
-      }
-    }
-    // Load procedures
-    const deployedProcedures = []
-    // @todo : implement pagination with limit and offset.
-    for (const procedure of organigram.procedures) {
-      deployedProcedures.push(
-        !procedure.isDeployed ||
+      )
+    ).filter(organ => organ != null)
+
+    const deployedProcedures = await this.mapWithConcurrencyLimit(
+      organigram.procedures,
+      loadConcurrency,
+      async procedure => {
+        if (
+          !procedure.isDeployed ||
           !procedure.address ||
           !ethers.isAddress(procedure.address)
-          ? procedure
-          : (this.procedures.find(p => p.address === procedure.address) ??
-              (await this.getDeployedProcedure(
-                procedure.address,
-                cached,
-                procedure
-              )) ??
-              procedure)
+        ) {
+          return procedure
+        }
+        return (
+          this.procedures.find(p => p.address === procedure.address) ??
+          (await this.getDeployedProcedure(
+            procedure.address,
+            cached,
+            procedure
+          )) ??
+          procedure
+        )
+      }
+    )
+
+    const deployedAssets = (
+      await this.mapWithConcurrencyLimit(
+        organigram.assets,
+        loadConcurrency,
+        async asset => {
+          if (
+            !asset.isDeployed ||
+            !asset.address ||
+            !ethers.isAddress(asset.address)
+          ) {
+            return asset
+          }
+          return (
+            (await this.getDeployedAsset(asset.address, cached, asset)) ?? asset
+          )
+        }
       )
-    }
-    // Load assets
-    const deployedAssets = []
-    for (const asset of organigram.assets) {
-      if (
-        !asset.isDeployed ||
-        !asset.address ||
-        !ethers.isAddress(asset.address)
-      ) {
-        deployedAssets.push(asset)
-        continue
-      }
-      const deployed = await this.getDeployedAsset(asset.address, cached, asset)
-      if (deployed != null) {
-        deployedAssets.push(deployed)
-      }
-    }
+    ).filter(asset => asset != null)
 
     const newOrganigram = {
       ...organigram,

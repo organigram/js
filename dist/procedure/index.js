@@ -1,6 +1,7 @@
 import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json';
 import { ethers } from 'ethers';
 import { capitalize, createRandom32BytesHexId, deployedAddresses, handleJsonBigInt, predictContractAddress } from '../utils';
+import { tryMulticall } from '../multicall';
 import { ProcedureTypeNameEnum, procedureTypes } from './utils';
 export const procedureFunctions = [
     {
@@ -198,21 +199,42 @@ export class Procedure {
             operations: parsedOperations
         };
     }
-    static async loadProposals(address, signerOrProvider) {
-        const data = await Procedure.loadData(address, signerOrProvider);
-        const proposalsLength = BigInt(data.proposalsLength);
-        const proposals = [];
-        for (let i = 0; i < proposalsLength; i++) {
+    static async loadProposals(address, signerOrProvider, data) {
+        const procedureData = data ?? (await Procedure.loadData(address, signerOrProvider));
+        const proposalsLength = Number(procedureData.proposalsLength);
+        const contractInterface = new ethers.Interface(ProcedureContractABI.abi);
+        const multicallProposals = await tryMulticall(signerOrProvider, Array.from({ length: proposalsLength }).map((_, i) => {
             const key = i.toString();
-            const proposal = await Procedure.loadProposal(address, key, signerOrProvider).catch((error) => {
+            return {
+                target: address,
+                callData: contractInterface.encodeFunctionData('getProposal', [key]),
+                decode: returnData => {
+                    const [proposal] = contractInterface.decodeFunctionResult('getProposal', returnData);
+                    const [creator, cid, blockReason, presented, blocked, adopted, applied] = proposal;
+                    return {
+                        key,
+                        creator,
+                        cid,
+                        blockReason,
+                        presented,
+                        blocked,
+                        adopted,
+                        applied,
+                        operations: proposal.operations.map((op) => Procedure.parseOperation(op))
+                    };
+                }
+            };
+        }));
+        if (multicallProposals != null) {
+            return multicallProposals.filter((proposal) => proposal != null);
+        }
+        return (await Promise.all(Array.from({ length: proposalsLength }).map(async (_, i) => {
+            const key = i.toString();
+            return await Procedure.loadProposal(address, key, signerOrProvider).catch((error) => {
                 console.warn('Error while loading proposal in procedure.', address, key, error.message);
                 return null;
             });
-            if (proposal != null) {
-                proposals.push(proposal);
-            }
-        }
-        return proposals;
+        }))).filter(proposal => proposal != null);
     }
     static async load(address, signerOrProvider, initialProcedure) {
         const provider = signerOrProvider.provider ?? signerOrProvider;
@@ -222,19 +244,22 @@ export class Procedure {
         if (!address) {
             throw new Error('No address provided.');
         }
-        const chainId = await provider
-            .getNetwork()
-            .then(({ chainId }) => chainId.toString())
-            .catch(_err => undefined);
+        const chainId = initialProcedure?.chainId ??
+            (await provider
+                .getNetwork()
+                .then(({ chainId }) => chainId.toString())
+                .catch(_err => undefined));
         if (chainId == null) {
             throw new Error('No chainId found.');
         }
-        const isProcedure = await Procedure.isProcedure(address, signerOrProvider);
-        if (!isProcedure) {
-            throw new Error('Contract at address is not a Procedure.');
+        if (initialProcedure?.typeName == null && initialProcedure?.type == null) {
+            const isProcedure = await Procedure.isProcedure(address, signerOrProvider);
+            if (!isProcedure) {
+                throw new Error('Contract at address is not a Procedure.');
+            }
         }
         const data = await Procedure.loadData(address, signerOrProvider);
-        const proposals = await Procedure.loadProposals(address, signerOrProvider);
+        const proposals = await Procedure.loadProposals(address, signerOrProvider, data);
         return new Procedure({
             ...initialProcedure,
             typeName: initialProcedure?.typeName ?? 'nomination',

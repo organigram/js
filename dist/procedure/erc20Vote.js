@@ -28,7 +28,7 @@ export class ERC20VoteProcedure extends VoteProcedure {
         return await contract.initialize.populateTransaction(input.cid, input.proposers, input.moderators, input.deciders, input.withModeration, input.forwarder, erc20, quorumSize, voteDuration, majoritySize);
     }
     static async load(address, signerOrProvider, initialProcedure) {
-        const procedure = await Procedure.load(address, signerOrProvider);
+        const procedure = await Procedure.load(address, signerOrProvider, initialProcedure);
         if (!procedure)
             throw new Error('Not a valid procedure.');
         const contract = new ethers.Contract(address, ERC20VoteProcedureContractABI.abi, signerOrProvider);
@@ -36,7 +36,7 @@ export class ERC20VoteProcedure extends VoteProcedure {
         const quorumSize = await contract.quorumSize();
         const voteDuration = await contract.voteDuration();
         const majoritySize = await contract.majoritySize();
-        const elections = await ERC20VoteProcedure.loadElections(address, signerOrProvider);
+        const elections = await ERC20VoteProcedure.loadElections(address, signerOrProvider, procedure.proposals.length);
         const proposals = procedure.proposals.map(proposal => {
             if (!proposal.blocked && !proposal.applied && !proposal.adopted) {
                 const election = elections.find(ba => ba.proposalKey === proposal.key);
@@ -49,14 +49,11 @@ export class ERC20VoteProcedure extends VoteProcedure {
             }
             return proposal;
         });
-        const chainId = await signerOrProvider?.provider
-            ?.getNetwork()
-            .then(n => n.chainId);
         return new ERC20VoteProcedure({
             ...initialProcedure,
             cid: procedure.cid,
             address: procedure.address,
-            chainId: chainId?.toString(),
+            chainId: procedure.chainId,
             signerOrProvider,
             metadata: procedure.metadata,
             proposers: procedure.proposers,

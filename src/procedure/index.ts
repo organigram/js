@@ -9,6 +9,7 @@ import {
   handleJsonBigInt,
   predictContractAddress
 } from '../utils'
+import { tryMulticall } from '../multicall'
 import {
   PopulateInitializeInput,
   ProcedureTypeName,
@@ -35,6 +36,17 @@ export interface ProcedureType {
   fields?: {
     [key: string]: ProcedureTypeField
   }
+}
+
+type ProcedureContractData = {
+  cid: string
+  metadata?: string
+  proposers: string
+  moderators: string
+  deciders: string
+  withModeration: boolean
+  forwarder: string
+  proposalsLength: string
 }
 
 export type ProcedureJson = {
@@ -423,16 +435,7 @@ export class Procedure {
   static async loadData(
     address: string,
     signerOrProvider: ethers.Signer | ethers.Provider
-  ): Promise<{
-    cid: string
-    metadata?: string
-    proposers: string
-    moderators: string
-    deciders: string
-    withModeration: boolean
-    forwarder: string
-    proposalsLength: string
-  }> {
+  ): Promise<ProcedureContractData> {
     const contract = new ethers.Contract(
       address,
       ProcedureContractABI.abi,
@@ -474,31 +477,78 @@ export class Procedure {
 
   static async loadProposals(
     address: string,
-    signerOrProvider: ethers.Signer | ethers.Provider
+    signerOrProvider: ethers.Signer | ethers.Provider,
+    data?: ProcedureContractData
   ): Promise<ProcedureProposal[]> {
-    const data = await Procedure.loadData(address, signerOrProvider)
-    const proposalsLength = BigInt(data.proposalsLength)
-    const proposals: ProcedureProposal[] = []
-    for (let i = 0; i < proposalsLength; i++) {
-      const key: string = i.toString()
-      const proposal: ProcedureProposal | null = await Procedure.loadProposal(
-        address,
-        key,
-        signerOrProvider
-      ).catch((error: Error) => {
-        console.warn(
-          'Error while loading proposal in procedure.',
-          address,
-          key,
-          error.message
-        )
-        return null
+    const procedureData =
+      data ?? (await Procedure.loadData(address, signerOrProvider))
+    const proposalsLength = Number(procedureData.proposalsLength)
+    const contractInterface = new ethers.Interface(ProcedureContractABI.abi)
+    const multicallProposals = await tryMulticall(
+      signerOrProvider,
+      Array.from({ length: proposalsLength }).map((_, i) => {
+        const key = i.toString()
+        return {
+          target: address,
+          callData: contractInterface.encodeFunctionData('getProposal', [key]),
+          decode: returnData => {
+            const [proposal] = contractInterface.decodeFunctionResult(
+              'getProposal',
+              returnData
+            )
+            const [
+              creator,
+              cid,
+              blockReason,
+              presented,
+              blocked,
+              adopted,
+              applied
+            ] = proposal
+            return {
+              key,
+              creator,
+              cid,
+              blockReason,
+              presented,
+              blocked,
+              adopted,
+              applied,
+              operations: proposal.operations.map((op: unknown) =>
+                Procedure.parseOperation(op)
+              )
+            }
+          }
+        }
       })
-      if (proposal != null) {
-        proposals.push(proposal)
-      }
+    )
+
+    if (multicallProposals != null) {
+      return multicallProposals.filter(
+        (proposal): proposal is ProcedureProposal => proposal != null
+      )
     }
-    return proposals
+
+    return (
+      await Promise.all(
+        Array.from({ length: proposalsLength }).map(async (_, i) => {
+          const key = i.toString()
+          return await Procedure.loadProposal(
+            address,
+            key,
+            signerOrProvider
+          ).catch((error: Error) => {
+            console.warn(
+              'Error while loading proposal in procedure.',
+              address,
+              key,
+              error.message
+            )
+            return null
+          })
+        })
+      )
+    ).filter(proposal => proposal != null)
   }
 
   static async load(
@@ -514,24 +564,29 @@ export class Procedure {
     if (!address) {
       throw new Error('No address provided.')
     }
-    const chainId = await provider
-      .getNetwork()
-      .then(({ chainId }) => chainId.toString())
-      .catch(_err => undefined)
+    const chainId =
+      initialProcedure?.chainId ??
+      (await provider
+        .getNetwork()
+        .then(({ chainId }) => chainId.toString())
+        .catch(_err => undefined))
     if (chainId == null) {
       throw new Error('No chainId found.')
     }
-    const isProcedure: boolean = await Procedure.isProcedure(
-      address,
-      signerOrProvider
-    )
-    if (!isProcedure) {
-      throw new Error('Contract at address is not a Procedure.')
+    if (initialProcedure?.typeName == null && initialProcedure?.type == null) {
+      const isProcedure: boolean = await Procedure.isProcedure(
+        address,
+        signerOrProvider
+      )
+      if (!isProcedure) {
+        throw new Error('Contract at address is not a Procedure.')
+      }
     }
     const data = await Procedure.loadData(address, signerOrProvider)
     const proposals: ProcedureProposal[] = await Procedure.loadProposals(
       address,
-      signerOrProvider
+      signerOrProvider,
+      data
     )
     return new Procedure({
       ...initialProcedure,

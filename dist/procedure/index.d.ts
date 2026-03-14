@@ -20,6 +20,16 @@ export interface ProcedureType {
         [key: string]: ProcedureTypeField;
     };
 }
+type ProcedureContractData = {
+    cid: string;
+    metadata?: string;
+    proposers: string;
+    moderators: string;
+    deciders: string;
+    withModeration: boolean;
+    forwarder: string;
+    proposalsLength: string;
+};
 export type ProcedureJson = {
     isDeployed: boolean;
     address: string;
@@ -154,18 +164,9 @@ export declare class Procedure {
     type: ProcedureType;
     constructor({ address, deciders, typeName, name, description, salt, cid, chainId, signerOrProvider, metadata, proposers, withModeration, forwarder, moderators, proposals, isDeployed, type, data, organigramId }: ProcedureInput);
     static _populateInitialize(_populateInitializeInput: PopulateInitializeInput): Promise<ethers.ContractTransaction>;
-    static loadData(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<{
-        cid: string;
-        metadata?: string;
-        proposers: string;
-        moderators: string;
-        deciders: string;
-        withModeration: boolean;
-        forwarder: string;
-        proposalsLength: string;
-    }>;
+    static loadData(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<ProcedureContractData>;
     static loadProposal(address: string, proposalKey: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<ProcedureProposal>;
-    static loadProposals(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<ProcedureProposal[]>;
+    static loadProposals(address: string, signerOrProvider: ethers.Signer | ethers.Provider, data?: ProcedureContractData): Promise<ProcedureProposal[]>;
     static load(address: string, signerOrProvider: ethers.Signer | ethers.Provider, initialProcedure?: ProcedureInput): Promise<Procedure>;
     static _stringifyParamType(type: OperationParamType): string;
     static _extractParams(types: OperationParamType[], operation?: ProcedureProposalOperation): OperationParam[];
@@ -187,3 +188,4 @@ export declare class Procedure {
     reloadData(): Promise<Procedure>;
     toJson: () => ProcedureJson;
 }
+export {};

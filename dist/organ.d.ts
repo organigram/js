@@ -13,6 +13,12 @@ export interface OrganPermission {
     permissionAddress: string;
     permissionValue: number;
 }
+type OrganContractData = {
+    cid: string;
+    permissionsLength: bigint;
+    entriesLength: bigint;
+    entriesCount: bigint;
+};
 export interface OrganInput {
     address?: string | null;
     chainId?: string | null;
@@ -87,18 +93,13 @@ export declare class Organ {
     static load(address: string, signerOrProvider: ethers.Signer | ethers.Provider, initialOrgan?: OrganInput): Promise<Organ>;
     static isOrgan(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<boolean>;
     static getBalance(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<bigint>;
-    static loadData(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<{
-        cid: string;
-        permissionsLength: bigint;
-        entriesLength: bigint;
-        entriesCount: bigint;
-    }>;
+    static loadData(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<OrganContractData>;
     static loadEntryForAccount(address: string, account: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<OrganEntry | undefined>;
     static checkAddressPermissions(organAddress: string, addressToCheck: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<number>;
     static loadPermission(address: string, index: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<OrganPermission>;
-    static loadPermissions(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<OrganPermission[]>;
+    static loadPermissions(address: string, signerOrProvider: ethers.Signer | ethers.Provider, data?: OrganContractData): Promise<OrganPermission[]>;
     static loadEntry(address: string, index: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<OrganEntry>;
-    static loadEntries(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<OrganEntry[]>;
+    static loadEntries(address: string, signerOrProvider: ethers.Signer | ethers.Provider, data?: OrganContractData): Promise<OrganEntry[]>;
     static populateTransaction(address: string, signer: ethers.Signer, functionName: OrganFunctionName, ...args: unknown[]): Promise<ethers.ContractTransaction>;
     reload(): Promise<Organ>;
     reloadEntries(): Promise<Organ>;
@@ -106,3 +107,4 @@ export declare class Organ {
     reloadData(): Promise<Organ>;
     toJson: () => OrganJson;
 }
+export {};

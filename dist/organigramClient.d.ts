@@ -80,6 +80,7 @@ export declare class OrganigramClient {
         provider: ethers.Provider;
         signer?: ethers.Signer;
     }): Promise<OrganigramClient>;
+    private mapWithConcurrencyLimit;
     getProcedureType(procedureAddress: string): Promise<ProcedureType | null>;
     getDeployedOrgan(address: string, cached?: boolean, initialOrgan?: OrganInput): Promise<Organ>;
     getDeployedAsset(address: string, cached?: boolean, initialAsset?: Asset): Promise<Asset>;

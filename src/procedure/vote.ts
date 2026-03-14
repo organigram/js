@@ -9,6 +9,7 @@ import {
 import VoteProcedureContractABI from '@organigram/protocol/artifacts/contracts/procedures/Vote.sol/VoteProcedure.json'
 import { type TransactionOptions } from '../organigramClient'
 import { deployedAddresses, handleJsonBigInt } from '../utils'
+import { tryMulticall } from '../multicall'
 import { PopulateInitializeInput, ProcedureTypeName, vote } from './utils'
 
 export type VoteProcedureInput = ProcedureInput & {
@@ -94,23 +95,28 @@ export class VoteProcedure extends Procedure {
   static async loadElection(
     address: string,
     proposalKey: string,
-    signer: ethers.Signer
+    signer: ethers.Signer,
+    voteDuration?: bigint,
+    contract?: ethers.Contract
   ): Promise<Election> {
-    const contract = new ethers.Contract(
-      address,
-      VoteProcedureContractABI.abi,
-      signer
-    )
-    const election = await contract.getElection(proposalKey)
+    const procedureContract =
+      contract ??
+      new ethers.Contract(
+        address,
+        VoteProcedureContractABI.abi,
+        signer
+      )
+    const election = await procedureContract.getElection(proposalKey)
     if (!election.start) throw new Error('Election not found.')
-    const voteDuration = await contract.voteDuration()
+    const currentVoteDuration =
+      voteDuration ?? (await procedureContract.voteDuration())
     const hasEnded =
-      parseInt(voteDuration) + parseInt(election.start) < Date.now() / 1000
+      Number(currentVoteDuration) + parseInt(election.start) < Date.now() / 1000
     let approved
     try {
       approved = hasEnded
         ? election.votesCount !== BigInt(0)
-          ? await contract.count(proposalKey)
+          ? await procedureContract.count(proposalKey)
           : false
         : false
     } catch (error) {
@@ -128,29 +134,117 @@ export class VoteProcedure extends Procedure {
 
   static async loadElections(
     address: string,
-    signerOrProvider: ethers.Signer | ethers.Provider
+    signerOrProvider: ethers.Signer | ethers.Provider,
+    proposalsLength?: number
   ): Promise<Election[]> {
-    const data = await Procedure.loadData(address, signerOrProvider)
-    const proposalsLength = BigInt(data.proposalsLength)
-    const elections: Election[] = []
-    for (let i = 0; i < proposalsLength; i++) {
-      const key: string = i.toString()
-      const election: Election | null = await VoteProcedure.loadElection(
-        address,
-        key,
-        signerOrProvider as ethers.Signer
-      ).catch((error: Error) => {
-        console.warn(
-          'Error while loading election in vote procedure.',
-          address,
-          key,
-          error.message
+    const totalProposals =
+      proposalsLength ??
+      Number(
+        (await Procedure.loadData(address, signerOrProvider)).proposalsLength
+      )
+    const contract = new ethers.Contract(
+      address,
+      VoteProcedureContractABI.abi,
+      signerOrProvider
+    )
+    const voteDuration = await contract.voteDuration()
+    const contractInterface = new ethers.Interface(VoteProcedureContractABI.abi)
+    const multicallElections = await tryMulticall(
+      signerOrProvider,
+      Array.from({ length: totalProposals }).map((_, i) => ({
+        target: address,
+        callData: contractInterface.encodeFunctionData('getElection', [
+          i.toString()
+        ]),
+        decode: returnData => {
+          const [election] = contractInterface.decodeFunctionResult(
+            'getElection',
+            returnData
+          )
+          return {
+            key: i.toString(),
+            start: election.start,
+            votesCount: election.votesCount,
+            hasVoted: election.hasVoted
+          }
+        }
+      }))
+    )
+
+    if (multicallElections != null) {
+      const electionsToCount = multicallElections.filter(
+        election =>
+          election != null &&
+          election.start != null &&
+          election.start !== BigInt(0) &&
+          Number(voteDuration ?? 0n) + Number(election.start) <
+            Date.now() / 1000 &&
+          election.votesCount !== BigInt(0)
+      )
+      const countedResults =
+        electionsToCount.length > 0
+          ? await tryMulticall(
+              signerOrProvider,
+              electionsToCount.map(election => ({
+                target: address,
+                callData: contractInterface.encodeFunctionData('count', [
+                  election!.key
+                ]),
+                decode: returnData =>
+                  contractInterface.decodeFunctionResult('count', returnData)[0]
+              }))
+            )
+          : []
+      const countedApprovals = new Map<string, boolean>()
+      electionsToCount.forEach((election, index) => {
+        countedApprovals.set(
+          election!.key,
+          countedResults?.[index] != null ? Boolean(countedResults[index]) : false
         )
-        return null
       })
-      if (election) elections.push(election)
+
+      return multicallElections
+        .filter(
+          (
+            election
+          ): election is {
+            key: string
+            start: bigint
+            votesCount: bigint
+            hasVoted: boolean
+          } => election != null && election.start != null && election.start !== BigInt(0)
+        )
+        .map(election => ({
+          proposalKey: election!.key,
+          start: election!.start.toString(),
+          votesCount: election!.votesCount.toString(),
+          hasVoted: election!.hasVoted,
+          approved: countedApprovals.get(election!.key) ?? false
+        }))
     }
-    return elections
+
+    return (
+      await Promise.all(
+        Array.from({ length: totalProposals }).map(async (_, i) => {
+          const key = i.toString()
+          return await VoteProcedure.loadElection(
+            address,
+            key,
+            signerOrProvider as ethers.Signer,
+            voteDuration,
+            contract
+          ).catch((error: Error) => {
+            console.warn(
+              'Error while loading election in vote procedure.',
+              address,
+              key,
+              error.message
+            )
+            return null
+          })
+        })
+      )
+    ).filter((election): election is Election => election != null)
   }
 
   static async load(
@@ -158,7 +252,11 @@ export class VoteProcedure extends Procedure {
     signerOrProvider: ethers.Signer | ethers.Provider,
     initialProcedure?: ProcedureInput
   ): Promise<VoteProcedure> {
-    const procedure = await Procedure.load(address, signerOrProvider)
+    const procedure = await Procedure.load(
+      address,
+      signerOrProvider,
+      initialProcedure
+    )
     if (!procedure) throw new Error('Not a valid procedure.')
     const contract = new ethers.Contract(
       address,
@@ -170,7 +268,8 @@ export class VoteProcedure extends Procedure {
     const majoritySize = await contract.majoritySize()
     const elections = await VoteProcedure.loadElections(
       address,
-      signerOrProvider as ethers.Signer
+      signerOrProvider as ethers.Signer,
+      procedure.proposals.length
     )
     // Make sure expired proposals are listed as blocked.
     const proposals = procedure.proposals.map((proposal: ProcedureProposal) => {
@@ -187,16 +286,11 @@ export class VoteProcedure extends Procedure {
       return proposal
     })
 
-    const chainId =
-      (await signerOrProvider.provider?.getNetwork().then(n => n.chainId)) ??
-      (await (signerOrProvider as ethers.Provider)
-        .getNetwork()
-        .then(n => n.chainId))
     return new VoteProcedure({
       ...initialProcedure,
       cid: procedure.cid,
       address: procedure.address,
-      chainId: chainId?.toString()!,
+      chainId: procedure.chainId,
       signerOrProvider: signerOrProvider as ethers.Signer,
       metadata: procedure.metadata,
       proposers: procedure.proposers,

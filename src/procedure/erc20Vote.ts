@@ -67,7 +67,11 @@ export class ERC20VoteProcedure extends VoteProcedure {
     signerOrProvider: ethers.Signer | ethers.Provider,
     initialProcedure?: ProcedureInput
   ): Promise<ERC20VoteProcedure> {
-    const procedure = await Procedure.load(address, signerOrProvider)
+    const procedure = await Procedure.load(
+      address,
+      signerOrProvider,
+      initialProcedure
+    )
     if (!procedure) throw new Error('Not a valid procedure.')
     const contract = new ethers.Contract(
       address,
@@ -80,7 +84,8 @@ export class ERC20VoteProcedure extends VoteProcedure {
     const majoritySize = await contract.majoritySize()
     const elections = await ERC20VoteProcedure.loadElections(
       address,
-      signerOrProvider
+      signerOrProvider,
+      procedure.proposals.length
     )
     // Make sure expired proposals are listed as blocked.
     const proposals = procedure.proposals.map(proposal => {
@@ -98,14 +103,11 @@ export class ERC20VoteProcedure extends VoteProcedure {
       return proposal
     })
 
-    const chainId = await signerOrProvider?.provider
-      ?.getNetwork()
-      .then(n => n.chainId)
     return new ERC20VoteProcedure({
       ...initialProcedure,
       cid: procedure.cid,
       address: procedure.address,
-      chainId: chainId?.toString()!,
+      chainId: procedure.chainId,
       signerOrProvider,
       metadata: procedure.metadata,
       proposers: procedure.proposers,

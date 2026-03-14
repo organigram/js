@@ -51,12 +51,11 @@ export class NominationProcedure extends Procedure {
     signerOrProvider: ethers.Signer | ethers.Provider,
     initialProcedure?: ProcedureInput
   ): Promise<NominationProcedure> {
-    const procedure = await Procedure.load(address, signerOrProvider, initialProcedure)
-    const chainId =
-      (await signerOrProvider.provider?.getNetwork().then(n => n.chainId)) ??
-      (await (signerOrProvider as ethers.Provider)
-        .getNetwork()
-        .then(n => n.chainId))
+    const procedure = await Procedure.load(
+      address,
+      signerOrProvider,
+      initialProcedure
+    )
     const contract = new ethers.Contract(
       address,
       NominationProcedureContractABI.abi,
@@ -66,7 +65,7 @@ export class NominationProcedure extends Procedure {
       ...initialProcedure,
       cid: procedure.cid,
       address: procedure.address,
-      chainId: chainId?.toString()!,
+      chainId: procedure.chainId,
       signerOrProvider,
       metadata: procedure.metadata,
       proposers: procedure.proposers,

@@ -131,6 +131,21 @@ export class OrganigramClient {
         });
         return newOrganigramClient;
     }
+    async mapWithConcurrencyLimit(values, limit, callback) {
+        const results = new Array(values.length);
+        let nextIndex = 0;
+        const workers = Array.from({
+            length: Math.max(1, Math.min(limit, values.length))
+        }).map(async () => {
+            while (nextIndex < values.length) {
+                const currentIndex = nextIndex;
+                nextIndex += 1;
+                results[currentIndex] = await callback(values[currentIndex], currentIndex);
+            }
+        });
+        await Promise.all(workers);
+        return results;
+    }
     async getProcedureType(procedureAddress) {
         if (this.provider == null || this.signer == null) {
             throw new Error('No provider or signer.');
@@ -146,7 +161,7 @@ export class OrganigramClient {
     async getDeployedOrgan(address, cached = true, initialOrgan) {
         const index = this.organs.findIndex(c => c.address.toLowerCase() === address.toLowerCase() &&
             c.chainId === this.chainId);
-        let organ = cached && index > 0 ? this.organs[index] : undefined;
+        let organ = cached && index >= 0 ? this.organs[index] : undefined;
         if (organ == null && this.provider != null) {
             organ = await Organ.load(address, this.signer ?? this.provider, initialOrgan).catch((error) => {
                 console.error('Error loading organ ', address, error.message);
@@ -169,9 +184,9 @@ export class OrganigramClient {
     async getDeployedAsset(address, cached = true, initialAsset) {
         const index = this.assets.findIndex(c => c.address.toLowerCase() === address.toLowerCase() &&
             c.chainId === this.chainId);
-        let asset = cached && index > 0 ? this.assets[index] : undefined;
+        let asset = cached && index >= 0 ? this.assets[index] : undefined;
         if (asset == null && this.provider != null) {
-            asset = await Asset.load(address, this.signer, initialAsset).catch((error) => {
+            asset = await Asset.load(address, this.signer ?? this.provider, initialAsset).catch((error) => {
                 console.error('Error loading asset ', address, error.message);
                 return undefined;
             });
@@ -442,44 +457,33 @@ export class OrganigramClient {
         });
     }
     async loadOrganigram(organigram, cached = true) {
-        const deployedOrgans = [];
-        for (const organ of organigram.organs) {
+        const loadConcurrency = 4;
+        const deployedOrgans = (await this.mapWithConcurrencyLimit(organigram.organs, loadConcurrency, async (organ) => {
             if (!organ.isDeployed ||
                 !organ.address ||
                 !ethers.isAddress(organ.address)) {
-                deployedOrgans.push(organ);
-                continue;
+                return organ;
             }
-            {
-                const deployed = await this.getDeployedOrgan(organ.address, cached, organ);
-                if (deployed != null) {
-                    deployedOrgans.push(deployed);
-                }
-            }
-        }
-        const deployedProcedures = [];
-        for (const procedure of organigram.procedures) {
-            deployedProcedures.push(!procedure.isDeployed ||
+            return ((await this.getDeployedOrgan(organ.address, cached, organ)) ?? organ);
+        })).filter(organ => organ != null);
+        const deployedProcedures = await this.mapWithConcurrencyLimit(organigram.procedures, loadConcurrency, async (procedure) => {
+            if (!procedure.isDeployed ||
                 !procedure.address ||
-                !ethers.isAddress(procedure.address)
-                ? procedure
-                : (this.procedures.find(p => p.address === procedure.address) ??
-                    (await this.getDeployedProcedure(procedure.address, cached, procedure)) ??
-                    procedure));
-        }
-        const deployedAssets = [];
-        for (const asset of organigram.assets) {
+                !ethers.isAddress(procedure.address)) {
+                return procedure;
+            }
+            return (this.procedures.find(p => p.address === procedure.address) ??
+                (await this.getDeployedProcedure(procedure.address, cached, procedure)) ??
+                procedure);
+        });
+        const deployedAssets = (await this.mapWithConcurrencyLimit(organigram.assets, loadConcurrency, async (asset) => {
             if (!asset.isDeployed ||
                 !asset.address ||
                 !ethers.isAddress(asset.address)) {
-                deployedAssets.push(asset);
-                continue;
+                return asset;
             }
-            const deployed = await this.getDeployedAsset(asset.address, cached, asset);
-            if (deployed != null) {
-                deployedAssets.push(deployed);
-            }
-        }
+            return ((await this.getDeployedAsset(asset.address, cached, asset)) ?? asset);
+        })).filter(asset => asset != null);
         const newOrganigram = {
             ...organigram,
             organs: deployedOrgans,

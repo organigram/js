@@ -1,6 +1,7 @@
 import { ethers } from 'ethers';
 import OrganContractABI from '@organigram/protocol/artifacts/contracts/Organ.sol/Organ.json';
 import { createRandom32BytesHexId, deployedAddresses, predictContractAddress } from './utils';
+import { tryMulticall } from './multicall';
 export var OrganFunctionName;
 (function (OrganFunctionName) {
     OrganFunctionName[OrganFunctionName["addEntries"] = 0] = "addEntries";
@@ -182,8 +183,11 @@ export class Organ {
             throw new Error('Cannot load organ: No signer or provider provided.');
         }
         const provider = signerOrProvider.provider ?? signerOrProvider;
-        const network = signerOrProvider.provider != null ? await provider?.getNetwork() : null;
-        const chainId = network?.chainId.toString() ?? '1';
+        const chainId = initialOrgan?.chainId ??
+            (signerOrProvider.provider != null
+                ? await provider?.getNetwork().then(network => network.chainId.toString())
+                : undefined) ??
+            '1';
         if (chainId == null) {
             throw new Error('Cannot load organ: No chainId found.');
         }
@@ -192,11 +196,13 @@ export class Organ {
             ?.getBalance(address)
             .then(balance => balance.toString())
             .catch(() => '0n');
-        const permissions = await Organ.loadPermissions(address, signerOrProvider);
-        const entries = await Organ.loadEntries(address, signerOrProvider).catch((error) => {
-            console.warn(error.message);
-            return [];
-        });
+        const [permissions, entries] = await Promise.all([
+            Organ.loadPermissions(address, signerOrProvider, data),
+            Organ.loadEntries(address, signerOrProvider, data).catch((error) => {
+                console.warn(error.message);
+                return [];
+            })
+        ]);
         return new Organ({
             ...initialOrgan,
             address,
@@ -257,35 +263,65 @@ export class Organ {
                 : permission.perms
         };
     }
-    static async loadPermissions(address, signerOrProvider) {
-        const data = await Organ.loadData(address, signerOrProvider);
-        const permissions = [];
-        for (let i = 0n; i < data.permissionsLength; i++) {
-            const permission = await Organ.loadPermission(address, i.toString(), signerOrProvider).catch((error) => {
-                console.warn('Error while loading permission in organ ', address, i.toString(), error.message);
-                return null;
-            });
-            if (permission != null)
-                permissions.push(permission);
+    static async loadPermissions(address, signerOrProvider, data) {
+        const organData = data ?? (await Organ.loadData(address, signerOrProvider));
+        const contractInterface = new ethers.Interface(OrganContractABI.abi);
+        const multicallPermissions = await tryMulticall(signerOrProvider, Array.from({ length: Number(organData.permissionsLength) }).map((_, i) => ({
+            target: address,
+            callData: contractInterface.encodeFunctionData('getPermission', [
+                i.toString()
+            ]),
+            decode: returnData => {
+                const [permission] = contractInterface.decodeFunctionResult('getPermission', returnData);
+                return {
+                    permissionAddress: permission.addr,
+                    permissionValue: typeof permission.perms === 'string'
+                        ? parseInt(permission.perms, 16)
+                        : permission.perms
+                };
+            }
+        })));
+        if (multicallPermissions != null) {
+            return multicallPermissions.filter((permission) => permission != null);
         }
-        return permissions;
+        return (await Promise.all(Array.from({ length: Number(organData.permissionsLength) }).map(async (_, i) => await Organ.loadPermission(address, i.toString(), signerOrProvider).catch((error) => {
+            console.warn('Error while loading permission in organ ', address, i.toString(), error.message);
+            return null;
+        })))).filter(permission => permission != null);
     }
     static async loadEntry(address, index, signerOrProvider) {
         const contract = new ethers.Contract(address, OrganContractABI.abi, signerOrProvider);
         const entry = await contract.getEntry(index);
         return { index, address: entry.addr, cid: entry.cid };
     }
-    static async loadEntries(address, signerOrProvider) {
-        const length = (await Organ.loadData(address, signerOrProvider))?.entriesLength ?? 0n;
+    static async loadEntries(address, signerOrProvider, data) {
+        const length = (data ?? (await Organ.loadData(address, signerOrProvider)))
+            ?.entriesLength ?? 0n;
+        const contractInterface = new ethers.Interface(OrganContractABI.abi);
+        const multicallEntries = await tryMulticall(signerOrProvider, Array.from({ length: parseInt(length.toString()) }).map((_, i) => ({
+            target: address,
+            callData: contractInterface.encodeFunctionData('getEntry', [
+                i.toString()
+            ]),
+            decode: returnData => {
+                const [entry] = contractInterface.decodeFunctionResult('getEntry', returnData);
+                return {
+                    index: i.toString(),
+                    address: entry.addr,
+                    cid: entry.cid
+                };
+            }
+        })));
+        if (multicallEntries != null) {
+            return multicallEntries.filter((entry) => entry != null && entry.address !== ethers.ZeroAddress);
+        }
         const entries = await Promise.all(Array.from({ length: parseInt(length.toString()) }).map(async (_, i) => {
-            if (i !== 0) {
-                const entry = await Organ.loadEntry(address, i.toString(), signerOrProvider).catch((error) => {
-                    console.warn('Error while loading entry in organ.', address, i.toString(), error.message);
-                    return null;
-                });
-                if (entry != null && entry.address !== ethers.ZeroAddress) {
-                    return entry;
-                }
+            const entry = await Organ.loadEntry(address, i.toString(), signerOrProvider).catch((error) => {
+                console.warn('Error while loading entry in organ.', address, i.toString(), error.message);
+                return null;
+            });
+            if (entry != null && entry.address !== ethers.ZeroAddress) {
+                return entry;
             }
         })).then(e => e.filter(i => i != null));
         return entries;
