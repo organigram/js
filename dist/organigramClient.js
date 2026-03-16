@@ -41,14 +41,15 @@ export class OrganigramClient {
     contract;
     signer;
     constructor(input) {
+        const resolvedChainId = input?.chainId ?? '11155111';
         const resolvedAddress = input?.address ??
             input?.contract?.target ??
-            deployedAddresses[input?.chainId]?.OrganigramClient;
+            deployedAddresses[resolvedChainId]?.OrganigramClient;
         if (input?.contract == null && !resolvedAddress) {
             throw new Error('OrganigramClient address not configured. Provide an address or a chainId with deployments.');
         }
         this.address = resolvedAddress ?? '';
-        this.chainId = input?.chainId ?? '11155111';
+        this.chainId = resolvedChainId;
         this.procedureTypes = input?.procedureTypes ?? Object.values(procedureTypes);
         this.organs = [];
         this.procedures = [];

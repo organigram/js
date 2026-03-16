@@ -130,17 +130,18 @@ export class OrganigramClient {
     contract?: ethers.Contract
     signer?: ethers.Signer
   }) {
+    const resolvedChainId = input?.chainId ?? '11155111'
     const resolvedAddress =
       input?.address ??
       (input?.contract?.target as string | undefined) ??
-      deployedAddresses[input?.chainId as '11155111']?.OrganigramClient
+      deployedAddresses[resolvedChainId as '11155111']?.OrganigramClient
     if (input?.contract == null && !resolvedAddress) {
       throw new Error(
         'OrganigramClient address not configured. Provide an address or a chainId with deployments.'
       )
     }
     this.address = resolvedAddress ?? ''
-    this.chainId = input?.chainId ?? '11155111'
+    this.chainId = resolvedChainId
     this.procedureTypes = input?.procedureTypes ?? Object.values(procedureTypes)
     this.organs = []
     this.procedures = []
