@@ -37,8 +37,6 @@
   },
   "dependencies": {
     "@organigram/protocol": "workspace:^",
-    "js-sha3": "^0.9.3",
-    "openpgp": "^5.11.2",
     "typedoc": "^0.26.5",
     "uint8arrays": "^5.1.0"
   },
