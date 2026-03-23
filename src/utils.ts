@@ -76,7 +76,7 @@ export const formatSalt = (salt?: string | null) => {
 // Organ permissions granted to procedures
 export const PERMISSIONS = {
   ADMIN: 0xffff,
-  ALL: 0x07ff,
+  ALL: 0x1fff,
   ALL_PERMISSIONS: 0x0003,
   ALL_ENTRIES: 0x000c,
   ADD_PERMISSIONS: 0x0001,
@@ -89,7 +89,9 @@ export const PERMISSIONS = {
   DEPOSIT_COINS: 0x0080,
   WITHDRAW_COINS: 0x0100,
   DEPOSIT_COLLECTIBLES: 0x0200,
-  WITHDRAW_COLLECTIBLES: 0x0400
+  WITHDRAW_COLLECTIBLES: 0x0400,
+  EXECUTE_WHITELISTED: 0x0800,
+  MANAGE_EXECUTION_WHITELIST: 0x1000
 }
 
 export const getPermissionsSet = (permissions: number): string[] =>
