@@ -165,6 +165,16 @@ export interface SignedProposalInput {
   deadline: bigint | number
 }
 
+export interface SignedProposalActionInput {
+  proposalKey: string
+  nonce: bigint
+  deadline: bigint | number
+}
+
+export interface SignedBlockProposalInput extends SignedProposalActionInput {
+  reason: string
+}
+
 export interface ProcedureProposalOperation {
   index: string
   functionSelector: string
@@ -903,6 +913,58 @@ export class Procedure {
     )
   }
 
+  async signPresentProposal(input: SignedProposalActionInput): Promise<string> {
+    if (this.signer?.signTypedData == null) {
+      throw new Error('Connected signer cannot sign typed data.')
+    }
+    return await this.signer.signTypedData(
+      this.getTypedDataDomain(),
+      {
+        PresentProposal: [
+          { name: 'proposalKey', type: 'uint256' },
+          { name: 'nonce', type: 'uint256' },
+          { name: 'deadline', type: 'uint256' }
+        ]
+      },
+      input
+    )
+  }
+
+  async signBlockProposal(input: SignedBlockProposalInput): Promise<string> {
+    if (this.signer?.signTypedData == null) {
+      throw new Error('Connected signer cannot sign typed data.')
+    }
+    return await this.signer.signTypedData(
+      this.getTypedDataDomain(),
+      {
+        BlockProposal: [
+          { name: 'proposalKey', type: 'uint256' },
+          { name: 'reason', type: 'string' },
+          { name: 'nonce', type: 'uint256' },
+          { name: 'deadline', type: 'uint256' }
+        ]
+      },
+      input
+    )
+  }
+
+  async signApplyProposal(input: SignedProposalActionInput): Promise<string> {
+    if (this.signer?.signTypedData == null) {
+      throw new Error('Connected signer cannot sign typed data.')
+    }
+    return await this.signer.signTypedData(
+      this.getTypedDataDomain(),
+      {
+        ApplyProposal: [
+          { name: 'proposalKey', type: 'uint256' },
+          { name: 'nonce', type: 'uint256' },
+          { name: 'deadline', type: 'uint256' }
+        ]
+      },
+      input
+    )
+  }
+
   async proposeBySig(input: SignedProposalInput & { signature: string }) {
     const signerOrProvider = this.signer ?? this.provider
     if (signerOrProvider == null) {
@@ -987,6 +1049,26 @@ export class Procedure {
     return await tx.wait()
   }
 
+  async blockProposalBySig(
+    input: SignedBlockProposalInput & { signature: string },
+    options?: TransactionOptions
+  ): Promise<ContractTransactionReceipt> {
+    const tx = await this._contract.blockProposalBySig(
+      input.proposalKey,
+      input.reason,
+      input.nonce,
+      input.deadline,
+      input.signature
+    )
+    if (options?.onTransaction != null) {
+      options.onTransaction(
+        tx,
+        `Block proposal ${input.proposalKey} of procedure ${this.address} by signature`
+      )
+    }
+    return await tx.wait()
+  }
+
   async presentProposal(
     proposalKey: string,
     options?: TransactionOptions
@@ -1001,15 +1083,20 @@ export class Procedure {
     return await tx.wait()
   }
 
-  async adoptProposal(
-    proposalKey: string,
+  async presentProposalBySig(
+    input: SignedProposalActionInput & { signature: string },
     options?: TransactionOptions
   ): Promise<ContractTransactionReceipt> {
-    const tx = await this._contract.adoptProposal(proposalKey)
+    const tx = await this._contract.presentProposalBySig(
+      input.proposalKey,
+      input.nonce,
+      input.deadline,
+      input.signature
+    )
     if (options?.onTransaction != null) {
       options.onTransaction(
         tx,
-        `Adopt proposal ${proposalKey} of procedure ${this.address}`
+        `Present proposal ${input.proposalKey} of procedure ${this.address} by signature`
       )
     }
     return await tx.wait()
@@ -1024,6 +1111,25 @@ export class Procedure {
       options.onTransaction(
         tx,
         `Apply proposal ${proposalKey} of procedure ${this.address}`
+      )
+    }
+    return await tx.wait()
+  }
+
+  async applyProposalBySig(
+    input: SignedProposalActionInput & { signature: string },
+    options?: TransactionOptions
+  ): Promise<ContractTransactionReceipt> {
+    const tx = await this._contract.applyProposalBySig(
+      input.proposalKey,
+      input.nonce,
+      input.deadline,
+      input.signature
+    )
+    if (options?.onTransaction != null) {
+      options.onTransaction(
+        tx,
+        `Apply proposal ${input.proposalKey} of procedure ${this.address} by signature`
       )
     }
     return await tx.wait()
