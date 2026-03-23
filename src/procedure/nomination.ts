@@ -93,4 +93,41 @@ export class NominationProcedure extends Procedure {
     const receipt = await tx.wait()
     return receipt.status === 1
   }
+
+  async signNomination(input: {
+    proposalKey: string
+    nonce: bigint
+    deadline: bigint | number
+  }): Promise<string> {
+    if (this.signer?.signTypedData == null) {
+      throw new Error('Connected signer cannot sign typed data.')
+    }
+    return await this.signer.signTypedData(
+      this.getTypedDataDomain(),
+      {
+        Nomination: [
+          { name: 'proposalKey', type: 'uint256' },
+          { name: 'nonce', type: 'uint256' },
+          { name: 'deadline', type: 'uint256' }
+        ]
+      },
+      input
+    )
+  }
+
+  async nominateBySig(input: {
+    proposalKey: string
+    nonce: bigint
+    deadline: bigint | number
+    signature: string
+  }): Promise<boolean> {
+    const tx = await this.contract.nominateBySig(
+      input.proposalKey,
+      input.nonce,
+      input.deadline,
+      input.signature
+    )
+    const receipt = await tx.wait()
+    return receipt.status === 1
+  }
 }

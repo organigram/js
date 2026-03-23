@@ -330,6 +330,46 @@ export class VoteProcedure extends Procedure {
     return await tx.wait()
   }
 
+  async signVote(input: {
+    proposalKey: string
+    approval: boolean
+    nonce: bigint
+    deadline: bigint | number
+  }): Promise<string> {
+    if (this.signer?.signTypedData == null) {
+      throw new Error('Connected signer cannot sign typed data.')
+    }
+    return await this.signer.signTypedData(
+      this.getTypedDataDomain(),
+      {
+        Vote: [
+          { name: 'proposalKey', type: 'uint256' },
+          { name: 'approval', type: 'bool' },
+          { name: 'nonce', type: 'uint256' },
+          { name: 'deadline', type: 'uint256' }
+        ]
+      },
+      input
+    )
+  }
+
+  async voteBySig(input: {
+    proposalKey: string
+    approval: boolean
+    nonce: bigint
+    deadline: bigint | number
+    signature: string
+  }): Promise<boolean> {
+    const tx = await this.contract.voteBySig(
+      input.proposalKey,
+      input.approval,
+      input.nonce,
+      input.deadline,
+      input.signature
+    )
+    return await tx.wait()
+  }
+
   async count(proposalKey: string): Promise<boolean> {
     return this.contract.count(proposalKey).catch((error: Error) => {
       console.error(

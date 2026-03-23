@@ -108,6 +108,7 @@ export type OperationParamType =
   | 'entry'
   | 'entries'
   | 'address'
+  | 'bytes'
   | 'addresses'
   | 'index'
   | 'indexes'
@@ -149,6 +150,21 @@ export interface ProcedureProposalOperationFunction {
   target?: 'organ' | 'self'
 }
 
+export interface ExternalCallOperationInput {
+  organAddress: string
+  target: string
+  data: string
+  value?: string | bigint | number
+  index?: string | number
+}
+
+export interface SignedProposalInput {
+  cid: string
+  operations: ProcedureProposalOperation[]
+  nonce: bigint
+  deadline: bigint | number
+}
+
 export interface ProcedureProposalOperation {
   index: string
   functionSelector: string
@@ -186,6 +202,7 @@ export type ProposalKey =
   | 'replacePermission'
   | 'updateMetadata'
   | 'transfer'
+  | 'externalCall'
   | string
 
 export interface ProposalMetadata {
@@ -309,6 +326,15 @@ export const procedureFunctions: ProcedureProposalOperationFunction[] = [
     label: 'Withdraw ERC721',
     tags: ['transfer', 'withdraw', 'collectibles', 'erc721'],
     params: ['address', 'address', 'address', 'tokenId'],
+    target: 'organ'
+  },
+  {
+    funcSig: ethers.id('executeWhitelisted(address,uint256,bytes)').slice(0, 10),
+    key: 'externalCall',
+    signature: 'executeWhitelisted(address,uint256,bytes)',
+    label: 'External call',
+    tags: ['transfer'],
+    params: ['address', 'amount', 'bytes'],
     target: 'organ'
   }
 ]
@@ -619,6 +645,8 @@ export class Procedure {
         return 'bytes2'
       case 'addresses':
         return 'address[]'
+      case 'bytes':
+        return 'bytes'
       case 'address':
         return 'address'
       case 'organ':
@@ -815,6 +843,133 @@ export class Procedure {
     }
     this.proposals.push(proposal)
     return proposal
+  }
+
+  async signProposal(input: SignedProposalInput): Promise<string> {
+    if (this.signer?.signTypedData == null) {
+      throw new Error('Connected signer cannot sign typed data.')
+    }
+    const ops = input.operations.map(operation => ({
+      index:
+        operation?.index != null && operation.index !== ''
+          ? operation.index
+          : '0',
+      target: operation.target,
+      data: operation.data,
+      value: operation.value ?? '0'
+    }))
+    return await this.signer.signTypedData(
+      this.getTypedDataDomain(),
+      {
+        Operation: [
+          { name: 'index', type: 'uint256' },
+          { name: 'target', type: 'address' },
+          { name: 'data', type: 'bytes' },
+          { name: 'value', type: 'uint256' }
+        ],
+        Proposal: [
+          { name: 'cid', type: 'string' },
+          { name: 'operationsHash', type: 'bytes32' },
+          { name: 'nonce', type: 'uint256' },
+          { name: 'deadline', type: 'uint256' }
+        ]
+      },
+      {
+        cid: input.cid,
+        operationsHash: ethers.solidityPackedKeccak256(
+          ['bytes32[]'],
+          [
+            ops.map(operation =>
+              ethers.keccak256(
+                ethers.AbiCoder.defaultAbiCoder().encode(
+                  ['bytes32', 'uint256', 'address', 'bytes32', 'uint256'],
+                  [
+                    ethers.id(
+                      'Operation(uint256 index,address target,bytes data,uint256 value)'
+                    ),
+                    operation.index,
+                    operation.target,
+                    ethers.keccak256(operation.data),
+                    operation.value
+                  ]
+                )
+              )
+            )
+          ]
+        ),
+        nonce: input.nonce,
+        deadline: input.deadline
+      }
+    )
+  }
+
+  async proposeBySig(input: SignedProposalInput & { signature: string }) {
+    const signerOrProvider = this.signer ?? this.provider
+    if (signerOrProvider == null) {
+      throw new Error('Not connected.')
+    }
+    const ops = input.operations.map(operation => ({
+      index:
+        operation?.index != null && operation.index !== ''
+          ? operation.index
+          : '0',
+      target: operation.target,
+      data: operation.data,
+      value: operation.value ?? '0',
+      processed: false
+    }))
+    const tx = await this._contract.proposeBySig(
+      input.cid,
+      ops,
+      input.nonce,
+      input.deadline,
+      input.signature
+    )
+    await tx.wait()
+    return tx
+  }
+
+  async getNonce(account: string): Promise<bigint> {
+    return await this._contract.getNonce(account)
+  }
+
+  getTypedDataDomain(): {
+    name: string
+    version: string
+    chainId: bigint
+    verifyingContract: string
+  } {
+    return {
+      name: 'Organigram Procedure',
+      version: '1',
+      chainId: BigInt(this.chainId),
+      verifyingContract: this.address
+    }
+  }
+
+  static createExternalCallOperation({
+    organAddress,
+    target,
+    data,
+    value = 0,
+    index = 0
+  }: ExternalCallOperationInput): ProcedureProposalOperation {
+    const organInterface = new ethers.Interface([
+      'function executeWhitelisted(address target,uint256 value,bytes data)'
+    ])
+    return {
+      index: index.toString(),
+      target: organAddress,
+      value: '0',
+      data: organInterface.encodeFunctionData('executeWhitelisted', [
+        target,
+        value,
+        data
+      ]),
+      functionSelector: ethers
+        .id('executeWhitelisted(address,uint256,bytes)')
+        .slice(0, 10)
+    }
   }
 
   async blockProposal(
