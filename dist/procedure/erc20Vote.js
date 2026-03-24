@@ -25,7 +25,9 @@ export class ERC20VoteProcedure extends VoteProcedure {
         }
         const [erc20, quorumSize, voteDuration, majoritySize] = input.args;
         const contract = new ethers.Contract(erc20Vote.address, ERC20VoteProcedureContractABI.abi, input.options.signer);
-        return await contract.initialize.populateTransaction(input.cid, input.proposers, input.moderators, input.deciders, input.withModeration, input.forwarder, erc20, quorumSize, voteDuration, majoritySize);
+        return await contract
+            .getFunction('initialize(string,address,address,address,bool,address,uint32,uint32,uint32,address)')
+            .populateTransaction(input.cid, input.proposers, input.moderators, input.deciders, input.withModeration, input.forwarder, quorumSize, voteDuration, majoritySize, erc20);
     }
     static async load(address, signerOrProvider, initialProcedure) {
         const procedure = await Procedure.load(address, signerOrProvider, initialProcedure);

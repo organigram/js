@@ -129,7 +129,7 @@
             "address": "elect-directors-address",
             "name": "Elect directors",
             "typeName": "erc20Vote",
-            "data": "{\"erc20\":\"shares-address\",\"quorumSize\":\"20001\",\"voteDuration\":\"3600\",\"majoritySize\":\"50001\"}",
+            "data": "{\"quorumSize\":\"20001\",\"voteDuration\":\"3600\",\"majoritySize\":\"50001\",\"erc20\":\"shares-address\"}",
             "deciders": "members-address",
             "proposers": "members-address"
         },
@@ -156,7 +156,7 @@
             "address": "general-meeting-address",
             "name": "General meeting",
             "typeName": "erc20Vote",
-            "data": "{\"erc20\":\"shares-address\",\"quorumSize\":\"20001\",\"voteDuration\":\"3600\",\"majoritySize\":\"50001\"}",
+            "data": "{\"quorumSize\":\"20001\",\"voteDuration\":\"3600\",\"majoritySize\":\"50001\",\"erc20\":\"shares-address\"}",
             "deciders": "members-address",
             "proposers": "members-address"
         },

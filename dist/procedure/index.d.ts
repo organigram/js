@@ -64,7 +64,7 @@ export type AccountInOrgans = {
     deciders?: boolean;
 };
 export type OperationTag = 'cid' | 'entries' | 'permissions' | 'coins' | 'collectibles' | 'erc721' | 'erc20' | 'erc1155' | 'ether' | 'add' | 'replace' | 'remove' | 'deposit' | 'withdraw' | 'transfer';
-export type OperationParamType = 'cid' | 'entry' | 'entries' | 'address' | 'addresses' | 'index' | 'indexes' | 'organ' | 'oldPermissionAddress' | 'newPermissionAddress' | 'permissionAddress' | 'permissionValue' | 'proposal' | 'proposals' | 'amount' | 'tokenId';
+export type OperationParamType = 'cid' | 'entry' | 'entries' | 'address' | 'bytes' | 'addresses' | 'index' | 'indexes' | 'organ' | 'oldPermissionAddress' | 'newPermissionAddress' | 'permissionAddress' | 'permissionValue' | 'proposal' | 'proposals' | 'amount' | 'tokenId';
 export type OperationParamAction = 'select' | 'create' | 'update' | 'delete' | 'withdraw' | 'deposit' | 'transfer' | 'block';
 export interface OperationParam {
     type: OperationParamType;
@@ -81,6 +81,27 @@ export interface ProcedureProposalOperationFunction {
     params?: OperationParamType[];
     abi?: unknown;
     target?: 'organ' | 'self';
+}
+export interface ExternalCallOperationInput {
+    organAddress: string;
+    target: string;
+    data: string;
+    value?: string | bigint | number;
+    index?: string | number;
+}
+export interface SignedProposalInput {
+    cid: string;
+    operations: ProcedureProposalOperation[];
+    nonce: bigint;
+    deadline: bigint | number;
+}
+export interface SignedProposalActionInput {
+    proposalKey: string;
+    nonce: bigint;
+    deadline: bigint | number;
+}
+export interface SignedBlockProposalInput extends SignedProposalActionInput {
+    reason: string;
 }
 export interface ProcedureProposalOperation {
     index: string;
@@ -107,7 +128,7 @@ export interface ProcedureProposal {
     operations: ProcedureProposalOperation[];
     metadata?: ProposalMetadata;
 }
-export type ProposalKey = 'addEntries' | 'removeEntries' | 'replaceEntry' | 'addPermission' | 'removePermission' | 'replacePermission' | 'updateMetadata' | 'transfer' | string;
+export type ProposalKey = 'addEntries' | 'removeEntries' | 'replaceEntry' | 'addPermission' | 'removePermission' | 'replacePermission' | 'updateMetadata' | 'transfer' | 'externalCall' | string;
 export interface ProposalMetadata {
     title: string;
     subtitle?: string;
@@ -179,10 +200,33 @@ export declare class Procedure {
         operations: ProcedureProposalOperation[];
         options?: TransactionOptions;
     }): Promise<ProcedureProposal>;
+    signProposal(input: SignedProposalInput): Promise<string>;
+    signPresentProposal(input: SignedProposalActionInput): Promise<string>;
+    signBlockProposal(input: SignedBlockProposalInput): Promise<string>;
+    signApplyProposal(input: SignedProposalActionInput): Promise<string>;
+    proposeBySig(input: SignedProposalInput & {
+        signature: string;
+    }): Promise<any>;
+    getNonce(account: string): Promise<bigint>;
+    getTypedDataDomain(): {
+        name: string;
+        version: string;
+        chainId: bigint;
+        verifyingContract: string;
+    };
+    static createExternalCallOperation({ organAddress, target, data, value, index }: ExternalCallOperationInput): ProcedureProposalOperation;
     blockProposal(proposalKey: string, reason: string, options?: TransactionOptions): Promise<ContractTransactionReceipt>;
+    blockProposalBySig(input: SignedBlockProposalInput & {
+        signature: string;
+    }, options?: TransactionOptions): Promise<ContractTransactionReceipt>;
     presentProposal(proposalKey: string, options?: TransactionOptions): Promise<ContractTransactionReceipt>;
-    adoptProposal(proposalKey: string, options?: TransactionOptions): Promise<ContractTransactionReceipt>;
+    presentProposalBySig(input: SignedProposalActionInput & {
+        signature: string;
+    }, options?: TransactionOptions): Promise<ContractTransactionReceipt>;
     applyProposal(proposalKey: string, options?: TransactionOptions): Promise<ContractTransactionReceipt>;
+    applyProposalBySig(input: SignedProposalActionInput & {
+        signature: string;
+    }, options?: TransactionOptions): Promise<ContractTransactionReceipt>;
     reloadProposals(): Promise<Procedure>;
     reloadProposal(proposalKey: string): Promise<Procedure>;
     reloadData(): Promise<Procedure>;

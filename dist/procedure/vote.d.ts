@@ -53,6 +53,19 @@ export declare class VoteProcedure extends Procedure {
     static loadElections(address: string, signerOrProvider: ethers.Signer | ethers.Provider, proposalsLength?: number): Promise<Election[]>;
     static load(address: string, signerOrProvider: ethers.Signer | ethers.Provider, initialProcedure?: ProcedureInput): Promise<VoteProcedure>;
     vote(proposalKey: string, approval: boolean, options?: TransactionOptions): Promise<boolean>;
+    signVote(input: {
+        proposalKey: string;
+        approval: boolean;
+        nonce: bigint;
+        deadline: bigint | number;
+    }): Promise<string>;
+    voteBySig(input: {
+        proposalKey: string;
+        approval: boolean;
+        nonce: bigint;
+        deadline: bigint | number;
+        signature: string;
+    }): Promise<boolean>;
     count(proposalKey: string): Promise<boolean>;
     toJson: () => ProcedureJson;
 }

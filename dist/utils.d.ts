@@ -26,6 +26,8 @@ export declare const PERMISSIONS: {
     WITHDRAW_COINS: number;
     DEPOSIT_COLLECTIBLES: number;
     WITHDRAW_COLLECTIBLES: number;
+    EXECUTE_WHITELISTED: number;
+    MANAGE_EXECUTION_WHITELIST: number;
 };
 export declare const getPermissionsSet: (permissions: number) => string[];
 export declare const capitalize: (s: string) => string;

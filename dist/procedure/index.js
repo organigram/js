@@ -93,6 +93,15 @@ export const procedureFunctions = [
         tags: ['transfer', 'withdraw', 'collectibles', 'erc721'],
         params: ['address', 'address', 'address', 'tokenId'],
         target: 'organ'
+    },
+    {
+        funcSig: ethers.id('executeWhitelisted(address,uint256,bytes)').slice(0, 10),
+        key: 'externalCall',
+        signature: 'executeWhitelisted(address,uint256,bytes)',
+        label: 'External call',
+        tags: ['transfer'],
+        params: ['address', 'amount', 'bytes'],
+        target: 'organ'
     }
 ];
 export class Procedure {
@@ -289,6 +298,8 @@ export class Procedure {
                 return 'bytes2';
             case 'addresses':
                 return 'address[]';
+            case 'bytes':
+                return 'bytes';
             case 'address':
                 return 'address';
             case 'organ':
@@ -427,10 +438,141 @@ export class Procedure {
         this.proposals.push(proposal);
         return proposal;
     }
+    async signProposal(input) {
+        if (this.signer?.signTypedData == null) {
+            throw new Error('Connected signer cannot sign typed data.');
+        }
+        const ops = input.operations.map(operation => ({
+            index: operation?.index != null && operation.index !== ''
+                ? operation.index
+                : '0',
+            target: operation.target,
+            data: operation.data,
+            value: operation.value ?? '0'
+        }));
+        return await this.signer.signTypedData(this.getTypedDataDomain(), {
+            Operation: [
+                { name: 'index', type: 'uint256' },
+                { name: 'target', type: 'address' },
+                { name: 'data', type: 'bytes' },
+                { name: 'value', type: 'uint256' }
+            ],
+            Proposal: [
+                { name: 'cid', type: 'string' },
+                { name: 'operationsHash', type: 'bytes32' },
+                { name: 'nonce', type: 'uint256' },
+                { name: 'deadline', type: 'uint256' }
+            ]
+        }, {
+            cid: input.cid,
+            operationsHash: ethers.solidityPackedKeccak256(['bytes32[]'], [
+                ops.map(operation => ethers.keccak256(ethers.AbiCoder.defaultAbiCoder().encode(['bytes32', 'uint256', 'address', 'bytes32', 'uint256'], [
+                    ethers.id('Operation(uint256 index,address target,bytes data,uint256 value)'),
+                    operation.index,
+                    operation.target,
+                    ethers.keccak256(operation.data),
+                    operation.value
+                ])))
+            ]),
+            nonce: input.nonce,
+            deadline: input.deadline
+        });
+    }
+    async signPresentProposal(input) {
+        if (this.signer?.signTypedData == null) {
+            throw new Error('Connected signer cannot sign typed data.');
+        }
+        return await this.signer.signTypedData(this.getTypedDataDomain(), {
+            PresentProposal: [
+                { name: 'proposalKey', type: 'uint256' },
+                { name: 'nonce', type: 'uint256' },
+                { name: 'deadline', type: 'uint256' }
+            ]
+        }, input);
+    }
+    async signBlockProposal(input) {
+        if (this.signer?.signTypedData == null) {
+            throw new Error('Connected signer cannot sign typed data.');
+        }
+        return await this.signer.signTypedData(this.getTypedDataDomain(), {
+            BlockProposal: [
+                { name: 'proposalKey', type: 'uint256' },
+                { name: 'reason', type: 'string' },
+                { name: 'nonce', type: 'uint256' },
+                { name: 'deadline', type: 'uint256' }
+            ]
+        }, input);
+    }
+    async signApplyProposal(input) {
+        if (this.signer?.signTypedData == null) {
+            throw new Error('Connected signer cannot sign typed data.');
+        }
+        return await this.signer.signTypedData(this.getTypedDataDomain(), {
+            ApplyProposal: [
+                { name: 'proposalKey', type: 'uint256' },
+                { name: 'nonce', type: 'uint256' },
+                { name: 'deadline', type: 'uint256' }
+            ]
+        }, input);
+    }
+    async proposeBySig(input) {
+        const signerOrProvider = this.signer ?? this.provider;
+        if (signerOrProvider == null) {
+            throw new Error('Not connected.');
+        }
+        const ops = input.operations.map(operation => ({
+            index: operation?.index != null && operation.index !== ''
+                ? operation.index
+                : '0',
+            target: operation.target,
+            data: operation.data,
+            value: operation.value ?? '0',
+            processed: false
+        }));
+        const tx = await this._contract.proposeBySig(input.cid, ops, input.nonce, input.deadline, input.signature);
+        await tx.wait();
+        return tx;
+    }
+    async getNonce(account) {
+        return await this._contract.getNonce(account);
+    }
+    getTypedDataDomain() {
+        return {
+            name: 'Organigram Procedure',
+            version: '1',
+            chainId: BigInt(this.chainId),
+            verifyingContract: this.address
+        };
+    }
+    static createExternalCallOperation({ organAddress, target, data, value = 0, index = 0 }) {
+        const organInterface = new ethers.Interface([
+            'function executeWhitelisted(address target,uint256 value,bytes data)'
+        ]);
+        return {
+            index: index.toString(),
+            target: organAddress,
+            value: '0',
+            data: organInterface.encodeFunctionData('executeWhitelisted', [
+                target,
+                value,
+                data
+            ]),
+            functionSelector: ethers
+                .id('executeWhitelisted(address,uint256,bytes)')
+                .slice(0, 10)
+        };
+    }
     async blockProposal(proposalKey, reason, options) {
         const tx = await this._contract.blockProposal(proposalKey, reason);
         if (options?.onTransaction != null) {
             options.onTransaction(tx, `Block proposal ${proposalKey} of procedure ${this.address}`);
+        }
+        return await tx.wait();
+    }
+    async blockProposalBySig(input, options) {
+        const tx = await this._contract.blockProposalBySig(input.proposalKey, input.reason, input.nonce, input.deadline, input.signature);
+        if (options?.onTransaction != null) {
+            options.onTransaction(tx, `Block proposal ${input.proposalKey} of procedure ${this.address} by signature`);
         }
         return await tx.wait();
     }
@@ -441,10 +583,10 @@ export class Procedure {
         }
         return await tx.wait();
     }
-    async adoptProposal(proposalKey, options) {
-        const tx = await this._contract.adoptProposal(proposalKey);
+    async presentProposalBySig(input, options) {
+        const tx = await this._contract.presentProposalBySig(input.proposalKey, input.nonce, input.deadline, input.signature);
         if (options?.onTransaction != null) {
-            options.onTransaction(tx, `Adopt proposal ${proposalKey} of procedure ${this.address}`);
+            options.onTransaction(tx, `Present proposal ${input.proposalKey} of procedure ${this.address} by signature`);
         }
         return await tx.wait();
     }
@@ -452,6 +594,13 @@ export class Procedure {
         const tx = await this._contract.applyProposal(proposalKey);
         if (options?.onTransaction != null) {
             options.onTransaction(tx, `Apply proposal ${proposalKey} of procedure ${this.address}`);
+        }
+        return await tx.wait();
+    }
+    async applyProposalBySig(input, options) {
+        const tx = await this._contract.applyProposalBySig(input.proposalKey, input.nonce, input.deadline, input.signature);
+        if (options?.onTransaction != null) {
+            options.onTransaction(tx, `Apply proposal ${input.proposalKey} of procedure ${this.address} by signature`);
         }
         return await tx.wait();
     }

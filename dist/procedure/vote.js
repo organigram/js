@@ -194,6 +194,23 @@ export class VoteProcedure extends Procedure {
         }
         return await tx.wait();
     }
+    async signVote(input) {
+        if (this.signer?.signTypedData == null) {
+            throw new Error('Connected signer cannot sign typed data.');
+        }
+        return await this.signer.signTypedData(this.getTypedDataDomain(), {
+            Vote: [
+                { name: 'proposalKey', type: 'uint256' },
+                { name: 'approval', type: 'bool' },
+                { name: 'nonce', type: 'uint256' },
+                { name: 'deadline', type: 'uint256' }
+            ]
+        }, input);
+    }
+    async voteBySig(input) {
+        const tx = await this.contract.voteBySig(input.proposalKey, input.approval, input.nonce, input.deadline, input.signature);
+        return await tx.wait();
+    }
     async count(proposalKey) {
         return this.contract.count(proposalKey).catch((error) => {
             console.error('Error while counting.', this.address, proposalKey, error.message);
