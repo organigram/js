@@ -1,6 +1,6 @@
-import OrganLibraryContractABI from '@organigram/protocol/artifacts/contracts/libraries/OrganLibrary.sol/OrganLibrary.json';
-import OrganigramClientContractABI from '@organigram/protocol/artifacts/contracts/OrganigramClient.sol/OrganigramClient.json';
-import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json';
+import OrganLibraryContractABI from '@organigram/protocol/abi/OrganLibrary.sol/OrganLibrary.json';
+import OrganigramClientContractABI from '@organigram/protocol/abi/OrganigramClient.sol/OrganigramClient.json';
+import ProcedureContractABI from '@organigram/protocol/abi/Procedure.sol/Procedure.json';
 import { decodeEventLog, isAddress, parseEther, toHex, zeroAddress } from 'viem';
 import { createRandom32BytesHexId, deployedAddresses, formatSalt, PERMISSIONS } from './utils';
 import { Organ } from './organ';
@@ -117,14 +117,14 @@ export class OrganigramClient {
         const { publicClient, walletClient } = input;
         const organLibraryTx = await createDeployTransaction({
             abi: OrganLibraryContractABI.abi,
-            bytecode: OrganLibraryContractABI.bytecode,
+            bytecode: OrganLibraryContractABI.bytecode.object,
             clients: { publicClient, walletClient }
         });
         const organLibraryReceipt = await organLibraryTx.wait();
         if (organLibraryReceipt.contractAddress == null) {
             throw new Error('Organ library deployment failed.');
         }
-        const linkedBytecode = linkContractBytecode(OrganigramClientContractABI.bytecode, OrganigramClientContractABI.linkReferences, {
+        const linkedBytecode = linkContractBytecode(OrganigramClientContractABI.bytecode.object, OrganigramClientContractABI.bytecode.linkReferences, {
             OrganLibrary: organLibraryReceipt.contractAddress
         });
         const clientTx = await createDeployTransaction({

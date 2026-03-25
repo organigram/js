@@ -1,4 +1,4 @@
-import OrganContractABI from '@organigram/protocol/artifacts/contracts/Organ.sol/Organ.json';
+import OrganContractABI from '@organigram/protocol/abi/Organ.sol/Organ.json';
 import { decodeFunctionResult, encodeFunctionData, padHex, toHex, zeroAddress } from 'viem';
 import { createRandom32BytesHexId, deployedAddresses, predictContractAddress } from './utils';
 import { tryMulticall } from './multicall';

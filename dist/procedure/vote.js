@@ -1,4 +1,4 @@
-import VoteProcedureContractABI from '@organigram/protocol/artifacts/contracts/procedures/Vote.sol/VoteProcedure.json';
+import VoteProcedureContractABI from '@organigram/protocol/abi/Vote.sol/VoteProcedure.json';
 import { Procedure } from '../procedure';
 import { deployedAddresses, handleJsonBigInt } from '../utils';
 import { tryMulticall } from '../multicall';

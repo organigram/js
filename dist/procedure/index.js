@@ -1,4 +1,4 @@
-import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json';
+import ProcedureContractABI from '@organigram/protocol/abi/Procedure.sol/Procedure.json';
 import { decodeAbiParameters, decodeFunctionResult, encodeAbiParameters, encodeFunctionData, encodePacked, keccak256, parseAbiParameters, toFunctionSelector, toHex, zeroAddress } from 'viem';
 import { capitalize, createRandom32BytesHexId, deployedAddresses, handleJsonBigInt, predictContractAddress } from '../utils';
 import { tryMulticall } from '../multicall';
