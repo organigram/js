@@ -750,10 +750,14 @@ export class Organ {
     clients: ContractClients,
     data?: OrganContractData
   ): Promise<OrganEntry[]> {
-    const length = (data ?? (await Organ.loadData(address, clients))).entriesCount
+    const organData = data ?? (await Organ.loadData(address, clients))
+    const indexes = Array.from(
+      { length: Math.max(Number(organData.entriesLength) - 1, 0) },
+      (_, index) => index + 1
+    )
     const multicallEntries = await tryMulticall(
       clients,
-      Array.from({ length: Number(length) }).map((_, index) => ({
+      indexes.map(index => ({
         target: address,
         callData: encodeFunctionData({
           abi: OrganContractABI.abi,
@@ -779,7 +783,7 @@ export class Organ {
     }
 
     const entries = await Promise.all(
-      Array.from({ length: Number(length) }).map(async (_, index) => {
+      indexes.map(async index => {
         const entry = await Organ.loadEntry(
           address,
           index.toString(),

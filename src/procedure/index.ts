@@ -63,13 +63,12 @@ export interface ProcedureType {
 
 type ProcedureContractData = {
   cid: string
-  metadata?: string
   proposers: string
   moderators: string
   deciders: string
   withModeration: boolean
-  forwarder: string
   proposalsLength: bigint
+  interfaceId?: string
 }
 
 export type ProcedureJson = {
@@ -270,13 +269,12 @@ export interface ProcedureInput {
 
 const normalizeProcedureData = (data: any): ProcedureContractData => ({
   cid: data.cid ?? data[0],
-  metadata: data.metadata ?? data[1],
-  proposers: data.proposers ?? data[2],
-  moderators: data.moderators ?? data[3],
-  deciders: data.deciders ?? data[4],
-  withModeration: data.withModeration ?? data[5],
-  forwarder: data.forwarder ?? data[6],
-  proposalsLength: BigInt(data.proposalsLength ?? data[7] ?? 0)
+  proposers: data.proposers ?? data[1],
+  moderators: data.moderators ?? data[2],
+  deciders: data.deciders ?? data[3],
+  withModeration: data.withModeration ?? data[4] ?? false,
+  proposalsLength: BigInt(data.proposalsLength ?? data[5] ?? 0),
+  interfaceId: data.interfaceId ?? data[6]
 })
 
 const normalizeTupleEntry = (value: any) => ({
@@ -628,13 +626,13 @@ export class Procedure {
       chainId,
       publicClient: clients.publicClient,
       walletClient: clients.walletClient,
-      metadata: data.metadata,
+      metadata: initialProcedure?.metadata ?? '{}',
       proposers: data.proposers,
       moderators: data.moderators,
       deciders: data.deciders,
       withModeration: data.withModeration,
       forwarder:
-        data.forwarder ??
+        initialProcedure?.forwarder ??
         deployedAddresses[chainId as '11155111']?.MetaGasStation,
       proposals,
       isDeployed: true
