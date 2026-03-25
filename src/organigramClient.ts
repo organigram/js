@@ -1,12 +1,15 @@
-import {
-  ethers,
-  type EventLog,
-  type ContractTransaction,
-  parseEther
-} from 'ethers'
 import OrganLibraryContractABI from '@organigram/protocol/artifacts/contracts/libraries/OrganLibrary.sol/OrganLibrary.json'
 import OrganigramClientContractABI from '@organigram/protocol/artifacts/contracts/OrganigramClient.sol/OrganigramClient.json'
 import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json'
+import {
+  decodeEventLog,
+  isAddress,
+  parseEther,
+  toHex,
+  type PublicClient,
+  type WalletClient,
+  zeroAddress
+} from 'viem'
 import { createRandom32BytesHexId, deployedAddresses, formatSalt, PERMISSIONS } from './utils'
 
 import { Organ, OrganEntry, OrganInput, OrganPermission } from './organ'
@@ -21,6 +24,15 @@ import {
   procedureTypes
 } from './procedure/utils'
 import { Asset, ERC20_INITIAL_SUPPLY } from './asset'
+import {
+  type ContractClients,
+  type OrganigramTransaction,
+  type OrganigramTransactionReceipt,
+  createContractWriteTransaction,
+  createDeployTransaction,
+  getContractInstance,
+  getWalletAddress
+} from './contracts'
 
 export interface DeployOrganInput {
   cid?: string
@@ -61,7 +73,7 @@ export interface DeployAssetInput {
 export interface TransactionOptions {
   nonce?: number
   customData?: { index?: number }
-  onTransaction?: (tx: ethers.TransactionResponse, description: string) => void
+  onTransaction?: (tx: OrganigramTransaction, description: string) => void
 }
 
 export interface File {
@@ -101,6 +113,61 @@ const linkContractBytecode = (
   return linkedBytecode
 }
 
+const getDeploymentAddresses = (
+  receipt: OrganigramTransactionReceipt,
+  eventName: 'organDeployed' | 'assetDeployed' | 'procedureDeployed'
+): string[] =>
+  receipt.logs.flatMap(log => {
+    try {
+      const decoded = decodeEventLog({
+        abi: OrganigramClientContractABI.abi,
+        data: log.data,
+        topics: log.topics,
+        eventName
+      }) as {
+        eventName: 'organDeployed' | 'assetDeployed' | 'procedureDeployed'
+        args?: Record<string, unknown> | readonly unknown[]
+      }
+      const args = decoded.args as Record<string, unknown> | readonly unknown[] | undefined
+
+      if (args == null || Array.isArray(args)) {
+        return []
+      }
+      const objectArgs = args as Record<string, unknown>
+
+      switch (decoded.eventName) {
+        case 'organDeployed':
+          return [objectArgs.organ as string]
+        case 'assetDeployed':
+          return [objectArgs.asset as string]
+        case 'procedureDeployed':
+          return [objectArgs.procedure as string]
+      }
+
+      return []
+    } catch {
+      return []
+    }
+  })
+
+const createInitialProcedureInput = (
+  input: DeployProceduresInput,
+  chainId: string
+): ProcedureInput => ({
+  typeName: input.typeName,
+  type: procedureTypes[input.typeName as keyof typeof procedureTypes],
+  chainId,
+  cid: input.cid ?? '',
+  deciders: input.deciders,
+  proposers: input.proposers ?? input.deciders,
+  moderators: input.moderators ?? zeroAddress,
+  withModeration: input.withModeration ?? false,
+  forwarder:
+    input.forwarder ?? deployedAddresses[chainId as '11155111']?.MetaGasStation,
+  salt: formatSalt(input.salt),
+  ...(input.data != null ? { data: input.data } : {})
+})
+
 export class OrganigramClient {
   address: string
   chainId: string
@@ -109,128 +176,112 @@ export class OrganigramClient {
   procedures: Procedure[]
   assets: Asset[]
   cids: File[]
-  provider: ethers.Provider
-  contract: ethers.Contract
-  signer?: ethers.Signer
+  publicClient: PublicClient
+  contract: any
+  walletClient?: WalletClient
 
-  /**
-   * Creates an instance of Organigram client.
-   * @param {string} address - The contract address.
-   * @param {string} chainId - The network id.
-   * @param {ProcedureType[]} procedureTypes - The procedure types.
-   * @param {ethers.Contract} contract - The ethers contract instance.
-   * @param {ethers.Provider} provider - The ethers provider.
-   * @param {ethers.Signer} [signer] - The ethers signer.
-   */
   constructor(input: {
-    provider: ethers.Provider
+    publicClient: PublicClient
     address?: string
     chainId?: string
     procedureTypes?: ProcedureType[]
-    contract?: ethers.Contract
-    signer?: ethers.Signer
+    contract?: any
+    walletClient?: WalletClient
   }) {
-    const resolvedChainId = input?.chainId ?? '11155111'
+    const resolvedChainId = input.chainId ?? '11155111'
     const resolvedAddress =
-      input?.address ??
-      (input?.contract?.target as string | undefined) ??
+      input.address ??
+      input.contract?.address ??
       deployedAddresses[resolvedChainId as '11155111']?.OrganigramClient
-    if (input?.contract == null && !resolvedAddress) {
+    if (input.contract == null && !resolvedAddress) {
       throw new Error(
         'OrganigramClient address not configured. Provide an address or a chainId with deployments.'
       )
     }
     this.address = resolvedAddress ?? ''
     this.chainId = resolvedChainId
-    this.procedureTypes = input?.procedureTypes ?? Object.values(procedureTypes)
+    this.procedureTypes = input.procedureTypes ?? Object.values(procedureTypes)
     this.organs = []
     this.procedures = []
     this.assets = []
     this.cids = []
-    this.signer = input?.signer
-    this.provider = input?.provider
+    this.walletClient = input.walletClient
+    this.publicClient = input.publicClient
     this.contract =
-      input?.contract ??
-      new ethers.Contract(
-        resolvedAddress!,
-        OrganigramClientContractABI.abi,
-        input?.signer ?? input?.provider
-      )
+      input.contract ??
+      getContractInstance({
+        address: resolvedAddress!,
+        abi: OrganigramClientContractABI.abi,
+        publicClient: input.publicClient,
+        walletClient: input.walletClient
+      })
   }
 
-  static async deployClient(
-    signer: ethers.Signer
-  ): Promise<OrganigramClient> {
-    const network = await signer.provider?.getNetwork()
-    const organLibraryFactory = new ethers.ContractFactory(
-      OrganLibraryContractABI.abi,
-      OrganLibraryContractABI.bytecode,
-      signer
-    )
-    const organLibrary = await organLibraryFactory.deploy()
-    await organLibrary.waitForDeployment()
+  private getClients(): ContractClients {
+    return {
+      publicClient: this.publicClient,
+      walletClient: this.walletClient
+    }
+  }
+
+  static async deployClient(input: {
+    publicClient: PublicClient
+    walletClient: WalletClient
+  }): Promise<OrganigramClient> {
+    const { publicClient, walletClient } = input
+    const organLibraryTx = await createDeployTransaction({
+      abi: OrganLibraryContractABI.abi,
+      bytecode: OrganLibraryContractABI.bytecode,
+      clients: { publicClient, walletClient }
+    })
+    const organLibraryReceipt = await organLibraryTx.wait()
+    if (organLibraryReceipt.contractAddress == null) {
+      throw new Error('Organ library deployment failed.')
+    }
     const linkedBytecode = linkContractBytecode(
       OrganigramClientContractABI.bytecode,
       OrganigramClientContractABI.linkReferences,
       {
-        OrganLibrary: await organLibrary.getAddress()
+        OrganLibrary: organLibraryReceipt.contractAddress
       }
     )
-    const factory = new ethers.ContractFactory(
-      OrganigramClientContractABI.abi,
-      linkedBytecode,
-      signer
-    )
-    const contract = await factory.deploy(
-      '',
-      ethers.ZeroAddress,
-      createRandom32BytesHexId()
-    )
-    await contract.waitForDeployment()
-    const clientContract = new ethers.Contract(
-      await contract.getAddress(),
-      OrganigramClientContractABI.abi,
-      signer
-    )
+    const clientTx = await createDeployTransaction({
+      abi: OrganigramClientContractABI.abi,
+      bytecode: linkedBytecode,
+      args: ['', zeroAddress, createRandom32BytesHexId()],
+      clients: { publicClient, walletClient }
+    })
+    const clientReceipt = await clientTx.wait()
+    if (clientReceipt.contractAddress == null) {
+      throw new Error('OrganigramClient deployment failed.')
+    }
     return new OrganigramClient({
-      provider: signer.provider!,
-      signer,
-      chainId: network?.chainId.toString(),
-      contract: clientContract
+      publicClient,
+      walletClient,
+      chainId: String(await publicClient.getChainId()),
+      address: clientReceipt.contractAddress
     })
   }
 
-  /**
-   * Loads a procedure type from registry (a contract address and provider).
-   * @param {Object} options - The options object.
-   * @param {string} options.addr - The contract address.
-   * @param {string} [options.cid] - The IPFS content identifier.
-   * @param {ethers.Provider} provider - The ethers provider.
-   * @returns {Promise<ProcedureType>} A promise that resolves to a ProcedureType object.
-   * @throws {Error} Throws an error if the contract does not support interfaces or is not a procedure.
-   */
   static async loadProcedureType(
     { addr, cid }: { addr: string; cid?: string },
-    provider: ethers.Provider
+    publicClient: PublicClient
   ): Promise<ProcedureType> {
-    const contract = new ethers.Contract(
-      addr,
-      ProcedureContractABI.abi,
-      provider
-    )
-    // @todo : Parse doc for custom parser.
+    const contract = getContractInstance({
+      address: addr,
+      abi: ProcedureContractABI.abi,
+      publicClient
+    })
     let metadata
-    // @todo : Leverage interfaces or metadata in registry to detect procedure class.
-    if (!((await contract.supportsInterface('0x01ffc9a7')) as boolean)) {
+    if (!(await contract.read.supportsInterface(['0x01ffc9a7']))) {
       throw new Error('Contract does not support interfaces.')
     }
-    if (!((await contract.supportsInterface(Procedure.INTERFACE)) as boolean)) {
+    if (!(await contract.read.supportsInterface([Procedure.INTERFACE]))) {
       throw new Error('Contract is not a procedure.')
     }
     if (cid === 'nomination' || cid === 'vote' || cid === 'erc20Vote') {
       metadata = procedureTypes[cid as keyof typeof procedureTypes].metadata
     }
-    // @todo : If Class is set, test if addr supports the procedure's interface.
     return {
       key: cid ?? '',
       address: addr,
@@ -241,33 +292,25 @@ export class OrganigramClient {
     }
   }
 
-  /**
-   * Loads all procedure types from the registry.
-   * @param {string} address - The contract address.
-   * @param {ethers.Provider} provider - The ethers provider.
-   * @returns {Promise<ProcedureType[]>} A promise that resolves to an array of ProcedureType objects.
-   */
   static async loadProcedureTypes({
     address,
-    provider
+    publicClient
   }: {
-    provider: ethers.Provider
+    publicClient: PublicClient
     address?: string
   }): Promise<ProcedureType[]> {
-    const chainId = await provider.getNetwork().then(n => n.chainId.toString())
-    const contract = new ethers.Contract(
-      address ?? deployedAddresses[chainId as '11155111'].OrganigramClient,
-      OrganigramClientContractABI.abi,
-      provider
-    )
-    const proceduresRegistryAddress = (
-      await contract.proceduresRegistry()
-    ).toString()
-    const procedures = await Organ.loadEntries(
-      proceduresRegistryAddress,
-      provider
-    )
-    const procedureTypes = await Promise.all(
+    const chainId = String(await publicClient.getChainId())
+    const contract = getContractInstance({
+      address:
+        address ?? deployedAddresses[chainId as '11155111'].OrganigramClient,
+      abi: OrganigramClientContractABI.abi,
+      publicClient
+    })
+    const proceduresRegistryAddress = (await contract.read.proceduresRegistry()) as string
+    const procedures = await Organ.loadEntries(proceduresRegistryAddress, {
+      publicClient
+    })
+    const loadedProcedureTypes = await Promise.all(
       procedures.map(
         async procedure =>
           await OrganigramClient.loadProcedureType(
@@ -275,65 +318,41 @@ export class OrganigramClient {
               addr: procedure.address,
               cid: procedure.cid
             },
-            provider
+            publicClient
           )
       )
-    ).then((types: Array<ProcedureType | undefined>): ProcedureType[] =>
-      types.filter(i => i != null)
     )
-    return procedureTypes
+    return loadedProcedureTypes.filter(
+      (type): type is ProcedureType => type != null
+    )
   }
 
-  /**
-   * Loads an onchain instance of Organigram client.
-   * @param {string} address - The client address.
-   * @param {ethers.Provider} provider - The ethers provider.
-   * @param {ethers.Signer} [signer] - The ethers signer.
-   * @returns {Promise<OrganigramClient>} A promise that resolves to an instance of OrganigramClient  .
-   * @throws {Error} Throws an error if no provider or signer is provided.
-   */
   static async load(input: {
     address?: string
-    provider: ethers.Provider
-    signer?: ethers.Signer
-    // ipfs?: IPFS
+    publicClient: PublicClient
+    walletClient?: WalletClient
   }): Promise<OrganigramClient> {
-    if (input.provider == null && input.signer == null) {
-      throw new Error('No provider or signer.')
-    }
-    const chainId = await input.provider
-      .getNetwork()
-      .then(n => n.chainId.toString())
-      .catch(() => '')
-    const contract = new ethers.Contract(
-      input.address ??
+    const chainId = await input.publicClient.getChainId().then(String).catch(() => '')
+    const contract = getContractInstance({
+      address:
+        input.address ??
         deployedAddresses[chainId as '11155111'].OrganigramClient,
-      OrganigramClientContractABI.abi,
-      input.signer ?? input.provider
-    )
-    const procedureTypes = await OrganigramClient.loadProcedureTypes(
-      input.provider
-    )
-    const newOrganigramClient = new OrganigramClient({
-      chainId,
-      procedureTypes,
-      contract,
-      provider: input.provider,
-      signer: input.signer
+      abi: OrganigramClientContractABI.abi,
+      publicClient: input.publicClient,
+      walletClient: input.walletClient
     })
-    return newOrganigramClient
+    const loadedProcedureTypes = await OrganigramClient.loadProcedureTypes({
+      address: input.address,
+      publicClient: input.publicClient
+    })
+    return new OrganigramClient({
+      chainId,
+      procedureTypes: loadedProcedureTypes,
+      contract,
+      publicClient: input.publicClient,
+      walletClient: input.walletClient
+    })
   }
-
-  // // @todo : Identify contract from on-chain function.
-  // public static async checkInterface(address:string) {
-  //     // @ts-ignore
-  //     const contract = new web3.eth.Contract(Organigram.abi, address)
-  //     return contract.checkInterface(interface, interface)
-  // }
-
-  /**
-   * Instance API.
-   */
 
   private async mapWithConcurrencyLimit<T, U>(
     values: T[],
@@ -358,19 +377,13 @@ export class OrganigramClient {
     return results
   }
 
-  // Get master procedure data.
-  async getProcedureType(
-    procedureAddress: string
-  ): Promise<ProcedureType | null> {
-    if (this.provider == null || this.signer == null) {
-      throw new Error('No provider or signer.')
-    }
-    const code = await (this.provider ?? this.signer.provider)?.getCode(
-      procedureAddress
-    )
-    const type: string = `0x${code?.substring(22, 62)}`.toLowerCase()
+  async getProcedureType(procedureAddress: string): Promise<ProcedureType | null> {
+    const code = await this.publicClient.getBytecode({
+      address: procedureAddress as `0x${string}`
+    })
+    const type = `0x${code?.substring(22, 62)}`.toLowerCase()
     const procedureType = this.procedureTypes.find(
-      (pt: ProcedureType) => pt.address.toLowerCase() === type
+      pt => pt.address.toLowerCase() === type
     )
     if (procedureType == null) {
       throw new Error('getProcedureType: Procedure not supported.')
@@ -378,27 +391,24 @@ export class OrganigramClient {
     return procedureType
   }
 
-  // Get or load organ data.
   async getDeployedOrgan(
     address: string,
     cached = true,
     initialOrgan?: OrganInput
   ): Promise<Organ> {
     const index = this.organs.findIndex(
-      c =>
-        c.address.toLowerCase() === address.toLowerCase() &&
-        c.chainId === this.chainId
+      organ =>
+        organ.address.toLowerCase() === address.toLowerCase() &&
+        organ.chainId === this.chainId
     )
     let organ = cached && index >= 0 ? this.organs[index] : undefined
-    if (organ == null && this.provider != null) {
-      organ = await Organ.load(
-        address,
-        this.signer ?? this.provider,
-        initialOrgan
-      ).catch((error: Error) => {
-        console.error('Error loading organ ', address, error.message)
-        return undefined
-      })
+    if (organ == null) {
+      organ = await Organ.load(address, this.getClients(), initialOrgan).catch(
+        (error: Error) => {
+          console.error('Error loading organ ', address, error.message)
+          return undefined
+        }
+      )
       if (organ != null) {
         if (index >= 0) {
           this.organs[index] = organ
@@ -419,17 +429,13 @@ export class OrganigramClient {
     initialAsset?: Asset
   ): Promise<Asset> {
     const index = this.assets.findIndex(
-      c =>
-        c.address.toLowerCase() === address.toLowerCase() &&
-        c.chainId === this.chainId
+      asset =>
+        asset.address.toLowerCase() === address.toLowerCase() &&
+        asset.chainId === this.chainId
     )
     let asset = cached && index >= 0 ? this.assets[index] : undefined
-    if (asset == null && this.provider != null) {
-      asset = await Asset.load(
-        address,
-        this.signer ?? this.provider,
-        initialAsset
-      ).catch(
+    if (asset == null) {
+      asset = await Asset.load(address, this.getClients(), initialAsset).catch(
         (error: Error) => {
           console.error('Error loading asset ', address, error.message)
           return undefined
@@ -449,7 +455,6 @@ export class OrganigramClient {
     return asset
   }
 
-  // Get or load procedure data.
   async getDeployedProcedure(
     address: string,
     cached = true,
@@ -460,26 +465,25 @@ export class OrganigramClient {
       procedureTypes[
         initialProcedure?.typeName as keyof typeof procedureTypes
       ] ??
-      (await this.getProcedureType(address).catch((e: Error) => {
-        console.error(e.message)
+      (await this.getProcedureType(address).catch((error: Error) => {
+        console.error(error.message)
         return null
       }))
 
     if (procedureType == null) {
       throw new Error('getDeployedProcedure: Procedure not supported.')
     }
+
     let procedure = cached
-      ? this.procedures.find(c => c.address === address)
+      ? this.procedures.find(existingProcedure => existingProcedure.address === address)
       : undefined
     if (procedure == null) {
-      const signerOrProvider = this.signer ?? this.provider
-      if (signerOrProvider == null) {
-        throw new Error('Not connected.')
-      }
-      const _Class = await getProcedureClass(procedureType.key)
-      procedure = await _Class
-        .load(address, signerOrProvider, initialProcedure)
-        .then((p: Procedure) => Object.assign(p, { type: procedureType }))
+      const ProcedureClass = await getProcedureClass(procedureType.key)
+      procedure = await ProcedureClass
+        .load(address, this.getClients(), initialProcedure)
+        .then((loadedProcedure: Procedure) =>
+          Object.assign(loadedProcedure, { type: procedureType })
+        )
         .catch((error: Error) => {
           console.error('Unable to load procedure.', error.message)
           return undefined
@@ -494,103 +498,99 @@ export class OrganigramClient {
     return procedure
   }
 
-  // Create and load an organ.
   async deployOrgan(input?: DeployOrganInput): Promise<Organ> {
+    if (this.walletClient == null) {
+      throw new Error('Wallet client not connected.')
+    }
     const { cid, permissions, salt, entries, options } = input ?? {}
-    if (this.signer == null) {
-      throw new Error('Signer not connected.')
-    }
-    let nonce: bigint | undefined
-    if (options?.nonce != null) {
-      nonce = BigInt(options?.nonce ?? 0)
-    }
-    const _salt = formatSalt(salt)
-    const _permissionAddresses: string[] = []
-    const _permissionValues: string[] = []
+    const resolvedSalt = formatSalt(salt)
+    const permissionAddresses: string[] = []
+    const permissionValues: string[] = []
+
     if (!permissions || permissions.length === 0) {
-      const address = await this.signer.getAddress()
-      _permissionAddresses.push(address)
-      _permissionValues.push(
-        ethers.zeroPadValue(ethers.toBeHex(PERMISSIONS.ADMIN), 2)
-      )
+      permissionAddresses.push(await getWalletAddress(this.walletClient))
+      permissionValues.push(toHex(PERMISSIONS.ADMIN).replace(/^0x/, '0x'))
+      permissionValues[0] = permissionValues[0].length === 6
+        ? permissionValues[0]
+        : `0x${permissionValues[0].slice(2).padStart(4, '0')}`
     }
-    permissions?.forEach((p: OrganPermission) => {
-      _permissionAddresses.push(p.permissionAddress)
-      _permissionValues.push(
-        ethers.zeroPadValue(ethers.toBeHex(p.permissionValue), 2)
+
+    permissions?.forEach(permission => {
+      permissionAddresses.push(permission.permissionAddress)
+      permissionValues.push(
+        `0x${toHex(permission.permissionValue).slice(2).padStart(4, '0')}`
       )
     })
-    const _entries =
-      entries?.map((e: OrganEntry) => ({
-        addr: e.address,
-        cid: e.cid ?? ''
-      })) ?? []
-    const tx = await this.contract.deployOrgan(
-      _permissionAddresses,
-      _permissionValues,
-      cid ?? '',
-      _entries,
-      _salt,
-      {
-        nonce,
-        customData: options?.customData
-      }
-    )
-    if (options?.onTransaction != null) {
-      options.onTransaction(tx, `Deploy organ with CID ${cid?.toString()}`)
-    }
-    const receipt = await tx?.wait()
-    const eventCreation = receipt?.logs?.find(
-      (e: EventLog) =>
-        // e.topics[0] === keccak256('organCreated(address payable organ)')
-        e.address !== this.address
-    )
 
-    if (eventCreation == null) {
+    const formattedEntries =
+      entries?.map(entry => ({
+        addr: entry.address,
+        cid: entry.cid ?? ''
+      })) ?? []
+
+    const tx = await createContractWriteTransaction({
+      address: this.address,
+      abi: OrganigramClientContractABI.abi,
+      functionName: 'deployOrgan',
+      args: [
+        permissionAddresses,
+        permissionValues,
+        cid ?? '',
+        formattedEntries,
+        resolvedSalt
+      ],
+      clients: this.getClients(),
+      nonce: options?.nonce
+    })
+    options?.onTransaction?.(tx, `Deploy organ with CID ${cid?.toString()}`)
+    const receipt = await tx.wait()
+    const organAddress = getDeploymentAddresses(receipt, 'organDeployed')[0]
+
+    if (organAddress == null) {
       throw new Error('Organ creation failed.')
     }
-    const address: string = eventCreation.address
-    return await this.getDeployedOrgan(address, false).catch((error: Error) => {
-      console.error(
-        'Unable to load organ with address ' + address + ' after creating it.',
-        error.message
-      )
-      return { address } as unknown as Organ
-    })
+    return await this.getDeployedOrgan(organAddress, false).catch(
+      (error: Error) => {
+        console.error(
+          'Unable to load organ with address ' +
+            organAddress +
+            ' after creating it.',
+          error.message
+        )
+        return { address: organAddress } as unknown as Organ
+      }
+    )
   }
 
   async deployOrgans(deployOrgansInput: DeployOrganInput[]): Promise<Organ[]> {
-    if (this.signer == null) {
-      throw new Error('Signer not connected.')
-    }
-    const input = prepareDeployOrgansInput(deployOrgansInput)
-    const tx = await this.contract.deployOrgans(input)
+    const tx = await createContractWriteTransaction({
+      address: this.address,
+      abi: OrganigramClientContractABI.abi,
+      functionName: 'deployOrgans',
+      args: [prepareDeployOrgansInput(deployOrgansInput)],
+      clients: this.getClients()
+    })
 
-    const receipt = await tx?.wait()
-    const eventCreations = receipt?.logs?.filter(
-      (e: EventLog) =>
-        // e.topics[0] === keccak256('organCreated(address payable organ)')
-        e.address !== this.address
-    )
+    const receipt = await tx.wait()
+    const addresses = getDeploymentAddresses(receipt, 'organDeployed')
 
-    if (eventCreations == null || eventCreations.length === 0) {
+    if (addresses.length === 0) {
       throw new Error('Organ deployment failed.')
     }
-    const addresses: string[] = eventCreations.map(
-      (eventCreation: EventLog) => eventCreation.address
-    )
     return await Promise.all(
       addresses.map(
-        async address =>
-          await this.getDeployedOrgan(address, false).catch((error: Error) => {
-            console.error(
-              'Unable to load organ with address ' +
-                address +
-                ' after deploying it in batch.',
-              error.message
-            )
-            return { address } as unknown as Organ
-          })
+        async organAddress =>
+          await this.getDeployedOrgan(organAddress, false).catch(
+            (error: Error) => {
+              console.error(
+                'Unable to load organ with address ' +
+                  organAddress +
+                  ' after deploying it in batch.',
+                error.message
+              )
+              return { address: organAddress } as unknown as Organ
+            }
+          )
       )
     )
   }
@@ -602,43 +602,32 @@ export class OrganigramClient {
     salt?: string,
     options?: TransactionOptions
   ): Promise<string> {
-    if (this.signer == null) {
-      throw new Error('Signer not connected.')
-    }
-    // let nonce: bigint | undefined
-    // if (options?.nonce != null) {
-    //   nonce = BigInt(options?.nonce)
-    // }
-    const tx = await this.contract.deployAsset(
-      name,
-      symbol,
-      parseEther(initialSupply.toString() ?? ERC20_INITIAL_SUPPLY.toString()),
-      formatSalt(salt)
-      // {
-      //   nonce,
-      //   customData: options?.customData
-      // }
-    )
-    if (options?.onTransaction != null) {
-      options.onTransaction(tx, `Create asset ${name} (${symbol})`)
-    }
-    const receipt = await tx?.wait()
-    const address = receipt?.logs?.find(
-      (e: EventLog) => e.address !== this.address
-    ).address
-    if (address == null) {
+    const tx = await createContractWriteTransaction({
+      address: this.address,
+      abi: OrganigramClientContractABI.abi,
+      functionName: 'deployAsset',
+      args: [
+        name,
+        symbol,
+        parseEther(initialSupply.toString() ?? ERC20_INITIAL_SUPPLY.toString()),
+        formatSalt(salt)
+      ],
+      clients: this.getClients(),
+      nonce: options?.nonce
+    })
+    options?.onTransaction?.(tx, `Create asset ${name} (${symbol})`)
+    const receipt = await tx.wait()
+    const assetAddress = getDeploymentAddresses(receipt, 'assetDeployed')[0]
+    if (assetAddress == null) {
       throw new Error('Asset creation failed.')
     }
-    return address
+    return assetAddress
   }
 
   async deployAssets(
     assets: DeployAssetInput[],
     options?: TransactionOptions
   ): Promise<string[]> {
-    if (this.signer == null) {
-      throw new Error('Signer not connected.')
-    }
     const formattedAssets = assets.map(asset => ({
       name: asset.name,
       symbol: asset.symbol,
@@ -647,34 +636,30 @@ export class OrganigramClient {
       ),
       salt: formatSalt(asset.salt)
     }))
-    const tx = await this.contract.deployAssets(formattedAssets, {
-      customData: options?.customData,
-      nonce: options?.nonce != null ? BigInt(options.nonce) : undefined
+    const tx = await createContractWriteTransaction({
+      address: this.address,
+      abi: OrganigramClientContractABI.abi,
+      functionName: 'deployAssets',
+      args: [formattedAssets],
+      clients: this.getClients(),
+      nonce: options?.nonce
     })
-    if (options?.onTransaction != null) {
-      options.onTransaction(tx, `Deploy ${assets.length} assets`)
-    }
-    const receipt = await tx?.wait()
-    const eventCreations = receipt?.logs?.filter(
-      (e: EventLog) => e.address !== this.address
-    )
+    options?.onTransaction?.(tx, `Deploy ${assets.length} assets`)
+    const receipt = await tx.wait()
+    const addresses = getDeploymentAddresses(receipt, 'assetDeployed')
 
-    if (eventCreations == null || eventCreations.length === 0) {
+    if (addresses.length === 0) {
       throw new Error('Asset batch deployments failed.')
     }
 
-    const addresses: string[] = [
-      ...new Set<string>(
-        eventCreations.map((eventCreation: EventLog) => eventCreation.address)
-      )
-    ]
-    return addresses
+    return [...new Set(addresses)]
   }
 
   async deployProcedure(input: DeployProceduresInput): Promise<Procedure> {
-    if (this.signer == null) {
-      throw new Error('Signer not connected.')
+    if (this.walletClient == null) {
+      throw new Error('Wallet client not connected.')
     }
+    const initialProcedure = createInitialProcedureInput(input, this.chainId)
     const initializeProcedure = await populateInitializeProcedure(
       {
         typeName: input.typeName,
@@ -682,108 +667,111 @@ export class OrganigramClient {
         cid: input.cid ?? '',
         deciders: input.deciders,
         proposers: input.proposers ?? input.deciders,
-        moderators: input.moderators ?? ethers.ZeroAddress,
+        moderators: input.moderators ?? zeroAddress,
         withModeration: input.withModeration ?? false,
         forwarder:
           input.forwarder ??
           deployedAddresses[this.chainId as '11155111']?.MetaGasStation,
         args: input.args ?? []
       },
-      this.signer
+      this.getClients()
     )
     const typeAddress =
       procedureTypes[input.typeName as keyof typeof procedureTypes].address
-    let nonce: bigint | undefined
-    if (input.options?.nonce != null) {
-      nonce = BigInt(input.options?.nonce)
-    }
-    const _salt = formatSalt(input.salt)
-    const tx = await this.contract.deployProcedure(
-      typeAddress,
-      initializeProcedure?.data,
-      _salt,
-      { nonce, customData: input.options?.customData }
+    const tx = await createContractWriteTransaction({
+      address: this.address,
+      abi: OrganigramClientContractABI.abi,
+      functionName: 'deployProcedure',
+      args: [typeAddress, initializeProcedure.data, formatSalt(input.salt)],
+      clients: this.getClients(),
+      nonce: input.options?.nonce
+    })
+    input.options?.onTransaction?.(
+      tx,
+      `Deploy procedure of type ${
+        this.procedureTypes.find(
+          procedureType =>
+            procedureType.address.toLowerCase() === typeAddress.toLowerCase()
+        )?.metadata.label ?? typeAddress
+      }.`
     )
-    if (input.options?.onTransaction != null) {
-      input.options.onTransaction(
-        tx,
-        `Deploy procedure of type ${this.procedureTypes?.find(pt => pt.address.toLowerCase() === typeAddress.toLowerCase())?.metadata.label ?? typeAddress}.`
-      )
-    }
-    const receipt = await tx?.wait()
-    const address = receipt?.logs?.find(
-      (e: EventLog) => e.address !== this.address
-    ).address
-    if (address == null) {
+    const receipt = await tx.wait()
+    const procedureAddress = getDeploymentAddresses(
+      receipt,
+      'procedureDeployed'
+    )[0]
+    if (procedureAddress == null) {
       throw new Error('Procedure deployment failed.')
     }
-    return await this.getDeployedProcedure(address!, false).catch(
-      (error: Error) => {
-        throw new Error(
-          'Unable to load procedure with address ' +
-            address +
-            ' after creating it.' +
-            error.message
-        )
+    return await this.getDeployedProcedure(
+      procedureAddress,
+      false,
+      {
+        ...initialProcedure,
+        address: procedureAddress
       }
-    )
+    ).catch((error: Error) => {
+      throw new Error(
+        'Unable to load procedure with address ' +
+          procedureAddress +
+          ' after creating it.' +
+          error.message
+      )
+    })
   }
 
   async deployProcedures(
     deployProceduresInput: DeployProceduresInput[]
   ): Promise<Procedure[]> {
-    if (this.signer == null) {
-      throw new Error('Signer not connected.')
-    }
     const input = await prepareDeployProceduresInput(
       deployProceduresInput,
-      this.signer
+      this.getClients()
     )
-    const tx = await this.contract.deployProcedures(input, {})
+    const tx = await createContractWriteTransaction({
+      address: this.address,
+      abi: OrganigramClientContractABI.abi,
+      functionName: 'deployProcedures',
+      args: [input],
+      clients: this.getClients()
+    })
 
-    const receipt = await tx?.wait()
-    const eventCreations = receipt?.logs?.filter(
-      (e: EventLog) =>
-        // e.topics[0] ===
-        // ethers.keccak256(
-        //   ethers.toUtf8Bytes(
-        //     'procedureCreated(address procedureType, address procedure)'
-        //   )
-        // )
-        e.address !== this.address
-    )
+    const receipt = await tx.wait()
+    const addresses = getDeploymentAddresses(receipt, 'procedureDeployed')
 
-    if (eventCreations == null || eventCreations.length === 0) {
+    if (addresses.length === 0) {
       throw new Error('Procedure batch creations failed.')
     }
 
-    const addresses: string[] = eventCreations.map(
-      (eventCreation: EventLog) => eventCreation.address
-    )
-
     return await Promise.all(
-      addresses.map(
-        async address =>
-          await this.getDeployedProcedure(address, false).catch(
-            (error: Error) => {
-              console.error(
-                'Unable to load procedure with address ' +
-                  address +
-                  ' after creating it.',
-                error.message
-              )
-              return { address } as unknown as Procedure
-            }
+      addresses.map(async (procedureAddress, index) => {
+        const currentInput = deployProceduresInput[index]
+        const initialProcedure =
+          currentInput != null
+            ? {
+                ...createInitialProcedureInput(currentInput, this.chainId),
+                address: procedureAddress
+              }
+            : undefined
+        return await this.getDeployedProcedure(
+          procedureAddress,
+          false,
+          initialProcedure
+        ).catch((error: Error) => {
+          console.error(
+            'Unable to load procedure with address ' +
+              procedureAddress +
+              ' after creating it.',
+            error.message
           )
-      )
+          return { address: procedureAddress } as unknown as Procedure
+        })
+      })
     )
   }
 
-  async deployOrganigram(
-    input: DeployOrganigramInput
-  ): Promise<ContractTransaction> {
-    if (this.signer == null) {
-      throw new Error('Signer not connected.')
+  async deployOrganigram(input: DeployOrganigramInput): Promise<readonly string[]> {
+    if (this.walletClient == null) {
+      throw new Error('Wallet client not connected.')
     }
     const formattedAssets = input.assets.map(asset => ({
       name: asset.name,
@@ -796,26 +784,29 @@ export class OrganigramClient {
     const organsInput = prepareDeployOrgansInput(input.organs)
     const proceduresInput = await prepareDeployProceduresInput(
       input.procedures,
-      this.signer
+      this.getClients()
     )
-    const deployedAddresses = await this.contract.deployOrganigram.staticCall(
-      organsInput,
-      formattedAssets,
-      proceduresInput
-    )
+    const account = await getWalletAddress(this.walletClient)
+    const simulation = await this.publicClient.simulateContract({
+      address: this.address as `0x${string}`,
+      abi: OrganigramClientContractABI.abi,
+      functionName: 'deployOrganigram',
+      args: [organsInput, formattedAssets, proceduresInput],
+      account
+    })
+    const tx = await createContractWriteTransaction({
+      address: this.address,
+      abi: OrganigramClientContractABI.abi,
+      functionName: 'deployOrganigram',
+      args: [organsInput, formattedAssets, proceduresInput],
+      clients: this.getClients()
+    })
 
-    const tx = await this.contract.deployOrganigram(
-      organsInput,
-      formattedAssets,
-      proceduresInput
-    )
+    await tx.wait()
 
-    await tx?.wait()
-
-    return deployedAddresses
+    return simulation.result
   }
 
-  // Get or load a deployed contract (organ or procedure).
   async loadContract(
     address: string,
     cached = true
@@ -869,10 +860,6 @@ export class OrganigramClient {
   async loadOrganigram(
     organigram: Organigram,
     cached = true
-    // options: { discover: boolean; limit: number } = {
-    //   discover: true,
-    //   limit: 100
-    // }
   ): Promise<Organigram> {
     const loadConcurrency = 4
 
@@ -884,7 +871,7 @@ export class OrganigramClient {
           if (
             !organ.isDeployed ||
             !organ.address ||
-            !ethers.isAddress(organ.address)
+            !isAddress(organ.address as `0x${string}`)
           ) {
             return organ
           }
@@ -902,12 +889,12 @@ export class OrganigramClient {
         if (
           !procedure.isDeployed ||
           !procedure.address ||
-          !ethers.isAddress(procedure.address)
+          !isAddress(procedure.address as `0x${string}`)
         ) {
           return procedure
         }
         return (
-          this.procedures.find(p => p.address === procedure.address) ??
+          this.procedures.find(existingProcedure => existingProcedure.address === procedure.address) ??
           (await this.getDeployedProcedure(
             procedure.address,
             cached,
@@ -926,7 +913,7 @@ export class OrganigramClient {
           if (
             !asset.isDeployed ||
             !asset.address ||
-            !ethers.isAddress(asset.address)
+            !isAddress(asset.address as `0x${string}`)
           ) {
             return asset
           }
@@ -937,14 +924,15 @@ export class OrganigramClient {
       )
     ).filter(asset => asset != null)
 
-    const newOrganigram = {
+    return new Organigram({
       ...organigram,
       organs: deployedOrgans,
       procedures: deployedProcedures,
-      assets: deployedAssets
-    }
-
-    return new Organigram(newOrganigram)
+      assets: deployedAssets,
+      organigramClient: this,
+      publicClient: this.publicClient,
+      walletClient: this.walletClient
+    })
   }
 }
 

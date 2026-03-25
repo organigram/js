@@ -1,10 +1,15 @@
-import { ethers } from 'ethers'
-import { Procedure, ProcedureInput, ProcedureJson } from '.'
 import ERC20VoteProcedureContractABI from '@organigram/protocol/artifacts/contracts/procedures/ERC20Vote.sol/ERC20VoteProcedure.json'
+import { Procedure, ProcedureInput, ProcedureJson } from '.'
 import { TransactionOptions } from '../organigramClient'
-import { erc20Vote, PopulateInitializeInput, ProcedureTypeName } from './utils'
+import { erc20Vote, PopulateInitializeInput, PopulatedTransactionData, ProcedureTypeName } from './utils'
 import { VoteProcedure, VoteProcedureInput } from './vote'
 import { handleJsonBigInt } from '../utils'
+import { encodeFunctionData, zeroAddress } from 'viem'
+import {
+  type ContractClients,
+  createContractWriteTransaction,
+  getContractInstance
+} from '../contracts'
 
 export type ERC20VoteProcedureInput = Omit<
   VoteProcedureInput,
@@ -14,13 +19,13 @@ export type ERC20VoteProcedureInput = Omit<
 }
 
 export class ERC20VoteProcedure extends VoteProcedure {
-  static INTERFACE = '0xc9d27afe' // vote() signature.
+  static INTERFACE = '0xc9d27afe'
+
   erc20: string
-  contract: ethers.Contract
+  contract?: any
   type = erc20Vote
   typeName = 'erc20Vote' as ProcedureTypeName
 
-  // Constructor needs to call Procedure constructor.
   constructor({ erc20, ...voteProcedureArguments }: ERC20VoteProcedureInput) {
     super({
       ...voteProcedureArguments,
@@ -28,80 +33,71 @@ export class ERC20VoteProcedure extends VoteProcedure {
       type: erc20Vote
     })
     this.erc20 = erc20
-    this.contract = new ethers.Contract(
-      this.address,
-      ERC20VoteProcedureContractABI.abi,
-      voteProcedureArguments.signerOrProvider
-    )
+    this.contract =
+      this.publicClient != null
+        ? getContractInstance({
+            address: this.address,
+            abi: ERC20VoteProcedureContractABI.abi,
+            publicClient: this.publicClient,
+            walletClient: this.walletClient
+          })
+        : undefined
   }
 
   static async _populateInitialize(
-    input: PopulateInitializeInput
-  ): Promise<ethers.ContractTransaction> {
-    if (input.options?.signer == null) {
-      throw new Error('Not connected.')
-    }
+    input: PopulateInitializeInput,
+    _clients: ContractClients
+  ): Promise<PopulatedTransactionData> {
     const [erc20, quorumSize, voteDuration, majoritySize] =
       input.args as string[]
-    const contract = new ethers.Contract(
-      erc20Vote.address,
-      ERC20VoteProcedureContractABI.abi,
-      input.options.signer
-    )
-    return await contract
-      .getFunction(
-        'initialize(string,address,address,address,bool,address,uint32,uint32,uint32,address)'
-      )
-      .populateTransaction(
-        input.cid,
-        input.proposers,
-        input.moderators,
-        input.deciders,
-        input.withModeration,
-        input.forwarder,
-        quorumSize,
-        voteDuration,
-        majoritySize,
-        erc20
-      )
+    return {
+      data: encodeFunctionData({
+        abi: ERC20VoteProcedureContractABI.abi,
+        functionName: 'initialize',
+        args: [
+          input.cid,
+          input.proposers,
+          input.moderators,
+          input.deciders,
+          input.withModeration,
+          input.forwarder,
+          Number(quorumSize),
+          Number(voteDuration),
+          Number(majoritySize),
+          erc20
+        ]
+      })
+    }
   }
 
   static async load(
     address: string,
-    signerOrProvider: ethers.Signer | ethers.Provider,
+    clients: ContractClients,
     initialProcedure?: ProcedureInput
   ): Promise<ERC20VoteProcedure> {
-    const procedure = await Procedure.load(
+    const procedure = await Procedure.load(address, clients, initialProcedure)
+    const contract = getContractInstance({
       address,
-      signerOrProvider,
-      initialProcedure
-    )
-    if (!procedure) throw new Error('Not a valid procedure.')
-    const contract = new ethers.Contract(
-      address,
-      ERC20VoteProcedureContractABI.abi,
-      signerOrProvider
-    )
-    const erc20 = await contract.tokenContract()
-    const quorumSize = await contract.quorumSize()
-    const voteDuration = await contract.voteDuration()
-    const majoritySize = await contract.majoritySize()
+      abi: ERC20VoteProcedureContractABI.abi,
+      publicClient: clients.publicClient,
+      walletClient: clients.walletClient
+    })
+    const erc20 = (await contract.read.tokenContract()) as string
+    const quorumSize = (await contract.read.quorumSize()) as bigint
+    const voteDuration = (await contract.read.voteDuration()) as bigint
+    const majoritySize = (await contract.read.majoritySize()) as bigint
     const elections = await ERC20VoteProcedure.loadElections(
       address,
-      signerOrProvider,
+      clients,
       procedure.proposals.length
     )
-    // Make sure expired proposals are listed as blocked.
     const proposals = procedure.proposals.map(proposal => {
       if (!proposal.blocked && !proposal.applied && !proposal.adopted) {
-        const election = elections.find(ba => ba.proposalKey === proposal.key)
+        const election = elections.find(candidate => candidate.proposalKey === proposal.key)
         if (election?.start) {
-          // Proposal is blocked if election is expired and not approved.
-          // @todo User BigNumber
           proposal.blocked =
             !election.approved &&
-            parseInt(election.start) + parseInt(voteDuration) <=
-              Date.now() / 1000
+            parseInt(election.start) + Number(voteDuration) <= Date.now() / 1000
         }
       }
       return proposal
@@ -112,7 +108,8 @@ export class ERC20VoteProcedure extends VoteProcedure {
       cid: procedure.cid,
       address: procedure.address,
       chainId: procedure.chainId,
-      signerOrProvider,
+      publicClient: clients.publicClient,
+      walletClient: clients.walletClient,
       metadata: procedure.metadata,
       proposers: procedure.proposers,
       moderators: procedure.moderators,
@@ -121,49 +118,51 @@ export class ERC20VoteProcedure extends VoteProcedure {
       forwarder: procedure.forwarder,
       proposals,
       isDeployed: true,
-      erc20: erc20?.toString(),
-      quorumSize: quorumSize?.toString(),
-      voteDuration: voteDuration?.toString(),
-      majoritySize: majoritySize?.toString(),
-      elections
+      erc20: erc20.toString(),
+      quorumSize: quorumSize.toString(),
+      voteDuration: voteDuration.toString(),
+      majoritySize: majoritySize.toString(),
+      elections,
+      data:
+        initialProcedure?.data ??
+        JSON.stringify({
+          quorumSize: quorumSize.toString(),
+          voteDuration: voteDuration.toString(),
+          majoritySize: majoritySize.toString()
+        })
     })
   }
 
   async erc20Balance(account?: string): Promise<bigint> {
-    const erc20 = await this.contract.tokenContract()
-    const ERC20_ABI = [
-      // balanceOf
-      {
-        constant: true,
-        inputs: [{ name: '_owner', type: 'address' }],
-        name: 'balanceOf',
-        outputs: [{ name: 'balance', type: 'uint256' }],
-        type: 'function'
-      },
-      // decimals
-      {
-        constant: true,
-        inputs: [],
-        name: 'decimals',
-        outputs: [{ name: '', type: 'uint8' }],
-        type: 'function'
-      }
-    ]
-    const signerOrProvider = this.signer ?? this.provider
-    if (signerOrProvider == null) {
+    const erc20 = (await this.contract?.read.tokenContract()) as string | undefined
+    if (erc20 == null || this.publicClient == null) {
       throw new Error('Not connected.')
     }
-    const erc20Contract = new ethers.Contract(
-      erc20,
-      ERC20_ABI,
-      signerOrProvider
-    )
-    if (this.signer == null && account == null) {
-      return BigInt(0)
+    const erc20Contract = getContractInstance({
+      address: erc20,
+      abi: [
+        {
+          constant: true,
+          inputs: [{ name: '_owner', type: 'address' }],
+          name: 'balanceOf',
+          outputs: [{ name: 'balance', type: 'uint256' }],
+          type: 'function',
+          stateMutability: 'view'
+        }
+      ],
+      publicClient: this.publicClient,
+      walletClient: this.walletClient
+    })
+    if (this.walletClient == null && account == null) {
+      return 0n
     }
-    return await erc20Contract.balanceOf(
-      account ?? (await this.signer?.getAddress())
-    )
+    const resolvedAccount =
+      account ??
+      (typeof this.walletClient?.account === 'string'
+        ? this.walletClient.account
+        : this.walletClient?.account?.address)
+    if (resolvedAccount == null) return 0n
+    return (await erc20Contract.read.balanceOf([resolvedAccount])) as bigint
   }
 
   async vote(
@@ -171,21 +170,19 @@ export class ERC20VoteProcedure extends VoteProcedure {
     approval: boolean,
     options: TransactionOptions
   ): Promise<boolean> {
-    const tx = await this.contract
-      .vote(proposalKey, approval)
-      .catch((error: Error) => {
-        console.error(
-          'Error while voting.',
-          this.address,
-          proposalKey,
-          error.message
-        )
-        throw error
-      })
-    if (options?.onTransaction != null) {
-      options.onTransaction(tx, 'Initialize ERC20 Vote procedure.')
-    }
-    return await tx.wait()
+    const tx = await createContractWriteTransaction({
+      address: this.address,
+      abi: ERC20VoteProcedureContractABI.abi,
+      functionName: 'vote',
+      args: [BigInt(proposalKey), approval],
+      clients: this.getClients(),
+      nonce: options?.nonce
+    }).catch((error: Error) => {
+      console.error('Error while voting.', this.address, proposalKey, error.message)
+      throw error
+    })
+    options?.onTransaction?.(tx, 'Initialize ERC20 Vote procedure.')
+    return (await tx.wait()).status === 'success'
   }
 
   toJson = (): ProcedureJson =>
@@ -194,7 +191,7 @@ export class ERC20VoteProcedure extends VoteProcedure {
         {
           address: this.address,
           salt: this.salt,
-          chainId: this.chainId!,
+          chainId: this.chainId,
           data: this.data,
           typeName: this.typeName,
           name: this.name,
@@ -204,7 +201,7 @@ export class ERC20VoteProcedure extends VoteProcedure {
           isDeployed: this.isDeployed,
           deciders: this.deciders,
           proposers: this.proposers,
-          moderators: this.moderators ?? ethers.ZeroAddress,
+          moderators: this.moderators ?? zeroAddress,
           withModeration: this.withModeration,
           forwarder: this.forwarder,
           metadata: this.metadata,

@@ -1,5 +1,5 @@
-import deployedAddresses from '@organigram/protocol/deployments.json'
-import { ethers } from 'ethers'
+import deployedAddresses from './deployments'
+import { bytesToHex, getCreate2Address, keccak256, padHex } from 'viem'
 
 export { deployedAddresses }
 
@@ -27,7 +27,7 @@ export function cloneInitCodeHash(implementation: string): string {
     impl +
     '5af43d82803e903d91602b57fd5bf3'
 
-  return ethers.keccak256(initCode as `0x${string}`)
+  return keccak256(initCode as `0x${string}`)
 }
 
 export const predictContractAddress = ({
@@ -39,10 +39,10 @@ export const predictContractAddress = ({
   chainId: string
   salt: string
 }): string => {
-  return ethers.getCreate2Address(
-    deployedAddresses[chainId as '11155111']?.OrganigramClient,
-    ethers.zeroPadValue(salt, 32),
-    cloneInitCodeHash(
+  return getCreate2Address({
+    from: deployedAddresses[chainId as '11155111']?.OrganigramClient as `0x${string}`,
+    salt: padHex(salt as `0x${string}`, { size: 32 }),
+    bytecodeHash: cloneInitCodeHash(
       type === 'Organ'
         ? deployedAddresses[chainId as '11155111']?.CloneableOrgan
         : type === 'Asset'
@@ -50,12 +50,12 @@ export const predictContractAddress = ({
           : deployedAddresses[chainId as '11155111']?.[
               type.replace('Erc', 'ERC') as ContractName
             ]
-    )
-  )
+    ) as `0x${string}`
+  })
 }
 
 export const createRandom32BytesHexId = () =>
-  ethers.hexlify(ethers.randomBytes(32))
+  bytesToHex(crypto.getRandomValues(new Uint8Array(32)))
 
 export const formatSalt = (salt?: string | null) => {
   if (salt == null) {

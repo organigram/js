@@ -1,8 +1,3 @@
-import { ethers, ContractTransaction } from 'ethers'
-
-// import { ERC20VoteProcedure } from './erc20Vote'
-// import { NominationProcedure } from './nomination'
-// import { VoteProcedure } from './vote'
 import { OrganEntry } from '../organ'
 import {
   DeployOrganInput,
@@ -14,6 +9,8 @@ import {
   deployedAddresses,
   formatSalt
 } from '../utils'
+import type { ContractClients } from '../contracts'
+import { encodeFunctionData, isAddress, padHex, toHex, zeroAddress } from 'viem'
 
 export type ProcedureTypeName = 'erc20Vote' | 'nomination' | 'vote'
 export enum ProcedureTypeNameEnum {
@@ -21,10 +18,9 @@ export enum ProcedureTypeNameEnum {
   nomination = 'nomination',
   vote = 'vote'
 }
+
 export interface PopulateInitializeInput {
-  options?: {
-    signer?: ethers.Signer
-  } & TransactionOptions
+  options?: TransactionOptions
   typeName?: ProcedureTypeName
   cid: string
   proposers: string
@@ -34,6 +30,16 @@ export interface PopulateInitializeInput {
   forwarder: string
   args: unknown[]
 }
+
+export type PopulatedTransactionData = {
+  data: string
+}
+
+const encodeDynamicFunctionData = encodeFunctionData as (parameters: {
+  abi: unknown
+  functionName: string
+  args?: unknown[]
+}) => string
 
 export const nomination = {
   key: 'nomination',
@@ -123,22 +129,22 @@ export const prepareDeployOrgansInput = (
   deployOrgansInput: DeployOrganInput[]
 ) =>
   deployOrgansInput.map(organ => {
-    const _permissionAddresses: string[] = []
-    const _permissionValues: string[] = []
-    organ.permissions?.forEach(p => {
-      _permissionAddresses.push(p.permissionAddress)
-      _permissionValues.push(
-        ethers.zeroPadValue(ethers.toBeHex(p.permissionValue), 2)
+    const permissionAddresses: string[] = []
+    const permissionValues: string[] = []
+    organ.permissions?.forEach(permission => {
+      permissionAddresses.push(permission.permissionAddress)
+      permissionValues.push(
+        padHex(toHex(permission.permissionValue), { size: 2 })
       )
     })
     const entries =
-      organ.entries?.map((e: OrganEntry) => ({
-        addr: e.address,
-        cid: e.cid ?? ''
+      organ.entries?.map((entry: OrganEntry) => ({
+        addr: entry.address,
+        cid: entry.cid ?? ''
       })) ?? []
     return {
-      permissionAddresses: _permissionAddresses,
-      permissionValues: _permissionValues,
+      permissionAddresses,
+      permissionValues,
       cid: organ.cid ?? '',
       entries,
       salt: organ.salt ?? createRandom32BytesHexId()
@@ -147,7 +153,7 @@ export const prepareDeployOrgansInput = (
 
 export const prepareDeployProceduresInput = async (
   deployProceduresInput: DeployProceduresInput[],
-  signer: ethers.Signer
+  clients: ContractClients
 ) =>
   await Promise.all(
     deployProceduresInput.map(async procedure => {
@@ -163,29 +169,30 @@ export const prepareDeployProceduresInput = async (
         )
       }
       const parsedData = procedure.data ? JSON.parse(procedure.data) : {}
-      const _args = procedure.args ?? Object.values(parsedData)
+      const rawArgs = procedure.args ?? Object.values(parsedData)
       const initialize = await populateInitializeProcedure(
         {
           typeName: procedure.typeName,
           options: procedure.options ?? {},
           cid: procedure.cid ?? '',
-          moderators: procedure.moderators ?? ethers.ZeroAddress,
+          moderators: procedure.moderators ?? zeroAddress,
           deciders: procedure.deciders,
           proposers: procedure.proposers ?? procedure.deciders,
           withModeration: procedure.withModeration ?? false,
           forwarder:
             procedure.forwarder ??
             deployedAddresses[procedure.chainId as '11155111']?.MetaGasStation,
-          // Convert any string arguments to hex number, to ensure they are correctly encoded in the transaction data
-          args: _args.map(arg =>
+          args: rawArgs.map(arg =>
             typeof arg === 'string'
-              ? ethers.isHexString(arg)
+              ? isAddress(arg as `0x${string}`) || arg.startsWith('0x')
                 ? arg
-                : ethers.toBeHex(arg)
+                : /^-?\d+$/.test(arg)
+                  ? toHex(BigInt(arg))
+                  : toHex(arg)
               : arg
           )
         },
-        signer
+        clients
       )
       return {
         procedureType:
@@ -223,30 +230,28 @@ export const getProcedureClass = async (typeName: string) => {
 
 export const populateInitializeProcedure = async (
   input: PopulateInitializeInput,
-  signer: ethers.Signer
-): Promise<ContractTransaction> => {
-  if (signer == null) {
-    throw new Error('Signer not connected.')
+  clients: ContractClients
+): Promise<PopulatedTransactionData> => {
+  if (clients.walletClient == null) {
+    throw new Error('Wallet client not connected.')
   }
   const procedureClass = await getProcedureClass(input.typeName!)
   try {
-    const chainId = await signer.provider
-      ?.getNetwork()
-      .then(n => n.chainId.toString())
-    return await procedureClass._populateInitialize({
-      options: { ...input.options, signer },
-      cid: input.cid ?? '',
-      proposers: input.proposers ?? input.deciders,
-      moderators: input.moderators ?? ethers.ZeroAddress,
-      deciders: input.deciders,
-      withModeration: input.withModeration ?? false,
-      forwarder:
-        input.forwarder ??
-        deployedAddresses[chainId as '11155111']?.MetaGasStation,
-      args: input.args
-    })
+    return await procedureClass._populateInitialize(input, clients)
   } catch (error) {
     console.error('populateInitializeProcedure', (error as Error).message)
     throw error
   }
 }
+
+export const encodeProcedureInitialization = (
+  abi: unknown,
+  functionName: string,
+  args: unknown[]
+): PopulatedTransactionData => ({
+  data: encodeDynamicFunctionData({
+    abi,
+    functionName,
+    args
+  })
+})

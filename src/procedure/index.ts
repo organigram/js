@@ -1,5 +1,19 @@
 import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json'
-import { type ContractTransactionReceipt, ethers } from 'ethers'
+import {
+  decodeAbiParameters,
+  decodeFunctionResult,
+  encodeAbiParameters,
+  encodeFunctionData,
+  encodePacked,
+  isAddress,
+  keccak256,
+  parseAbiParameters,
+  toFunctionSelector,
+  toHex,
+  type PublicClient,
+  type WalletClient,
+  zeroAddress
+} from 'viem'
 
 import type { TransactionOptions } from '../organigramClient'
 import {
@@ -11,11 +25,20 @@ import {
 } from '../utils'
 import { tryMulticall } from '../multicall'
 import {
-  PopulateInitializeInput,
+  type PopulateInitializeInput,
+  type PopulatedTransactionData,
   ProcedureTypeName,
   ProcedureTypeNameEnum,
   procedureTypes
 } from './utils'
+import {
+  type ContractClients,
+  type OrganigramTransaction,
+  type OrganigramTransactionReceipt,
+  createContractWriteTransaction,
+  getContractInstance,
+  getWalletAccount,
+} from '../contracts'
 
 export interface ProcedureTypeField {
   name: string
@@ -46,7 +69,7 @@ type ProcedureContractData = {
   deciders: string
   withModeration: boolean
   forwarder: string
-  proposalsLength: string
+  proposalsLength: bigint
 }
 
 export type ProcedureJson = {
@@ -79,7 +102,6 @@ export type Election = {
   approved?: boolean
 }
 
-// Is the connected account present the deciders/proposers/moderators organ?
 export type AccountInOrgans = {
   moderators?: boolean
   proposers?: boolean
@@ -134,9 +156,9 @@ export type OperationParamAction =
 
 export interface OperationParam {
   type: OperationParamType
-  action?: OperationParamAction // Used to generate form UI.
-  value?: unknown // Used to display an operation
-  parser?: unknown // Used to parse a submitted form
+  action?: OperationParamAction
+  value?: unknown
+  parser?: unknown
 }
 
 export interface ProcedureProposalOperationFunction {
@@ -186,7 +208,6 @@ export interface ProcedureProposalOperation {
   params?: OperationParam[]
   userIsInOrgan?: boolean
   userIsInEntry?: boolean
-  // @todo : generate a text from operation params.
   description?: string
 }
 
@@ -234,7 +255,8 @@ export interface ProcedureInput {
   salt?: string | null
   chainId?: string | null
   cid?: string | null
-  signerOrProvider?: ethers.Signer | ethers.Provider | null
+  publicClient?: PublicClient | null
+  walletClient?: WalletClient | null
   metadata?: string | null
   proposers?: string | null
   withModeration?: boolean | null
@@ -246,7 +268,39 @@ export interface ProcedureInput {
   data?: string | null
 }
 
-// @todo : Generate this list from the ABI of the procedure contract.
+const normalizeProcedureData = (data: any): ProcedureContractData => ({
+  cid: data.cid ?? data[0],
+  metadata: data.metadata ?? data[1],
+  proposers: data.proposers ?? data[2],
+  moderators: data.moderators ?? data[3],
+  deciders: data.deciders ?? data[4],
+  withModeration: data.withModeration ?? data[5],
+  forwarder: data.forwarder ?? data[6],
+  proposalsLength: BigInt(data.proposalsLength ?? data[7] ?? 0)
+})
+
+const normalizeTupleEntry = (value: any) => ({
+  addr: value?.addr ?? value?.address ?? value?.[0],
+  cid: value?.cid ?? value?.[1]
+})
+
+const normalizeProposal = (
+  proposal: any,
+  key: string
+): ProcedureProposal => ({
+  key,
+  creator: proposal.creator ?? proposal[0],
+  cid: proposal.cid ?? proposal[1],
+  blockReason: proposal.blockReason ?? proposal[2],
+  presented: proposal.presented ?? proposal[3],
+  blocked: proposal.blocked ?? proposal[4],
+  adopted: proposal.adopted ?? proposal[5],
+  applied: proposal.applied ?? proposal[6],
+  operations: (proposal.operations ?? proposal[7] ?? []).map((operation: unknown) =>
+    Procedure.parseOperation(operation)
+  )
+})
+
 export const procedureFunctions: ProcedureProposalOperationFunction[] = [
   {
     funcSig: '0x4d3f8407',
@@ -339,7 +393,7 @@ export const procedureFunctions: ProcedureProposalOperationFunction[] = [
     target: 'organ'
   },
   {
-    funcSig: ethers.id('executeWhitelisted(address,uint256,bytes)').slice(0, 10),
+    funcSig: toFunctionSelector('executeWhitelisted(address,uint256,bytes)'),
     key: 'externalCall',
     signature: 'executeWhitelisted(address,uint256,bytes)',
     label: 'External call',
@@ -352,7 +406,6 @@ export const procedureFunctions: ProcedureProposalOperationFunction[] = [
 export class Procedure {
   static INTERFACE = '0x71dbd330'
 
-  // @todo : Implement a registry.
   static OPERATIONS_FUNCTIONS: ProcedureProposalOperationFunction[] =
     procedureFunctions
 
@@ -370,11 +423,11 @@ export class Procedure {
   data: string
   forwarder: string
   proposals: ProcedureProposal[]
-  _contract: ethers.Contract
+  contract?: any
   salt?: string
   chainId: string
-  signer?: ethers.Signer
-  provider?: ethers.Provider
+  walletClient?: WalletClient
+  publicClient?: PublicClient
   organigramId: string
   type: ProcedureType
 
@@ -387,7 +440,8 @@ export class Procedure {
     salt,
     cid,
     chainId,
-    signerOrProvider,
+    publicClient,
+    walletClient,
     metadata,
     proposers,
     withModeration,
@@ -413,12 +467,12 @@ export class Procedure {
     this.address =
       address ??
       predictContractAddress({
-        type: (capitalize(typeName!) + 'Procedure') as 'NominationProcedure',
+        type: (capitalize(typeName) + 'Procedure') as 'NominationProcedure',
         chainId: chainId ?? '11155111',
         salt: this.salt!
       })
     this.deciders = deciders
-    this.typeName = typeName as 'nomination'
+    this.typeName = typeName as ProcedureTypeName
     this.isDeployed = isDeployed ?? false
     this.cid = cid ?? this.typeName
     this.name = name ?? 'Unnamed procedure'
@@ -427,134 +481,97 @@ export class Procedure {
     this.organigramId = organigramId ?? 'default-organigram-id'
     this.metadata = metadata ?? '{}'
     this.proposers = proposers ?? deciders
-    this.moderators = moderators ?? ethers.ZeroAddress
+    this.moderators = moderators ?? zeroAddress
     this.withModeration = withModeration ?? false
     this.forwarder =
-      forwarder ?? deployedAddresses[chainId as '11155111']?.MetaGasStation
+      forwarder ?? deployedAddresses[this.chainId as '11155111']?.MetaGasStation
     this.proposals = proposals ?? []
-    if (signerOrProvider?.provider != null) {
-      this.signer = signerOrProvider as ethers.Signer
-      this.provider = this.signer.provider as ethers.Provider
-    } else {
-      this.provider = signerOrProvider as ethers.Provider
-      this.signer = undefined
-      try {
-        if (this.provider instanceof ethers.JsonRpcProvider) {
-          this.provider
-            .getSigner(this.address)
-            .then(signer => {
-              this.signer = signer
-            })
-            .catch(error => {
-              console.warn('Error while getting signer from provider.', error)
-            })
-        }
-      } catch (error) {}
-    }
-    this._contract = new ethers.Contract(
-      this.address,
-      ProcedureContractABI.abi,
-      signerOrProvider
-    )
+    this.walletClient = walletClient ?? undefined
+    this.publicClient = publicClient ?? undefined
+    this.contract =
+      this.publicClient != null
+        ? getContractInstance({
+            address: this.address,
+            abi: ProcedureContractABI.abi,
+            publicClient: this.publicClient,
+            walletClient: this.walletClient
+          })
+        : undefined
     this.type =
       type ?? procedureTypes[this.typeName as keyof typeof procedureTypes]
-    this.data = data!
+    this.data = data ?? ''
+  }
+
+  protected getClients(): ContractClients {
+    if (this.publicClient == null) {
+      throw new Error('Public client not connected.')
+    }
+    return {
+      publicClient: this.publicClient,
+      walletClient: this.walletClient
+    }
   }
 
   static async _populateInitialize(
-    _populateInitializeInput: PopulateInitializeInput
-  ): Promise<ethers.ContractTransaction> {
-    // @dev : initialize() must be overriden in procedure class.
+    _populateInitializeInput: PopulateInitializeInput,
+    _clients: ContractClients
+  ): Promise<PopulatedTransactionData> {
     throw new Error('Procedure cannot be initialized.')
   }
 
   static async loadData(
     address: string,
-    signerOrProvider: ethers.Signer | ethers.Provider
+    clients: ContractClients
   ): Promise<ProcedureContractData> {
-    const contract = new ethers.Contract(
+    const contract = getContractInstance({
       address,
-      ProcedureContractABI.abi,
-      signerOrProvider
-    )
-    return await contract.getProcedure()
+      abi: ProcedureContractABI.abi,
+      publicClient: clients.publicClient
+    })
+    return normalizeProcedureData(await contract.read.getProcedure())
   }
 
   static async loadProposal(
     address: string,
     proposalKey: string,
-    signerOrProvider: ethers.Signer | ethers.Provider
+    clients: ContractClients
   ): Promise<ProcedureProposal> {
-    const contract = new ethers.Contract(
+    const contract = getContractInstance({
       address,
-      ProcedureContractABI.abi,
-      signerOrProvider
-    )
-    const proposal = await contract.getProposal(proposalKey)
-    const [creator, cid, blockReason, presented, blocked, adopted, applied] =
-      proposal
-    const parsedOperations: ProcedureProposalOperation[] =
-      proposal.operations.map(
-        (op: unknown): ProcedureProposalOperation =>
-          Procedure.parseOperation(op)
-      )
-    return {
-      key: proposalKey,
-      creator,
-      cid,
-      blockReason,
-      presented,
-      blocked,
-      adopted,
-      applied,
-      operations: parsedOperations
-    }
+      abi: ProcedureContractABI.abi,
+      publicClient: clients.publicClient
+    })
+    const proposal = await contract.read.getProposal([BigInt(proposalKey)])
+    return normalizeProposal(proposal, proposalKey)
   }
 
   static async loadProposals(
     address: string,
-    signerOrProvider: ethers.Signer | ethers.Provider,
+    clients: ContractClients,
     data?: ProcedureContractData
   ): Promise<ProcedureProposal[]> {
-    const procedureData =
-      data ?? (await Procedure.loadData(address, signerOrProvider))
+    const procedureData = data ?? (await Procedure.loadData(address, clients))
     const proposalsLength = Number(procedureData.proposalsLength)
-    const contractInterface = new ethers.Interface(ProcedureContractABI.abi)
     const multicallProposals = await tryMulticall(
-      signerOrProvider,
-      Array.from({ length: proposalsLength }).map((_, i) => {
-        const key = i.toString()
+      clients,
+      Array.from({ length: proposalsLength }).map((_, index) => {
+        const key = index.toString()
         return {
           target: address,
-          callData: contractInterface.encodeFunctionData('getProposal', [key]),
-          decode: returnData => {
-            const [proposal] = contractInterface.decodeFunctionResult(
-              'getProposal',
-              returnData
+          callData: encodeFunctionData({
+            abi: ProcedureContractABI.abi,
+            functionName: 'getProposal',
+            args: [BigInt(index)]
+          }),
+          decode: returnData =>
+            normalizeProposal(
+              decodeFunctionResult({
+                abi: ProcedureContractABI.abi,
+                functionName: 'getProposal',
+                data: returnData
+              }),
+              key
             )
-            const [
-              creator,
-              cid,
-              blockReason,
-              presented,
-              blocked,
-              adopted,
-              applied
-            ] = proposal
-            return {
-              key,
-              creator,
-              cid,
-              blockReason,
-              presented,
-              blocked,
-              adopted,
-              applied,
-              operations: proposal.operations.map((op: unknown) =>
-                Procedure.parseOperation(op)
-              )
-            }
-          }
         }
       })
     )
@@ -567,70 +584,50 @@ export class Procedure {
 
     return (
       await Promise.all(
-        Array.from({ length: proposalsLength }).map(async (_, i) => {
-          const key = i.toString()
-          return await Procedure.loadProposal(
-            address,
-            key,
-            signerOrProvider
-          ).catch((error: Error) => {
-            console.warn(
-              'Error while loading proposal in procedure.',
-              address,
-              key,
-              error.message
-            )
-            return null
-          })
+        Array.from({ length: proposalsLength }).map(async (_, index) => {
+          const key = index.toString()
+          return await Procedure.loadProposal(address, key, clients).catch(
+            (error: Error) => {
+              console.warn(
+                'Error while loading proposal in procedure.',
+                address,
+                key,
+                error.message
+              )
+              return null
+            }
+          )
         })
       )
-    ).filter(proposal => proposal != null)
+    ).filter((proposal): proposal is ProcedureProposal => proposal != null)
   }
 
   static async load(
     address: string,
-    signerOrProvider: ethers.Signer | ethers.Provider,
+    clients: ContractClients,
     initialProcedure?: ProcedureInput
   ): Promise<Procedure> {
-    const provider =
-      signerOrProvider.provider ?? (signerOrProvider as ethers.Provider)
-    if (provider == null) {
-      throw new Error('No provider found.')
-    }
     if (!address) {
       throw new Error('No address provided.')
     }
     const chainId =
-      initialProcedure?.chainId ??
-      (await provider
-        .getNetwork()
-        .then(({ chainId }) => chainId.toString())
-        .catch(_err => undefined))
-    if (chainId == null) {
-      throw new Error('No chainId found.')
-    }
+      initialProcedure?.chainId ?? String(await clients.publicClient.getChainId())
     if (initialProcedure?.typeName == null && initialProcedure?.type == null) {
-      const isProcedure: boolean = await Procedure.isProcedure(
-        address,
-        signerOrProvider
-      )
+      const isProcedure = await Procedure.isProcedure(address, clients)
       if (!isProcedure) {
         throw new Error('Contract at address is not a Procedure.')
       }
     }
-    const data = await Procedure.loadData(address, signerOrProvider)
-    const proposals: ProcedureProposal[] = await Procedure.loadProposals(
-      address,
-      signerOrProvider,
-      data
-    )
+    const data = await Procedure.loadData(address, clients)
+    const proposals = await Procedure.loadProposals(address, clients, data)
     return new Procedure({
       ...initialProcedure,
       typeName: initialProcedure?.typeName ?? 'nomination',
       cid: data.cid,
       address,
       chainId,
-      signerOrProvider,
+      publicClient: clients.publicClient,
+      walletClient: clients.walletClient,
       metadata: data.metadata,
       proposers: data.proposers,
       moderators: data.moderators,
@@ -639,7 +636,8 @@ export class Procedure {
       forwarder:
         data.forwarder ??
         deployedAddresses[chainId as '11155111']?.MetaGasStation,
-      proposals
+      proposals,
+      isDeployed: true
     })
   }
 
@@ -658,17 +656,12 @@ export class Procedure {
       case 'bytes':
         return 'bytes'
       case 'address':
-        return 'address'
       case 'organ':
-        return 'address'
       case 'permissionAddress':
-        return 'address'
       case 'oldPermissionAddress':
-        return 'address'
       case 'newPermissionAddress':
         return 'address'
       case 'proposal':
-        return 'uint256'
       case 'proposals':
         return 'uint256'
       case 'entry':
@@ -676,7 +669,6 @@ export class Procedure {
       case 'entries':
         return '(address,string)[]'
       case 'amount':
-        return 'uint256'
       case 'tokenId':
         return 'uint256'
       default:
@@ -684,62 +676,45 @@ export class Procedure {
     }
   }
 
-  // Extra options for params, and decode value.
   static _extractParams(
     types: OperationParamType[],
     operation?: ProcedureProposalOperation
   ): OperationParam[] {
-    // Parse operation data if provided.
     if (operation?.data != null) {
-      const typesArray = types.map(type => Procedure._stringifyParamType(type))
-      const decoder = ethers.AbiCoder.defaultAbiCoder()
-      const decodedParams = decoder.decode(
-        typesArray,
+      const decodedParams = decodeAbiParameters(
+        parseAbiParameters(
+          types.map(type => Procedure._stringifyParamType(type)).join(', ')
+        ),
         `0x${operation.data.substring(10)}`
       )
       return types.map((type, index): OperationParam => {
-        let _value
-        // @todo Avoid Generic Injection Sink when using index like this.
         let value = decodedParams[index]
-        if (value != null && type != null) {
-          switch (type) {
-            case 'cid':
-              _value = value as [string]
-              value = _value[0]
-              break
-            case 'entry':
-              _value = value as [string, string]
-              value = {
-                addr: _value[0],
-                cid: _value[1]
-              }
-              break
-            case 'entries':
-              _value = value as [[string, string]]
-              value = _value.map(e => ({
-                addr: e[0],
-                cid: e[1]
-              }))
-              break
-            default:
-          }
+        switch (type) {
+          case 'cid':
+            value = value as string
+            break
+          case 'entry':
+            value = normalizeTupleEntry(value)
+            break
+          case 'entries':
+            value = (value as unknown[]).map(normalizeTupleEntry)
+            break
+          default:
         }
         return { type, value }
       })
-    } else {
-      return types.map(type => ({ type }))
     }
+    return types.map(type => ({ type }))
   }
 
-  static parseOperation(_operation: unknown): ProcedureProposalOperation {
-    const [index, target, data, value, processed] = _operation as [
-      string,
-      string,
-      string,
-      string,
-      boolean
-    ]
-    const functionSelector: string = data.toString().slice(0, 10)
+  static parseOperation(rawOperation: unknown): ProcedureProposalOperation {
+    const operationTuple = rawOperation as any
+    const index = (operationTuple.index ?? operationTuple[0]).toString()
+    const target = operationTuple.target ?? operationTuple[1]
+    const data = (operationTuple.data ?? operationTuple[2]) as string
+    const value = (operationTuple.value ?? operationTuple[3])?.toString()
+    const processed = operationTuple.processed ?? operationTuple[4]
+    const functionSelector = data.toString().slice(0, 10)
     const operation: ProcedureProposalOperation = {
       index,
       target,
@@ -749,7 +724,7 @@ export class Procedure {
       functionSelector
     }
     operation.function = Procedure.OPERATIONS_FUNCTIONS.find(
-      pof => pof.funcSig === functionSelector
+      procedureFunction => procedureFunction.funcSig === functionSelector
     )
     if (operation.function == null) {
       return operation
@@ -763,49 +738,51 @@ export class Procedure {
 
   static async isProcedure(
     address: string,
-    signerOrProvider: ethers.Signer | ethers.Provider
+    clients: ContractClients
   ): Promise<boolean> {
-    const contract = new ethers.Contract(
+    const contract = getContractInstance({
       address,
-      ProcedureContractABI.abi,
-      signerOrProvider
-    )
-    const isERC165: boolean = await contract.supportsInterface('0x01ffc9a7')
-    if (!isERC165) return false
-    return true // contract.supportsInterface(Procedure.INTERFACE)
+      abi: ProcedureContractABI.abi,
+      publicClient: clients.publicClient
+    })
+    return Boolean(await contract.read.supportsInterface(['0x01ffc9a7']))
   }
-
-  /**
-   * Procedure API.
-   */
 
   async updateCid(
     cid: string,
     options?: TransactionOptions
-  ): Promise<ethers.Transaction> {
-    const tx = await this._contract.updateCid(cid)
-    if (options?.onTransaction != null) {
-      options.onTransaction(
-        tx,
-        `Update metadata of procedure ${
-          this.address
-        } with CID ${cid.toString()}`
-      )
-    }
+  ): Promise<OrganigramTransaction> {
+    const tx = await createContractWriteTransaction({
+      address: this.address,
+      abi: ProcedureContractABI.abi,
+      functionName: 'updateCid',
+      args: [cid],
+      clients: this.getClients(),
+      nonce: options?.nonce
+    })
+    options?.onTransaction?.(
+      tx,
+      `Update metadata of procedure ${this.address} with CID ${cid.toString()}`
+    )
     return tx
   }
 
   async updateAdmin(
     address: string,
     options?: TransactionOptions
-  ): Promise<ethers.Transaction> {
-    const tx = await this._contract.updateAdmin(address)
-    if (options?.onTransaction != null) {
-      options.onTransaction(
-        tx,
-        `Update admin of procedure ${this.address} to ${address}.`
-      )
-    }
+  ): Promise<OrganigramTransaction> {
+    const tx = await createContractWriteTransaction({
+      address: this.address,
+      abi: ProcedureContractABI.abi,
+      functionName: 'updateAdmin',
+      args: [address],
+      clients: this.getClients(),
+      nonce: options?.nonce
+    })
+    options?.onTransaction?.(
+      tx,
+      `Update admin of procedure ${this.address} to ${address}.`
+    )
     return tx
   }
 
@@ -814,63 +791,80 @@ export class Procedure {
     operations: ProcedureProposalOperation[]
     options?: TransactionOptions
   }): Promise<ProcedureProposal> {
-    const signerOrProvider = this.signer ?? this.provider
-    if (signerOrProvider == null) {
-      throw new Error('Not connected.')
-    }
-    const ops = input.operations.map(operation => {
-      // Format operation for transaction call.
-      return {
-        index:
-          operation?.index != null && operation.index !== ''
-            ? operation.index
-            : '0',
-        target: operation.target,
-        data: operation.data,
-        value: operation.value,
-        processed: false
-      }
+    const ops = input.operations.map(operation => ({
+      index:
+        operation.index != null && operation.index !== ''
+          ? BigInt(operation.index)
+          : 0n,
+      target: operation.target ?? zeroAddress,
+      data: operation.data as `0x${string}`,
+      value: BigInt(operation.value ?? '0'),
+      processed: false
+    }))
+    const tx = await createContractWriteTransaction({
+      address: this.address,
+      abi: ProcedureContractABI.abi,
+      functionName: 'propose',
+      args: [input.cid, ops],
+      clients: this.getClients(),
+      nonce: input.options?.nonce
     })
-    const tx = await this._contract.propose(input.cid, ops)
-    if (input.options?.onTransaction != null) {
-      input.options.onTransaction(
-        tx,
-        `Create proposal with CID ${input.cid} on procedure ${this.address}`
-      )
-    }
+    input.options?.onTransaction?.(
+      tx,
+      `Create proposal with CID ${input.cid} on procedure ${this.address}`
+    )
     const receipt = await tx.wait()
-    const proposalKey: string = receipt.logs[0].topics[2]
-    if (proposalKey == null || proposalKey === '') {
+    const proposalKey = receipt.logs[0]?.topics?.[2]
+    if (proposalKey == null) {
       throw new Error('Proposal not created.')
     }
     const proposal = await Procedure.loadProposal(
       this.address,
       proposalKey,
-      signerOrProvider
+      this.getClients()
     )
-    if (proposal == null) {
-      throw new Error('Proposal not found.')
-    }
     this.proposals.push(proposal)
     return proposal
   }
 
   async signProposal(input: SignedProposalInput): Promise<string> {
-    if (this.signer?.signTypedData == null) {
-      throw new Error('Connected signer cannot sign typed data.')
+    if (this.walletClient == null) {
+      throw new Error('Connected wallet cannot sign typed data.')
     }
+    const account = await getWalletAccount(this.walletClient)
     const ops = input.operations.map(operation => ({
       index:
-        operation?.index != null && operation.index !== ''
-          ? operation.index
-          : '0',
-      target: operation.target,
-      data: operation.data,
-      value: operation.value ?? '0'
+        operation.index != null && operation.index !== ''
+          ? BigInt(operation.index)
+          : 0n,
+      target: (operation.target ?? zeroAddress) as `0x${string}`,
+      data: operation.data as `0x${string}`,
+      value: BigInt(operation.value ?? '0')
     }))
-    return await this.signer.signTypedData(
-      this.getTypedDataDomain(),
-      {
+    const operationTypeHash = keccak256(
+      toHex('Operation(uint256 index,address target,bytes data,uint256 value)')
+    )
+    const operationHashes = ops.map(operation =>
+      keccak256(
+        encodeAbiParameters(
+          parseAbiParameters(
+            ['bytes32', 'uint256', 'address', 'bytes32', 'uint256'].join(', ')
+          ),
+          [
+            operationTypeHash,
+            operation.index,
+            operation.target,
+            keccak256(operation.data),
+            operation.value
+          ]
+        )
+      )
+    )
+    return await this.walletClient.signTypedData({
+      account,
+      domain: this.getTypedDataDomain(),
+      primaryType: 'Proposal',
+      types: {
         Operation: [
           { name: 'index', type: 'uint256' },
           { name: 'target', type: 'address' },
@@ -884,59 +878,51 @@ export class Procedure {
           { name: 'deadline', type: 'uint256' }
         ]
       },
-      {
+      message: {
         cid: input.cid,
-        operationsHash: ethers.solidityPackedKeccak256(
-          ['bytes32[]'],
-          [
-            ops.map(operation =>
-              ethers.keccak256(
-                ethers.AbiCoder.defaultAbiCoder().encode(
-                  ['bytes32', 'uint256', 'address', 'bytes32', 'uint256'],
-                  [
-                    ethers.id(
-                      'Operation(uint256 index,address target,bytes data,uint256 value)'
-                    ),
-                    operation.index,
-                    operation.target,
-                    ethers.keccak256(operation.data),
-                    operation.value
-                  ]
-                )
-              )
-            )
-          ]
+        operationsHash: keccak256(
+          encodePacked(['bytes32[]'], [operationHashes])
         ),
         nonce: input.nonce,
-        deadline: input.deadline
+        deadline: BigInt(input.deadline)
       }
-    )
+    })
   }
 
   async signPresentProposal(input: SignedProposalActionInput): Promise<string> {
-    if (this.signer?.signTypedData == null) {
-      throw new Error('Connected signer cannot sign typed data.')
+    if (this.walletClient == null) {
+      throw new Error('Connected wallet cannot sign typed data.')
     }
-    return await this.signer.signTypedData(
-      this.getTypedDataDomain(),
-      {
+    const account = await getWalletAccount(this.walletClient)
+    return await this.walletClient.signTypedData({
+      account,
+      domain: this.getTypedDataDomain(),
+      primaryType: 'PresentProposal',
+      types: {
         PresentProposal: [
           { name: 'proposalKey', type: 'uint256' },
           { name: 'nonce', type: 'uint256' },
           { name: 'deadline', type: 'uint256' }
         ]
       },
-      input
-    )
+      message: {
+        ...input,
+        proposalKey: BigInt(input.proposalKey),
+        deadline: BigInt(input.deadline)
+      }
+    })
   }
 
   async signBlockProposal(input: SignedBlockProposalInput): Promise<string> {
-    if (this.signer?.signTypedData == null) {
-      throw new Error('Connected signer cannot sign typed data.')
+    if (this.walletClient == null) {
+      throw new Error('Connected wallet cannot sign typed data.')
     }
-    return await this.signer.signTypedData(
-      this.getTypedDataDomain(),
-      {
+    const account = await getWalletAccount(this.walletClient)
+    return await this.walletClient.signTypedData({
+      account,
+      domain: this.getTypedDataDomain(),
+      primaryType: 'BlockProposal',
+      types: {
         BlockProposal: [
           { name: 'proposalKey', type: 'uint256' },
           { name: 'reason', type: 'string' },
@@ -944,68 +930,89 @@ export class Procedure {
           { name: 'deadline', type: 'uint256' }
         ]
       },
-      input
-    )
+      message: {
+        ...input,
+        proposalKey: BigInt(input.proposalKey),
+        deadline: BigInt(input.deadline)
+      }
+    })
   }
 
   async signApplyProposal(input: SignedProposalActionInput): Promise<string> {
-    if (this.signer?.signTypedData == null) {
-      throw new Error('Connected signer cannot sign typed data.')
+    if (this.walletClient == null) {
+      throw new Error('Connected wallet cannot sign typed data.')
     }
-    return await this.signer.signTypedData(
-      this.getTypedDataDomain(),
-      {
+    const account = await getWalletAccount(this.walletClient)
+    return await this.walletClient.signTypedData({
+      account,
+      domain: this.getTypedDataDomain(),
+      primaryType: 'ApplyProposal',
+      types: {
         ApplyProposal: [
           { name: 'proposalKey', type: 'uint256' },
           { name: 'nonce', type: 'uint256' },
           { name: 'deadline', type: 'uint256' }
         ]
       },
-      input
-    )
+      message: {
+        ...input,
+        proposalKey: BigInt(input.proposalKey),
+        deadline: BigInt(input.deadline)
+      }
+    })
   }
 
-  async proposeBySig(input: SignedProposalInput & { signature: string }) {
-    const signerOrProvider = this.signer ?? this.provider
-    if (signerOrProvider == null) {
-      throw new Error('Not connected.')
-    }
+  async proposeBySig(
+    input: SignedProposalInput & { signature: string }
+  ): Promise<OrganigramTransaction> {
     const ops = input.operations.map(operation => ({
       index:
-        operation?.index != null && operation.index !== ''
-          ? operation.index
-          : '0',
-      target: operation.target,
-      data: operation.data,
-      value: operation.value ?? '0',
+        operation.index != null && operation.index !== ''
+          ? BigInt(operation.index)
+          : 0n,
+      target: operation.target ?? zeroAddress,
+      data: operation.data as `0x${string}`,
+      value: BigInt(operation.value ?? '0'),
       processed: false
     }))
-    const tx = await this._contract.proposeBySig(
-      input.cid,
-      ops,
-      input.nonce,
-      input.deadline,
-      input.signature
-    )
+    const tx = await createContractWriteTransaction({
+      address: this.address,
+      abi: ProcedureContractABI.abi,
+      functionName: 'proposeBySig',
+      args: [
+        input.cid,
+        ops,
+        input.nonce,
+        BigInt(input.deadline),
+        input.signature
+      ],
+      clients: this.getClients()
+    })
     await tx.wait()
     return tx
   }
 
   async getNonce(account: string): Promise<bigint> {
-    return await this._contract.getNonce(account)
+    const contract = this.contract ??
+      getContractInstance({
+        address: this.address,
+        abi: ProcedureContractABI.abi,
+        ...this.getClients()
+      })
+    return await contract.read.getNonce([account])
   }
 
   getTypedDataDomain(): {
     name: string
     version: string
     chainId: bigint
-    verifyingContract: string
+    verifyingContract: `0x${string}`
   } {
     return {
       name: 'Organigram Procedure',
       version: '1',
       chainId: BigInt(this.chainId),
-      verifyingContract: this.address
+      verifyingContract: this.address as `0x${string}`
     }
   }
 
@@ -1016,21 +1023,34 @@ export class Procedure {
     value = 0,
     index = 0
   }: ExternalCallOperationInput): ProcedureProposalOperation {
-    const organInterface = new ethers.Interface([
-      'function executeWhitelisted(address target,uint256 value,bytes data)'
-    ])
     return {
       index: index.toString(),
       target: organAddress,
       value: '0',
-      data: organInterface.encodeFunctionData('executeWhitelisted', [
-        target,
-        value,
-        data
-      ]),
-      functionSelector: ethers
-        .id('executeWhitelisted(address,uint256,bytes)')
-        .slice(0, 10)
+      data: encodeFunctionData({
+        abi: [
+          {
+            type: 'function',
+            name: 'executeWhitelisted',
+            stateMutability: 'nonpayable',
+            inputs: [
+              { name: 'target', type: 'address' },
+              { name: 'value', type: 'uint256' },
+              { name: 'data', type: 'bytes' }
+            ],
+            outputs: []
+          }
+        ],
+        functionName: 'executeWhitelisted',
+        args: [
+          target as `0x${string}`,
+          BigInt(value),
+          data as `0x${string}`
+        ]
+      }),
+      functionSelector: toFunctionSelector(
+        'executeWhitelisted(address,uint256,bytes)'
+      )
     }
   }
 
@@ -1038,143 +1058,155 @@ export class Procedure {
     proposalKey: string,
     reason: string,
     options?: TransactionOptions
-  ): Promise<ContractTransactionReceipt> {
-    const tx = await this._contract.blockProposal(proposalKey, reason)
-    if (options?.onTransaction != null) {
-      options.onTransaction(
-        tx,
-        `Block proposal ${proposalKey} of procedure ${this.address}`
-      )
-    }
+  ): Promise<OrganigramTransactionReceipt> {
+    const tx = await createContractWriteTransaction({
+      address: this.address,
+      abi: ProcedureContractABI.abi,
+      functionName: 'blockProposal',
+      args: [BigInt(proposalKey), reason],
+      clients: this.getClients(),
+      nonce: options?.nonce
+    })
+    options?.onTransaction?.(
+      tx,
+      `Block proposal ${proposalKey} of procedure ${this.address}`
+    )
     return await tx.wait()
   }
 
   async blockProposalBySig(
     input: SignedBlockProposalInput & { signature: string },
     options?: TransactionOptions
-  ): Promise<ContractTransactionReceipt> {
-    const tx = await this._contract.blockProposalBySig(
-      input.proposalKey,
-      input.reason,
-      input.nonce,
-      input.deadline,
-      input.signature
+  ): Promise<OrganigramTransactionReceipt> {
+    const tx = await createContractWriteTransaction({
+      address: this.address,
+      abi: ProcedureContractABI.abi,
+      functionName: 'blockProposalBySig',
+      args: [
+        BigInt(input.proposalKey),
+        input.reason,
+        input.nonce,
+        BigInt(input.deadline),
+        input.signature
+      ],
+      clients: this.getClients(),
+      nonce: options?.nonce
+    })
+    options?.onTransaction?.(
+      tx,
+      `Block proposal ${input.proposalKey} of procedure ${this.address} by signature`
     )
-    if (options?.onTransaction != null) {
-      options.onTransaction(
-        tx,
-        `Block proposal ${input.proposalKey} of procedure ${this.address} by signature`
-      )
-    }
     return await tx.wait()
   }
 
   async presentProposal(
     proposalKey: string,
     options?: TransactionOptions
-  ): Promise<ContractTransactionReceipt> {
-    const tx = await this._contract.presentProposal(proposalKey)
-    if (options?.onTransaction != null) {
-      options.onTransaction(
-        tx,
-        `Present proposal ${proposalKey} of procedure ${this.address}`
-      )
-    }
+  ): Promise<OrganigramTransactionReceipt> {
+    const tx = await createContractWriteTransaction({
+      address: this.address,
+      abi: ProcedureContractABI.abi,
+      functionName: 'presentProposal',
+      args: [BigInt(proposalKey)],
+      clients: this.getClients(),
+      nonce: options?.nonce
+    })
+    options?.onTransaction?.(
+      tx,
+      `Present proposal ${proposalKey} of procedure ${this.address}`
+    )
     return await tx.wait()
   }
 
   async presentProposalBySig(
     input: SignedProposalActionInput & { signature: string },
     options?: TransactionOptions
-  ): Promise<ContractTransactionReceipt> {
-    const tx = await this._contract.presentProposalBySig(
-      input.proposalKey,
-      input.nonce,
-      input.deadline,
-      input.signature
+  ): Promise<OrganigramTransactionReceipt> {
+    const tx = await createContractWriteTransaction({
+      address: this.address,
+      abi: ProcedureContractABI.abi,
+      functionName: 'presentProposalBySig',
+      args: [
+        BigInt(input.proposalKey),
+        input.nonce,
+        BigInt(input.deadline),
+        input.signature
+      ],
+      clients: this.getClients(),
+      nonce: options?.nonce
+    })
+    options?.onTransaction?.(
+      tx,
+      `Present proposal ${input.proposalKey} of procedure ${this.address} by signature`
     )
-    if (options?.onTransaction != null) {
-      options.onTransaction(
-        tx,
-        `Present proposal ${input.proposalKey} of procedure ${this.address} by signature`
-      )
-    }
     return await tx.wait()
   }
 
   async applyProposal(
     proposalKey: string,
     options?: TransactionOptions
-  ): Promise<ContractTransactionReceipt> {
-    const tx = await this._contract.applyProposal(proposalKey)
-    if (options?.onTransaction != null) {
-      options.onTransaction(
-        tx,
-        `Apply proposal ${proposalKey} of procedure ${this.address}`
-      )
-    }
+  ): Promise<OrganigramTransactionReceipt> {
+    const tx = await createContractWriteTransaction({
+      address: this.address,
+      abi: ProcedureContractABI.abi,
+      functionName: 'applyProposal',
+      args: [BigInt(proposalKey)],
+      clients: this.getClients(),
+      nonce: options?.nonce
+    })
+    options?.onTransaction?.(
+      tx,
+      `Apply proposal ${proposalKey} of procedure ${this.address}`
+    )
     return await tx.wait()
   }
 
   async applyProposalBySig(
     input: SignedProposalActionInput & { signature: string },
     options?: TransactionOptions
-  ): Promise<ContractTransactionReceipt> {
-    const tx = await this._contract.applyProposalBySig(
-      input.proposalKey,
-      input.nonce,
-      input.deadline,
-      input.signature
+  ): Promise<OrganigramTransactionReceipt> {
+    const tx = await createContractWriteTransaction({
+      address: this.address,
+      abi: ProcedureContractABI.abi,
+      functionName: 'applyProposalBySig',
+      args: [
+        BigInt(input.proposalKey),
+        input.nonce,
+        BigInt(input.deadline),
+        input.signature
+      ],
+      clients: this.getClients(),
+      nonce: options?.nonce
+    })
+    options?.onTransaction?.(
+      tx,
+      `Apply proposal ${input.proposalKey} of procedure ${this.address} by signature`
     )
-    if (options?.onTransaction != null) {
-      options.onTransaction(
-        tx,
-        `Apply proposal ${input.proposalKey} of procedure ${this.address} by signature`
-      )
-    }
     return await tx.wait()
   }
 
-  /**
-   * Sync API.
-   */
-
   async reloadProposals(): Promise<Procedure> {
-    const signerOrProvider = this.signer ?? this.provider
-    if (signerOrProvider == null) {
-      throw new Error('Not connected.')
-    }
-    const proposals = await Procedure.loadProposals(
+    this.proposals = await Procedure.loadProposals(
       this.address,
-      signerOrProvider
+      this.getClients()
     )
-    this.proposals = proposals
     return this
   }
 
   async reloadProposal(proposalKey: string): Promise<Procedure> {
-    const signerOrProvider = this.signer ?? this.provider
-    if (signerOrProvider == null) {
-      throw new Error('Not connected.')
-    }
     const proposal = await Procedure.loadProposal(
       this.address,
       proposalKey,
-      signerOrProvider
+      this.getClients()
     )
-    const proposals = this.proposals.map(m =>
-      m.key === proposalKey ? proposal : m
+    this.proposals = this.proposals.map(existingProposal =>
+      existingProposal.key === proposalKey ? proposal : existingProposal
     )
-    this.proposals = proposals
     return this
   }
 
   async reloadData(): Promise<Procedure> {
-    const signerOrProvider = this.signer ?? this.provider
-    if (signerOrProvider == null) {
-      throw new Error('Not connected.')
-    }
-    const data = await Procedure.loadData(this.address, signerOrProvider)
+    const data = await Procedure.loadData(this.address, this.getClients())
     this.cid = data.cid
     this.proposers = data.proposers
     this.moderators = data.moderators
@@ -1190,7 +1222,7 @@ export class Procedure {
           address: this.address,
           salt: this.salt,
           organigramId: this.organigramId,
-          chainId: this.chainId!,
+          chainId: this.chainId,
           data: this.data,
           typeName: this.typeName,
           name: this.name,
@@ -1199,7 +1231,7 @@ export class Procedure {
           isDeployed: this.isDeployed,
           deciders: this.deciders,
           proposers: this.proposers,
-          moderators: this.moderators ?? ethers.ZeroAddress,
+          moderators: this.moderators ?? zeroAddress,
           withModeration: this.withModeration,
           forwarder: this.forwarder,
           metadata: this.metadata,
