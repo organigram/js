@@ -420,9 +420,30 @@ describe('Organigram JS Client', () => {
         strictEqual(proposal?.key != null, true)
       })
 
+      it('should reload a procedure with its proposals', async () => {
+        const reloadedProcedure = await NominationProcedure.load(
+          procedure.address,
+          clients,
+          {
+            typeName: 'nomination',
+            deciders: procedure.deciders,
+            proposers: procedure.proposers,
+            moderators: procedure.moderators
+          }
+        )
+
+        strictEqual(reloadedProcedure.proposals.length, 1)
+        strictEqual(reloadedProcedure.proposals[0]?.presented, true)
+      })
+
       it('should approve a proposal', async () => {
         const nominated = await procedure.nominate(proposalKey)
         strictEqual(nominated, true)
+      })
+
+      it('should reload an organ with newly approved entries', async () => {
+        organ = await organ.reload()
+        strictEqual(organ.entries.length, 1)
       })
 
       it('should block a proposal', async () => {
