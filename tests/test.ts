@@ -1,6 +1,6 @@
 import { strictEqual } from 'assert'
 import deployedAddresses from '@organigram/protocol/deployments.json'
-import AssetContractABI from '@organigram/protocol/artifacts/contracts/Asset.sol/Asset.json'
+import AssetContractABI from '@organigram/protocol/abi/Asset.sol/Asset.json'
 import {
   createPublicClient,
   createWalletClient,

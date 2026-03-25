@@ -1,4 +1,4 @@
-import AssetContract from '@organigram/protocol/artifacts/contracts/Asset.sol/Asset.json'
+import AssetContract from '@organigram/protocol/abi/Asset.sol/Asset.json'
 import {
   decodeFunctionResult,
   encodeFunctionData,

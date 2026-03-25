@@ -1,9 +1,6 @@
 import rawDeployedAddresses from '@organigram/protocol/deployments.json'
 
 export type ProtocolDeploymentName =
-  | 'CoreLibrary'
-  | 'OrganLibrary'
-  | 'ProcedureLibrary'
   | 'Asset'
   | 'Organ'
   | 'ERC20VoteProcedure'
