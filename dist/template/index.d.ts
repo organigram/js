@@ -121,7 +121,8 @@ export declare const renewSaltsAndAddresses: (organigram: OrganigramInput, chain
             permissionAddress: string;
             permissionValue: number;
         }[] | undefined;
-        signerOrProvider?: import("ethers").Signer | import("ethers").Provider | null;
+        publicClient?: import("viem").PublicClient | null;
+        walletClient?: import("viem").WalletClient | null;
         balance?: string | null;
         cid?: string | null;
         entries?: Array<{
@@ -148,7 +149,8 @@ export declare const renewSaltsAndAddresses: (organigram: OrganigramInput, chain
         name?: string | null;
         description?: string | null;
         cid?: string | null;
-        signerOrProvider?: import("ethers").Signer | import("ethers").Provider | null;
+        publicClient?: import("viem").PublicClient | null;
+        walletClient?: import("viem").WalletClient | null;
         metadata?: string | null;
         withModeration?: boolean | null;
         forwarder?: string | null;
@@ -162,7 +164,6 @@ export declare const renewSaltsAndAddresses: (organigram: OrganigramInput, chain
         address: string;
         name?: string | null;
         description?: string | null;
-        contract?: import("ethers").Contract | null;
         symbol?: string | null;
         initialSupply?: number | null;
         image?: string | null;
@@ -174,7 +175,8 @@ export declare const renewSaltsAndAddresses: (organigram: OrganigramInput, chain
     name?: string | null;
     description?: string | null;
     organigramClient?: import("..").OrganigramClient | null;
-    signer?: import("ethers").Signer | null;
+    walletClient?: import("viem").WalletClient | null;
+    publicClient?: import("viem").PublicClient | null;
     contractAddresses?: string[] | null;
     workspaceId?: string | null;
 };
@@ -189,7 +191,8 @@ export declare const getTemplate: (templateName: keyof typeof templates, chainId
             permissionAddress: string;
             permissionValue: number;
         }[] | undefined;
-        signerOrProvider?: import("ethers").Signer | import("ethers").Provider | null;
+        publicClient?: import("viem").PublicClient | null;
+        walletClient?: import("viem").WalletClient | null;
         balance?: string | null;
         cid?: string | null;
         entries?: Array<{
@@ -216,7 +219,8 @@ export declare const getTemplate: (templateName: keyof typeof templates, chainId
         name?: string | null;
         description?: string | null;
         cid?: string | null;
-        signerOrProvider?: import("ethers").Signer | import("ethers").Provider | null;
+        publicClient?: import("viem").PublicClient | null;
+        walletClient?: import("viem").WalletClient | null;
         metadata?: string | null;
         withModeration?: boolean | null;
         forwarder?: string | null;
@@ -230,7 +234,6 @@ export declare const getTemplate: (templateName: keyof typeof templates, chainId
         address: string;
         name?: string | null;
         description?: string | null;
-        contract?: import("ethers").Contract | null;
         symbol?: string | null;
         initialSupply?: number | null;
         image?: string | null;
@@ -242,7 +245,8 @@ export declare const getTemplate: (templateName: keyof typeof templates, chainId
     name?: string | null;
     description?: string | null;
     organigramClient?: import("..").OrganigramClient | null;
-    signer?: import("ethers").Signer | null;
+    walletClient?: import("viem").WalletClient | null;
+    publicClient?: import("viem").PublicClient | null;
     contractAddresses?: string[] | null;
     workspaceId?: string | null;
 };

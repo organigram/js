@@ -1,4 +1,4 @@
-import deployedAddresses from '@organigram/protocol/deployments.json';
+import deployedAddresses from './deployments';
 export { deployedAddresses };
 export type ContractName = 'Organ' | 'Asset' | 'ERC20VoteProcedure' | 'VoteProcedure' | 'NominationProcedure' | 'OrganigramClient';
 export declare const handleJsonBigInt: (key: string, value: any) => any;
@@ -8,7 +8,7 @@ export declare const predictContractAddress: ({ type, chainId, salt }: {
     chainId: string;
     salt: string;
 }) => string;
-export declare const createRandom32BytesHexId: () => string;
+export declare const createRandom32BytesHexId: () => `0x${string}`;
 export declare const formatSalt: (salt?: string | null) => string;
 export declare const PERMISSIONS: {
     ADMIN: number;

@@ -1,7 +1,8 @@
 import AssetContract from '@organigram/protocol/artifacts/contracts/Asset.sol/Asset.json';
-import { ethers, formatEther } from 'ethers';
+import { decodeFunctionResult, encodeFunctionData, formatEther, zeroAddress } from 'viem';
 import { createRandom32BytesHexId, predictContractAddress } from './utils';
-import { getProviderFromSignerOrProvider, tryMulticall } from './multicall';
+import { tryMulticall } from './multicall';
+import { getContractInstance, getWalletAddress } from './contracts';
 export const ERC20_INITIAL_SUPPLY = 10_000_000;
 export class Asset {
     address;
@@ -38,75 +39,104 @@ export class Asset {
         this.userBalance = input.userBalance ?? '0';
         this.organigramId = input.organigramId ?? null;
     }
-    static load = async (address, signerOrProvider, initilAsset) => {
+    static load = async (address, clients, initialAsset) => {
         if (!address) {
             throw new Error('Cannot load asset: No address provided.');
         }
-        const provider = getProviderFromSignerOrProvider(signerOrProvider);
-        const contract = new ethers.Contract(address, AssetContract.abi, signerOrProvider ?? provider);
-        const signerAddress = signerOrProvider != null && 'getAddress' in signerOrProvider
-            ? await signerOrProvider.getAddress()
+        const contract = getContractInstance({
+            address,
+            abi: AssetContract.abi,
+            ...clients
+        });
+        const walletAddress = clients.walletClient != null
+            ? await getWalletAddress(clients.walletClient)
             : undefined;
-        const contractInterface = new ethers.Interface(AssetContract.abi);
-        const multicallValues = await tryMulticall(signerOrProvider ?? provider, [
+        const multicallValues = await tryMulticall(clients, [
             {
                 target: address,
-                callData: contractInterface.encodeFunctionData('name'),
-                decode: returnData => contractInterface.decodeFunctionResult('name', returnData)[0]
+                callData: encodeFunctionData({
+                    abi: AssetContract.abi,
+                    functionName: 'name'
+                }),
+                decode: returnData => decodeFunctionResult({
+                    abi: AssetContract.abi,
+                    functionName: 'name',
+                    data: returnData
+                })
             },
             {
                 target: address,
-                callData: contractInterface.encodeFunctionData('symbol'),
-                decode: returnData => contractInterface.decodeFunctionResult('symbol', returnData)[0]
+                callData: encodeFunctionData({
+                    abi: AssetContract.abi,
+                    functionName: 'symbol'
+                }),
+                decode: returnData => decodeFunctionResult({
+                    abi: AssetContract.abi,
+                    functionName: 'symbol',
+                    data: returnData
+                })
             },
             {
                 target: address,
-                callData: contractInterface.encodeFunctionData('totalSupply'),
-                decode: returnData => contractInterface.decodeFunctionResult('totalSupply', returnData)[0]
+                callData: encodeFunctionData({
+                    abi: AssetContract.abi,
+                    functionName: 'totalSupply'
+                }),
+                decode: returnData => decodeFunctionResult({
+                    abi: AssetContract.abi,
+                    functionName: 'totalSupply',
+                    data: returnData
+                })
             },
             {
                 target: address,
-                callData: contractInterface.encodeFunctionData('balanceOf', [
-                    signerAddress ?? ethers.ZeroAddress
-                ]),
-                decode: returnData => contractInterface.decodeFunctionResult('balanceOf', returnData)[0]
+                callData: encodeFunctionData({
+                    abi: AssetContract.abi,
+                    functionName: 'balanceOf',
+                    args: [walletAddress ?? zeroAddress]
+                }),
+                decode: returnData => decodeFunctionResult({
+                    abi: AssetContract.abi,
+                    functionName: 'balanceOf',
+                    data: returnData
+                })
             }
         ]);
-        const [name, symbol, initialSupplyRaw, userBalanceRaw, chainId] = multicallValues != null
+        const loadedValues = multicallValues != null
             ? await Promise.all([
                 Promise.resolve(multicallValues[0]),
                 Promise.resolve(multicallValues[1]),
                 Promise.resolve(multicallValues[2]),
-                Promise.resolve(multicallValues[3] ?? 0),
-                initilAsset?.chainId != null
-                    ? Promise.resolve(initilAsset.chainId)
-                    : provider?.getNetwork().then(network => network.chainId.toString())
+                Promise.resolve((multicallValues[3] ?? 0n)),
+                initialAsset?.chainId != null
+                    ? Promise.resolve(initialAsset.chainId)
+                    : clients.publicClient.getChainId().then(String)
             ])
             : await Promise.all([
-                contract.name(),
-                contract.symbol(),
-                contract.totalSupply(),
-                signerAddress != null ? contract.balanceOf(signerAddress) : 0,
-                initilAsset?.chainId != null
-                    ? Promise.resolve(initilAsset.chainId)
-                    : provider?.getNetwork().then(network => network.chainId.toString())
+                Promise.resolve((await contract.read.name())),
+                Promise.resolve((await contract.read.symbol())),
+                Promise.resolve((await contract.read.totalSupply())),
+                walletAddress != null
+                    ? Promise.resolve((await contract.read.balanceOf([walletAddress])))
+                    : Promise.resolve(0n),
+                initialAsset?.chainId != null
+                    ? Promise.resolve(initialAsset.chainId)
+                    : clients.publicClient.getChainId().then(String)
             ]);
+        const [name, symbol, initialSupplyRaw, userBalanceRaw, chainId] = loadedValues;
         const initialSupply = parseInt((+formatEther(initialSupplyRaw)).toFixed(0));
         let userBalance = formatEther(userBalanceRaw);
         userBalance = (+userBalance).toFixed(0);
-        if (contract != null) {
-            return new Asset({
-                ...initilAsset,
-                address,
-                contract,
-                name,
-                symbol,
-                initialSupply,
-                userBalance,
-                chainId: chainId,
-                isDeployed: true
-            });
-        }
+        return new Asset({
+            ...initialAsset,
+            address,
+            name,
+            symbol,
+            initialSupply,
+            userBalance,
+            chainId,
+            isDeployed: true
+        });
     };
     toJson() {
         return {

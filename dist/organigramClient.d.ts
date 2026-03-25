@@ -1,9 +1,10 @@
-import { ethers, type ContractTransaction } from 'ethers';
+import { type PublicClient, type WalletClient } from 'viem';
 import { Organ, OrganEntry, OrganInput, OrganPermission } from './organ';
 import { Procedure, ProcedureInput, ProcedureType } from './procedure';
 import { Organigram } from './organigram';
 import { ProcedureTypeName } from './procedure/utils';
 import { Asset } from './asset';
+import { type OrganigramTransaction } from './contracts';
 export interface DeployOrganInput {
     cid?: string;
     permissions?: OrganPermission[];
@@ -41,7 +42,7 @@ export interface TransactionOptions {
     customData?: {
         index?: number;
     };
-    onTransaction?: (tx: ethers.TransactionResponse, description: string) => void;
+    onTransaction?: (tx: OrganigramTransaction, description: string) => void;
 }
 export interface File {
     cid: string;
@@ -55,30 +56,34 @@ export declare class OrganigramClient {
     procedures: Procedure[];
     assets: Asset[];
     cids: File[];
-    provider: ethers.Provider;
-    contract: ethers.Contract;
-    signer?: ethers.Signer;
+    publicClient: PublicClient;
+    contract: any;
+    walletClient?: WalletClient;
     constructor(input: {
-        provider: ethers.Provider;
+        publicClient: PublicClient;
         address?: string;
         chainId?: string;
         procedureTypes?: ProcedureType[];
-        contract?: ethers.Contract;
-        signer?: ethers.Signer;
+        contract?: any;
+        walletClient?: WalletClient;
     });
-    static deployClient(signer: ethers.Signer): Promise<OrganigramClient>;
+    private getClients;
+    static deployClient(input: {
+        publicClient: PublicClient;
+        walletClient: WalletClient;
+    }): Promise<OrganigramClient>;
     static loadProcedureType({ addr, cid }: {
         addr: string;
         cid?: string;
-    }, provider: ethers.Provider): Promise<ProcedureType>;
-    static loadProcedureTypes({ address, provider }: {
-        provider: ethers.Provider;
+    }, publicClient: PublicClient): Promise<ProcedureType>;
+    static loadProcedureTypes({ address, publicClient }: {
+        publicClient: PublicClient;
         address?: string;
     }): Promise<ProcedureType[]>;
     static load(input: {
         address?: string;
-        provider: ethers.Provider;
-        signer?: ethers.Signer;
+        publicClient: PublicClient;
+        walletClient?: WalletClient;
     }): Promise<OrganigramClient>;
     private mapWithConcurrencyLimit;
     getProcedureType(procedureAddress: string): Promise<ProcedureType | null>;
@@ -91,7 +96,7 @@ export declare class OrganigramClient {
     deployAssets(assets: DeployAssetInput[], options?: TransactionOptions): Promise<string[]>;
     deployProcedure(input: DeployProceduresInput): Promise<Procedure>;
     deployProcedures(deployProceduresInput: DeployProceduresInput[]): Promise<Procedure[]>;
-    deployOrganigram(input: DeployOrganigramInput): Promise<ContractTransaction>;
+    deployOrganigram(input: DeployOrganigramInput): Promise<readonly string[]>;
     loadContract(address: string, cached?: boolean): Promise<Organ | Procedure | null>;
     loadContracts(contractAddresses: string[]): Promise<Organigram>;
     loadOrganigram(organigram: Organigram, cached?: boolean): Promise<Organigram>;

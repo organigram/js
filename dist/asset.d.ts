@@ -1,4 +1,4 @@
-import { type Contract as EthersContract, ethers, type Signer } from 'ethers';
+import { type ContractClients } from './contracts';
 export declare const ERC20_INITIAL_SUPPLY = 10000000;
 export interface AssetJson {
     address: string;
@@ -16,7 +16,6 @@ export interface AssetInput {
     name?: string | null;
     description?: string | null;
     address?: string | null;
-    contract?: EthersContract | null;
     symbol?: string | null;
     initialSupply?: number | null;
     chainId?: string | null;
@@ -39,7 +38,7 @@ export declare class Asset {
     userBalance: string;
     organigramId?: string | null;
     constructor(input: AssetInput);
-    static load: (address: string, signerOrProvider?: Signer | ethers.Provider | null, initilAsset?: AssetInput) => Promise<(Asset & {
+    static load: (address: string, clients: ContractClients, initialAsset?: AssetInput) => Promise<(Asset & {
         userBalance: string;
     }) | undefined>;
     toJson(): AssetJson;

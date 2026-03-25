@@ -1,9 +1,9 @@
-import { Signer } from 'ethers';
 import { Asset, type AssetInput, type AssetJson } from './asset';
 import { Organ, type OrganInput, type OrganJson } from './organ';
 import { Procedure, type ProcedureInput, type ProcedureJson } from './procedure';
 import OrganigramClient from './organigramClient';
 import { templates } from './template';
+import type { PublicClient, WalletClient } from 'viem';
 export type ProcedureRoleTypeName = 'proposers' | 'moderators' | 'deciders';
 export declare const procedureRoleTypes: {
     label: string;
@@ -30,7 +30,8 @@ export type OrganigramInput = {
     procedures: ProcedureInput[];
     assets: AssetInput[];
     organigramClient?: OrganigramClient | null;
-    signer?: Signer | null;
+    walletClient?: WalletClient | null;
+    publicClient?: PublicClient | null;
     contractAddresses?: string[] | null;
     workspaceId?: string | null;
 };
@@ -46,7 +47,8 @@ export declare class Organigram {
     description: string;
     workspaceId?: string | null;
     organigramClient?: OrganigramClient | null;
-    signer?: Signer | null;
+    walletClient?: WalletClient | null;
+    publicClient?: PublicClient | null;
     constructor(input?: OrganigramInput | keyof typeof templates | string[]);
     editDetails({ name, description }: {
         name?: string;
@@ -57,7 +59,8 @@ export declare class Organigram {
     setAssets(assets: Asset[]): void;
     setProcedures(procedures: Procedure[]): void;
     load: (input?: {
-        signer?: Signer | null;
+        walletClient?: WalletClient | null;
+        publicClient?: PublicClient | null;
     }) => Promise<Organigram>;
     deploy(): Promise<Organigram>;
     toJson: () => OrganigramJson;

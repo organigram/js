@@ -1,6 +1,7 @@
-import { type ContractTransactionReceipt, ethers } from 'ethers';
+import { type PublicClient, type WalletClient } from 'viem';
 import type { TransactionOptions } from '../organigramClient';
-import { PopulateInitializeInput, ProcedureTypeName } from './utils';
+import { type PopulateInitializeInput, type PopulatedTransactionData, ProcedureTypeName } from './utils';
+import { type ContractClients, type OrganigramTransaction, type OrganigramTransactionReceipt } from '../contracts';
 export interface ProcedureTypeField {
     name: string;
     label: string;
@@ -22,13 +23,12 @@ export interface ProcedureType {
 }
 type ProcedureContractData = {
     cid: string;
-    metadata?: string;
     proposers: string;
     moderators: string;
     deciders: string;
     withModeration: boolean;
-    forwarder: string;
-    proposalsLength: string;
+    proposalsLength: bigint;
+    interfaceId?: string;
 };
 export type ProcedureJson = {
     isDeployed: boolean;
@@ -147,7 +147,8 @@ export interface ProcedureInput {
     salt?: string | null;
     chainId?: string | null;
     cid?: string | null;
-    signerOrProvider?: ethers.Signer | ethers.Provider | null;
+    publicClient?: PublicClient | null;
+    walletClient?: WalletClient | null;
     metadata?: string | null;
     proposers?: string | null;
     withModeration?: boolean | null;
@@ -176,25 +177,26 @@ export declare class Procedure {
     data: string;
     forwarder: string;
     proposals: ProcedureProposal[];
-    _contract: ethers.Contract;
+    contract?: any;
     salt?: string;
     chainId: string;
-    signer?: ethers.Signer;
-    provider?: ethers.Provider;
+    walletClient?: WalletClient;
+    publicClient?: PublicClient;
     organigramId: string;
     type: ProcedureType;
-    constructor({ address, deciders, typeName, name, description, salt, cid, chainId, signerOrProvider, metadata, proposers, withModeration, forwarder, moderators, proposals, isDeployed, type, data, organigramId }: ProcedureInput);
-    static _populateInitialize(_populateInitializeInput: PopulateInitializeInput): Promise<ethers.ContractTransaction>;
-    static loadData(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<ProcedureContractData>;
-    static loadProposal(address: string, proposalKey: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<ProcedureProposal>;
-    static loadProposals(address: string, signerOrProvider: ethers.Signer | ethers.Provider, data?: ProcedureContractData): Promise<ProcedureProposal[]>;
-    static load(address: string, signerOrProvider: ethers.Signer | ethers.Provider, initialProcedure?: ProcedureInput): Promise<Procedure>;
+    constructor({ address, deciders, typeName, name, description, salt, cid, chainId, publicClient, walletClient, metadata, proposers, withModeration, forwarder, moderators, proposals, isDeployed, type, data, organigramId }: ProcedureInput);
+    protected getClients(): ContractClients;
+    static _populateInitialize(_populateInitializeInput: PopulateInitializeInput, _clients: ContractClients): Promise<PopulatedTransactionData>;
+    static loadData(address: string, clients: ContractClients): Promise<ProcedureContractData>;
+    static loadProposal(address: string, proposalKey: string, clients: ContractClients): Promise<ProcedureProposal>;
+    static loadProposals(address: string, clients: ContractClients, data?: ProcedureContractData): Promise<ProcedureProposal[]>;
+    static load(address: string, clients: ContractClients, initialProcedure?: ProcedureInput): Promise<Procedure>;
     static _stringifyParamType(type: OperationParamType): string;
     static _extractParams(types: OperationParamType[], operation?: ProcedureProposalOperation): OperationParam[];
-    static parseOperation(_operation: unknown): ProcedureProposalOperation;
-    static isProcedure(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<boolean>;
-    updateCid(cid: string, options?: TransactionOptions): Promise<ethers.Transaction>;
-    updateAdmin(address: string, options?: TransactionOptions): Promise<ethers.Transaction>;
+    static parseOperation(rawOperation: unknown): ProcedureProposalOperation;
+    static isProcedure(address: string, clients: ContractClients): Promise<boolean>;
+    updateCid(cid: string, options?: TransactionOptions): Promise<OrganigramTransaction>;
+    updateAdmin(address: string, options?: TransactionOptions): Promise<OrganigramTransaction>;
     propose(input: {
         cid: string;
         operations: ProcedureProposalOperation[];
@@ -206,27 +208,27 @@ export declare class Procedure {
     signApplyProposal(input: SignedProposalActionInput): Promise<string>;
     proposeBySig(input: SignedProposalInput & {
         signature: string;
-    }): Promise<any>;
+    }): Promise<OrganigramTransaction>;
     getNonce(account: string): Promise<bigint>;
     getTypedDataDomain(): {
         name: string;
         version: string;
         chainId: bigint;
-        verifyingContract: string;
+        verifyingContract: `0x${string}`;
     };
     static createExternalCallOperation({ organAddress, target, data, value, index }: ExternalCallOperationInput): ProcedureProposalOperation;
-    blockProposal(proposalKey: string, reason: string, options?: TransactionOptions): Promise<ContractTransactionReceipt>;
+    blockProposal(proposalKey: string, reason: string, options?: TransactionOptions): Promise<OrganigramTransactionReceipt>;
     blockProposalBySig(input: SignedBlockProposalInput & {
         signature: string;
-    }, options?: TransactionOptions): Promise<ContractTransactionReceipt>;
-    presentProposal(proposalKey: string, options?: TransactionOptions): Promise<ContractTransactionReceipt>;
+    }, options?: TransactionOptions): Promise<OrganigramTransactionReceipt>;
+    presentProposal(proposalKey: string, options?: TransactionOptions): Promise<OrganigramTransactionReceipt>;
     presentProposalBySig(input: SignedProposalActionInput & {
         signature: string;
-    }, options?: TransactionOptions): Promise<ContractTransactionReceipt>;
-    applyProposal(proposalKey: string, options?: TransactionOptions): Promise<ContractTransactionReceipt>;
+    }, options?: TransactionOptions): Promise<OrganigramTransactionReceipt>;
+    applyProposal(proposalKey: string, options?: TransactionOptions): Promise<OrganigramTransactionReceipt>;
     applyProposalBySig(input: SignedProposalActionInput & {
         signature: string;
-    }, options?: TransactionOptions): Promise<ContractTransactionReceipt>;
+    }, options?: TransactionOptions): Promise<OrganigramTransactionReceipt>;
     reloadProposals(): Promise<Procedure>;
     reloadProposal(proposalKey: string): Promise<Procedure>;
     reloadData(): Promise<Procedure>;

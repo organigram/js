@@ -1,5 +1,5 @@
-import deployedAddresses from '@organigram/protocol/deployments.json';
-import { ethers } from 'ethers';
+import deployedAddresses from './deployments';
+import { bytesToHex, getCreate2Address, keccak256, padHex } from 'viem';
 export { deployedAddresses };
 export const handleJsonBigInt = (key, value) => {
     if (typeof value === 'bigint') {
@@ -13,16 +13,20 @@ export function cloneInitCodeHash(implementation) {
         '363d3d373d3d3d363d73' +
         impl +
         '5af43d82803e903d91602b57fd5bf3';
-    return ethers.keccak256(initCode);
+    return keccak256(initCode);
 }
 export const predictContractAddress = ({ type, chainId, salt }) => {
-    return ethers.getCreate2Address(deployedAddresses[chainId]?.OrganigramClient, ethers.zeroPadValue(salt, 32), cloneInitCodeHash(type === 'Organ'
-        ? deployedAddresses[chainId]?.CloneableOrgan
-        : type === 'Asset'
-            ? deployedAddresses[chainId]?.CloneableAsset
-            : deployedAddresses[chainId]?.[type.replace('Erc', 'ERC')]));
+    return getCreate2Address({
+        from: deployedAddresses[chainId]?.OrganigramClient,
+        salt: padHex(salt, { size: 32 }),
+        bytecodeHash: cloneInitCodeHash(type === 'Organ'
+            ? deployedAddresses[chainId]?.CloneableOrgan
+            : type === 'Asset'
+                ? deployedAddresses[chainId]?.CloneableAsset
+                : deployedAddresses[chainId]?.[type.replace('Erc', 'ERC')])
+    });
 };
-export const createRandom32BytesHexId = () => ethers.hexlify(ethers.randomBytes(32));
+export const createRandom32BytesHexId = () => bytesToHex(crypto.getRandomValues(new Uint8Array(32)));
 export const formatSalt = (salt) => {
     if (salt == null) {
         return createRandom32BytesHexId();

@@ -1,10 +1,10 @@
-import { ethers } from 'ethers';
-import { Procedure, ProcedureInput } from '.';
+import { Procedure, type ProcedureInput } from '.';
 import { TransactionOptions } from '../organigramClient';
-import { PopulateInitializeInput, ProcedureTypeName } from './utils';
+import { PopulateInitializeInput, PopulatedTransactionData, ProcedureTypeName } from './utils';
+import { type ContractClients } from '../contracts';
 export declare class NominationProcedure extends Procedure {
     static INTERFACE: string;
-    contract: ethers.Contract;
+    contract?: any;
     type: {
         key: string;
         address: string;
@@ -15,11 +15,9 @@ export declare class NominationProcedure extends Procedure {
         fields: {};
     };
     typeName: ProcedureTypeName;
-    constructor(procedureInput: ProcedureInput & {
-        contract?: ethers.Contract;
-    });
-    static _populateInitialize(input: PopulateInitializeInput): Promise<ethers.ContractTransaction>;
-    static load(address: string, signerOrProvider: ethers.Signer | ethers.Provider, initialProcedure?: ProcedureInput): Promise<NominationProcedure>;
+    constructor(procedureInput: ProcedureInput);
+    static _populateInitialize(input: PopulateInitializeInput, _clients: ContractClients): Promise<PopulatedTransactionData>;
+    static load(address: string, clients: ContractClients, initialProcedure?: ProcedureInput): Promise<NominationProcedure>;
     nominate(proposalKey: string, options?: TransactionOptions): Promise<boolean>;
     signNomination(input: {
         proposalKey: string;

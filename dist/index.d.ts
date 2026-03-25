@@ -9,3 +9,5 @@ export * from './procedure/erc20Vote';
 export * from './procedure/utils';
 export * from './template';
 export * from './utils';
+export { getWalletAddress } from './contracts';
+export type { ContractClients, OrganigramTransaction, OrganigramTransactionReceipt } from './contracts';
