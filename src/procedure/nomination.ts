@@ -1,4 +1,4 @@
-import NominationProcedureContractABI from '@organigram/protocol/artifacts/contracts/procedures/Nomination.sol/NominationProcedure.json'
+import NominationProcedureContractABI from '@organigram/protocol/abi/Nomination.sol/NominationProcedure.json'
 import { encodeFunctionData, zeroAddress } from 'viem'
 
 import { Procedure, type ProcedureInput } from '.'

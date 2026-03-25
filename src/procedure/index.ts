@@ -1,4 +1,4 @@
-import ProcedureContractABI from '@organigram/protocol/artifacts/contracts/Procedure.sol/Procedure.json'
+import ProcedureContractABI from '@organigram/protocol/abi/Procedure.sol/Procedure.json'
 import {
   decodeAbiParameters,
   decodeFunctionResult,
