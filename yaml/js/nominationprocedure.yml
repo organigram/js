@@ -1,0 +1,228 @@
+### YamlMime:TSType
+name: NominationProcedure
+uid: '@organigram/js!NominationProcedure:class'
+package: '@organigram/js!'
+fullName: NominationProcedure
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: class
+constructors:
+  - name: (constructor)(procedureInput)
+    uid: '@organigram/js!NominationProcedure:constructor(1)'
+    package: '@organigram/js!'
+    fullName: (constructor)(procedureInput)
+    summary: Constructs a new instance of the `NominationProcedure` class
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'constructor(procedureInput: ProcedureInput);'
+      parameters:
+        - id: procedureInput
+          description: ''
+          type: <xref uid="@organigram/js!ProcedureInput:interface" />
+properties:
+  - name: contract
+    uid: '@organigram/js!NominationProcedure#contract:member'
+    package: '@organigram/js!'
+    fullName: contract
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'contract?: any;'
+      return:
+        type: any
+  - name: INTERFACE
+    uid: '@organigram/js!NominationProcedure.INTERFACE:member'
+    package: '@organigram/js!'
+    fullName: INTERFACE
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'static INTERFACE: string;'
+      return:
+        type: string
+  - name: type
+    uid: '@organigram/js!NominationProcedure#type:member'
+    package: '@organigram/js!'
+    fullName: type
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        type: {
+                key: string;
+                address: string;
+                metadata: {
+                    label: string;
+                    description: string;
+                };
+                fields: {};
+            };
+      return:
+        type: |-
+          {
+                  key: string;
+                  address: string;
+                  metadata: {
+                      label: string;
+                      description: string;
+                  };
+                  fields: {};
+              }
+  - name: typeName
+    uid: '@organigram/js!NominationProcedure#typeName:member'
+    package: '@organigram/js!'
+    fullName: typeName
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'typeName: ProcedureTypeName;'
+      return:
+        type: <xref uid="@organigram/js!ProcedureTypeName:type" />
+methods:
+  - name: _populateInitialize(input, _clients)
+    uid: '@organigram/js!NominationProcedure._populateInitialize:member(1)'
+    package: '@organigram/js!'
+    fullName: _populateInitialize(input, _clients)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        static _populateInitialize(input: PopulateInitializeInput, _clients: ContractClients):
+        Promise<PopulatedTransactionData>;
+      parameters:
+        - id: input
+          description: ''
+          type: <xref uid="@organigram/js!PopulateInitializeInput:interface" />
+        - id: _clients
+          description: ''
+          type: <xref uid="@organigram/js!ContractClients:type" />
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!PopulatedTransactionData:type" />&gt;
+        description: ''
+  - name: load(address, clients, initialProcedure)
+    uid: '@organigram/js!NominationProcedure.load:member(1)'
+    package: '@organigram/js!'
+    fullName: load(address, clients, initialProcedure)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        static load(address: string, clients: ContractClients, initialProcedure?: ProcedureInput):
+        Promise<NominationProcedure>;
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: clients
+          description: ''
+          type: <xref uid="@organigram/js!ContractClients:type" />
+        - id: initialProcedure
+          description: ''
+          type: <xref uid="@organigram/js!ProcedureInput:interface" />
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!NominationProcedure:class" />&gt;
+        description: ''
+  - name: nominate(proposalKey, options)
+    uid: '@organigram/js!NominationProcedure#nominate:member(1)'
+    package: '@organigram/js!'
+    fullName: nominate(proposalKey, options)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'nominate(proposalKey: string, options?: TransactionOptions): Promise<boolean>;'
+      parameters:
+        - id: proposalKey
+          description: ''
+          type: string
+        - id: options
+          description: ''
+          type: <xref uid="@organigram/js!TransactionOptions:interface" />
+      return:
+        type: Promise&lt;boolean&gt;
+        description: ''
+  - name: nominateBySig(input)
+    uid: '@organigram/js!NominationProcedure#nominateBySig:member(1)'
+    package: '@organigram/js!'
+    fullName: nominateBySig(input)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        nominateBySig(input: {
+                proposalKey: string;
+                nonce: bigint;
+                deadline: bigint | number;
+                signature: string;
+            }): Promise<boolean>;
+      parameters:
+        - id: input
+          description: ''
+          type: |-
+            {
+                    proposalKey: string;
+                    nonce: bigint;
+                    deadline: bigint | number;
+                    signature: string;
+                }
+      return:
+        type: Promise&lt;boolean&gt;
+        description: ''
+  - name: signNomination(input)
+    uid: '@organigram/js!NominationProcedure#signNomination:member(1)'
+    package: '@organigram/js!'
+    fullName: signNomination(input)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        signNomination(input: {
+                proposalKey: string;
+                nonce: bigint;
+                deadline: bigint | number;
+            }): Promise<string>;
+      parameters:
+        - id: input
+          description: ''
+          type: |-
+            {
+                    proposalKey: string;
+                    nonce: bigint;
+                    deadline: bigint | number;
+                }
+      return:
+        type: Promise&lt;string&gt;
+        description: ''
+extends: <xref uid="@organigram/js!Procedure:class" />

@@ -1,7 +1,28 @@
-const fs = require('fs')
-const path = require('path')
-const files = require('./docs.json')
-const yaml = require('js-yaml')
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath, pathToFileURL } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const docsJsonPath = path.resolve(__dirname, './docs.json')
+const pnpmRoot = path.resolve(__dirname, '../../../node_modules/.pnpm')
+const yamlPackageDir = fs
+  .readdirSync(pnpmRoot)
+  .filter(entry => entry.startsWith('js-yaml@'))
+  .sort()
+  .at(-1)
+
+if (yamlPackageDir == null) {
+  throw new Error('Unable to locate js-yaml in the pnpm store.')
+}
+
+const { default: yaml } = await import(
+  pathToFileURL(
+    path.join(pnpmRoot, yamlPackageDir, 'node_modules/js-yaml/index.js')
+  ).href
+)
+
+const companyUrl = process.env.NEXT_PUBLIC_COMPANY_URL ?? 'Organigram.ai'
 
 const sanitizeMDX = str =>
   str.replace('{', '\\{').replace('}', '\\}').replace('!', '\\!')
@@ -70,7 +91,7 @@ ${declarations.syntax}
 }
 
 ${declarations.constructors
-  ?.map(member => jsConstructorTemplate(member, files))
+  ?.map(member => jsConstructorTemplate(member))
   ?.join('')}
 
 ### Properties - ++dnt++${declarations.name}:
@@ -175,7 +196,7 @@ const markdown = async ({ files }) => {
     let writeStream
     try {
       writeStream = fs.createWriteStream(
-        '../../stack/assets/docs/reference/js.mdx',
+        path.resolve(__dirname, '../../../stack/assets/docs/reference/js.mdx'),
         { flags: 'w' }
       )
     } catch (err) {
@@ -191,7 +212,7 @@ const markdown = async ({ files }) => {
 
 #  Typescript reference ⚙️
 
-The official Javascript/Typescript documentation for the contracts and types used in the ${process.env.NEXT_PUBLIC_COMPANY_URL} stack.
+The official Javascript/Typescript documentation for the contracts and types used in the ${companyUrl} stack.
 
 `)
     if (files != null) {
@@ -228,7 +249,7 @@ const walkPath = dir => {
   return results
 }
 
-function build() {
+async function build() {
   // If typescript:
 
   // With API Extractor:
@@ -249,13 +270,15 @@ function build() {
   // )
 
   // With API Documenter (yaml):
-  const filesPaths = walkPath('./yaml')
-  const files = filesPaths
+  const filePaths = walkPath(path.resolve(__dirname, '../yaml'))
+    .filter(filePath => filePath.endsWith('.yml'))
+    .filter(filePath => !filePath.endsWith(`${path.sep}toc.yml`))
+    .sort()
+  const files = filePaths
     .map(filePath => yaml.load(fs.readFileSync(filePath, 'utf8')))
-    .slice(0, -1)
-  fs.writeFileSync('./scripts/docs.json', JSON.stringify(files), 'utf8')
-  markdown({ files })
+  fs.writeFileSync(docsJsonPath, JSON.stringify(files), 'utf8')
+  await markdown({ files })
   console.info('done!')
 }
 
-build()
+await build()

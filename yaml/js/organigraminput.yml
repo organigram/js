@@ -1,0 +1,26 @@
+### YamlMime:TSTypeAlias
+name: OrganigramInput
+uid: '@organigram/js!OrganigramInput:type'
+package: '@organigram/js!'
+fullName: OrganigramInput
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+syntax: |-
+  export type OrganigramInput = {
+      id?: string | null;
+      slug?: string | null;
+      name?: string | null;
+      description?: string | null;
+      chainId?: string | null;
+      organs: OrganInput[];
+      procedures: ProcedureInput[];
+      assets: AssetInput[];
+      organigramClient?: OrganigramClient | null;
+      walletClient?: WalletClient | null;
+      publicClient?: PublicClient | null;
+      contractAddresses?: string[] | null;
+      workspaceId?: string | null;
+  };

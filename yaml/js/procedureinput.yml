@@ -1,0 +1,272 @@
+### YamlMime:TSType
+name: ProcedureInput
+uid: '@organigram/js!ProcedureInput:interface'
+package: '@organigram/js!'
+fullName: ProcedureInput
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: address
+    uid: '@organigram/js!ProcedureInput#address:member'
+    package: '@organigram/js!'
+    fullName: address
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'address?: string | null;'
+      return:
+        type: string | null
+  - name: chainId
+    uid: '@organigram/js!ProcedureInput#chainId:member'
+    package: '@organigram/js!'
+    fullName: chainId
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'chainId?: string | null;'
+      return:
+        type: string | null
+  - name: cid
+    uid: '@organigram/js!ProcedureInput#cid:member'
+    package: '@organigram/js!'
+    fullName: cid
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'cid?: string | null;'
+      return:
+        type: string | null
+  - name: data
+    uid: '@organigram/js!ProcedureInput#data:member'
+    package: '@organigram/js!'
+    fullName: data
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'data?: string | null;'
+      return:
+        type: string | null
+  - name: deciders
+    uid: '@organigram/js!ProcedureInput#deciders:member'
+    package: '@organigram/js!'
+    fullName: deciders
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'deciders: string;'
+      return:
+        type: string
+  - name: description
+    uid: '@organigram/js!ProcedureInput#description:member'
+    package: '@organigram/js!'
+    fullName: description
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'description?: string | null;'
+      return:
+        type: string | null
+  - name: forwarder
+    uid: '@organigram/js!ProcedureInput#forwarder:member'
+    package: '@organigram/js!'
+    fullName: forwarder
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'forwarder?: string | null;'
+      return:
+        type: string | null
+  - name: isDeployed
+    uid: '@organigram/js!ProcedureInput#isDeployed:member'
+    package: '@organigram/js!'
+    fullName: isDeployed
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'isDeployed?: boolean | null;'
+      return:
+        type: boolean | null
+  - name: metadata
+    uid: '@organigram/js!ProcedureInput#metadata:member'
+    package: '@organigram/js!'
+    fullName: metadata
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'metadata?: string | null;'
+      return:
+        type: string | null
+  - name: moderators
+    uid: '@organigram/js!ProcedureInput#moderators:member'
+    package: '@organigram/js!'
+    fullName: moderators
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'moderators?: string | null;'
+      return:
+        type: string | null
+  - name: name
+    uid: '@organigram/js!ProcedureInput#name:member'
+    package: '@organigram/js!'
+    fullName: name
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'name?: string | null;'
+      return:
+        type: string | null
+  - name: organigramId
+    uid: '@organigram/js!ProcedureInput#organigramId:member'
+    package: '@organigram/js!'
+    fullName: organigramId
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'organigramId?: string | null;'
+      return:
+        type: string | null
+  - name: proposals
+    uid: '@organigram/js!ProcedureInput#proposals:member'
+    package: '@organigram/js!'
+    fullName: proposals
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'proposals?: ProcedureProposal[] | null;'
+      return:
+        type: <xref uid="@organigram/js!ProcedureProposal:interface" />[] | null
+  - name: proposers
+    uid: '@organigram/js!ProcedureInput#proposers:member'
+    package: '@organigram/js!'
+    fullName: proposers
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'proposers?: string | null;'
+      return:
+        type: string | null
+  - name: publicClient
+    uid: '@organigram/js!ProcedureInput#publicClient:member'
+    package: '@organigram/js!'
+    fullName: publicClient
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'publicClient?: PublicClient | null;'
+      return:
+        type: <xref uid="viem!PublicClient:type" /> | null
+  - name: salt
+    uid: '@organigram/js!ProcedureInput#salt:member'
+    package: '@organigram/js!'
+    fullName: salt
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'salt?: string | null;'
+      return:
+        type: string | null
+  - name: type
+    uid: '@organigram/js!ProcedureInput#type:member'
+    package: '@organigram/js!'
+    fullName: type
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'type?: ProcedureType;'
+      return:
+        type: <xref uid="@organigram/js!ProcedureType:interface" />
+  - name: typeName
+    uid: '@organigram/js!ProcedureInput#typeName:member'
+    package: '@organigram/js!'
+    fullName: typeName
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'typeName: string;'
+      return:
+        type: string
+  - name: walletClient
+    uid: '@organigram/js!ProcedureInput#walletClient:member'
+    package: '@organigram/js!'
+    fullName: walletClient
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'walletClient?: WalletClient | null;'
+      return:
+        type: <xref uid="viem!WalletClient:type" /> | null
+  - name: withModeration
+    uid: '@organigram/js!ProcedureInput#withModeration:member'
+    package: '@organigram/js!'
+    fullName: withModeration
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'withModeration?: boolean | null;'
+      return:
+        type: boolean | null

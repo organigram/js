@@ -1,0 +1,206 @@
+### YamlMime:TSType
+name: Asset
+uid: '@organigram/js!Asset:class'
+package: '@organigram/js!'
+fullName: Asset
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: class
+constructors:
+  - name: (constructor)(input)
+    uid: '@organigram/js!Asset:constructor(1)'
+    package: '@organigram/js!'
+    fullName: (constructor)(input)
+    summary: Constructs a new instance of the `Asset` class
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'constructor(input: AssetInput);'
+      parameters:
+        - id: input
+          description: ''
+          type: <xref uid="@organigram/js!AssetInput:interface" />
+properties:
+  - name: address
+    uid: '@organigram/js!Asset#address:member'
+    package: '@organigram/js!'
+    fullName: address
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'address: string;'
+      return:
+        type: string
+  - name: chainId
+    uid: '@organigram/js!Asset#chainId:member'
+    package: '@organigram/js!'
+    fullName: chainId
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'chainId: string;'
+      return:
+        type: string
+  - name: description
+    uid: '@organigram/js!Asset#description:member'
+    package: '@organigram/js!'
+    fullName: description
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'description: string;'
+      return:
+        type: string
+  - name: image
+    uid: '@organigram/js!Asset#image:member'
+    package: '@organigram/js!'
+    fullName: image
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'image?: string | null;'
+      return:
+        type: string | null
+  - name: initialSupply
+    uid: '@organigram/js!Asset#initialSupply:member'
+    package: '@organigram/js!'
+    fullName: initialSupply
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'initialSupply: number;'
+      return:
+        type: number
+  - name: isDeployed
+    uid: '@organigram/js!Asset#isDeployed:member'
+    package: '@organigram/js!'
+    fullName: isDeployed
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'isDeployed: boolean;'
+      return:
+        type: boolean
+  - name: load
+    uid: '@organigram/js!Asset.load:member'
+    package: '@organigram/js!'
+    fullName: load
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        static load: (address: string, clients: ContractClients, initialAsset?: AssetInput) => Promise<(Asset & {
+                userBalance: string;
+            }) | undefined>;
+      return:
+        type: >-
+          (address: string, clients: <xref uid="@organigram/js!ContractClients:type" />, initialAsset?: <xref
+          uid="@organigram/js!AssetInput:interface" />) =&gt; Promise&lt;(<xref uid="@organigram/js!Asset:class" /> & {
+                  userBalance: string;
+              }) | undefined&gt;
+  - name: name
+    uid: '@organigram/js!Asset#name:member'
+    package: '@organigram/js!'
+    fullName: name
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'name: string;'
+      return:
+        type: string
+  - name: organigramId
+    uid: '@organigram/js!Asset#organigramId:member'
+    package: '@organigram/js!'
+    fullName: organigramId
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'organigramId?: string | null;'
+      return:
+        type: string | null
+  - name: salt
+    uid: '@organigram/js!Asset#salt:member'
+    package: '@organigram/js!'
+    fullName: salt
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'salt?: string | null;'
+      return:
+        type: string | null
+  - name: symbol
+    uid: '@organigram/js!Asset#symbol:member'
+    package: '@organigram/js!'
+    fullName: symbol
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'symbol: string;'
+      return:
+        type: string
+  - name: userBalance
+    uid: '@organigram/js!Asset#userBalance:member'
+    package: '@organigram/js!'
+    fullName: userBalance
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'userBalance: string;'
+      return:
+        type: string
+methods:
+  - name: toJson()
+    uid: '@organigram/js!Asset#toJson:member(1)'
+    package: '@organigram/js!'
+    fullName: toJson()
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'toJson(): AssetJson;'
+      return:
+        type: <xref uid="@organigram/js!AssetJson:interface" />
+        description: ''

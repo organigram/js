@@ -1,0 +1,168 @@
+### YamlMime:TSType
+name: DeployProceduresInput
+uid: '@organigram/js!DeployProceduresInput:interface'
+package: '@organigram/js!'
+fullName: DeployProceduresInput
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: args
+    uid: '@organigram/js!DeployProceduresInput#args:member'
+    package: '@organigram/js!'
+    fullName: args
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'args?: string[];'
+      return:
+        type: string[]
+  - name: chainId
+    uid: '@organigram/js!DeployProceduresInput#chainId:member'
+    package: '@organigram/js!'
+    fullName: chainId
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'chainId?: string | null;'
+      return:
+        type: string | null
+  - name: cid
+    uid: '@organigram/js!DeployProceduresInput#cid:member'
+    package: '@organigram/js!'
+    fullName: cid
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'cid?: string | null;'
+      return:
+        type: string | null
+  - name: data
+    uid: '@organigram/js!DeployProceduresInput#data:member'
+    package: '@organigram/js!'
+    fullName: data
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'data?: string;'
+      return:
+        type: string
+  - name: deciders
+    uid: '@organigram/js!DeployProceduresInput#deciders:member'
+    package: '@organigram/js!'
+    fullName: deciders
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'deciders: string;'
+      return:
+        type: string
+  - name: forwarder
+    uid: '@organigram/js!DeployProceduresInput#forwarder:member'
+    package: '@organigram/js!'
+    fullName: forwarder
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'forwarder?: string | null;'
+      return:
+        type: string | null
+  - name: moderators
+    uid: '@organigram/js!DeployProceduresInput#moderators:member'
+    package: '@organigram/js!'
+    fullName: moderators
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'moderators?: string | null;'
+      return:
+        type: string | null
+  - name: options
+    uid: '@organigram/js!DeployProceduresInput#options:member'
+    package: '@organigram/js!'
+    fullName: options
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'options?: TransactionOptions;'
+      return:
+        type: <xref uid="@organigram/js!TransactionOptions:interface" />
+  - name: proposers
+    uid: '@organigram/js!DeployProceduresInput#proposers:member'
+    package: '@organigram/js!'
+    fullName: proposers
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'proposers?: string | null;'
+      return:
+        type: string | null
+  - name: salt
+    uid: '@organigram/js!DeployProceduresInput#salt:member'
+    package: '@organigram/js!'
+    fullName: salt
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'salt?: string | null;'
+      return:
+        type: string | null
+  - name: typeName
+    uid: '@organigram/js!DeployProceduresInput#typeName:member'
+    package: '@organigram/js!'
+    fullName: typeName
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'typeName: ProcedureTypeName;'
+      return:
+        type: <xref uid="@organigram/js!ProcedureTypeName:type" />
+  - name: withModeration
+    uid: '@organigram/js!DeployProceduresInput#withModeration:member'
+    package: '@organigram/js!'
+    fullName: withModeration
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'withModeration?: boolean | null;'
+      return:
+        type: boolean | null

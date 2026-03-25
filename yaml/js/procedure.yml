@@ -1,0 +1,988 @@
+### YamlMime:TSType
+name: Procedure
+uid: '@organigram/js!Procedure:class'
+package: '@organigram/js!'
+fullName: Procedure
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: class
+constructors:
+  - name: >-
+      (constructor)({ address, deciders, typeName, name, description, salt, cid, chainId, publicClient, walletClient,
+      metadata, proposers, withModeration, forwarder, moderators, proposals, isDeployed, type, data, organigramId },
+      input)
+    uid: '@organigram/js!Procedure:constructor(1)'
+    package: '@organigram/js!'
+    fullName: >-
+      (constructor)({ address, deciders, typeName, name, description, salt, cid, chainId, publicClient, walletClient,
+      metadata, proposers, withModeration, forwarder, moderators, proposals, isDeployed, type, data, organigramId },
+      input)
+    summary: Constructs a new instance of the `Procedure` class
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'constructor(input: ProcedureInput);'
+      parameters:
+        - id: >-
+            { address, deciders, typeName, name, description, salt, cid, chainId, publicClient, walletClient, metadata,
+            proposers, withModeration, forwarder, moderators, proposals, isDeployed, type, data, organigramId }
+          description: ''
+          type: ''
+        - id: input
+          description: ''
+          type: <xref uid="@organigram/js!ProcedureInput:interface" />
+properties:
+  - name: address
+    uid: '@organigram/js!Procedure#address:member'
+    package: '@organigram/js!'
+    fullName: address
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'address: string;'
+      return:
+        type: string
+  - name: chainId
+    uid: '@organigram/js!Procedure#chainId:member'
+    package: '@organigram/js!'
+    fullName: chainId
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'chainId: string;'
+      return:
+        type: string
+  - name: cid
+    uid: '@organigram/js!Procedure#cid:member'
+    package: '@organigram/js!'
+    fullName: cid
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'cid: string;'
+      return:
+        type: string
+  - name: contract
+    uid: '@organigram/js!Procedure#contract:member'
+    package: '@organigram/js!'
+    fullName: contract
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'contract?: any;'
+      return:
+        type: any
+  - name: data
+    uid: '@organigram/js!Procedure#data:member'
+    package: '@organigram/js!'
+    fullName: data
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'data: string;'
+      return:
+        type: string
+  - name: deciders
+    uid: '@organigram/js!Procedure#deciders:member'
+    package: '@organigram/js!'
+    fullName: deciders
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'deciders: string;'
+      return:
+        type: string
+  - name: description
+    uid: '@organigram/js!Procedure#description:member'
+    package: '@organigram/js!'
+    fullName: description
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'description: string;'
+      return:
+        type: string
+  - name: forwarder
+    uid: '@organigram/js!Procedure#forwarder:member'
+    package: '@organigram/js!'
+    fullName: forwarder
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'forwarder: string;'
+      return:
+        type: string
+  - name: INTERFACE
+    uid: '@organigram/js!Procedure.INTERFACE:member'
+    package: '@organigram/js!'
+    fullName: INTERFACE
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'static INTERFACE: string;'
+      return:
+        type: string
+  - name: isDeployed
+    uid: '@organigram/js!Procedure#isDeployed:member'
+    package: '@organigram/js!'
+    fullName: isDeployed
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'isDeployed: boolean;'
+      return:
+        type: boolean
+  - name: metadata
+    uid: '@organigram/js!Procedure#metadata:member'
+    package: '@organigram/js!'
+    fullName: metadata
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'metadata: string;'
+      return:
+        type: string
+  - name: moderators
+    uid: '@organigram/js!Procedure#moderators:member'
+    package: '@organigram/js!'
+    fullName: moderators
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'moderators: string;'
+      return:
+        type: string
+  - name: name
+    uid: '@organigram/js!Procedure#name:member'
+    package: '@organigram/js!'
+    fullName: name
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'name: string;'
+      return:
+        type: string
+  - name: OPERATIONS_FUNCTIONS
+    uid: '@organigram/js!Procedure.OPERATIONS_FUNCTIONS:member'
+    package: '@organigram/js!'
+    fullName: OPERATIONS_FUNCTIONS
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'static OPERATIONS_FUNCTIONS: ProcedureProposalOperationFunction[];'
+      return:
+        type: <xref uid="@organigram/js!ProcedureProposalOperationFunction:interface" />[]
+  - name: organigramId
+    uid: '@organigram/js!Procedure#organigramId:member'
+    package: '@organigram/js!'
+    fullName: organigramId
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'organigramId: string;'
+      return:
+        type: string
+  - name: proposals
+    uid: '@organigram/js!Procedure#proposals:member'
+    package: '@organigram/js!'
+    fullName: proposals
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'proposals: ProcedureProposal[];'
+      return:
+        type: <xref uid="@organigram/js!ProcedureProposal:interface" />[]
+  - name: proposers
+    uid: '@organigram/js!Procedure#proposers:member'
+    package: '@organigram/js!'
+    fullName: proposers
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'proposers: string;'
+      return:
+        type: string
+  - name: publicClient
+    uid: '@organigram/js!Procedure#publicClient:member'
+    package: '@organigram/js!'
+    fullName: publicClient
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'publicClient?: PublicClient;'
+      return:
+        type: <xref uid="viem!PublicClient:type" />
+  - name: salt
+    uid: '@organigram/js!Procedure#salt:member'
+    package: '@organigram/js!'
+    fullName: salt
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'salt?: string;'
+      return:
+        type: string
+  - name: toJson
+    uid: '@organigram/js!Procedure#toJson:member'
+    package: '@organigram/js!'
+    fullName: toJson
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'toJson: () => ProcedureJson;'
+      return:
+        type: () =&gt; <xref uid="@organigram/js!ProcedureJson:type" />
+  - name: type
+    uid: '@organigram/js!Procedure#type:member'
+    package: '@organigram/js!'
+    fullName: type
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'type: ProcedureType;'
+      return:
+        type: <xref uid="@organigram/js!ProcedureType:interface" />
+  - name: typeName
+    uid: '@organigram/js!Procedure#typeName:member'
+    package: '@organigram/js!'
+    fullName: typeName
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'typeName: ProcedureTypeName;'
+      return:
+        type: <xref uid="@organigram/js!ProcedureTypeName:type" />
+  - name: walletClient
+    uid: '@organigram/js!Procedure#walletClient:member'
+    package: '@organigram/js!'
+    fullName: walletClient
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'walletClient?: WalletClient;'
+      return:
+        type: <xref uid="viem!WalletClient:type" />
+  - name: withModeration
+    uid: '@organigram/js!Procedure#withModeration:member'
+    package: '@organigram/js!'
+    fullName: withModeration
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'withModeration: boolean;'
+      return:
+        type: boolean
+methods:
+  - name: _extractParams(types, operation)
+    uid: '@organigram/js!Procedure._extractParams:member(1)'
+    package: '@organigram/js!'
+    fullName: _extractParams(types, operation)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'static _extractParams(types: OperationParamType[], operation?: ProcedureProposalOperation): OperationParam[];'
+      parameters:
+        - id: types
+          description: ''
+          type: <xref uid="@organigram/js!OperationParamType:type" />[]
+        - id: operation
+          description: ''
+          type: <xref uid="@organigram/js!ProcedureProposalOperation:interface" />
+      return:
+        type: <xref uid="@organigram/js!OperationParam:interface" />[]
+        description: ''
+  - name: _populateInitialize(_populateInitializeInput, _clients)
+    uid: '@organigram/js!Procedure._populateInitialize:member(1)'
+    package: '@organigram/js!'
+    fullName: _populateInitialize(_populateInitializeInput, _clients)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        static _populateInitialize(_populateInitializeInput: PopulateInitializeInput, _clients: ContractClients):
+        Promise<PopulatedTransactionData>;
+      parameters:
+        - id: _populateInitializeInput
+          description: ''
+          type: <xref uid="@organigram/js!PopulateInitializeInput:interface" />
+        - id: _clients
+          description: ''
+          type: <xref uid="@organigram/js!ContractClients:type" />
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!PopulatedTransactionData:type" />&gt;
+        description: ''
+  - name: _stringifyParamType(type)
+    uid: '@organigram/js!Procedure._stringifyParamType:member(1)'
+    package: '@organigram/js!'
+    fullName: _stringifyParamType(type)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'static _stringifyParamType(type: OperationParamType): string;'
+      parameters:
+        - id: type
+          description: ''
+          type: <xref uid="@organigram/js!OperationParamType:type" />
+      return:
+        type: string
+        description: ''
+  - name: applyProposal(proposalKey, options)
+    uid: '@organigram/js!Procedure#applyProposal:member(1)'
+    package: '@organigram/js!'
+    fullName: applyProposal(proposalKey, options)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'applyProposal(proposalKey: string, options?: TransactionOptions): Promise<OrganigramTransactionReceipt>;'
+      parameters:
+        - id: proposalKey
+          description: ''
+          type: string
+        - id: options
+          description: ''
+          type: <xref uid="@organigram/js!TransactionOptions:interface" />
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!OrganigramTransactionReceipt:type" />&gt;
+        description: ''
+  - name: applyProposalBySig(input, options)
+    uid: '@organigram/js!Procedure#applyProposalBySig:member(1)'
+    package: '@organigram/js!'
+    fullName: applyProposalBySig(input, options)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        applyProposalBySig(input: SignedProposalActionInput & {
+                signature: string;
+            }, options?: TransactionOptions): Promise<OrganigramTransactionReceipt>;
+      parameters:
+        - id: input
+          description: ''
+          type: |-
+            <xref uid="@organigram/js!SignedProposalActionInput:interface" /> & {
+                    signature: string;
+                }
+        - id: options
+          description: ''
+          type: <xref uid="@organigram/js!TransactionOptions:interface" />
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!OrganigramTransactionReceipt:type" />&gt;
+        description: ''
+  - name: blockProposal(proposalKey, reason, options)
+    uid: '@organigram/js!Procedure#blockProposal:member(1)'
+    package: '@organigram/js!'
+    fullName: blockProposal(proposalKey, reason, options)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        blockProposal(proposalKey: string, reason: string, options?: TransactionOptions):
+        Promise<OrganigramTransactionReceipt>;
+      parameters:
+        - id: proposalKey
+          description: ''
+          type: string
+        - id: reason
+          description: ''
+          type: string
+        - id: options
+          description: ''
+          type: <xref uid="@organigram/js!TransactionOptions:interface" />
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!OrganigramTransactionReceipt:type" />&gt;
+        description: ''
+  - name: blockProposalBySig(input, options)
+    uid: '@organigram/js!Procedure#blockProposalBySig:member(1)'
+    package: '@organigram/js!'
+    fullName: blockProposalBySig(input, options)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        blockProposalBySig(input: SignedBlockProposalInput & {
+                signature: string;
+            }, options?: TransactionOptions): Promise<OrganigramTransactionReceipt>;
+      parameters:
+        - id: input
+          description: ''
+          type: |-
+            <xref uid="@organigram/js!SignedBlockProposalInput:interface" /> & {
+                    signature: string;
+                }
+        - id: options
+          description: ''
+          type: <xref uid="@organigram/js!TransactionOptions:interface" />
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!OrganigramTransactionReceipt:type" />&gt;
+        description: ''
+  - name: createExternalCallOperation({ organAddress, target, data, value, index }, input)
+    uid: '@organigram/js!Procedure.createExternalCallOperation:member(1)'
+    package: '@organigram/js!'
+    fullName: createExternalCallOperation({ organAddress, target, data, value, index }, input)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'static createExternalCallOperation(input: ExternalCallOperationInput): ProcedureProposalOperation;'
+      parameters:
+        - id: '{ organAddress, target, data, value, index }'
+          description: ''
+          type: ''
+        - id: input
+          description: ''
+          type: <xref uid="@organigram/js!ExternalCallOperationInput:interface" />
+      return:
+        type: <xref uid="@organigram/js!ProcedureProposalOperation:interface" />
+        description: ''
+  - name: getClients()
+    uid: '@organigram/js!Procedure#getClients:member(1)'
+    package: '@organigram/js!'
+    fullName: getClients()
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'protected getClients(): ContractClients;'
+      return:
+        type: <xref uid="@organigram/js!ContractClients:type" />
+        description: ''
+  - name: getNonce(account)
+    uid: '@organigram/js!Procedure#getNonce:member(1)'
+    package: '@organigram/js!'
+    fullName: getNonce(account)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'getNonce(account: string): Promise<bigint>;'
+      parameters:
+        - id: account
+          description: ''
+          type: string
+      return:
+        type: Promise&lt;bigint&gt;
+        description: ''
+  - name: getTypedDataDomain()
+    uid: '@organigram/js!Procedure#getTypedDataDomain:member(1)'
+    package: '@organigram/js!'
+    fullName: getTypedDataDomain()
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        getTypedDataDomain(): {
+                name: string;
+                version: string;
+                chainId: bigint;
+                verifyingContract: `0x${string}`;
+            };
+      return:
+        type: |-
+          {
+                  name: string;
+                  version: string;
+                  chainId: bigint;
+                  verifyingContract: `0x${string}`;
+              }
+        description: ''
+  - name: isProcedure(address, clients)
+    uid: '@organigram/js!Procedure.isProcedure:member(1)'
+    package: '@organigram/js!'
+    fullName: isProcedure(address, clients)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'static isProcedure(address: string, clients: ContractClients): Promise<boolean>;'
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: clients
+          description: ''
+          type: <xref uid="@organigram/js!ContractClients:type" />
+      return:
+        type: Promise&lt;boolean&gt;
+        description: ''
+  - name: load(address, clients, initialProcedure)
+    uid: '@organigram/js!Procedure.load:member(1)'
+    package: '@organigram/js!'
+    fullName: load(address, clients, initialProcedure)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'static load(address: string, clients: ContractClients, initialProcedure?: ProcedureInput): Promise<Procedure>;'
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: clients
+          description: ''
+          type: <xref uid="@organigram/js!ContractClients:type" />
+        - id: initialProcedure
+          description: ''
+          type: <xref uid="@organigram/js!ProcedureInput:interface" />
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!Procedure:class" />&gt;
+        description: ''
+  - name: loadData(address, clients)
+    uid: '@organigram/js!Procedure.loadData:member(1)'
+    package: '@organigram/js!'
+    fullName: loadData(address, clients)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'static loadData(address: string, clients: ContractClients): Promise<ProcedureContractData>;'
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: clients
+          description: ''
+          type: <xref uid="@organigram/js!ContractClients:type" />
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!~ProcedureContractData:type" />&gt;
+        description: ''
+  - name: loadProposal(address, proposalKey, clients)
+    uid: '@organigram/js!Procedure.loadProposal:member(1)'
+    package: '@organigram/js!'
+    fullName: loadProposal(address, proposalKey, clients)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'static loadProposal(address: string, proposalKey: string, clients: ContractClients): Promise<ProcedureProposal>;'
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: proposalKey
+          description: ''
+          type: string
+        - id: clients
+          description: ''
+          type: <xref uid="@organigram/js!ContractClients:type" />
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!ProcedureProposal:interface" />&gt;
+        description: ''
+  - name: loadProposals(address, clients, data)
+    uid: '@organigram/js!Procedure.loadProposals:member(1)'
+    package: '@organigram/js!'
+    fullName: loadProposals(address, clients, data)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        static loadProposals(address: string, clients: ContractClients, data?: ProcedureContractData):
+        Promise<ProcedureProposal[]>;
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: clients
+          description: ''
+          type: <xref uid="@organigram/js!ContractClients:type" />
+        - id: data
+          description: ''
+          type: <xref uid="@organigram/js!~ProcedureContractData:type" />
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!ProcedureProposal:interface" />[]&gt;
+        description: ''
+  - name: parseOperation(rawOperation)
+    uid: '@organigram/js!Procedure.parseOperation:member(1)'
+    package: '@organigram/js!'
+    fullName: parseOperation(rawOperation)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'static parseOperation(rawOperation: unknown): ProcedureProposalOperation;'
+      parameters:
+        - id: rawOperation
+          description: ''
+          type: unknown
+      return:
+        type: <xref uid="@organigram/js!ProcedureProposalOperation:interface" />
+        description: ''
+  - name: presentProposal(proposalKey, options)
+    uid: '@organigram/js!Procedure#presentProposal:member(1)'
+    package: '@organigram/js!'
+    fullName: presentProposal(proposalKey, options)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'presentProposal(proposalKey: string, options?: TransactionOptions): Promise<OrganigramTransactionReceipt>;'
+      parameters:
+        - id: proposalKey
+          description: ''
+          type: string
+        - id: options
+          description: ''
+          type: <xref uid="@organigram/js!TransactionOptions:interface" />
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!OrganigramTransactionReceipt:type" />&gt;
+        description: ''
+  - name: presentProposalBySig(input, options)
+    uid: '@organigram/js!Procedure#presentProposalBySig:member(1)'
+    package: '@organigram/js!'
+    fullName: presentProposalBySig(input, options)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        presentProposalBySig(input: SignedProposalActionInput & {
+                signature: string;
+            }, options?: TransactionOptions): Promise<OrganigramTransactionReceipt>;
+      parameters:
+        - id: input
+          description: ''
+          type: |-
+            <xref uid="@organigram/js!SignedProposalActionInput:interface" /> & {
+                    signature: string;
+                }
+        - id: options
+          description: ''
+          type: <xref uid="@organigram/js!TransactionOptions:interface" />
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!OrganigramTransactionReceipt:type" />&gt;
+        description: ''
+  - name: propose(input)
+    uid: '@organigram/js!Procedure#propose:member(1)'
+    package: '@organigram/js!'
+    fullName: propose(input)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        propose(input: {
+                cid: string;
+                operations: ProcedureProposalOperation[];
+                options?: TransactionOptions;
+            }): Promise<ProcedureProposal>;
+      parameters:
+        - id: input
+          description: ''
+          type: |-
+            {
+                    cid: string;
+                    operations: <xref uid="@organigram/js!ProcedureProposalOperation:interface" />[];
+                    options?: <xref uid="@organigram/js!TransactionOptions:interface" />;
+                }
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!ProcedureProposal:interface" />&gt;
+        description: ''
+  - name: proposeBySig(input)
+    uid: '@organigram/js!Procedure#proposeBySig:member(1)'
+    package: '@organigram/js!'
+    fullName: proposeBySig(input)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        proposeBySig(input: SignedProposalInput & {
+                signature: string;
+            }): Promise<OrganigramTransaction>;
+      parameters:
+        - id: input
+          description: ''
+          type: |-
+            <xref uid="@organigram/js!SignedProposalInput:interface" /> & {
+                    signature: string;
+                }
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!OrganigramTransaction:type" />&gt;
+        description: ''
+  - name: reloadData()
+    uid: '@organigram/js!Procedure#reloadData:member(1)'
+    package: '@organigram/js!'
+    fullName: reloadData()
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'reloadData(): Promise<Procedure>;'
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!Procedure:class" />&gt;
+        description: ''
+  - name: reloadProposal(proposalKey)
+    uid: '@organigram/js!Procedure#reloadProposal:member(1)'
+    package: '@organigram/js!'
+    fullName: reloadProposal(proposalKey)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'reloadProposal(proposalKey: string): Promise<Procedure>;'
+      parameters:
+        - id: proposalKey
+          description: ''
+          type: string
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!Procedure:class" />&gt;
+        description: ''
+  - name: reloadProposals()
+    uid: '@organigram/js!Procedure#reloadProposals:member(1)'
+    package: '@organigram/js!'
+    fullName: reloadProposals()
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'reloadProposals(): Promise<Procedure>;'
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!Procedure:class" />&gt;
+        description: ''
+  - name: signApplyProposal(input)
+    uid: '@organigram/js!Procedure#signApplyProposal:member(1)'
+    package: '@organigram/js!'
+    fullName: signApplyProposal(input)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'signApplyProposal(input: SignedProposalActionInput): Promise<string>;'
+      parameters:
+        - id: input
+          description: ''
+          type: <xref uid="@organigram/js!SignedProposalActionInput:interface" />
+      return:
+        type: Promise&lt;string&gt;
+        description: ''
+  - name: signBlockProposal(input)
+    uid: '@organigram/js!Procedure#signBlockProposal:member(1)'
+    package: '@organigram/js!'
+    fullName: signBlockProposal(input)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'signBlockProposal(input: SignedBlockProposalInput): Promise<string>;'
+      parameters:
+        - id: input
+          description: ''
+          type: <xref uid="@organigram/js!SignedBlockProposalInput:interface" />
+      return:
+        type: Promise&lt;string&gt;
+        description: ''
+  - name: signPresentProposal(input)
+    uid: '@organigram/js!Procedure#signPresentProposal:member(1)'
+    package: '@organigram/js!'
+    fullName: signPresentProposal(input)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'signPresentProposal(input: SignedProposalActionInput): Promise<string>;'
+      parameters:
+        - id: input
+          description: ''
+          type: <xref uid="@organigram/js!SignedProposalActionInput:interface" />
+      return:
+        type: Promise&lt;string&gt;
+        description: ''
+  - name: signProposal(input)
+    uid: '@organigram/js!Procedure#signProposal:member(1)'
+    package: '@organigram/js!'
+    fullName: signProposal(input)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'signProposal(input: SignedProposalInput): Promise<string>;'
+      parameters:
+        - id: input
+          description: ''
+          type: <xref uid="@organigram/js!SignedProposalInput:interface" />
+      return:
+        type: Promise&lt;string&gt;
+        description: ''
+  - name: updateAdmin(address, options)
+    uid: '@organigram/js!Procedure#updateAdmin:member(1)'
+    package: '@organigram/js!'
+    fullName: updateAdmin(address, options)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'updateAdmin(address: string, options?: TransactionOptions): Promise<OrganigramTransaction>;'
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: options
+          description: ''
+          type: <xref uid="@organigram/js!TransactionOptions:interface" />
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!OrganigramTransaction:type" />&gt;
+        description: ''
+  - name: updateCid(cid, options)
+    uid: '@organigram/js!Procedure#updateCid:member(1)'
+    package: '@organigram/js!'
+    fullName: updateCid(cid, options)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'updateCid(cid: string, options?: TransactionOptions): Promise<OrganigramTransaction>;'
+      parameters:
+        - id: cid
+          description: ''
+          type: string
+        - id: options
+          description: ''
+          type: <xref uid="@organigram/js!TransactionOptions:interface" />
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!OrganigramTransaction:type" />&gt;
+        description: ''

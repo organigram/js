@@ -1,0 +1,90 @@
+### YamlMime:TSType
+name: ProposalMetadata
+uid: '@organigram/js!ProposalMetadata:interface'
+package: '@organigram/js!'
+fullName: ProposalMetadata
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: cid
+    uid: '@organigram/js!ProposalMetadata#cid:member'
+    package: '@organigram/js!'
+    fullName: cid
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'cid?: string;'
+      return:
+        type: string
+  - name: description
+    uid: '@organigram/js!ProposalMetadata#description:member'
+    package: '@organigram/js!'
+    fullName: description
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'description?: string;'
+      return:
+        type: string
+  - name: discussion
+    uid: '@organigram/js!ProposalMetadata#discussion:member'
+    package: '@organigram/js!'
+    fullName: discussion
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'discussion?: string;'
+      return:
+        type: string
+  - name: file
+    uid: '@organigram/js!ProposalMetadata#file:member'
+    package: '@organigram/js!'
+    fullName: file
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'file?: string;'
+      return:
+        type: string
+  - name: subtitle
+    uid: '@organigram/js!ProposalMetadata#subtitle:member'
+    package: '@organigram/js!'
+    fullName: subtitle
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'subtitle?: string;'
+      return:
+        type: string
+  - name: title
+    uid: '@organigram/js!ProposalMetadata#title:member'
+    package: '@organigram/js!'
+    fullName: title
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'title: string;'
+      return:
+        type: string

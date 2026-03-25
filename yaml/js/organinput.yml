@@ -1,0 +1,204 @@
+### YamlMime:TSType
+name: OrganInput
+uid: '@organigram/js!OrganInput:interface'
+package: '@organigram/js!'
+fullName: OrganInput
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: address
+    uid: '@organigram/js!OrganInput#address:member'
+    package: '@organigram/js!'
+    fullName: address
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'address?: string | null;'
+      return:
+        type: string | null
+  - name: balance
+    uid: '@organigram/js!OrganInput#balance:member'
+    package: '@organigram/js!'
+    fullName: balance
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'balance?: string | null;'
+      return:
+        type: string | null
+  - name: chainId
+    uid: '@organigram/js!OrganInput#chainId:member'
+    package: '@organigram/js!'
+    fullName: chainId
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'chainId?: string | null;'
+      return:
+        type: string | null
+  - name: cid
+    uid: '@organigram/js!OrganInput#cid:member'
+    package: '@organigram/js!'
+    fullName: cid
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'cid?: string | null;'
+      return:
+        type: string | null
+  - name: description
+    uid: '@organigram/js!OrganInput#description:member'
+    package: '@organigram/js!'
+    fullName: description
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'description?: string | null;'
+      return:
+        type: string | null
+  - name: entries
+    uid: '@organigram/js!OrganInput#entries:member'
+    package: '@organigram/js!'
+    fullName: entries
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        entries?: Array<{
+                index: string;
+                address: string;
+                cid: string;
+            }> | null;
+      return:
+        type: |-
+          Array&lt;{
+                  index: string;
+                  address: string;
+                  cid: string;
+              }&gt; | null
+  - name: forwarder
+    uid: '@organigram/js!OrganInput#forwarder:member'
+    package: '@organigram/js!'
+    fullName: forwarder
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'forwarder?: string | null;'
+      return:
+        type: string | null
+  - name: isDeployed
+    uid: '@organigram/js!OrganInput#isDeployed:member'
+    package: '@organigram/js!'
+    fullName: isDeployed
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'isDeployed?: boolean | null;'
+      return:
+        type: boolean | null
+  - name: name
+    uid: '@organigram/js!OrganInput#name:member'
+    package: '@organigram/js!'
+    fullName: name
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'name?: string | null;'
+      return:
+        type: string | null
+  - name: organigramId
+    uid: '@organigram/js!OrganInput#organigramId:member'
+    package: '@organigram/js!'
+    fullName: organigramId
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'organigramId?: string | null;'
+      return:
+        type: string | null
+  - name: permissions
+    uid: '@organigram/js!OrganInput#permissions:member'
+    package: '@organigram/js!'
+    fullName: permissions
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'permissions?: OrganPermission[] | null;'
+      return:
+        type: <xref uid="@organigram/js!OrganPermission:interface" />[] | null
+  - name: publicClient
+    uid: '@organigram/js!OrganInput#publicClient:member'
+    package: '@organigram/js!'
+    fullName: publicClient
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'publicClient?: PublicClient | null;'
+      return:
+        type: <xref uid="viem!PublicClient:type" /> | null
+  - name: salt
+    uid: '@organigram/js!OrganInput#salt:member'
+    package: '@organigram/js!'
+    fullName: salt
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'salt?: string | null;'
+      return:
+        type: string | null
+  - name: walletClient
+    uid: '@organigram/js!OrganInput#walletClient:member'
+    package: '@organigram/js!'
+    fullName: walletClient
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'walletClient?: WalletClient | null;'
+      return:
+        type: <xref uid="viem!WalletClient:type" /> | null

@@ -1,0 +1,14 @@
+### YamlMime:TSTypeAlias
+name: PopulatedTransactionData
+uid: '@organigram/js!PopulatedTransactionData:type'
+package: '@organigram/js!'
+fullName: PopulatedTransactionData
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+syntax: |-
+  export type PopulatedTransactionData = {
+      data: string;
+  };

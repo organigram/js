@@ -1,0 +1,15 @@
+### YamlMime:TSTypeAlias
+name: OrganigramTransaction
+uid: '@organigram/js!OrganigramTransaction:type'
+package: '@organigram/js!'
+fullName: OrganigramTransaction
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+syntax: |-
+  export type OrganigramTransaction = {
+      hash: Hex;
+      wait: () => Promise<OrganigramTransactionReceipt>;
+  };

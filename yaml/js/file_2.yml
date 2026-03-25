@@ -1,0 +1,38 @@
+### YamlMime:TSType
+name: File_2
+uid: '@organigram/js!File_2:interface'
+package: '@organigram/js!'
+fullName: File_2
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: cid
+    uid: '@organigram/js!File_2#cid:member'
+    package: '@organigram/js!'
+    fullName: cid
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'cid: string;'
+      return:
+        type: string
+  - name: data
+    uid: '@organigram/js!File_2#data:member'
+    package: '@organigram/js!'
+    fullName: data
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'data: unknown;'
+      return:
+        type: unknown

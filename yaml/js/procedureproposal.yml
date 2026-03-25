@@ -1,7 +1,7 @@
 ### YamlMime:TSType
 name: ProcedureProposal
-uid: '@organigram/client-js!ProcedureProposal:interface'
-package: '@organigram/client-js!'
+uid: '@organigram/js!ProcedureProposal:interface'
+package: '@organigram/js!'
 fullName: ProcedureProposal
 summary: ''
 remarks: ''
@@ -11,8 +11,8 @@ isDeprecated: false
 type: interface
 properties:
   - name: adopted
-    uid: '@organigram/client-js!ProcedureProposal#adopted:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposal#adopted:member'
+    package: '@organigram/js!'
     fullName: adopted
     summary: ''
     remarks: ''
@@ -24,8 +24,8 @@ properties:
       return:
         type: boolean
   - name: applied
-    uid: '@organigram/client-js!ProcedureProposal#applied:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposal#applied:member'
+    package: '@organigram/js!'
     fullName: applied
     summary: ''
     remarks: ''
@@ -37,8 +37,8 @@ properties:
       return:
         type: boolean
   - name: blocked
-    uid: '@organigram/client-js!ProcedureProposal#blocked:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposal#blocked:member'
+    package: '@organigram/js!'
     fullName: blocked
     summary: ''
     remarks: ''
@@ -50,8 +50,8 @@ properties:
       return:
         type: boolean
   - name: blockReason
-    uid: '@organigram/client-js!ProcedureProposal#blockReason:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposal#blockReason:member'
+    package: '@organigram/js!'
     fullName: blockReason
     summary: ''
     remarks: ''
@@ -63,8 +63,8 @@ properties:
       return:
         type: string
   - name: cid
-    uid: '@organigram/client-js!ProcedureProposal#cid:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposal#cid:member'
+    package: '@organigram/js!'
     fullName: cid
     summary: ''
     remarks: ''
@@ -76,8 +76,8 @@ properties:
       return:
         type: string
   - name: creator
-    uid: '@organigram/client-js!ProcedureProposal#creator:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposal#creator:member'
+    package: '@organigram/js!'
     fullName: creator
     summary: ''
     remarks: ''
@@ -89,8 +89,8 @@ properties:
       return:
         type: string
   - name: key
-    uid: '@organigram/client-js!ProcedureProposal#key:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposal#key:member'
+    package: '@organigram/js!'
     fullName: key
     summary: ''
     remarks: ''
@@ -98,12 +98,25 @@ properties:
     isPreview: false
     isDeprecated: false
     syntax:
-      content: 'key: string;'
+      content: 'key: ProposalKey;'
       return:
-        type: string
+        type: <xref uid="@organigram/js!ProposalKey:type" />
+  - name: metadata
+    uid: '@organigram/js!ProcedureProposal#metadata:member'
+    package: '@organigram/js!'
+    fullName: metadata
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'metadata?: ProposalMetadata;'
+      return:
+        type: <xref uid="@organigram/js!ProposalMetadata:interface" />
   - name: operations
-    uid: '@organigram/client-js!ProcedureProposal#operations:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposal#operations:member'
+    package: '@organigram/js!'
     fullName: operations
     summary: ''
     remarks: ''
@@ -113,10 +126,10 @@ properties:
     syntax:
       content: 'operations: ProcedureProposalOperation[];'
       return:
-        type: '<xref uid="@organigram/client-js!ProcedureProposalOperation:interface" />[]'
+        type: <xref uid="@organigram/js!ProcedureProposalOperation:interface" />[]
   - name: presented
-    uid: '@organigram/client-js!ProcedureProposal#presented:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposal#presented:member'
+    package: '@organigram/js!'
     fullName: presented
     summary: ''
     remarks: ''

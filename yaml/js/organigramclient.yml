@@ -1,0 +1,585 @@
+### YamlMime:TSType
+name: OrganigramClient
+uid: '@organigram/js!OrganigramClient:class'
+package: '@organigram/js!'
+fullName: OrganigramClient
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: class
+constructors:
+  - name: (constructor)(input)
+    uid: '@organigram/js!OrganigramClient:constructor(1)'
+    package: '@organigram/js!'
+    fullName: (constructor)(input)
+    summary: Constructs a new instance of the `OrganigramClient` class
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        constructor(input: {
+                publicClient: PublicClient;
+                address?: string;
+                chainId?: string;
+                procedureTypes?: ProcedureType[];
+                contract?: any;
+                walletClient?: WalletClient;
+            });
+      parameters:
+        - id: input
+          description: ''
+          type: |-
+            {
+                    publicClient: <xref uid="viem!PublicClient:type" />;
+                    address?: string;
+                    chainId?: string;
+                    procedureTypes?: <xref uid="@organigram/js!ProcedureType:interface" />[];
+                    contract?: any;
+                    walletClient?: <xref uid="viem!WalletClient:type" />;
+                }
+properties:
+  - name: address
+    uid: '@organigram/js!OrganigramClient#address:member'
+    package: '@organigram/js!'
+    fullName: address
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'address: string;'
+      return:
+        type: string
+  - name: assets
+    uid: '@organigram/js!OrganigramClient#assets:member'
+    package: '@organigram/js!'
+    fullName: assets
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'assets: Asset[];'
+      return:
+        type: <xref uid="@organigram/js!Asset:class" />[]
+  - name: chainId
+    uid: '@organigram/js!OrganigramClient#chainId:member'
+    package: '@organigram/js!'
+    fullName: chainId
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'chainId: string;'
+      return:
+        type: string
+  - name: cids
+    uid: '@organigram/js!OrganigramClient#cids:member'
+    package: '@organigram/js!'
+    fullName: cids
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'cids: File[];'
+      return:
+        type: <xref uid="@organigram/js!File_2:interface" />[]
+  - name: contract
+    uid: '@organigram/js!OrganigramClient#contract:member'
+    package: '@organigram/js!'
+    fullName: contract
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'contract: any;'
+      return:
+        type: any
+  - name: organs
+    uid: '@organigram/js!OrganigramClient#organs:member'
+    package: '@organigram/js!'
+    fullName: organs
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'organs: Organ[];'
+      return:
+        type: <xref uid="@organigram/js!Organ:class" />[]
+  - name: procedures
+    uid: '@organigram/js!OrganigramClient#procedures:member'
+    package: '@organigram/js!'
+    fullName: procedures
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'procedures: Procedure[];'
+      return:
+        type: <xref uid="@organigram/js!Procedure:class" />[]
+  - name: procedureTypes
+    uid: '@organigram/js!OrganigramClient#procedureTypes:member'
+    package: '@organigram/js!'
+    fullName: procedureTypes
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'procedureTypes: ProcedureType[];'
+      return:
+        type: <xref uid="@organigram/js!ProcedureType:interface" />[]
+  - name: publicClient
+    uid: '@organigram/js!OrganigramClient#publicClient:member'
+    package: '@organigram/js!'
+    fullName: publicClient
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'publicClient: PublicClient;'
+      return:
+        type: <xref uid="viem!PublicClient:type" />
+  - name: walletClient
+    uid: '@organigram/js!OrganigramClient#walletClient:member'
+    package: '@organigram/js!'
+    fullName: walletClient
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'walletClient?: WalletClient;'
+      return:
+        type: <xref uid="viem!WalletClient:type" />
+methods:
+  - name: deployAsset(name, symbol, initialSupply, salt, options)
+    uid: '@organigram/js!OrganigramClient#deployAsset:member(1)'
+    package: '@organigram/js!'
+    fullName: deployAsset(name, symbol, initialSupply, salt, options)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        deployAsset(name: string, symbol: string, initialSupply: number, salt?: string, options?: TransactionOptions):
+        Promise<string>;
+      parameters:
+        - id: name
+          description: ''
+          type: string
+        - id: symbol
+          description: ''
+          type: string
+        - id: initialSupply
+          description: ''
+          type: number
+        - id: salt
+          description: ''
+          type: string
+        - id: options
+          description: ''
+          type: <xref uid="@organigram/js!TransactionOptions:interface" />
+      return:
+        type: Promise&lt;string&gt;
+        description: ''
+  - name: deployAssets(assets, options)
+    uid: '@organigram/js!OrganigramClient#deployAssets:member(1)'
+    package: '@organigram/js!'
+    fullName: deployAssets(assets, options)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'deployAssets(assets: DeployAssetInput[], options?: TransactionOptions): Promise<string[]>;'
+      parameters:
+        - id: assets
+          description: ''
+          type: <xref uid="@organigram/js!DeployAssetInput:interface" />[]
+        - id: options
+          description: ''
+          type: <xref uid="@organigram/js!TransactionOptions:interface" />
+      return:
+        type: Promise&lt;string[]&gt;
+        description: ''
+  - name: deployClient(input)
+    uid: '@organigram/js!OrganigramClient.deployClient:member(1)'
+    package: '@organigram/js!'
+    fullName: deployClient(input)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        static deployClient(input: {
+                publicClient: PublicClient;
+                walletClient: WalletClient;
+            }): Promise<OrganigramClient>;
+      parameters:
+        - id: input
+          description: ''
+          type: |-
+            {
+                    publicClient: <xref uid="viem!PublicClient:type" />;
+                    walletClient: <xref uid="viem!WalletClient:type" />;
+                }
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!OrganigramClient:class" />&gt;
+        description: ''
+  - name: deployOrgan(input)
+    uid: '@organigram/js!OrganigramClient#deployOrgan:member(1)'
+    package: '@organigram/js!'
+    fullName: deployOrgan(input)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'deployOrgan(input?: DeployOrganInput): Promise<Organ>;'
+      parameters:
+        - id: input
+          description: ''
+          type: <xref uid="@organigram/js!DeployOrganInput:interface" />
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!Organ:class" />&gt;
+        description: ''
+  - name: deployOrganigram(input)
+    uid: '@organigram/js!OrganigramClient#deployOrganigram:member(1)'
+    package: '@organigram/js!'
+    fullName: deployOrganigram(input)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'deployOrganigram(input: DeployOrganigramInput): Promise<readonly string[]>;'
+      parameters:
+        - id: input
+          description: ''
+          type: <xref uid="@organigram/js!DeployOrganigramInput:interface" />
+      return:
+        type: Promise&lt;readonly string[]&gt;
+        description: ''
+  - name: deployOrgans(deployOrgansInput)
+    uid: '@organigram/js!OrganigramClient#deployOrgans:member(1)'
+    package: '@organigram/js!'
+    fullName: deployOrgans(deployOrgansInput)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'deployOrgans(deployOrgansInput: DeployOrganInput[]): Promise<Organ[]>;'
+      parameters:
+        - id: deployOrgansInput
+          description: ''
+          type: <xref uid="@organigram/js!DeployOrganInput:interface" />[]
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!Organ:class" />[]&gt;
+        description: ''
+  - name: deployProcedure(input)
+    uid: '@organigram/js!OrganigramClient#deployProcedure:member(1)'
+    package: '@organigram/js!'
+    fullName: deployProcedure(input)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'deployProcedure(input: DeployProceduresInput): Promise<Procedure>;'
+      parameters:
+        - id: input
+          description: ''
+          type: <xref uid="@organigram/js!DeployProceduresInput:interface" />
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!Procedure:class" />&gt;
+        description: ''
+  - name: deployProcedures(deployProceduresInput)
+    uid: '@organigram/js!OrganigramClient#deployProcedures:member(1)'
+    package: '@organigram/js!'
+    fullName: deployProcedures(deployProceduresInput)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'deployProcedures(deployProceduresInput: DeployProceduresInput[]): Promise<Procedure[]>;'
+      parameters:
+        - id: deployProceduresInput
+          description: ''
+          type: <xref uid="@organigram/js!DeployProceduresInput:interface" />[]
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!Procedure:class" />[]&gt;
+        description: ''
+  - name: getDeployedAsset(address, cached, initialAsset)
+    uid: '@organigram/js!OrganigramClient#getDeployedAsset:member(1)'
+    package: '@organigram/js!'
+    fullName: getDeployedAsset(address, cached, initialAsset)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'getDeployedAsset(address: string, cached?: boolean, initialAsset?: Asset): Promise<Asset>;'
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: cached
+          description: ''
+          type: boolean
+        - id: initialAsset
+          description: ''
+          type: <xref uid="@organigram/js!Asset:class" />
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!Asset:class" />&gt;
+        description: ''
+  - name: getDeployedOrgan(address, cached, initialOrgan)
+    uid: '@organigram/js!OrganigramClient#getDeployedOrgan:member(1)'
+    package: '@organigram/js!'
+    fullName: getDeployedOrgan(address, cached, initialOrgan)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'getDeployedOrgan(address: string, cached?: boolean, initialOrgan?: OrganInput): Promise<Organ>;'
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: cached
+          description: ''
+          type: boolean
+        - id: initialOrgan
+          description: ''
+          type: <xref uid="@organigram/js!OrganInput:interface" />
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!Organ:class" />&gt;
+        description: ''
+  - name: getDeployedProcedure(address, cached, initialProcedure)
+    uid: '@organigram/js!OrganigramClient#getDeployedProcedure:member(1)'
+    package: '@organigram/js!'
+    fullName: getDeployedProcedure(address, cached, initialProcedure)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'getDeployedProcedure(address: string, cached?: boolean, initialProcedure?: ProcedureInput): Promise<Procedure>;'
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: cached
+          description: ''
+          type: boolean
+        - id: initialProcedure
+          description: ''
+          type: <xref uid="@organigram/js!ProcedureInput:interface" />
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!Procedure:class" />&gt;
+        description: ''
+  - name: getProcedureType(procedureAddress)
+    uid: '@organigram/js!OrganigramClient#getProcedureType:member(1)'
+    package: '@organigram/js!'
+    fullName: getProcedureType(procedureAddress)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'getProcedureType(procedureAddress: string): Promise<ProcedureType | null>;'
+      parameters:
+        - id: procedureAddress
+          description: ''
+          type: string
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!ProcedureType:interface" /> | null&gt;
+        description: ''
+  - name: load(input)
+    uid: '@organigram/js!OrganigramClient.load:member(1)'
+    package: '@organigram/js!'
+    fullName: load(input)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        static load(input: {
+                address?: string;
+                publicClient: PublicClient;
+                walletClient?: WalletClient;
+            }): Promise<OrganigramClient>;
+      parameters:
+        - id: input
+          description: ''
+          type: |-
+            {
+                    address?: string;
+                    publicClient: <xref uid="viem!PublicClient:type" />;
+                    walletClient?: <xref uid="viem!WalletClient:type" />;
+                }
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!OrganigramClient:class" />&gt;
+        description: ''
+  - name: loadContract(address, cached)
+    uid: '@organigram/js!OrganigramClient#loadContract:member(1)'
+    package: '@organigram/js!'
+    fullName: loadContract(address, cached)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'loadContract(address: string, cached?: boolean): Promise<Organ | Procedure | null>;'
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: cached
+          description: ''
+          type: boolean
+      return:
+        type: >-
+          Promise&lt;<xref uid="@organigram/js!Organ:class" /> | <xref uid="@organigram/js!Procedure:class" /> |
+          null&gt;
+        description: ''
+  - name: loadContracts(contractAddresses)
+    uid: '@organigram/js!OrganigramClient#loadContracts:member(1)'
+    package: '@organigram/js!'
+    fullName: loadContracts(contractAddresses)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'loadContracts(contractAddresses: string[]): Promise<Organigram>;'
+      parameters:
+        - id: contractAddresses
+          description: ''
+          type: string[]
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!Organigram:class" />&gt;
+        description: ''
+  - name: loadOrganigram(organigram, cached)
+    uid: '@organigram/js!OrganigramClient#loadOrganigram:member(1)'
+    package: '@organigram/js!'
+    fullName: loadOrganigram(organigram, cached)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'loadOrganigram(organigram: Organigram, cached?: boolean): Promise<Organigram>;'
+      parameters:
+        - id: organigram
+          description: ''
+          type: <xref uid="@organigram/js!Organigram:class" />
+        - id: cached
+          description: ''
+          type: boolean
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!Organigram:class" />&gt;
+        description: ''
+  - name: loadProcedureType({ addr, cid }, input, publicClient)
+    uid: '@organigram/js!OrganigramClient.loadProcedureType:member(1)'
+    package: '@organigram/js!'
+    fullName: loadProcedureType({ addr, cid }, input, publicClient)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        static loadProcedureType(input: {
+                addr: string;
+                cid?: string;
+            }, publicClient: PublicClient): Promise<ProcedureType>;
+      parameters:
+        - id: '{ addr, cid }'
+          description: ''
+          type: ''
+        - id: input
+          description: ''
+          type: |-
+            {
+                    addr: string;
+                    cid?: string;
+                }
+        - id: publicClient
+          description: ''
+          type: <xref uid="viem!PublicClient:type" />
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!ProcedureType:interface" />&gt;
+        description: ''
+  - name: loadProcedureTypes({ address, publicClient }, input)
+    uid: '@organigram/js!OrganigramClient.loadProcedureTypes:member(1)'
+    package: '@organigram/js!'
+    fullName: loadProcedureTypes({ address, publicClient }, input)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        static loadProcedureTypes(input: {
+                publicClient: PublicClient;
+                address?: string;
+            }): Promise<ProcedureType[]>;
+      parameters:
+        - id: '{ address, publicClient }'
+          description: ''
+          type: ''
+        - id: input
+          description: ''
+          type: |-
+            {
+                    publicClient: <xref uid="viem!PublicClient:type" />;
+                    address?: string;
+                }
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!ProcedureType:interface" />[]&gt;
+        description: ''

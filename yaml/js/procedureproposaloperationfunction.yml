@@ -1,7 +1,7 @@
 ### YamlMime:TSType
 name: ProcedureProposalOperationFunction
-uid: '@organigram/client-js!ProcedureProposalOperationFunction:interface'
-package: '@organigram/client-js!'
+uid: '@organigram/js!ProcedureProposalOperationFunction:interface'
+package: '@organigram/js!'
 fullName: ProcedureProposalOperationFunction
 summary: ''
 remarks: ''
@@ -11,8 +11,8 @@ isDeprecated: false
 type: interface
 properties:
   - name: abi
-    uid: '@organigram/client-js!ProcedureProposalOperationFunction#abi:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposalOperationFunction#abi:member'
+    package: '@organigram/js!'
     fullName: abi
     summary: ''
     remarks: ''
@@ -24,8 +24,8 @@ properties:
       return:
         type: unknown
   - name: funcSig
-    uid: '@organigram/client-js!ProcedureProposalOperationFunction#funcSig:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposalOperationFunction#funcSig:member'
+    package: '@organigram/js!'
     fullName: funcSig
     summary: ''
     remarks: ''
@@ -37,8 +37,8 @@ properties:
       return:
         type: string
   - name: key
-    uid: '@organigram/client-js!ProcedureProposalOperationFunction#key:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposalOperationFunction#key:member'
+    package: '@organigram/js!'
     fullName: key
     summary: ''
     remarks: ''
@@ -46,12 +46,12 @@ properties:
     isPreview: false
     isDeprecated: false
     syntax:
-      content: 'key: string;'
+      content: 'key: ProposalKey;'
       return:
-        type: string
+        type: <xref uid="@organigram/js!ProposalKey:type" />
   - name: label
-    uid: '@organigram/client-js!ProcedureProposalOperationFunction#label:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposalOperationFunction#label:member'
+    package: '@organigram/js!'
     fullName: label
     summary: ''
     remarks: ''
@@ -63,8 +63,8 @@ properties:
       return:
         type: string
   - name: params
-    uid: '@organigram/client-js!ProcedureProposalOperationFunction#params:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposalOperationFunction#params:member'
+    package: '@organigram/js!'
     fullName: params
     summary: ''
     remarks: ''
@@ -74,10 +74,10 @@ properties:
     syntax:
       content: 'params?: OperationParamType[];'
       return:
-        type: '<xref uid="@organigram/client-js!~OperationParamType:type" />[]'
+        type: <xref uid="@organigram/js!OperationParamType:type" />[]
   - name: signature
-    uid: '@organigram/client-js!ProcedureProposalOperationFunction#signature:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposalOperationFunction#signature:member'
+    package: '@organigram/js!'
     fullName: signature
     summary: ''
     remarks: ''
@@ -89,8 +89,8 @@ properties:
       return:
         type: string
   - name: tags
-    uid: '@organigram/client-js!ProcedureProposalOperationFunction#tags:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposalOperationFunction#tags:member'
+    package: '@organigram/js!'
     fullName: tags
     summary: ''
     remarks: ''
@@ -100,10 +100,10 @@ properties:
     syntax:
       content: 'tags?: OperationTag[];'
       return:
-        type: '<xref uid="@organigram/client-js!~OperationTag:type" />[]'
+        type: <xref uid="@organigram/js!OperationTag:type" />[]
   - name: target
-    uid: '@organigram/client-js!ProcedureProposalOperationFunction#target:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposalOperationFunction#target:member'
+    package: '@organigram/js!'
     fullName: target
     summary: ''
     remarks: ''

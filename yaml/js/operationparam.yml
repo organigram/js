@@ -1,0 +1,64 @@
+### YamlMime:TSType
+name: OperationParam
+uid: '@organigram/js!OperationParam:interface'
+package: '@organigram/js!'
+fullName: OperationParam
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: action
+    uid: '@organigram/js!OperationParam#action:member'
+    package: '@organigram/js!'
+    fullName: action
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'action?: OperationParamAction;'
+      return:
+        type: <xref uid="@organigram/js!OperationParamAction:type" />
+  - name: parser
+    uid: '@organigram/js!OperationParam#parser:member'
+    package: '@organigram/js!'
+    fullName: parser
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'parser?: unknown;'
+      return:
+        type: unknown
+  - name: type
+    uid: '@organigram/js!OperationParam#type:member'
+    package: '@organigram/js!'
+    fullName: type
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'type: OperationParamType;'
+      return:
+        type: <xref uid="@organigram/js!OperationParamType:type" />
+  - name: value
+    uid: '@organigram/js!OperationParam#value:member'
+    package: '@organigram/js!'
+    fullName: value
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'value?: unknown;'
+      return:
+        type: unknown

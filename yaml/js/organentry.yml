@@ -1,7 +1,7 @@
 ### YamlMime:TSType
 name: OrganEntry
-uid: '@organigram/client-js!OrganEntry:interface'
-package: '@organigram/client-js!'
+uid: '@organigram/js!OrganEntry:interface'
+package: '@organigram/js!'
 fullName: OrganEntry
 summary: ''
 remarks: ''
@@ -11,8 +11,8 @@ isDeprecated: false
 type: interface
 properties:
   - name: address
-    uid: '@organigram/client-js!OrganEntry#address:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!OrganEntry#address:member'
+    package: '@organigram/js!'
     fullName: address
     summary: ''
     remarks: ''
@@ -24,8 +24,8 @@ properties:
       return:
         type: string
   - name: cid
-    uid: '@organigram/client-js!OrganEntry#cid:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!OrganEntry#cid:member'
+    package: '@organigram/js!'
     fullName: cid
     summary: ''
     remarks: ''
@@ -37,8 +37,8 @@ properties:
       return:
         type: string
   - name: index
-    uid: '@organigram/client-js!OrganEntry#index:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!OrganEntry#index:member'
+    package: '@organigram/js!'
     fullName: index
     summary: ''
     remarks: ''

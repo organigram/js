@@ -1,0 +1,17 @@
+### YamlMime:TSTypeAlias
+name: VoteProcedureInput
+uid: '@organigram/js!VoteProcedureInput:type'
+package: '@organigram/js!'
+fullName: VoteProcedureInput
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+syntax: |-
+  export type VoteProcedureInput = ProcedureInput & {
+      quorumSize: string;
+      voteDuration: string;
+      majoritySize: string;
+      elections: Election[];
+  };

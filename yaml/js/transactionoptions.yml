@@ -1,0 +1,57 @@
+### YamlMime:TSType
+name: TransactionOptions
+uid: '@organigram/js!TransactionOptions:interface'
+package: '@organigram/js!'
+fullName: TransactionOptions
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: customData
+    uid: '@organigram/js!TransactionOptions#customData:member'
+    package: '@organigram/js!'
+    fullName: customData
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        customData?: {
+                index?: number;
+            };
+      return:
+        type: |-
+          {
+                  index?: number;
+              }
+  - name: nonce
+    uid: '@organigram/js!TransactionOptions#nonce:member'
+    package: '@organigram/js!'
+    fullName: nonce
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'nonce?: number;'
+      return:
+        type: number
+  - name: onTransaction
+    uid: '@organigram/js!TransactionOptions#onTransaction:member'
+    package: '@organigram/js!'
+    fullName: onTransaction
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'onTransaction?: (tx: OrganigramTransaction, description: string) => void;'
+      return:
+        type: '(tx: <xref uid="@organigram/js!OrganigramTransaction:type" />, description: string) =&gt; void'

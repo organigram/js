@@ -1,0 +1,26 @@
+### YamlMime:TSType
+name: SignedBlockProposalInput
+uid: '@organigram/js!SignedBlockProposalInput:interface'
+package: '@organigram/js!'
+fullName: SignedBlockProposalInput
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: reason
+    uid: '@organigram/js!SignedBlockProposalInput#reason:member'
+    package: '@organigram/js!'
+    fullName: reason
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'reason: string;'
+      return:
+        type: string
+extends: <xref uid="@organigram/js!SignedProposalActionInput:interface" />

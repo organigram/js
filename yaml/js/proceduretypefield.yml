@@ -1,0 +1,77 @@
+### YamlMime:TSType
+name: ProcedureTypeField
+uid: '@organigram/js!ProcedureTypeField:interface'
+package: '@organigram/js!'
+fullName: ProcedureTypeField
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: defaultValue
+    uid: '@organigram/js!ProcedureTypeField#defaultValue:member'
+    package: '@organigram/js!'
+    fullName: defaultValue
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'defaultValue: string;'
+      return:
+        type: string
+  - name: description
+    uid: '@organigram/js!ProcedureTypeField#description:member'
+    package: '@organigram/js!'
+    fullName: description
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'description: string;'
+      return:
+        type: string
+  - name: label
+    uid: '@organigram/js!ProcedureTypeField#label:member'
+    package: '@organigram/js!'
+    fullName: label
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'label: string;'
+      return:
+        type: string
+  - name: name
+    uid: '@organigram/js!ProcedureTypeField#name:member'
+    package: '@organigram/js!'
+    fullName: name
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'name: string;'
+      return:
+        type: string
+  - name: type
+    uid: '@organigram/js!ProcedureTypeField#type:member'
+    package: '@organigram/js!'
+    fullName: type
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'type: any;'
+      return:
+        type: any

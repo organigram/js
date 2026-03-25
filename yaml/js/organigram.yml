@@ -1,0 +1,320 @@
+### YamlMime:TSType
+name: Organigram
+uid: '@organigram/js!Organigram:class'
+package: '@organigram/js!'
+fullName: Organigram
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: class
+constructors:
+  - name: (constructor)(input)
+    uid: '@organigram/js!Organigram:constructor(1)'
+    package: '@organigram/js!'
+    fullName: (constructor)(input)
+    summary: Constructs a new instance of the `Organigram` class
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'constructor(input?: OrganigramInput | keyof typeof templates | string[]);'
+      parameters:
+        - id: input
+          description: ''
+          type: >-
+            <xref uid="@organigram/js!OrganigramInput:type" /> | keyof typeof <xref uid="@organigram/js!templates:var"
+            /> | string[]
+properties:
+  - name: assets
+    uid: '@organigram/js!Organigram#assets:member'
+    package: '@organigram/js!'
+    fullName: assets
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'assets: Asset[];'
+      return:
+        type: <xref uid="@organigram/js!Asset:class" />[]
+  - name: chainId
+    uid: '@organigram/js!Organigram#chainId:member'
+    package: '@organigram/js!'
+    fullName: chainId
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'chainId: string;'
+      return:
+        type: string
+  - name: description
+    uid: '@organigram/js!Organigram#description:member'
+    package: '@organigram/js!'
+    fullName: description
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'description: string;'
+      return:
+        type: string
+  - name: id
+    uid: '@organigram/js!Organigram#id:member'
+    package: '@organigram/js!'
+    fullName: id
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'id: string;'
+      return:
+        type: string
+  - name: load
+    uid: '@organigram/js!Organigram#load:member'
+    package: '@organigram/js!'
+    fullName: load
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        load: (input?: {
+                walletClient?: WalletClient | null;
+                publicClient?: PublicClient | null;
+            }) => Promise<Organigram>;
+      return:
+        type: |-
+          (input?: {
+                  walletClient?: <xref uid="viem!WalletClient:type" /> | null;
+                  publicClient?: <xref uid="viem!PublicClient:type" /> | null;
+              }) =&gt; Promise&lt;<xref uid="@organigram/js!Organigram:class" />&gt;
+  - name: name
+    uid: '@organigram/js!Organigram#name:member'
+    package: '@organigram/js!'
+    fullName: name
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'name: string;'
+      return:
+        type: string
+  - name: organigramClient
+    uid: '@organigram/js!Organigram#organigramClient:member'
+    package: '@organigram/js!'
+    fullName: organigramClient
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'organigramClient?: OrganigramClient | null;'
+      return:
+        type: <xref uid="@organigram/js!OrganigramClient:class" /> | null
+  - name: organs
+    uid: '@organigram/js!Organigram#organs:member'
+    package: '@organigram/js!'
+    fullName: organs
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'organs: Organ[];'
+      return:
+        type: <xref uid="@organigram/js!Organ:class" />[]
+  - name: procedures
+    uid: '@organigram/js!Organigram#procedures:member'
+    package: '@organigram/js!'
+    fullName: procedures
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'procedures: Procedure[];'
+      return:
+        type: <xref uid="@organigram/js!Procedure:class" />[]
+  - name: publicClient
+    uid: '@organigram/js!Organigram#publicClient:member'
+    package: '@organigram/js!'
+    fullName: publicClient
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'publicClient?: PublicClient | null;'
+      return:
+        type: <xref uid="viem!PublicClient:type" /> | null
+  - name: slug
+    uid: '@organigram/js!Organigram#slug:member'
+    package: '@organigram/js!'
+    fullName: slug
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'slug: string;'
+      return:
+        type: string
+  - name: toJson
+    uid: '@organigram/js!Organigram#toJson:member'
+    package: '@organigram/js!'
+    fullName: toJson
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'toJson: () => OrganigramJson;'
+      return:
+        type: () =&gt; <xref uid="@organigram/js!OrganigramJson:type" />
+  - name: walletClient
+    uid: '@organigram/js!Organigram#walletClient:member'
+    package: '@organigram/js!'
+    fullName: walletClient
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'walletClient?: WalletClient | null;'
+      return:
+        type: <xref uid="viem!WalletClient:type" /> | null
+  - name: workspaceId
+    uid: '@organigram/js!Organigram#workspaceId:member'
+    package: '@organigram/js!'
+    fullName: workspaceId
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'workspaceId?: string | null;'
+      return:
+        type: string | null
+methods:
+  - name: deploy()
+    uid: '@organigram/js!Organigram#deploy:member(1)'
+    package: '@organigram/js!'
+    fullName: deploy()
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'deploy(): Promise<Organigram>;'
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!Organigram:class" />&gt;
+        description: ''
+  - name: editDetails({ name, description }, input)
+    uid: '@organigram/js!Organigram#editDetails:member(1)'
+    package: '@organigram/js!'
+    fullName: editDetails({ name, description }, input)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        editDetails(input: {
+                name?: string;
+                description?: string;
+                contractAddresses?: string[];
+            }): void;
+      parameters:
+        - id: '{ name, description }'
+          description: ''
+          type: ''
+        - id: input
+          description: ''
+          type: |-
+            {
+                    name?: string;
+                    description?: string;
+                    contractAddresses?: string[];
+                }
+      return:
+        type: void
+        description: ''
+  - name: setAssets(assets)
+    uid: '@organigram/js!Organigram#setAssets:member(1)'
+    package: '@organigram/js!'
+    fullName: setAssets(assets)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'setAssets(assets: Asset[]): void;'
+      parameters:
+        - id: assets
+          description: ''
+          type: <xref uid="@organigram/js!Asset:class" />[]
+      return:
+        type: void
+        description: ''
+  - name: setOrgans(organs)
+    uid: '@organigram/js!Organigram#setOrgans:member(1)'
+    package: '@organigram/js!'
+    fullName: setOrgans(organs)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'setOrgans(organs: Organ[]): void;'
+      parameters:
+        - id: organs
+          description: ''
+          type: <xref uid="@organigram/js!Organ:class" />[]
+      return:
+        type: void
+        description: ''
+  - name: setProcedures(procedures)
+    uid: '@organigram/js!Organigram#setProcedures:member(1)'
+    package: '@organigram/js!'
+    fullName: setProcedures(procedures)
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'setProcedures(procedures: Procedure[]): void;'
+      parameters:
+        - id: procedures
+          description: ''
+          type: <xref uid="@organigram/js!Procedure:class" />[]
+      return:
+        type: void
+        description: ''

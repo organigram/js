@@ -1,0 +1,15 @@
+### YamlMime:TSTypeAlias
+name: ContractClients
+uid: '@organigram/js!ContractClients:type'
+package: '@organigram/js!'
+fullName: ContractClients
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+syntax: |-
+  export type ContractClients = {
+      publicClient: PublicClient;
+      walletClient?: WalletClient | null;
+  };

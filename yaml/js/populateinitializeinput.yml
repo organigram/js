@@ -1,0 +1,129 @@
+### YamlMime:TSType
+name: PopulateInitializeInput
+uid: '@organigram/js!PopulateInitializeInput:interface'
+package: '@organigram/js!'
+fullName: PopulateInitializeInput
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: args
+    uid: '@organigram/js!PopulateInitializeInput#args:member'
+    package: '@organigram/js!'
+    fullName: args
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'args: unknown[];'
+      return:
+        type: unknown[]
+  - name: cid
+    uid: '@organigram/js!PopulateInitializeInput#cid:member'
+    package: '@organigram/js!'
+    fullName: cid
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'cid: string;'
+      return:
+        type: string
+  - name: deciders
+    uid: '@organigram/js!PopulateInitializeInput#deciders:member'
+    package: '@organigram/js!'
+    fullName: deciders
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'deciders: string;'
+      return:
+        type: string
+  - name: forwarder
+    uid: '@organigram/js!PopulateInitializeInput#forwarder:member'
+    package: '@organigram/js!'
+    fullName: forwarder
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'forwarder: string;'
+      return:
+        type: string
+  - name: moderators
+    uid: '@organigram/js!PopulateInitializeInput#moderators:member'
+    package: '@organigram/js!'
+    fullName: moderators
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'moderators: string;'
+      return:
+        type: string
+  - name: options
+    uid: '@organigram/js!PopulateInitializeInput#options:member'
+    package: '@organigram/js!'
+    fullName: options
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'options?: TransactionOptions;'
+      return:
+        type: <xref uid="@organigram/js!TransactionOptions:interface" />
+  - name: proposers
+    uid: '@organigram/js!PopulateInitializeInput#proposers:member'
+    package: '@organigram/js!'
+    fullName: proposers
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'proposers: string;'
+      return:
+        type: string
+  - name: typeName
+    uid: '@organigram/js!PopulateInitializeInput#typeName:member'
+    package: '@organigram/js!'
+    fullName: typeName
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'typeName?: ProcedureTypeName;'
+      return:
+        type: <xref uid="@organigram/js!ProcedureTypeName:type" />
+  - name: withModeration
+    uid: '@organigram/js!PopulateInitializeInput#withModeration:member'
+    package: '@organigram/js!'
+    fullName: withModeration
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'withModeration: boolean;'
+      return:
+        type: boolean

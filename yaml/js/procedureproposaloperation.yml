@@ -1,7 +1,7 @@
 ### YamlMime:TSType
 name: ProcedureProposalOperation
-uid: '@organigram/client-js!ProcedureProposalOperation:interface'
-package: '@organigram/client-js!'
+uid: '@organigram/js!ProcedureProposalOperation:interface'
+package: '@organigram/js!'
 fullName: ProcedureProposalOperation
 summary: ''
 remarks: ''
@@ -11,8 +11,8 @@ isDeprecated: false
 type: interface
 properties:
   - name: data
-    uid: '@organigram/client-js!ProcedureProposalOperation#data:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposalOperation#data:member'
+    package: '@organigram/js!'
     fullName: data
     summary: ''
     remarks: ''
@@ -24,8 +24,8 @@ properties:
       return:
         type: string
   - name: description
-    uid: '@organigram/client-js!ProcedureProposalOperation#description:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposalOperation#description:member'
+    package: '@organigram/js!'
     fullName: description
     summary: ''
     remarks: ''
@@ -37,8 +37,8 @@ properties:
       return:
         type: string
   - name: function
-    uid: '@organigram/client-js!ProcedureProposalOperation#function:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposalOperation#function:member'
+    package: '@organigram/js!'
     fullName: function
     summary: ''
     remarks: ''
@@ -48,10 +48,10 @@ properties:
     syntax:
       content: 'function?: ProcedureProposalOperationFunction;'
       return:
-        type: '<xref uid="@organigram/client-js!ProcedureProposalOperationFunction:interface" />'
+        type: <xref uid="@organigram/js!ProcedureProposalOperationFunction:interface" />
   - name: functionSelector
-    uid: '@organigram/client-js!ProcedureProposalOperation#functionSelector:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposalOperation#functionSelector:member'
+    package: '@organigram/js!'
     fullName: functionSelector
     summary: ''
     remarks: ''
@@ -63,8 +63,8 @@ properties:
       return:
         type: string
   - name: index
-    uid: '@organigram/client-js!ProcedureProposalOperation#index:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposalOperation#index:member'
+    package: '@organigram/js!'
     fullName: index
     summary: ''
     remarks: ''
@@ -76,8 +76,8 @@ properties:
       return:
         type: string
   - name: params
-    uid: '@organigram/client-js!ProcedureProposalOperation#params:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposalOperation#params:member'
+    package: '@organigram/js!'
     fullName: params
     summary: ''
     remarks: ''
@@ -87,10 +87,10 @@ properties:
     syntax:
       content: 'params?: OperationParam[];'
       return:
-        type: '<xref uid="@organigram/client-js!~OperationParam:interface" />[]'
+        type: <xref uid="@organigram/js!OperationParam:interface" />[]
   - name: processed
-    uid: '@organigram/client-js!ProcedureProposalOperation#processed:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposalOperation#processed:member'
+    package: '@organigram/js!'
     fullName: processed
     summary: ''
     remarks: ''
@@ -102,8 +102,8 @@ properties:
       return:
         type: boolean
   - name: target
-    uid: '@organigram/client-js!ProcedureProposalOperation#target:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposalOperation#target:member'
+    package: '@organigram/js!'
     fullName: target
     summary: ''
     remarks: ''
@@ -115,8 +115,8 @@ properties:
       return:
         type: string
   - name: userIsInEntry
-    uid: '@organigram/client-js!ProcedureProposalOperation#userIsInEntry:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposalOperation#userIsInEntry:member'
+    package: '@organigram/js!'
     fullName: userIsInEntry
     summary: ''
     remarks: ''
@@ -128,8 +128,8 @@ properties:
       return:
         type: boolean
   - name: userIsInOrgan
-    uid: '@organigram/client-js!ProcedureProposalOperation#userIsInOrgan:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposalOperation#userIsInOrgan:member'
+    package: '@organigram/js!'
     fullName: userIsInOrgan
     summary: ''
     remarks: ''
@@ -141,8 +141,8 @@ properties:
       return:
         type: boolean
   - name: value
-    uid: '@organigram/client-js!ProcedureProposalOperation#value:member'
-    package: '@organigram/client-js!'
+    uid: '@organigram/js!ProcedureProposalOperation#value:member'
+    package: '@organigram/js!'
     fullName: value
     summary: ''
     remarks: ''

@@ -1,0 +1,51 @@
+### YamlMime:TSType
+name: SignedProposalActionInput
+uid: '@organigram/js!SignedProposalActionInput:interface'
+package: '@organigram/js!'
+fullName: SignedProposalActionInput
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: deadline
+    uid: '@organigram/js!SignedProposalActionInput#deadline:member'
+    package: '@organigram/js!'
+    fullName: deadline
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'deadline: bigint | number;'
+      return:
+        type: bigint | number
+  - name: nonce
+    uid: '@organigram/js!SignedProposalActionInput#nonce:member'
+    package: '@organigram/js!'
+    fullName: nonce
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'nonce: bigint;'
+      return:
+        type: bigint
+  - name: proposalKey
+    uid: '@organigram/js!SignedProposalActionInput#proposalKey:member'
+    package: '@organigram/js!'
+    fullName: proposalKey
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'proposalKey: string;'
+      return:
+        type: string

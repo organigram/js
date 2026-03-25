@@ -1,0 +1,11 @@
+### YamlMime:TSTypeAlias
+name: ProcedureRoleTypeName
+uid: '@organigram/js!ProcedureRoleTypeName:type'
+package: '@organigram/js!'
+fullName: ProcedureRoleTypeName
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+syntax: export type ProcedureRoleTypeName = 'proposers' | 'moderators' | 'deciders';

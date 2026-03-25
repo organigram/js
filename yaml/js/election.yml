@@ -1,0 +1,18 @@
+### YamlMime:TSTypeAlias
+name: Election
+uid: '@organigram/js!Election:type'
+package: '@organigram/js!'
+fullName: Election
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+syntax: |-
+  export type Election = {
+      proposalKey: string;
+      start: string;
+      votesCount: string;
+      hasVoted: boolean;
+      approved?: boolean;
+  };
