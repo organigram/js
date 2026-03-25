@@ -5,7 +5,6 @@ import {
   encodeAbiParameters,
   encodeFunctionData,
   encodePacked,
-  isAddress,
   keccak256,
   parseAbiParameters,
   toFunctionSelector,
