@@ -34,7 +34,7 @@ export type ProcedureJson = {
     isDeployed: boolean;
     address: string;
     deciders: string;
-    typeName: string;
+    typeName: ProcedureTypeName;
     name: string;
     description: string;
     cid: string;

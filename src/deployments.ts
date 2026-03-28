@@ -1,4 +1,4 @@
-import rawDeployedAddresses from '@organigram/protocol/deployments.json'
+import rawDeployedAddresses from '@organigram/protocol/deployments.json' with { type: 'json' }
 
 export type ProtocolDeploymentName =
   | 'Asset'

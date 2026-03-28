@@ -23,6 +23,9 @@ export type OrganigramTransaction = {
   wait: () => Promise<OrganigramTransactionReceipt>
 }
 
+export const bufferEstimatedGas = (estimatedGas: bigint): bigint =>
+  (estimatedGas * 120n) / 100n + 25_000n
+
 const requireWalletClient = (clients: ContractClients): WalletClient => {
   if (clients.walletClient == null) {
     throw new Error('Wallet client not connected.')

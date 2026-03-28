@@ -10,6 +10,7 @@ export type OrganigramTransaction = {
     hash: Hex;
     wait: () => Promise<OrganigramTransactionReceipt>;
 };
+export declare const bufferEstimatedGas: (estimatedGas: bigint) => bigint;
 export declare const getWalletAccount: (walletClient: WalletClient) => Promise<Account | Address>;
 export declare const getWalletAddress: (walletClient: WalletClient) => Promise<Address>;
 export declare const getContractInstance: <TAbi extends Abi | readonly unknown[]>({ address, abi, publicClient, walletClient }: {

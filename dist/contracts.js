@@ -1,4 +1,5 @@
 import { getAddress, getContract } from 'viem';
+export const bufferEstimatedGas = (estimatedGas) => (estimatedGas * 120n) / 100n + 25000n;
 const requireWalletClient = (clients) => {
     if (clients.walletClient == null) {
         throw new Error('Wallet client not connected.');

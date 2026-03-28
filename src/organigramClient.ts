@@ -1,6 +1,6 @@
-import OrganLibraryContractABI from '@organigram/protocol/abi/OrganLibrary.sol/OrganLibrary.json'
-import OrganigramClientContractABI from '@organigram/protocol/abi/OrganigramClient.sol/OrganigramClient.json'
-import ProcedureContractABI from '@organigram/protocol/abi/Procedure.sol/Procedure.json'
+import OrganLibraryContractABI from '@organigram/protocol/abi/OrganLibrary.sol/OrganLibrary.json' with { type: 'json' }
+import OrganigramClientContractABI from '@organigram/protocol/abi/OrganigramClient.sol/OrganigramClient.json' with { type: 'json' }
+import ProcedureContractABI from '@organigram/protocol/abi/Procedure.sol/Procedure.json' with { type: 'json' }
 import {
   decodeEventLog,
   isAddress,
@@ -10,7 +10,12 @@ import {
   type WalletClient,
   zeroAddress
 } from 'viem'
-import { createRandom32BytesHexId, deployedAddresses, formatSalt, PERMISSIONS } from './utils'
+import {
+  createRandom32BytesHexId,
+  deployedAddresses,
+  formatSalt,
+  PERMISSIONS
+} from './utils'
 
 import { Organ, OrganEntry, OrganInput, OrganPermission } from './organ'
 import { Procedure, ProcedureInput, ProcedureType } from './procedure'
@@ -38,7 +43,7 @@ export interface DeployOrganInput {
   cid?: string
   permissions?: OrganPermission[]
   entries?: OrganEntry[]
-  salt?: string
+  salt?: string | null
   options?: TransactionOptions
 }
 
@@ -54,7 +59,7 @@ export interface DeployProceduresInput {
   salt?: string | null
   options?: TransactionOptions
   data?: string
-  args?: string[]
+  args?: unknown[]
 }
 
 export interface DeployOrganigramInput {
@@ -128,7 +133,10 @@ const getDeploymentAddresses = (
         eventName: 'organDeployed' | 'assetDeployed' | 'procedureDeployed'
         args?: Record<string, unknown> | readonly unknown[]
       }
-      const args = decoded.args as Record<string, unknown> | readonly unknown[] | undefined
+      const args = decoded.args as
+        | Record<string, unknown>
+        | readonly unknown[]
+        | undefined
 
       if (args == null || Array.isArray(args)) {
         return []
@@ -306,7 +314,8 @@ export class OrganigramClient {
       abi: OrganigramClientContractABI.abi,
       publicClient
     })
-    const proceduresRegistryAddress = (await contract.read.proceduresRegistry()) as string
+    const proceduresRegistryAddress =
+      (await contract.read.proceduresRegistry()) as string
     const procedures = await Organ.loadEntries(proceduresRegistryAddress, {
       publicClient
     })
@@ -332,7 +341,10 @@ export class OrganigramClient {
     publicClient: PublicClient
     walletClient?: WalletClient
   }): Promise<OrganigramClient> {
-    const chainId = await input.publicClient.getChainId().then(String).catch(() => '')
+    const chainId = await input.publicClient
+      .getChainId()
+      .then(String)
+      .catch(() => '')
     const contract = getContractInstance({
       address:
         input.address ??
@@ -368,7 +380,10 @@ export class OrganigramClient {
       while (nextIndex < values.length) {
         const currentIndex = nextIndex
         nextIndex += 1
-        results[currentIndex] = await callback(values[currentIndex], currentIndex)
+        results[currentIndex] = await callback(
+          values[currentIndex],
+          currentIndex
+        )
       }
     })
 
@@ -377,7 +392,9 @@ export class OrganigramClient {
     return results
   }
 
-  async getProcedureType(procedureAddress: string): Promise<ProcedureType | null> {
+  async getProcedureType(
+    procedureAddress: string
+  ): Promise<ProcedureType | null> {
     const code = await this.publicClient.getBytecode({
       address: procedureAddress as `0x${string}`
     })
@@ -475,12 +492,17 @@ export class OrganigramClient {
     }
 
     let procedure = cached
-      ? this.procedures.find(existingProcedure => existingProcedure.address === address)
+      ? this.procedures.find(
+          existingProcedure => existingProcedure.address === address
+        )
       : undefined
     if (procedure == null) {
       const ProcedureClass = await getProcedureClass(procedureType.key)
-      procedure = await ProcedureClass
-        .load(address, this.getClients(), initialProcedure)
+      procedure = await ProcedureClass.load(
+        address,
+        this.getClients(),
+        initialProcedure
+      )
         .then((loadedProcedure: Procedure) =>
           Object.assign(loadedProcedure, { type: procedureType })
         )
@@ -510,9 +532,10 @@ export class OrganigramClient {
     if (!permissions || permissions.length === 0) {
       permissionAddresses.push(await getWalletAddress(this.walletClient))
       permissionValues.push(toHex(PERMISSIONS.ADMIN).replace(/^0x/, '0x'))
-      permissionValues[0] = permissionValues[0].length === 6
-        ? permissionValues[0]
-        : `0x${permissionValues[0].slice(2).padStart(4, '0')}`
+      permissionValues[0] =
+        permissionValues[0].length === 6
+          ? permissionValues[0]
+          : `0x${permissionValues[0].slice(2).padStart(4, '0')}`
     }
 
     permissions?.forEach(permission => {
@@ -703,14 +726,10 @@ export class OrganigramClient {
     if (procedureAddress == null) {
       throw new Error('Procedure deployment failed.')
     }
-    return await this.getDeployedProcedure(
-      procedureAddress,
-      false,
-      {
-        ...initialProcedure,
-        address: procedureAddress
-      }
-    ).catch((error: Error) => {
+    return await this.getDeployedProcedure(procedureAddress, false, {
+      ...initialProcedure,
+      address: procedureAddress
+    }).catch((error: Error) => {
       throw new Error(
         'Unable to load procedure with address ' +
           procedureAddress +
@@ -769,7 +788,9 @@ export class OrganigramClient {
     )
   }
 
-  async deployOrganigram(input: DeployOrganigramInput): Promise<readonly string[]> {
+  async deployOrganigram(
+    input: DeployOrganigramInput
+  ): Promise<readonly string[]> {
     if (this.walletClient == null) {
       throw new Error('Wallet client not connected.')
     }
@@ -786,14 +807,6 @@ export class OrganigramClient {
       input.procedures,
       this.getClients()
     )
-    const account = await getWalletAddress(this.walletClient)
-    const simulation = await this.publicClient.simulateContract({
-      address: this.address as `0x${string}`,
-      abi: OrganigramClientContractABI.abi,
-      functionName: 'deployOrganigram',
-      args: [organsInput, formattedAssets, proceduresInput],
-      account
-    })
     const tx = await createContractWriteTransaction({
       address: this.address,
       abi: OrganigramClientContractABI.abi,
@@ -801,10 +814,13 @@ export class OrganigramClient {
       args: [organsInput, formattedAssets, proceduresInput],
       clients: this.getClients()
     })
+    const receipt = await tx.wait()
 
-    await tx.wait()
-
-    return simulation.result
+    return [
+      getDeploymentAddresses(receipt, 'organDeployed'),
+      getDeploymentAddresses(receipt, 'assetDeployed'),
+      getDeploymentAddresses(receipt, 'procedureDeployed')
+    ] as unknown as readonly string[]
   }
 
   async loadContract(
@@ -875,9 +891,19 @@ export class OrganigramClient {
           ) {
             return organ
           }
-          return (
-            (await this.getDeployedOrgan(organ.address, cached, organ)) ?? organ
-          )
+          try {
+            return (
+              (await this.getDeployedOrgan(organ.address, false, organ)) ??
+              organ
+            )
+          } catch (error) {
+            console.warn(
+              'Unable to hydrate deployed organ in organigram load.',
+              organ.address,
+              (error as Error).message
+            )
+            return organ
+          }
         }
       )
     ).filter(organ => organ != null)
@@ -893,15 +919,22 @@ export class OrganigramClient {
         ) {
           return procedure
         }
-        return (
-          this.procedures.find(existingProcedure => existingProcedure.address === procedure.address) ??
-          (await this.getDeployedProcedure(
+        try {
+          return (
+            (await this.getDeployedProcedure(
+              procedure.address,
+              false,
+              procedure
+            )) ?? procedure
+          )
+        } catch (error) {
+          console.warn(
+            'Unable to hydrate deployed procedure in organigram load.',
             procedure.address,
-            cached,
-            procedure
-          )) ??
-          procedure
-        )
+            (error as Error).message
+          )
+          return procedure
+        }
       }
     )
 
@@ -917,9 +950,19 @@ export class OrganigramClient {
           ) {
             return asset
           }
-          return (
-            (await this.getDeployedAsset(asset.address, cached, asset)) ?? asset
-          )
+          try {
+            return (
+              (await this.getDeployedAsset(asset.address, false, asset)) ??
+              asset
+            )
+          } catch (error) {
+            console.warn(
+              'Unable to hydrate deployed asset in organigram load.',
+              asset.address,
+              (error as Error).message
+            )
+            return asset
+          }
         }
       )
     ).filter(asset => asset != null)

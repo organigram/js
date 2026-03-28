@@ -1,4 +1,4 @@
-import OrganContractABI from '@organigram/protocol/abi/Organ.sol/Organ.json'
+import OrganContractABI from '@organigram/protocol/abi/Organ.sol/Organ.json' with { type: 'json' }
 import {
   decodeFunctionResult,
   encodeFunctionData,

@@ -1,4 +1,4 @@
-import ProcedureContractABI from '@organigram/protocol/abi/Procedure.sol/Procedure.json'
+import ProcedureContractABI from '@organigram/protocol/abi/Procedure.sol/Procedure.json' with { type: 'json' }
 import {
   decodeAbiParameters,
   decodeFunctionResult,
@@ -36,7 +36,7 @@ import {
   type OrganigramTransactionReceipt,
   createContractWriteTransaction,
   getContractInstance,
-  getWalletAccount,
+  getWalletAccount
 } from '../contracts'
 
 export interface ProcedureTypeField {
@@ -74,7 +74,7 @@ export type ProcedureJson = {
   isDeployed: boolean
   address: string
   deciders: string
-  typeName: string
+  typeName: ProcedureTypeName
   name: string
   description: string
   cid: string
@@ -281,10 +281,7 @@ const normalizeTupleEntry = (value: any) => ({
   cid: value?.cid ?? value?.[1]
 })
 
-const normalizeProposal = (
-  proposal: any,
-  key: string
-): ProcedureProposal => ({
+const normalizeProposal = (proposal: any, key: string): ProcedureProposal => ({
   key,
   creator: proposal.creator ?? proposal[0],
   cid: proposal.cid ?? proposal[1],
@@ -293,8 +290,8 @@ const normalizeProposal = (
   blocked: proposal.blocked ?? proposal[4],
   adopted: proposal.adopted ?? proposal[5],
   applied: proposal.applied ?? proposal[6],
-  operations: (proposal.operations ?? proposal[7] ?? []).map((operation: unknown) =>
-    Procedure.parseOperation(operation)
+  operations: (proposal.operations ?? proposal[7] ?? []).map(
+    (operation: unknown) => Procedure.parseOperation(operation)
   )
 })
 
@@ -608,7 +605,8 @@ export class Procedure {
       throw new Error('No address provided.')
     }
     const chainId =
-      initialProcedure?.chainId ?? String(await clients.publicClient.getChainId())
+      initialProcedure?.chainId ??
+      String(await clients.publicClient.getChainId())
     if (initialProcedure?.typeName == null && initialProcedure?.type == null) {
       const isProcedure = await Procedure.isProcedure(address, clients)
       if (!isProcedure) {
@@ -788,6 +786,10 @@ export class Procedure {
     operations: ProcedureProposalOperation[]
     options?: TransactionOptions
   }): Promise<ProcedureProposal> {
+    const currentProcedureData = await Procedure.loadData(
+      this.address,
+      this.getClients()
+    )
     const ops = input.operations.map(operation => ({
       index:
         operation.index != null && operation.index !== ''
@@ -810,11 +812,8 @@ export class Procedure {
       tx,
       `Create proposal with CID ${input.cid} on procedure ${this.address}`
     )
-    const receipt = await tx.wait()
-    const proposalKey = receipt.logs[0]?.topics?.[2]
-    if (proposalKey == null) {
-      throw new Error('Proposal not created.')
-    }
+    await tx.wait()
+    const proposalKey = currentProcedureData.proposalsLength.toString()
     const proposal = await Procedure.loadProposal(
       this.address,
       proposalKey,
@@ -990,7 +989,8 @@ export class Procedure {
   }
 
   async getNonce(account: string): Promise<bigint> {
-    const contract = this.contract ??
+    const contract =
+      this.contract ??
       getContractInstance({
         address: this.address,
         abi: ProcedureContractABI.abi,
@@ -1039,11 +1039,7 @@ export class Procedure {
           }
         ],
         functionName: 'executeWhitelisted',
-        args: [
-          target as `0x${string}`,
-          BigInt(value),
-          data as `0x${string}`
-        ]
+        args: [target as `0x${string}`, BigInt(value), data as `0x${string}`]
       }),
       functionSelector: toFunctionSelector(
         'executeWhitelisted(address,uint256,bytes)'

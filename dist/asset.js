@@ -1,4 +1,4 @@
-import AssetContract from '@organigram/protocol/abi/Asset.sol/Asset.json';
+import AssetContract from '@organigram/protocol/abi/Asset.sol/Asset.json' with { type: 'json' };
 import { decodeFunctionResult, encodeFunctionData, formatEther, zeroAddress } from 'viem';
 import { createRandom32BytesHexId, predictContractAddress } from './utils';
 import { tryMulticall } from './multicall';

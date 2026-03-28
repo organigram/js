@@ -1,4 +1,4 @@
-import ERC20VoteProcedureContractABI from '@organigram/protocol/abi/ERC20Vote.sol/ERC20VoteProcedure.json';
+import ERC20VoteProcedureContractABI from '@organigram/protocol/abi/ERC20Vote.sol/ERC20VoteProcedure.json' with { type: 'json' };
 import { Procedure } from '.';
 import { erc20Vote } from './utils';
 import { VoteProcedure } from './vote';

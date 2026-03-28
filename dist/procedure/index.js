@@ -1,9 +1,9 @@
-import ProcedureContractABI from '@organigram/protocol/abi/Procedure.sol/Procedure.json';
+import ProcedureContractABI from '@organigram/protocol/abi/Procedure.sol/Procedure.json' with { type: 'json' };
 import { decodeAbiParameters, decodeFunctionResult, encodeAbiParameters, encodeFunctionData, encodePacked, keccak256, parseAbiParameters, toFunctionSelector, toHex, zeroAddress } from 'viem';
 import { capitalize, createRandom32BytesHexId, deployedAddresses, handleJsonBigInt, predictContractAddress } from '../utils';
 import { tryMulticall } from '../multicall';
 import { ProcedureTypeNameEnum, procedureTypes } from './utils';
-import { createContractWriteTransaction, getContractInstance, getWalletAccount, } from '../contracts';
+import { createContractWriteTransaction, getContractInstance, getWalletAccount } from '../contracts';
 const normalizeProcedureData = (data) => ({
     cid: data.cid ?? data[0],
     proposers: data.proposers ?? data[1],
@@ -261,7 +261,8 @@ export class Procedure {
         if (!address) {
             throw new Error('No address provided.');
         }
-        const chainId = initialProcedure?.chainId ?? String(await clients.publicClient.getChainId());
+        const chainId = initialProcedure?.chainId ??
+            String(await clients.publicClient.getChainId());
         if (initialProcedure?.typeName == null && initialProcedure?.type == null) {
             const isProcedure = await Procedure.isProcedure(address, clients);
             if (!isProcedure) {
@@ -404,6 +405,7 @@ export class Procedure {
         return tx;
     }
     async propose(input) {
+        const currentProcedureData = await Procedure.loadData(this.address, this.getClients());
         const ops = input.operations.map(operation => ({
             index: operation.index != null && operation.index !== ''
                 ? BigInt(operation.index)
@@ -422,11 +424,8 @@ export class Procedure {
             nonce: input.options?.nonce
         });
         input.options?.onTransaction?.(tx, `Create proposal with CID ${input.cid} on procedure ${this.address}`);
-        const receipt = await tx.wait();
-        const proposalKey = receipt.logs[0]?.topics?.[2];
-        if (proposalKey == null) {
-            throw new Error('Proposal not created.');
-        }
+        await tx.wait();
+        const proposalKey = currentProcedureData.proposalsLength.toString();
         const proposal = await Procedure.loadProposal(this.address, proposalKey, this.getClients());
         this.proposals.push(proposal);
         return proposal;
@@ -611,11 +610,7 @@ export class Procedure {
                     }
                 ],
                 functionName: 'executeWhitelisted',
-                args: [
-                    target,
-                    BigInt(value),
-                    data
-                ]
+                args: [target, BigInt(value), data]
             }),
             functionSelector: toFunctionSelector('executeWhitelisted(address,uint256,bytes)')
         };

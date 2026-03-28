@@ -9,7 +9,7 @@ export interface DeployOrganInput {
     cid?: string;
     permissions?: OrganPermission[];
     entries?: OrganEntry[];
-    salt?: string;
+    salt?: string | null;
     options?: TransactionOptions;
 }
 export interface DeployProceduresInput {
@@ -24,7 +24,7 @@ export interface DeployProceduresInput {
     salt?: string | null;
     options?: TransactionOptions;
     data?: string;
-    args?: string[];
+    args?: unknown[];
 }
 export interface DeployOrganigramInput {
     organs: DeployOrganInput[];

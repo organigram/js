@@ -1,7 +1,7 @@
-import none from './none.json';
-import forProfit from './for-profit.json';
-import nonProfit from './non-profit.json';
-import openSource from './open-source.json';
+import none from './none.json' with { type: 'json' };
+import forProfit from './for-profit.json' with { type: 'json' };
+import nonProfit from './non-profit.json' with { type: 'json' };
+import openSource from './open-source.json' with { type: 'json' };
 import { capitalize, createRandom32BytesHexId, predictContractAddress } from '../utils';
 export const templates = {
     none,

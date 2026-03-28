@@ -1,4 +1,4 @@
-import VoteProcedureContractABI from '@organigram/protocol/abi/Vote.sol/VoteProcedure.json'
+import VoteProcedureContractABI from '@organigram/protocol/abi/Vote.sol/VoteProcedure.json' with { type: 'json' }
 import {
   Procedure,
   type ProcedureProposal,
@@ -33,8 +33,8 @@ export type VoteProcedureInput = ProcedureInput & {
 const normalizeElection = (election: any, proposalKey: string): Election => ({
   proposalKey,
   start: (election.start ?? election[0]).toString(),
-  votesCount: (election.votesCount ?? election[1]).toString(),
-  hasVoted: Boolean(election.hasVoted ?? election[2])
+  votesCount: (election.votesCount ?? election[2]).toString(),
+  hasVoted: Boolean(election.hasVoted ?? election[1])
 })
 
 export class VoteProcedure extends Procedure {

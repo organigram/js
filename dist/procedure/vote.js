@@ -1,4 +1,4 @@
-import VoteProcedureContractABI from '@organigram/protocol/abi/Vote.sol/VoteProcedure.json';
+import VoteProcedureContractABI from '@organigram/protocol/abi/Vote.sol/VoteProcedure.json' with { type: 'json' };
 import { Procedure } from '../procedure';
 import { deployedAddresses, handleJsonBigInt } from '../utils';
 import { tryMulticall } from '../multicall';
@@ -8,8 +8,8 @@ import { createContractWriteTransaction, getContractInstance, getWalletAccount }
 const normalizeElection = (election, proposalKey) => ({
     proposalKey,
     start: (election.start ?? election[0]).toString(),
-    votesCount: (election.votesCount ?? election[1]).toString(),
-    hasVoted: Boolean(election.hasVoted ?? election[2])
+    votesCount: (election.votesCount ?? election[2]).toString(),
+    hasVoted: Boolean(election.hasVoted ?? election[1])
 });
 export class VoteProcedure extends Procedure {
     static INTERFACE = '0xc9d27afe';
