@@ -1,4 +1,5 @@
 export * from './asset';
+export * from './contracts';
 export * from './organ';
 export * from './organigram';
 export * from './organigramClient';
@@ -9,4 +10,3 @@ export * from './procedure/erc20Vote';
 export * from './procedure/utils';
 export * from './template';
 export * from './utils';
-export * from './contracts';
