@@ -35,9 +35,11 @@ const getDeploymentAddresses = (receipt, eventName) => receipt.logs.flatMap(log 
         const decoded = decodeEventLog({
             abi: OrganigramClientContractABI.abi,
             data: log.data,
-            topics: log.topics,
-            eventName
+            topics: log.topics
         });
+        if (decoded.eventName !== eventName) {
+            return [];
+        }
         const args = decoded.args;
         if (args == null || Array.isArray(args)) {
             return [];

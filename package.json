@@ -44,9 +44,9 @@
     "docs:generate": "pnpm api-extractor run && pnpm api-documenter yaml --input-folder .",
     "docs": "sudo node ./scripts/docs.js",
     "build": "tsc --pretty",
-    "test": "jest",
-    "test:coverage": "jest --coverage",
-    "test:watch": "jest --watch",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
+    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
     "typecheck": "tsc --noEmit --incremental false"
   },
   "gitHead": "5aeceb89fcac23a06b21969c01c8bfdd36cea896"

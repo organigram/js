@@ -127,11 +127,13 @@ const getDeploymentAddresses = (
       const decoded = decodeEventLog({
         abi: OrganigramClientContractABI.abi,
         data: log.data,
-        topics: log.topics,
-        eventName
+        topics: log.topics
       }) as {
         eventName: 'organDeployed' | 'assetDeployed' | 'procedureDeployed'
         args?: Record<string, unknown> | readonly unknown[]
+      }
+      if (decoded.eventName !== eventName) {
+        return []
       }
       const args = decoded.args as
         | Record<string, unknown>
