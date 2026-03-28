@@ -1,6 +1,5 @@
-import { strictEqual } from 'assert'
-import deployedAddresses from '@organigram/protocol/deployments.json'
-import AssetContractABI from '@organigram/protocol/abi/Asset.sol/Asset.json'
+import deployedAddresses from '@organigram/protocol/deployments.json' with { type: 'json' }
+import AssetContractABI from '@organigram/protocol/abi/Asset.sol/Asset.json' with { type: 'json' }
 import {
   createPublicClient,
   createWalletClient,
@@ -66,16 +65,16 @@ describe('Organigram JS Client', () => {
     it('should connect Web3 to a provider', async () => {
       const chainId = await publicClient.getChainId()
 
-      strictEqual(chainId, 11155111)
+      expect(chainId).toBe(11155111)
     })
 
     it('should provide signer with funds', async () => {
       const chainId = await publicClient.getChainId()
       const balance = await publicClient.getBalance({ address: signerAddress })
 
-      strictEqual(chainId, 11155111)
-      strictEqual(signerAddress != null, true)
-      strictEqual(balance != null && balance > 0n, true)
+      expect(chainId).toBe(11155111)
+      expect(signerAddress).not.toBeNull()
+      expect(balance).toBeGreaterThan(0n)
     })
   })
 
@@ -90,17 +89,17 @@ describe('Organigram JS Client', () => {
     })
 
     it('should connect to the deployed client', async () => {
-      strictEqual(organigramClient?.address != null, true)
+      expect(organigramClient?.address).not.toBeNull()
     })
 
     it('should create an organ', async () => {
       organ = await organigramClient.deployOrgan()
-      strictEqual(organ?.address != null, true)
+      expect(organ?.address).not.toBeNull()
     })
 
     it('should create organs in batch', async () => {
       const organs = await organigramClient.deployOrgans([{}, {}])
-      strictEqual(organs?.length === 2, true)
+      expect(organs?.length).toBe(2)
     })
 
     it('should deploy an ERC20 asset', async () => {
@@ -111,7 +110,7 @@ describe('Organigram JS Client', () => {
         undefined,
         txOptions
       )
-      strictEqual(isAddress(asset), true)
+      expect(isAddress(asset)).toBe(true)
     })
 
     it('should deploy assets in batch', async () => {
@@ -128,8 +127,8 @@ describe('Organigram JS Client', () => {
         ],
         txOptions
       )
-      strictEqual(assets?.length === 2, true)
-      strictEqual(isAddress(assets[0]), true)
+      expect(assets?.length).toBe(2)
+      expect(isAddress(assets[0])).toBe(true)
     })
 
     it('should deposit ether into an organ', async () => {
@@ -143,10 +142,9 @@ describe('Organigram JS Client', () => {
 
       await publicClient.waitForTransactionReceipt({ hash })
 
-      strictEqual(
-        await publicClient.getBalance({ address: organ.address as Address }),
-        amount
-      )
+      expect(
+        await publicClient.getBalance({ address: organ.address as Address })
+      ).toBe(amount)
     })
 
     it('should withdraw ether from an organ', async () => {
@@ -158,20 +156,18 @@ describe('Organigram JS Client', () => {
         txOptions
       )
 
-      strictEqual(
+      expect(
         await publicClient.getBalance({
           address: organ.address as Address,
           blockNumber: receipt.blockNumber
-        }),
-        0n
-      )
-      strictEqual(
+        })
+      ).toBe(0n)
+      expect(
         await publicClient.getBalance({
           address: recipientAddress,
           blockNumber: receipt.blockNumber
-        }),
-        amount
-      )
+        })
+      ).toBe(amount)
     })
 
     it('should withdraw ERC20 tokens from an organ', async () => {
@@ -192,22 +188,19 @@ describe('Organigram JS Client', () => {
       )
       await publicClient.waitForTransactionReceipt({ hash: transferHash })
 
-      strictEqual(
-        await assetContract.read.balanceOf([organ.address as Address]),
-        amount
-      )
+      expect(
+        await assetContract.read.balanceOf([organ.address as Address])
+      ).toBe(amount)
 
       await organ.withdrawERC20(asset, recipientAddress, amount, txOptions)
 
-      strictEqual(
-        await assetContract.read.balanceOf([organ.address as Address]),
-        0n
-      )
-      strictEqual(
-        await assetContract.read.balanceOf([recipientAddress]),
-        amount
-      )
-    })
+      expect(
+        await assetContract.read.balanceOf([organ.address as Address])
+      ).toBe(0n)
+      expect(
+        await assetContract.read.balanceOf([recipientAddress])
+      ).toBe(amount)
+      })
 
     it('should deploy procedures in batch', async () => {
       const address = signerAddress
@@ -222,7 +215,7 @@ describe('Organigram JS Client', () => {
           args: ['1', '8', '1']
         }
       ])
-      strictEqual(procedures?.length === 2, true)
+      expect(procedures?.length).toBe(2)
     })
 
     it('should deploy test organigram', async () => {
@@ -256,7 +249,7 @@ describe('Organigram JS Client', () => {
           }
         ]
       })
-      strictEqual(organigram != null, true)
+      expect(organigram).not.toBeNull()
     })
 
     it('should predict deterministic addresses', async () => {
@@ -354,12 +347,12 @@ describe('Organigram JS Client', () => {
       )) as unknown as string[][][]
       const [organs, assets, procedures] = deployed
 
-      strictEqual(organs[0], predictedAddress)
-      strictEqual(organs[1], predictedAddress2)
-      strictEqual(procedures[0], predictedAddress3)
-      strictEqual(procedures[1], predictedAddress4)
-      strictEqual(procedures[2], predictedAddress5)
-      strictEqual(assets[0], predictedAddress6)
+      expect(organs[0]).toBe(predictedAddress)
+      expect(organs[1]).toBe(predictedAddress2)
+      expect(procedures[0]).toBe(predictedAddress3)
+      expect(procedures[1]).toBe(predictedAddress4)
+      expect(procedures[2]).toBe(predictedAddress5)
+      expect(assets[0]).toBe(predictedAddress6)
     })
 
     describe('Nomination', () => {
@@ -374,7 +367,7 @@ describe('Organigram JS Client', () => {
           deciders: address
         })) as NominationProcedure
 
-        strictEqual(procedure?.address != null, true)
+        expect(procedure?.address).not.toBeNull()
       })
 
       it('should add procedure to an organ', async () => {
@@ -383,15 +376,14 @@ describe('Organigram JS Client', () => {
           permissionValue: PERMISSIONS.ADMIN
         })
         organ = await organ.reload()
-        strictEqual(receipt.status, 'success')
-        strictEqual(
+        expect(receipt.status).toBe('success')
+        expect(
           organ.permissions.some(
             p =>
               p.permissionAddress === procedure.address &&
               p.permissionValue === PERMISSIONS.ADMIN
-          ),
-          true
-        )
+          )
+        ).toBe(true)
       })
 
       it('should create a proposal', async () => {
@@ -417,7 +409,7 @@ describe('Organigram JS Client', () => {
         })
         proposalKey = proposal?.key
 
-        strictEqual(proposal?.key != null, true)
+        expect(proposal?.key).not.toBeNull()
       })
 
       it('should reload a procedure with its proposals', async () => {
@@ -432,18 +424,18 @@ describe('Organigram JS Client', () => {
           }
         )
 
-        strictEqual(reloadedProcedure.proposals.length, 1)
-        strictEqual(reloadedProcedure.proposals[0]?.presented, true)
+        expect(reloadedProcedure.proposals.length).toBe(1)
+        expect(reloadedProcedure.proposals[0]?.presented).toBe(true)
       })
 
       it('should approve a proposal', async () => {
         const nominated = await procedure.nominate(proposalKey)
-        strictEqual(nominated, true)
+        expect(nominated).toBe(true)
       })
 
       it('should reload an organ with newly approved entries', async () => {
         organ = await organ.reload()
-        strictEqual(organ.entries.length, 1)
+        expect(organ.entries.length).toBe(1)
       })
 
       it('should block a proposal', async () => {
@@ -476,8 +468,8 @@ describe('Organigram JS Client', () => {
           proposal.key,
           clients
         )
-        strictEqual(receipt.status, 'success')
-        strictEqual(payload.blocked, true)
+        expect(receipt.status).toBe('success')
+        expect(payload.blocked).toBe(true)
       })
     })
 
@@ -500,7 +492,7 @@ describe('Organigram JS Client', () => {
           args: ['1', '1', '8']
         })) as unknown as VoteProcedure
 
-        strictEqual(procedure?.address != null, true)
+        expect(procedure?.address).not.toBeNull()
       })
 
       it('should add permission to an organ', async () => {
@@ -532,7 +524,7 @@ describe('Organigram JS Client', () => {
         })
         proposalKey = proposal?.key
 
-        strictEqual(proposalKey != null, true)
+        expect(proposalKey).not.toBeNull()
       })
 
       it('should block a proposal', async () => {
@@ -543,8 +535,8 @@ describe('Organigram JS Client', () => {
           proposalKey,
           clients
         )
-        strictEqual(receipt.status, 'success')
-        strictEqual(payload.blocked, true)
+        expect(receipt.status).toBe('success')
+        expect(payload.blocked).toBe(true)
       })
     })
 
@@ -567,7 +559,7 @@ describe('Organigram JS Client', () => {
           args: [ERC20_EXAMPLE, '1', '1', '8']
         })) as ERC20VoteProcedure
 
-        strictEqual(procedure?.address != null, true)
+        expect(procedure?.address).not.toBeNull()
       })
 
       it('should add procedure to an organ', async () => {
@@ -576,15 +568,14 @@ describe('Organigram JS Client', () => {
           permissionValue: parseInt('0xffff', 16)
         })
         organ = await organ.reload()
-        strictEqual(receipt.status, 'success')
-        strictEqual(
+        expect(receipt.status).toBe('success')
+        expect(
           organ.permissions.some(
             p =>
               p.permissionAddress === procedure.address &&
               p.permissionValue === 65535
-          ),
-          true
-        )
+          )
+        ).toBe(true)
       })
 
       it('should create a proposal', async () => {
@@ -609,7 +600,7 @@ describe('Organigram JS Client', () => {
         })
         proposalKey = proposal?.key
 
-        strictEqual(proposalKey != null, true)
+        expect(proposalKey).not.toBeNull()
       })
 
       it('should block a proposal', async () => {
@@ -620,8 +611,8 @@ describe('Organigram JS Client', () => {
           proposalKey,
           clients
         )
-        strictEqual(receipt.status, 'success')
-        strictEqual(payload.blocked, true)
+        expect(receipt.status).toBe('success')
+        expect(payload.blocked).toBe(true)
       })
     })
   })
