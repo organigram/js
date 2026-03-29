@@ -1,5 +1,5 @@
 import deployedAddresses from './deployments';
-import { bytesToHex, getCreate2Address, keccak256, padHex } from 'viem';
+import { bytesToHex, getCreate2Address, keccak256, padHex, toHex } from 'viem';
 export { deployedAddresses };
 export const handleJsonBigInt = (key, value) => {
     if (typeof value === 'bigint') {
@@ -16,9 +16,12 @@ export function cloneInitCodeHash(implementation) {
     return keccak256(initCode);
 }
 export const predictContractAddress = ({ type, chainId, salt }) => {
+    const normalizedSalt = /^0x[0-9a-fA-F]{64}$/.test(salt)
+        ? salt
+        : padHex(toHex(salt), { size: 32 });
     return getCreate2Address({
         from: deployedAddresses[chainId]?.OrganigramClient,
-        salt: padHex(salt, { size: 32 }),
+        salt: normalizedSalt,
         bytecodeHash: cloneInitCodeHash(type === 'Organ'
             ? deployedAddresses[chainId]?.CloneableOrgan
             : type === 'Asset'

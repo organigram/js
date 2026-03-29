@@ -1,5 +1,5 @@
 import deployedAddresses from './deployments'
-import { bytesToHex, getCreate2Address, keccak256, padHex } from 'viem'
+import { bytesToHex, getCreate2Address, keccak256, padHex, toHex } from 'viem'
 
 export { deployedAddresses }
 
@@ -39,9 +39,13 @@ export const predictContractAddress = ({
   chainId: string
   salt: string
 }): string => {
+  const normalizedSalt = /^0x[0-9a-fA-F]{64}$/.test(salt)
+    ? (salt as `0x${string}`)
+    : padHex(toHex(salt), { size: 32 })
+
   return getCreate2Address({
     from: deployedAddresses[chainId as '11155111']?.OrganigramClient as `0x${string}`,
-    salt: padHex(salt as `0x${string}`, { size: 32 }),
+    salt: normalizedSalt,
     bytecodeHash: cloneInitCodeHash(
       type === 'Organ'
         ? deployedAddresses[chainId as '11155111']?.CloneableOrgan
