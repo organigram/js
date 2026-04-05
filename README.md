@@ -8,10 +8,6 @@ See the official [documentation](https://organigram.ai/en/docs/reference/js) for
 ```
 // npm:
 npm install @organigram/js
-
-// yarn:
-yarn add @organigram/js
-
 // pnpm:
 pnpm add @organigram/js
 ```
