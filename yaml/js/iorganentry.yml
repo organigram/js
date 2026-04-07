@@ -3,7 +3,7 @@ name: IOrganEntry
 uid: '@organigram/js!IOrganEntry:interface'
 package: '@organigram/js!'
 fullName: IOrganEntry
-summary: ''
+summary: Entry payload used when creating or updating an organ entry.
 remarks: ''
 example: []
 isPreview: false

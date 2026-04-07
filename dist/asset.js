@@ -3,7 +3,10 @@ import { decodeFunctionResult, encodeFunctionData, formatEther, zeroAddress } fr
 import { createRandom32BytesHexId, predictContractAddress } from './utils';
 import { tryMulticall } from './multicall';
 import { getContractInstance, getWalletAddress } from './contracts';
-export const ERC20_INITIAL_SUPPLY = 10_000_000;
+export const ERC20_INITIAL_SUPPLY = 10_000_000; // 10 million tokens.
+/**
+ * In-memory representation of one ERC-20 asset managed by an organigram.
+ */
 export class Asset {
     address;
     name;
@@ -39,6 +42,13 @@ export class Asset {
         this.userBalance = input.userBalance ?? '0';
         this.organigramId = input.organigramId ?? null;
     }
+    /**
+     * Hydrate an asset from chain state.
+     *
+     * @param address Asset contract address.
+     * @param clients viem clients used to query the contract.
+     * @param initialAsset Optional fallback metadata merged into the loaded asset.
+     */
     static load = async (address, clients, initialAsset) => {
         if (!address) {
             throw new Error('Cannot load asset: No address provided.');
@@ -138,6 +148,9 @@ export class Asset {
             isDeployed: true
         });
     };
+    /**
+     * Convert the asset into a JSON-safe structure.
+     */
     toJson() {
         return {
             address: this.address,

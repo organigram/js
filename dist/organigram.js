@@ -1,12 +1,24 @@
 import OrganigramClient from './organigramClient';
 import { getTemplate, templates } from './template';
 import { handleJsonBigInt } from './utils';
+/**
+ * Human-readable labels for the procedure role slots expected by the protocol.
+ */
 export const procedureRoleTypes = [
     { label: 'Create proposals', name: 'proposers' },
     { label: 'Approve proposals', name: 'deciders' },
     { label: 'Filter proposals', name: 'moderators' }
 ];
+/**
+ * Default Sepolia chain id used by the SDK templates.
+ */
 export const defaultChainId = '11155111';
+/**
+ * In-memory representation of an Organigram project.
+ *
+ * The class can be created from raw inputs, a built-in template name, or left
+ * blank to start from the default empty template.
+ */
 export class Organigram {
     id;
     organs = [];
@@ -58,6 +70,11 @@ export class Organigram {
     setOrgans(organs) { }
     setAssets(assets) { }
     setProcedures(procedures) { }
+    /**
+     * Hydrate every deployed object referenced by this organigram.
+     *
+     * @param input Optional viem clients used when the organigram has no attached client yet.
+     */
     load = async (input) => {
         const publicClient = input?.publicClient ??
             this.publicClient ??
@@ -76,6 +93,9 @@ export class Organigram {
             }));
         return await client.loadOrganigram(this);
     };
+    /**
+     * Deploy the full organigram through its attached client, then reload it from chain state.
+     */
     async deploy() {
         if (!this.organigramClient) {
             throw new Error('Organigram client not set.');
@@ -84,6 +104,9 @@ export class Organigram {
             .deployOrganigram(this)
             .then(async () => await this.load());
     }
+    /**
+     * Convert the organigram into a JSON-safe structure suitable for persistence or transport.
+     */
     toJson = () => JSON.parse(JSON.stringify({
         id: this.id,
         slug: this.slug,

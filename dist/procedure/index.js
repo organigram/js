@@ -129,6 +129,9 @@ export const procedureFunctions = [
         target: 'organ'
     }
 ];
+/**
+ * Base SDK model shared by every procedure implementation.
+ */
 export class Procedure {
     static INTERFACE = '0x71dbd330';
     static OPERATIONS_FUNCTIONS = procedureFunctions;

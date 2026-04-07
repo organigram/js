@@ -3,7 +3,7 @@ name: AssetInput
 uid: '@organigram/js!AssetInput:interface'
 package: '@organigram/js!'
 fullName: AssetInput
-summary: ''
+summary: Input used to create or hydrate an asset model.
 remarks: ''
 example: []
 isPreview: false

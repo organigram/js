@@ -3,7 +3,7 @@ name: OrganJson
 uid: '@organigram/js!OrganJson:interface'
 package: '@organigram/js!'
 fullName: OrganJson
-summary: ''
+summary: JSON-safe serialized representation of one organ.
 remarks: ''
 example: []
 isPreview: false

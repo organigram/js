@@ -3,7 +3,7 @@ name: ProcedureInput
 uid: '@organigram/js!ProcedureInput:interface'
 package: '@organigram/js!'
 fullName: ProcedureInput
-summary: ''
+summary: Input used to create or hydrate a procedure model.
 remarks: ''
 example: []
 isPreview: false

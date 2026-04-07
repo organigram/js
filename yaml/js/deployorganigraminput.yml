@@ -3,7 +3,7 @@ name: DeployOrganigramInput
 uid: '@organigram/js!DeployOrganigramInput:interface'
 package: '@organigram/js!'
 fullName: DeployOrganigramInput
-summary: ''
+summary: Batch deployment input for a full organigram.
 remarks: ''
 example: []
 isPreview: false

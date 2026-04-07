@@ -4,11 +4,29 @@
 
 ```ts
 
+import type { Abi } from 'viem';
+import type { Account } from 'viem';
 import type { Address } from 'viem';
+import { BlockTag } from 'viem';
+import { Chain } from 'viem';
+import { CreateContractEventFilterReturnType } from 'viem';
+import { EstimateContractGasParameters } from 'viem';
+import { EstimateContractGasReturnType } from 'viem';
+import { GetContractEventsReturnType } from 'viem';
 import type { Hex } from 'viem';
+import { Prettify } from 'viem';
 import { PublicClient } from 'viem';
+import { ReadContractParameters } from 'viem';
+import { ReadContractReturnType } from 'viem';
+import { SimulateContractParameters } from 'viem';
+import { SimulateContractReturnType } from 'viem';
 import type { TransactionReceipt } from 'viem';
+import { UnionOmit } from 'viem';
 import { WalletClient } from 'viem';
+import { WatchContractEventOnLogsFn } from 'viem';
+import { WatchContractEventReturnType } from 'viem';
+import { WriteContractParameters } from 'viem';
+import { WriteContractReturnType } from 'viem';
 
 // @public (undocumented)
 export type AccountInOrgans = {
@@ -17,7 +35,7 @@ export type AccountInOrgans = {
     deciders?: boolean;
 };
 
-// @public (undocumented)
+// @public
 export class Asset {
     constructor(input: AssetInput);
     // (undocumented)
@@ -32,7 +50,6 @@ export class Asset {
     initialSupply: number;
     // (undocumented)
     isDeployed: boolean;
-    // (undocumented)
     static load: (address: string, clients: ContractClients, initialAsset?: AssetInput) => Promise<(Asset & {
         userBalance: string;
     }) | undefined>;
@@ -44,13 +61,12 @@ export class Asset {
     salt?: string | null;
     // (undocumented)
     symbol: string;
-    // (undocumented)
     toJson(): AssetJson;
     // (undocumented)
     userBalance: string;
 }
 
-// @public (undocumented)
+// @public
 export interface AssetInput {
     // (undocumented)
     address?: string | null;
@@ -76,7 +92,7 @@ export interface AssetInput {
     userBalance?: string | null;
 }
 
-// @public (undocumented)
+// @public
 export interface AssetJson {
     // (undocumented)
     address: string;
@@ -101,6 +117,9 @@ export interface AssetJson {
 }
 
 // @public (undocumented)
+export const bufferEstimatedGas: (estimatedGas: bigint) => bigint;
+
+// @public (undocumented)
 export const capitalize: (s: string) => string;
 
 // @public (undocumented)
@@ -116,12 +135,33 @@ export type ContractClients = {
 export type ContractName = 'Organ' | 'Asset' | 'ERC20VoteProcedure' | 'VoteProcedure' | 'NominationProcedure' | 'OrganigramClient';
 
 // @public (undocumented)
+export const createContractWriteTransaction: <TAbi extends Abi | readonly unknown[]>(input: {
+    address: string;
+    abi: TAbi;
+    functionName: string;
+    args?: unknown[];
+    clients: ContractClients;
+    nonce?: number;
+    value?: bigint;
+}) => Promise<OrganigramTransaction>;
+
+// @public (undocumented)
+export const createDeployTransaction: <TAbi extends Abi | readonly unknown[]>(input: {
+    abi: TAbi;
+    bytecode: string;
+    args?: unknown[];
+    clients: ContractClients;
+    nonce?: number;
+    value?: bigint;
+}) => Promise<OrganigramTransaction>;
+
+// @public (undocumented)
 export const createRandom32BytesHexId: () => `0x${string}`;
 
-// @public (undocumented)
+// @public
 export const defaultChainId = "11155111";
 
-// @public (undocumented)
+// @public
 export interface DeployAssetInput {
     // (undocumented)
     initialSupply?: number | null;
@@ -138,7 +178,7 @@ export interface DeployAssetInput {
 // @public (undocumented)
 export const deployedAddresses: ProtocolDeployments;
 
-// @public (undocumented)
+// @public
 export interface DeployOrganigramInput {
     // (undocumented)
     assets: DeployAssetInput[];
@@ -148,7 +188,7 @@ export interface DeployOrganigramInput {
     procedures: DeployProceduresInput[];
 }
 
-// @public (undocumented)
+// @public
 export interface DeployOrganInput {
     // (undocumented)
     cid?: string;
@@ -159,13 +199,13 @@ export interface DeployOrganInput {
     // (undocumented)
     permissions?: OrganPermission[];
     // (undocumented)
-    salt?: string;
+    salt?: string | null;
 }
 
-// @public (undocumented)
+// @public
 export interface DeployProceduresInput {
     // (undocumented)
-    args?: string[];
+    args?: unknown[];
     // (undocumented)
     chainId?: string | null;
     // (undocumented)
@@ -190,7 +230,7 @@ export interface DeployProceduresInput {
     withModeration?: boolean | null;
 }
 
-// @public (undocumented)
+// @public
 export type Election = {
     proposalKey: string;
     start: string;
@@ -359,7 +399,7 @@ export interface ExternalCallOperationInput {
     value?: string | bigint | number;
 }
 
-// @public (undocumented)
+// @public
 interface File_2 {
     // (undocumented)
     cid: string;
@@ -372,13 +412,213 @@ export { File_2 as File }
 export const formatSalt: (salt?: string | null) => string;
 
 // @public (undocumented)
+export const getContractInstance: <TAbi extends Abi | readonly unknown[]>(input: {
+    address: string;
+    abi: TAbi;
+} & ContractClients) => {
+    read: {
+        [x: string]: (...parameters: [options?: Prettify<UnionOmit<ReadContractParameters<Abi, string, readonly unknown[]>, "address" | "abi" | "functionName" | "args">> | undefined] | [args: readonly unknown[], options?: Prettify<UnionOmit<ReadContractParameters<Abi, string, readonly unknown[]>, "address" | "abi" | "functionName" | "args">> | undefined]) => Promise<ReadContractReturnType>;
+    };
+    estimateGas: {
+        [x: string]: (...parameters: [options: Prettify<UnionOmit<EstimateContractGasParameters<Abi, string, readonly unknown[], Chain | undefined>, "address" | "abi" | "functionName" | "args">>] | [args: readonly unknown[], options: Prettify<UnionOmit<EstimateContractGasParameters<Abi, string, readonly unknown[], Chain | undefined>, "address" | "abi" | "functionName" | "args">>]) => Promise<EstimateContractGasReturnType>;
+    } & {
+        [x: string]: (...parameters: [options: Prettify<UnionOmit<EstimateContractGasParameters<Abi, string, readonly unknown[], Chain | undefined>, "address" | "abi" | "functionName" | "args">>] | [args: readonly unknown[], options: Prettify<UnionOmit<EstimateContractGasParameters<Abi, string, readonly unknown[], Chain | undefined>, "address" | "abi" | "functionName" | "args">>]) => Promise<EstimateContractGasReturnType>;
+    };
+    simulate: {
+        [x: string]: <chainOverride extends Chain | undefined = undefined, accountOverride extends Account | Address | undefined = undefined>(...parameters: [options?: Omit<SimulateContractParameters<Abi, string, readonly unknown[], Chain | undefined, chainOverride, accountOverride>, "address" | "abi" | "functionName" | "args"> | undefined] | [args: readonly unknown[], options?: Omit<SimulateContractParameters<Abi, string, readonly unknown[], Chain | undefined, chainOverride, accountOverride>, "address" | "abi" | "functionName" | "args"> | undefined]) => Promise<SimulateContractReturnType>;
+    };
+    createEventFilter: {
+        [x: string]: <strict extends boolean | undefined = undefined>(...parameters: [options?: ({
+            fromBlock?: bigint | BlockTag | undefined;
+            toBlock?: bigint | BlockTag | undefined;
+        } & {
+            strict?: strict | undefined;
+        }) | undefined] | [args: readonly unknown[] | {
+            [x: string]: unknown;
+            address?: undefined;
+            abi?: undefined;
+            eventName?: undefined;
+            fromBlock?: undefined;
+            strict?: undefined;
+            toBlock?: undefined;
+            args?: undefined;
+        }, options?: ({
+            fromBlock?: bigint | BlockTag | undefined;
+            toBlock?: bigint | BlockTag | undefined;
+        } & {
+            strict?: strict | undefined;
+        }) | undefined]) => Promise<CreateContractEventFilterReturnType>;
+    };
+    getEvents: {
+        [x: string]: (...parameters: [options?: {
+            strict?: boolean | undefined;
+            blockHash?: `0x${string}` | undefined;
+            fromBlock?: bigint | BlockTag | undefined;
+            toBlock?: bigint | BlockTag | undefined;
+        } | undefined] | [args?: readonly unknown[] | {
+            [x: string]: unknown;
+            address?: undefined;
+            abi?: undefined;
+            args?: undefined;
+            eventName?: undefined;
+            fromBlock?: undefined;
+            onError?: undefined;
+            onLogs?: undefined;
+            strict?: undefined;
+            poll?: undefined;
+            batch?: undefined;
+            pollingInterval?: undefined;
+        } | undefined, options?: {
+            strict?: boolean | undefined;
+            blockHash?: `0x${string}` | undefined;
+            fromBlock?: bigint | BlockTag | undefined;
+            toBlock?: bigint | BlockTag | undefined;
+        } | undefined]) => Promise<GetContractEventsReturnType<Abi, string>>;
+    };
+    watchEvent: {
+        [x: string]: (...parameters: [options?: {
+            batch?: boolean | undefined | undefined;
+            pollingInterval?: number | undefined | undefined;
+            strict?: boolean | undefined;
+            fromBlock?: bigint | undefined;
+            onError?: ((error: Error) => void) | undefined | undefined;
+            onLogs: WatchContractEventOnLogsFn<Abi, string, undefined>;
+            poll?: true | undefined | undefined;
+        } | undefined] | [args: readonly unknown[] | {
+            [x: string]: unknown;
+            address?: undefined;
+            abi?: undefined;
+            args?: undefined;
+            eventName?: undefined;
+            fromBlock?: undefined;
+            onError?: undefined;
+            onLogs?: undefined;
+            strict?: undefined;
+            poll?: undefined;
+            batch?: undefined;
+            pollingInterval?: undefined;
+        }, options?: {
+            batch?: boolean | undefined | undefined;
+            pollingInterval?: number | undefined | undefined;
+            strict?: boolean | undefined;
+            fromBlock?: bigint | undefined;
+            onError?: ((error: Error) => void) | undefined | undefined;
+            onLogs: WatchContractEventOnLogsFn<Abi, string, undefined>;
+            poll?: true | undefined | undefined;
+        } | undefined]) => WatchContractEventReturnType;
+    };
+    write: {
+        [x: string]: <chainOverride extends Chain | undefined, options extends UnionOmit<WriteContractParameters<Abi, string, readonly unknown[], Chain | undefined, undefined, chainOverride>, "address" | "abi" | "functionName" | "args"> extends infer T ? { [K in keyof T]: T[K]; } : never, Rest extends unknown[] = [options: options]>(...parameters: Rest | [args: readonly unknown[], ...parameters: Rest]) => Promise<WriteContractReturnType>;
+    };
+    address: `0x${string}`;
+    abi: Abi;
+} | {
+    read: {
+        [x: string]: (...parameters: [options?: Prettify<UnionOmit<ReadContractParameters<Abi, string, readonly unknown[]>, "address" | "abi" | "functionName" | "args">> | undefined] | [args: readonly unknown[], options?: Prettify<UnionOmit<ReadContractParameters<Abi, string, readonly unknown[]>, "address" | "abi" | "functionName" | "args">> | undefined]) => Promise<ReadContractReturnType>;
+    };
+    estimateGas: {
+        [x: string]: (...parameters: [options: Prettify<UnionOmit<EstimateContractGasParameters<Abi, string, readonly unknown[], Chain | undefined>, "address" | "abi" | "functionName" | "args">>] | [args: readonly unknown[], options: Prettify<UnionOmit<EstimateContractGasParameters<Abi, string, readonly unknown[], Chain | undefined>, "address" | "abi" | "functionName" | "args">>]) => Promise<EstimateContractGasReturnType>;
+    } & {
+        [x: string]: (...parameters: [options: Prettify<UnionOmit<EstimateContractGasParameters<Abi, string, readonly unknown[], Chain | undefined>, "address" | "abi" | "functionName" | "args">>] | [args: readonly unknown[], options: Prettify<UnionOmit<EstimateContractGasParameters<Abi, string, readonly unknown[], Chain | undefined>, "address" | "abi" | "functionName" | "args">>]) => Promise<EstimateContractGasReturnType>;
+    };
+    simulate: {
+        [x: string]: <chainOverride extends Chain | undefined = undefined, accountOverride extends Account | Address | undefined = undefined>(...parameters: [options?: Omit<SimulateContractParameters<Abi, string, readonly unknown[], Chain | undefined, chainOverride, accountOverride>, "address" | "abi" | "functionName" | "args"> | undefined] | [args: readonly unknown[], options?: Omit<SimulateContractParameters<Abi, string, readonly unknown[], Chain | undefined, chainOverride, accountOverride>, "address" | "abi" | "functionName" | "args"> | undefined]) => Promise<SimulateContractReturnType>;
+    };
+    createEventFilter: {
+        [x: string]: <strict extends boolean | undefined = undefined>(...parameters: [options?: ({
+            fromBlock?: bigint | BlockTag | undefined;
+            toBlock?: bigint | BlockTag | undefined;
+        } & {
+            strict?: strict | undefined;
+        }) | undefined] | [args: readonly unknown[] | {
+            [x: string]: unknown;
+            address?: undefined;
+            abi?: undefined;
+            eventName?: undefined;
+            fromBlock?: undefined;
+            strict?: undefined;
+            toBlock?: undefined;
+            args?: undefined;
+        }, options?: ({
+            fromBlock?: bigint | BlockTag | undefined;
+            toBlock?: bigint | BlockTag | undefined;
+        } & {
+            strict?: strict | undefined;
+        }) | undefined]) => Promise<CreateContractEventFilterReturnType>;
+    };
+    getEvents: {
+        [x: string]: (...parameters: [options?: {
+            strict?: boolean | undefined;
+            blockHash?: `0x${string}` | undefined;
+            fromBlock?: bigint | BlockTag | undefined;
+            toBlock?: bigint | BlockTag | undefined;
+        } | undefined] | [args?: readonly unknown[] | {
+            [x: string]: unknown;
+            address?: undefined;
+            abi?: undefined;
+            args?: undefined;
+            eventName?: undefined;
+            fromBlock?: undefined;
+            onError?: undefined;
+            onLogs?: undefined;
+            strict?: undefined;
+            poll?: undefined;
+            batch?: undefined;
+            pollingInterval?: undefined;
+        } | undefined, options?: {
+            strict?: boolean | undefined;
+            blockHash?: `0x${string}` | undefined;
+            fromBlock?: bigint | BlockTag | undefined;
+            toBlock?: bigint | BlockTag | undefined;
+        } | undefined]) => Promise<GetContractEventsReturnType<Abi, string>>;
+    };
+    watchEvent: {
+        [x: string]: (...parameters: [options?: {
+            batch?: boolean | undefined | undefined;
+            pollingInterval?: number | undefined | undefined;
+            strict?: boolean | undefined;
+            fromBlock?: bigint | undefined;
+            onError?: ((error: Error) => void) | undefined | undefined;
+            onLogs: WatchContractEventOnLogsFn<Abi, string, undefined>;
+            poll?: true | undefined | undefined;
+        } | undefined] | [args: readonly unknown[] | {
+            [x: string]: unknown;
+            address?: undefined;
+            abi?: undefined;
+            args?: undefined;
+            eventName?: undefined;
+            fromBlock?: undefined;
+            onError?: undefined;
+            onLogs?: undefined;
+            strict?: undefined;
+            poll?: undefined;
+            batch?: undefined;
+            pollingInterval?: undefined;
+        }, options?: {
+            batch?: boolean | undefined | undefined;
+            pollingInterval?: number | undefined | undefined;
+            strict?: boolean | undefined;
+            fromBlock?: bigint | undefined;
+            onError?: ((error: Error) => void) | undefined | undefined;
+            onLogs: WatchContractEventOnLogsFn<Abi, string, undefined>;
+            poll?: true | undefined | undefined;
+        } | undefined]) => WatchContractEventReturnType;
+    };
+    write: {
+        [x: string]: <chainOverride extends Chain | undefined, options extends UnionOmit<WriteContractParameters<Abi, string, readonly unknown[], Chain | undefined, Account | undefined, chainOverride>, "address" | "abi" | "functionName" | "args"> extends infer T ? { [K in keyof T]: T[K]; } : never, Rest extends unknown[] = [options: options]>(...parameters: Rest | [args: readonly unknown[], ...parameters: Rest]) => Promise<WriteContractReturnType>;
+    };
+    address: `0x${string}`;
+    abi: Abi;
+};
+
+// @public (undocumented)
 export const getPermissionsSet: (permissions: number) => string[];
 
 // @public (undocumented)
 export const getProcedureClass: (typeName: string) => Promise<VoteProcedure | ERC20VoteProcedure | NominationProcedure>;
 
 // @public (undocumented)
-export const getTemplate: (templateName: keyof typeof templates, chainId: string) => {
+export const getTemplate: (templateName: TemplateName, chainId: string) => {
     chainId: string;
     organs: {
         salt: string;
@@ -450,12 +690,15 @@ export const getTemplate: (templateName: keyof typeof templates, chainId: string
 };
 
 // @public (undocumented)
+export const getWalletAccount: (walletClient: WalletClient) => Promise<Account | Address>;
+
+// @public (undocumented)
 export const getWalletAddress: (walletClient: WalletClient) => Promise<Address>;
 
 // @public (undocumented)
 export const handleJsonBigInt: (key: string, value: any) => any;
 
-// @public (undocumented)
+// @public
 export interface IOrganEntry {
     // (undocumented)
     address?: string;
@@ -535,7 +778,7 @@ export type OperationParamType = 'cid' | 'entry' | 'entries' | 'address' | 'byte
 // @public (undocumented)
 export type OperationTag = 'cid' | 'entries' | 'permissions' | 'coins' | 'collectibles' | 'erc721' | 'erc20' | 'erc1155' | 'ether' | 'add' | 'replace' | 'remove' | 'deposit' | 'withdraw' | 'transfer';
 
-// @public (undocumented)
+// @public
 export class Organ {
     constructor(input: OrganInput);
     // (undocumented)
@@ -640,7 +883,7 @@ export interface OrganEntry {
     index: string;
 }
 
-// @public (undocumented)
+// @public
 export enum OrganFunctionName {
     // (undocumented)
     addEntries = "addEntries",
@@ -662,14 +905,13 @@ export enum OrganFunctionName {
     withdrawEther = "withdrawEther"
 }
 
-// @public (undocumented)
+// @public
 export class Organigram {
     constructor(input?: OrganigramInput | keyof typeof templates | string[]);
     // (undocumented)
     assets: Asset[];
     // (undocumented)
     chainId: string;
-    // (undocumented)
     deploy(): Promise<Organigram>;
     // (undocumented)
     description: string;
@@ -681,7 +923,6 @@ export class Organigram {
     }): void;
     // (undocumented)
     id: string;
-    // (undocumented)
     load: (input?: {
         walletClient?: WalletClient | null;
         publicClient?: PublicClient | null;
@@ -704,7 +945,6 @@ export class Organigram {
     setProcedures(procedures: Procedure[]): void;
     // (undocumented)
     slug: string;
-    // (undocumented)
     toJson: () => OrganigramJson;
     // (undocumented)
     walletClient?: WalletClient | null;
@@ -712,7 +952,7 @@ export class Organigram {
     workspaceId?: string | null;
 }
 
-// @public (undocumented)
+// @public
 export class OrganigramClient {
     constructor(input: {
         publicClient: PublicClient;
@@ -732,51 +972,33 @@ export class OrganigramClient {
     cids: File_2[];
     // (undocumented)
     contract: any;
-    // (undocumented)
     deployAsset(name: string, symbol: string, initialSupply: number, salt?: string, options?: TransactionOptions): Promise<string>;
-    // (undocumented)
     deployAssets(assets: DeployAssetInput[], options?: TransactionOptions): Promise<string[]>;
-    // (undocumented)
     static deployClient(input: {
         publicClient: PublicClient;
         walletClient: WalletClient;
     }): Promise<OrganigramClient>;
-    // (undocumented)
     deployOrgan(input?: DeployOrganInput): Promise<Organ>;
-    // (undocumented)
     deployOrganigram(input: DeployOrganigramInput): Promise<readonly string[]>;
-    // (undocumented)
     deployOrgans(deployOrgansInput: DeployOrganInput[]): Promise<Organ[]>;
-    // (undocumented)
     deployProcedure(input: DeployProceduresInput): Promise<Procedure>;
-    // (undocumented)
     deployProcedures(deployProceduresInput: DeployProceduresInput[]): Promise<Procedure[]>;
-    // (undocumented)
     getDeployedAsset(address: string, cached?: boolean, initialAsset?: Asset): Promise<Asset>;
-    // (undocumented)
     getDeployedOrgan(address: string, cached?: boolean, initialOrgan?: OrganInput): Promise<Organ>;
-    // (undocumented)
     getDeployedProcedure(address: string, cached?: boolean, initialProcedure?: ProcedureInput): Promise<Procedure>;
-    // (undocumented)
     getProcedureType(procedureAddress: string): Promise<ProcedureType | null>;
-    // (undocumented)
     static load(input: {
         address?: string;
         publicClient: PublicClient;
         walletClient?: WalletClient;
     }): Promise<OrganigramClient>;
-    // (undocumented)
     loadContract(address: string, cached?: boolean): Promise<Organ | Procedure | null>;
-    // (undocumented)
     loadContracts(contractAddresses: string[]): Promise<Organigram>;
-    // (undocumented)
     loadOrganigram(organigram: Organigram, cached?: boolean): Promise<Organigram>;
-    // (undocumented)
     static loadProcedureType(input: {
         addr: string;
         cid?: string;
     }, publicClient: PublicClient): Promise<ProcedureType>;
-    // (undocumented)
     static loadProcedureTypes(input: {
         publicClient: PublicClient;
         address?: string;
@@ -793,7 +1015,7 @@ export class OrganigramClient {
     walletClient?: WalletClient;
 }
 
-// @public (undocumented)
+// @public
 export type OrganigramInput = {
     id?: string | null;
     slug?: string | null;
@@ -810,7 +1032,7 @@ export type OrganigramInput = {
     workspaceId?: string | null;
 };
 
-// @public (undocumented)
+// @public
 export type OrganigramJson = {
     id: string;
     slug: string;
@@ -870,7 +1092,7 @@ export interface OrganInput {
     walletClient?: WalletClient | null;
 }
 
-// @public (undocumented)
+// @public
 export interface OrganJson {
     // (undocumented)
     address: string;
@@ -896,7 +1118,7 @@ export interface OrganJson {
     salt?: string | null;
 }
 
-// @public (undocumented)
+// @public
 export interface OrganPermission {
     // (undocumented)
     permissionAddress: string;
@@ -982,7 +1204,7 @@ export const prepareDeployProceduresInput: (deployProceduresInput: DeployProcedu
     options: TransactionOptions | undefined;
 }[]>;
 
-// @public (undocumented)
+// @public
 export class Procedure {
     constructor(input: ProcedureInput);
     // (undocumented)
@@ -1117,7 +1339,7 @@ export class Procedure {
 // @public (undocumented)
 export const procedureFunctions: ProcedureProposalOperationFunction[];
 
-// @public (undocumented)
+// @public
 export interface ProcedureInput {
     // (undocumented)
     address?: string | null;
@@ -1161,12 +1383,12 @@ export interface ProcedureInput {
     withModeration?: boolean | null;
 }
 
-// @public (undocumented)
+// @public
 export type ProcedureJson = {
     isDeployed: boolean;
     address: string;
     deciders: string;
-    typeName: string;
+    typeName: ProcedureTypeName;
     name: string;
     description: string;
     cid: string;
@@ -1191,7 +1413,7 @@ export const procedureMetadata: {
     _generatedAt: number;
 };
 
-// @public (undocumented)
+// @public
 export interface ProcedureProposal {
     // (undocumented)
     adopted: boolean;
@@ -1215,7 +1437,7 @@ export interface ProcedureProposal {
     presented: boolean;
 }
 
-// @public (undocumented)
+// @public
 export interface ProcedureProposalOperation {
     // (undocumented)
     data: string;
@@ -1261,16 +1483,16 @@ export interface ProcedureProposalOperationFunction {
     target?: 'organ' | 'self';
 }
 
-// @public (undocumented)
+// @public
 export type ProcedureRoleTypeName = 'proposers' | 'moderators' | 'deciders';
 
-// @public (undocumented)
+// @public
 export const procedureRoleTypes: {
     label: string;
     name: string;
 }[];
 
-// @public (undocumented)
+// @public
 export interface ProcedureType {
     // (undocumented)
     address: string;
@@ -1288,7 +1510,7 @@ export interface ProcedureType {
     };
 }
 
-// @public (undocumented)
+// @public
 export interface ProcedureTypeField {
     // (undocumented)
     defaultValue: string;
@@ -1404,7 +1626,7 @@ export const procedureTypes: {
 // @public (undocumented)
 export type ProposalKey = 'addEntries' | 'removeEntries' | 'replaceEntry' | 'addPermission' | 'removePermission' | 'replacePermission' | 'updateMetadata' | 'transfer' | 'externalCall' | string;
 
-// @public (undocumented)
+// @public
 export interface ProposalMetadata {
     // (undocumented)
     cid?: string;
@@ -1521,6 +1743,9 @@ export interface SignedProposalInput {
 }
 
 // @public (undocumented)
+export type TemplateName = keyof typeof templates;
+
+// @public (undocumented)
 export const templates: {
     none: {
         name: string;
@@ -1631,9 +1856,32 @@ export const templates: {
         }[];
         assets: never[];
     };
+    participatoryBudget: {
+        name: string;
+        organs: {
+            name: string;
+            address: string;
+            salt: string;
+            entries: never[];
+            permissions: {
+                permissionValue: number;
+                permissionAddress: string;
+            }[];
+        }[];
+        assets: never[];
+        procedures: {
+            address: string;
+            salt: string;
+            name: string;
+            typeName: string;
+            deciders: string;
+            proposers: string;
+            data: string;
+        }[];
+    };
 };
 
-// @public (undocumented)
+// @public
 export interface TransactionOptions {
     // (undocumented)
     customData?: {

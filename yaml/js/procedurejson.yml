@@ -3,7 +3,7 @@ name: ProcedureJson
 uid: '@organigram/js!ProcedureJson:type'
 package: '@organigram/js!'
 fullName: ProcedureJson
-summary: ''
+summary: JSON-safe serialized representation of one procedure.
 remarks: ''
 example: []
 isPreview: false
@@ -13,7 +13,7 @@ syntax: |-
       isDeployed: boolean;
       address: string;
       deciders: string;
-      typeName: string;
+      typeName: ProcedureTypeName;
       name: string;
       description: string;
       cid: string;

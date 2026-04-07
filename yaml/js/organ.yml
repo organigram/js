@@ -3,7 +3,7 @@ name: Organ
 uid: '@organigram/js!Organ:class'
 package: '@organigram/js!'
 fullName: Organ
-summary: ''
+summary: In-memory representation of one deployed or planned organ.
 remarks: ''
 example: []
 isPreview: false

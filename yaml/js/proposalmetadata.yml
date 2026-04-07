@@ -3,7 +3,7 @@ name: ProposalMetadata
 uid: '@organigram/js!ProposalMetadata:interface'
 package: '@organigram/js!'
 fullName: ProposalMetadata
-summary: ''
+summary: Rich content attached to a proposal, usually stored off-chain.
 remarks: ''
 example: []
 isPreview: false

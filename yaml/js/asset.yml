@@ -3,7 +3,7 @@ name: Asset
 uid: '@organigram/js!Asset:class'
 package: '@organigram/js!'
 fullName: Asset
-summary: ''
+summary: In-memory representation of one ERC-20 asset managed by an organigram.
 remarks: ''
 example: []
 isPreview: false
@@ -108,7 +108,7 @@ properties:
     uid: '@organigram/js!Asset.load:member'
     package: '@organigram/js!'
     fullName: load
-    summary: ''
+    summary: Hydrate an asset from chain state.
     remarks: ''
     example: []
     isPreview: false
@@ -194,7 +194,7 @@ methods:
     uid: '@organigram/js!Asset#toJson:member(1)'
     package: '@organigram/js!'
     fullName: toJson()
-    summary: ''
+    summary: Convert the asset into a JSON-safe structure.
     remarks: ''
     example: []
     isPreview: false

@@ -3,7 +3,7 @@ name: ProcedureProposalOperation
 uid: '@organigram/js!ProcedureProposalOperation:interface'
 package: '@organigram/js!'
 fullName: ProcedureProposalOperation
-summary: ''
+summary: One low-level operation bundled into a proposal.
 remarks: ''
 example: []
 isPreview: false

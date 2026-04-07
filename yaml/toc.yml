@@ -107,6 +107,8 @@ items:
             uid: '@organigram/js!SignedProposalActionInput:interface'
           - name: SignedProposalInput
             uid: '@organigram/js!SignedProposalInput:interface'
+          - name: TemplateName
+            uid: '@organigram/js!TemplateName:type'
           - name: TransactionOptions
             uid: '@organigram/js!TransactionOptions:interface'
           - name: VoteProcedure

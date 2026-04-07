@@ -3,7 +3,7 @@ name: OrganPermission
 uid: '@organigram/js!OrganPermission:interface'
 package: '@organigram/js!'
 fullName: OrganPermission
-summary: ''
+summary: Permission grant applied to a procedure or address on an organ.
 remarks: ''
 example: []
 isPreview: false

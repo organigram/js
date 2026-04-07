@@ -3,7 +3,12 @@ name: OrganigramClient
 uid: '@organigram/js!OrganigramClient:class'
 package: '@organigram/js!'
 fullName: OrganigramClient
-summary: ''
+summary: >-
+  Main SDK entry point used to deploy and hydrate Organigram protocol objects.
+
+
+  It keeps a public client, an optional wallet client, the registered procedure types for the current chain, and small
+  in-memory caches for loaded organs, procedures, and assets.
 remarks: ''
 example: []
 isPreview: false
@@ -177,7 +182,7 @@ methods:
     uid: '@organigram/js!OrganigramClient#deployAsset:member(1)'
     package: '@organigram/js!'
     fullName: deployAsset(name, symbol, initialSupply, salt, options)
-    summary: ''
+    summary: Deploy a single ERC-20 asset clone.
     remarks: ''
     example: []
     isPreview: false
@@ -188,28 +193,28 @@ methods:
         Promise<string>;
       parameters:
         - id: name
-          description: ''
+          description: Token name exposed by the deployed contract.
           type: string
         - id: symbol
-          description: ''
+          description: Token symbol exposed by the deployed contract.
           type: string
         - id: initialSupply
-          description: ''
+          description: Human-readable token supply before conversion to wei.
           type: number
         - id: salt
-          description: ''
+          description: Optional deterministic clone salt.
           type: string
         - id: options
-          description: ''
+          description: Optional transaction controls.
           type: <xref uid="@organigram/js!TransactionOptions:interface" />
       return:
         type: Promise&lt;string&gt;
-        description: ''
+        description: The address of the deployed asset contract.
   - name: deployAssets(assets, options)
     uid: '@organigram/js!OrganigramClient#deployAssets:member(1)'
     package: '@organigram/js!'
     fullName: deployAssets(assets, options)
-    summary: ''
+    summary: Deploy several assets in one batch transaction.
     remarks: ''
     example: []
     isPreview: false
@@ -218,19 +223,19 @@ methods:
       content: 'deployAssets(assets: DeployAssetInput[], options?: TransactionOptions): Promise<string[]>;'
       parameters:
         - id: assets
-          description: ''
+          description: Assets to deploy.
           type: <xref uid="@organigram/js!DeployAssetInput:interface" />[]
         - id: options
-          description: ''
+          description: Optional transaction controls.
           type: <xref uid="@organigram/js!TransactionOptions:interface" />
       return:
         type: Promise&lt;string[]&gt;
-        description: ''
+        description: The deployed asset addresses in deployment order.
   - name: deployClient(input)
     uid: '@organigram/js!OrganigramClient.deployClient:member(1)'
     package: '@organigram/js!'
     fullName: deployClient(input)
-    summary: ''
+    summary: Deploy a fresh Organigram client contract together with its linked library.
     remarks: ''
     example: []
     isPreview: false
@@ -243,7 +248,7 @@ methods:
             }): Promise<OrganigramClient>;
       parameters:
         - id: input
-          description: ''
+          description: Clients used to broadcast deployments and wait for receipts.
           type: |-
             {
                     publicClient: <xref uid="viem!PublicClient:type" />;
@@ -251,12 +256,17 @@ methods:
                 }
       return:
         type: Promise&lt;<xref uid="@organigram/js!OrganigramClient:class" />&gt;
-        description: ''
+        description: A ready-to-use SDK instance pointing at the newly deployed client.
   - name: deployOrgan(input)
     uid: '@organigram/js!OrganigramClient#deployOrgan:member(1)'
     package: '@organigram/js!'
     fullName: deployOrgan(input)
-    summary: ''
+    summary: >-
+      Deploy a single organ clone and hydrate the resulting SDK object.
+
+
+      When no permissions are provided, the connected wallet is granted the full admin bitmask by default so the organ
+      remains operable after deployment.
     remarks: ''
     example: []
     isPreview: false
@@ -265,7 +275,7 @@ methods:
       content: 'deployOrgan(input?: DeployOrganInput): Promise<Organ>;'
       parameters:
         - id: input
-          description: ''
+          description: Optional organ metadata, permissions, entries, and transaction options.
           type: <xref uid="@organigram/js!DeployOrganInput:interface" />
       return:
         type: Promise&lt;<xref uid="@organigram/js!Organ:class" />&gt;
@@ -274,7 +284,7 @@ methods:
     uid: '@organigram/js!OrganigramClient#deployOrganigram:member(1)'
     package: '@organigram/js!'
     fullName: deployOrganigram(input)
-    summary: ''
+    summary: Deploy a full organigram, including its organs, assets, and procedures.
     remarks: ''
     example: []
     isPreview: false
@@ -283,16 +293,16 @@ methods:
       content: 'deployOrganigram(input: DeployOrganigramInput): Promise<readonly string[]>;'
       parameters:
         - id: input
-          description: ''
+          description: Batch deployment input for the whole organigram.
           type: <xref uid="@organigram/js!DeployOrganigramInput:interface" />
       return:
         type: Promise&lt;readonly string[]&gt;
-        description: ''
+        description: The deployed organ, asset, and procedure addresses.
   - name: deployOrgans(deployOrgansInput)
     uid: '@organigram/js!OrganigramClient#deployOrgans:member(1)'
     package: '@organigram/js!'
     fullName: deployOrgans(deployOrgansInput)
-    summary: ''
+    summary: Deploy several organs in one batch transaction.
     remarks: ''
     example: []
     isPreview: false
@@ -301,7 +311,7 @@ methods:
       content: 'deployOrgans(deployOrgansInput: DeployOrganInput[]): Promise<Organ[]>;'
       parameters:
         - id: deployOrgansInput
-          description: ''
+          description: Organ definitions to deploy.
           type: <xref uid="@organigram/js!DeployOrganInput:interface" />[]
       return:
         type: Promise&lt;<xref uid="@organigram/js!Organ:class" />[]&gt;
@@ -310,7 +320,7 @@ methods:
     uid: '@organigram/js!OrganigramClient#deployProcedure:member(1)'
     package: '@organigram/js!'
     fullName: deployProcedure(input)
-    summary: ''
+    summary: Deploy a single procedure clone from one registered procedure type.
     remarks: ''
     example: []
     isPreview: false
@@ -319,7 +329,7 @@ methods:
       content: 'deployProcedure(input: DeployProceduresInput): Promise<Procedure>;'
       parameters:
         - id: input
-          description: ''
+          description: Procedure type, role organs, optional metadata, and initialization args.
           type: <xref uid="@organigram/js!DeployProceduresInput:interface" />
       return:
         type: Promise&lt;<xref uid="@organigram/js!Procedure:class" />&gt;
@@ -328,7 +338,7 @@ methods:
     uid: '@organigram/js!OrganigramClient#deployProcedures:member(1)'
     package: '@organigram/js!'
     fullName: deployProcedures(deployProceduresInput)
-    summary: ''
+    summary: Deploy several procedures in one batch transaction.
     remarks: ''
     example: []
     isPreview: false
@@ -337,7 +347,7 @@ methods:
       content: 'deployProcedures(deployProceduresInput: DeployProceduresInput[]): Promise<Procedure[]>;'
       parameters:
         - id: deployProceduresInput
-          description: ''
+          description: Procedure definitions to deploy.
           type: <xref uid="@organigram/js!DeployProceduresInput:interface" />[]
       return:
         type: Promise&lt;<xref uid="@organigram/js!Procedure:class" />[]&gt;
@@ -346,7 +356,7 @@ methods:
     uid: '@organigram/js!OrganigramClient#getDeployedAsset:member(1)'
     package: '@organigram/js!'
     fullName: getDeployedAsset(address, cached, initialAsset)
-    summary: ''
+    summary: Load one deployed asset and memoize it in the client cache.
     remarks: ''
     example: []
     isPreview: false
@@ -355,13 +365,13 @@ methods:
       content: 'getDeployedAsset(address: string, cached?: boolean, initialAsset?: Asset): Promise<Asset>;'
       parameters:
         - id: address
-          description: ''
+          description: Asset contract address.
           type: string
         - id: cached
-          description: ''
+          description: Whether an already hydrated asset can be reused from memory.
           type: boolean
         - id: initialAsset
-          description: ''
+          description: Optional fallback metadata merged into the loaded asset.
           type: <xref uid="@organigram/js!Asset:class" />
       return:
         type: Promise&lt;<xref uid="@organigram/js!Asset:class" />&gt;
@@ -370,7 +380,7 @@ methods:
     uid: '@organigram/js!OrganigramClient#getDeployedOrgan:member(1)'
     package: '@organigram/js!'
     fullName: getDeployedOrgan(address, cached, initialOrgan)
-    summary: ''
+    summary: Load one deployed organ and memoize it in the client cache.
     remarks: ''
     example: []
     isPreview: false
@@ -379,13 +389,13 @@ methods:
       content: 'getDeployedOrgan(address: string, cached?: boolean, initialOrgan?: OrganInput): Promise<Organ>;'
       parameters:
         - id: address
-          description: ''
+          description: Organ contract address.
           type: string
         - id: cached
-          description: ''
+          description: Whether an already hydrated organ can be reused from memory.
           type: boolean
         - id: initialOrgan
-          description: ''
+          description: Optional fallback metadata merged into the loaded organ.
           type: <xref uid="@organigram/js!OrganInput:interface" />
       return:
         type: Promise&lt;<xref uid="@organigram/js!Organ:class" />&gt;
@@ -394,7 +404,7 @@ methods:
     uid: '@organigram/js!OrganigramClient#getDeployedProcedure:member(1)'
     package: '@organigram/js!'
     fullName: getDeployedProcedure(address, cached, initialProcedure)
-    summary: ''
+    summary: Load one deployed procedure and memoize it in the client cache.
     remarks: ''
     example: []
     isPreview: false
@@ -403,13 +413,13 @@ methods:
       content: 'getDeployedProcedure(address: string, cached?: boolean, initialProcedure?: ProcedureInput): Promise<Procedure>;'
       parameters:
         - id: address
-          description: ''
+          description: Procedure contract address.
           type: string
         - id: cached
-          description: ''
+          description: Whether an already hydrated procedure can be reused from memory.
           type: boolean
         - id: initialProcedure
-          description: ''
+          description: Optional fallback metadata merged into the loaded procedure.
           type: <xref uid="@organigram/js!ProcedureInput:interface" />
       return:
         type: Promise&lt;<xref uid="@organigram/js!Procedure:class" />&gt;
@@ -418,7 +428,7 @@ methods:
     uid: '@organigram/js!OrganigramClient#getProcedureType:member(1)'
     package: '@organigram/js!'
     fullName: getProcedureType(procedureAddress)
-    summary: ''
+    summary: Infer the registered procedure type of a deployed procedure clone.
     remarks: ''
     example: []
     isPreview: false
@@ -427,7 +437,7 @@ methods:
       content: 'getProcedureType(procedureAddress: string): Promise<ProcedureType | null>;'
       parameters:
         - id: procedureAddress
-          description: ''
+          description: Address of the deployed procedure instance.
           type: string
       return:
         type: Promise&lt;<xref uid="@organigram/js!ProcedureType:interface" /> | null&gt;
@@ -436,7 +446,7 @@ methods:
     uid: '@organigram/js!OrganigramClient.load:member(1)'
     package: '@organigram/js!'
     fullName: load(input)
-    summary: ''
+    summary: Connect the SDK to an already deployed Organigram client contract.
     remarks: ''
     example: []
     isPreview: false
@@ -450,7 +460,7 @@ methods:
             }): Promise<OrganigramClient>;
       parameters:
         - id: input
-          description: ''
+          description: Address override plus the viem clients used for reads and writes.
           type: |-
             {
                     address?: string;
@@ -464,7 +474,7 @@ methods:
     uid: '@organigram/js!OrganigramClient#loadContract:member(1)'
     package: '@organigram/js!'
     fullName: loadContract(address, cached)
-    summary: ''
+    summary: Attempt to load one deployed contract as an organ or procedure.
     remarks: ''
     example: []
     isPreview: false
@@ -473,10 +483,10 @@ methods:
       content: 'loadContract(address: string, cached?: boolean): Promise<Organ | Procedure | null>;'
       parameters:
         - id: address
-          description: ''
+          description: Contract address to inspect.
           type: string
         - id: cached
-          description: ''
+          description: Whether cached instances may be reused.
           type: boolean
       return:
         type: >-
@@ -487,7 +497,7 @@ methods:
     uid: '@organigram/js!OrganigramClient#loadContracts:member(1)'
     package: '@organigram/js!'
     fullName: loadContracts(contractAddresses)
-    summary: ''
+    summary: Load a heterogeneous list of deployed contract addresses into an organigram.
     remarks: ''
     example: []
     isPreview: false
@@ -496,7 +506,7 @@ methods:
       content: 'loadContracts(contractAddresses: string[]): Promise<Organigram>;'
       parameters:
         - id: contractAddresses
-          description: ''
+          description: Addresses to resolve as organs, procedures, or assets.
           type: string[]
       return:
         type: Promise&lt;<xref uid="@organigram/js!Organigram:class" />&gt;
@@ -505,7 +515,12 @@ methods:
     uid: '@organigram/js!OrganigramClient#loadOrganigram:member(1)'
     package: '@organigram/js!'
     fullName: loadOrganigram(organigram, cached)
-    summary: ''
+    summary: >-
+      Hydrate every deployed object referenced by an organigram definition.
+
+
+      Undeployed placeholders are preserved as-is, while deployed organs, procedures, and assets are refreshed from
+      chain state.
     remarks: ''
     example: []
     isPreview: false
@@ -514,10 +529,10 @@ methods:
       content: 'loadOrganigram(organigram: Organigram, cached?: boolean): Promise<Organigram>;'
       parameters:
         - id: organigram
-          description: ''
+          description: Organigram definition to hydrate.
           type: <xref uid="@organigram/js!Organigram:class" />
         - id: cached
-          description: ''
+          description: Whether previously cached instances may be reused.
           type: boolean
       return:
         type: Promise&lt;<xref uid="@organigram/js!Organigram:class" />&gt;
@@ -526,7 +541,7 @@ methods:
     uid: '@organigram/js!OrganigramClient.loadProcedureType:member(1)'
     package: '@organigram/js!'
     fullName: loadProcedureType({ addr, cid }, input, publicClient)
-    summary: ''
+    summary: Load metadata for one deployed procedure implementation.
     remarks: ''
     example: []
     isPreview: false
@@ -542,14 +557,14 @@ methods:
           description: ''
           type: ''
         - id: input
-          description: ''
+          description: Address and optional CID used to identify the procedure type.
           type: |-
             {
                     addr: string;
                     cid?: string;
                 }
         - id: publicClient
-          description: ''
+          description: Read-only client used for interface checks.
           type: <xref uid="viem!PublicClient:type" />
       return:
         type: Promise&lt;<xref uid="@organigram/js!ProcedureType:interface" />&gt;
@@ -558,7 +573,7 @@ methods:
     uid: '@organigram/js!OrganigramClient.loadProcedureTypes:member(1)'
     package: '@organigram/js!'
     fullName: loadProcedureTypes({ address, publicClient }, input)
-    summary: ''
+    summary: Read the procedure registry and resolve every supported procedure type.
     remarks: ''
     example: []
     isPreview: false
@@ -574,7 +589,7 @@ methods:
           description: ''
           type: ''
         - id: input
-          description: ''
+          description: Optional client contract address and the public client used to query it.
           type: |-
             {
                     publicClient: <xref uid="viem!PublicClient:type" />;

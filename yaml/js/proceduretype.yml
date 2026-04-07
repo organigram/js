@@ -3,7 +3,7 @@ name: ProcedureType
 uid: '@organigram/js!ProcedureType:interface'
 package: '@organigram/js!'
 fullName: ProcedureType
-summary: ''
+summary: Metadata describing one registered procedure implementation.
 remarks: ''
 example: []
 isPreview: false

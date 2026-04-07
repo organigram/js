@@ -3,7 +3,12 @@ name: Organigram
 uid: '@organigram/js!Organigram:class'
 package: '@organigram/js!'
 fullName: Organigram
-summary: ''
+summary: >-
+  In-memory representation of an Organigram project.
+
+
+  The class can be created from raw inputs, a built-in template name, or left blank to start from the default empty
+  template.
 remarks: ''
 example: []
 isPreview: false
@@ -84,7 +89,7 @@ properties:
     uid: '@organigram/js!Organigram#load:member'
     package: '@organigram/js!'
     fullName: load
-    summary: ''
+    summary: Hydrate every deployed object referenced by this organigram.
     remarks: ''
     example: []
     isPreview: false
@@ -183,7 +188,7 @@ properties:
     uid: '@organigram/js!Organigram#toJson:member'
     package: '@organigram/js!'
     fullName: toJson
-    summary: ''
+    summary: Convert the organigram into a JSON-safe structure suitable for persistence or transport.
     remarks: ''
     example: []
     isPreview: false
@@ -223,7 +228,7 @@ methods:
     uid: '@organigram/js!Organigram#deploy:member(1)'
     package: '@organigram/js!'
     fullName: deploy()
-    summary: ''
+    summary: Deploy the full organigram through its attached client, then reload it from chain state.
     remarks: ''
     example: []
     isPreview: false

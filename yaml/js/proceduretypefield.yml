@@ -3,7 +3,7 @@ name: ProcedureTypeField
 uid: '@organigram/js!ProcedureTypeField:interface'
 package: '@organigram/js!'
 fullName: ProcedureTypeField
-summary: ''
+summary: Declarative description of one procedure configuration field.
 remarks: ''
 example: []
 isPreview: false

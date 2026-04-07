@@ -3,7 +3,7 @@ name: AssetJson
 uid: '@organigram/js!AssetJson:interface'
 package: '@organigram/js!'
 fullName: AssetJson
-summary: ''
+summary: JSON-safe serialized representation of one asset.
 remarks: ''
 example: []
 isPreview: false

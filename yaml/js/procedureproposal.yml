@@ -3,7 +3,7 @@ name: ProcedureProposal
 uid: '@organigram/js!ProcedureProposal:interface'
 package: '@organigram/js!'
 fullName: ProcedureProposal
-summary: ''
+summary: Hydrated proposal state exposed by the SDK.
 remarks: ''
 example: []
 isPreview: false

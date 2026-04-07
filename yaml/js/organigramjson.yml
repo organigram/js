@@ -3,7 +3,7 @@ name: OrganigramJson
 uid: '@organigram/js!OrganigramJson:type'
 package: '@organigram/js!'
 fullName: OrganigramJson
-summary: ''
+summary: JSON-safe serialized representation of an organigram.
 remarks: ''
 example: []
 isPreview: false

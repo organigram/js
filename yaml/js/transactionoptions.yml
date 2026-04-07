@@ -3,7 +3,7 @@ name: TransactionOptions
 uid: '@organigram/js!TransactionOptions:interface'
 package: '@organigram/js!'
 fullName: TransactionOptions
-summary: ''
+summary: Optional transaction-level controls shared by write operations.
 remarks: ''
 example: []
 isPreview: false

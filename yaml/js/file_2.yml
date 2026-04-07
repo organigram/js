@@ -3,7 +3,7 @@ name: File_2
 uid: '@organigram/js!File_2:interface'
 package: '@organigram/js!'
 fullName: File_2
-summary: ''
+summary: In-memory representation of a CID-backed file managed by the client.
 remarks: ''
 example: []
 isPreview: false

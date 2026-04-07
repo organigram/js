@@ -3,7 +3,7 @@ name: DeployProceduresInput
 uid: '@organigram/js!DeployProceduresInput:interface'
 package: '@organigram/js!'
 fullName: DeployProceduresInput
-summary: ''
+summary: Input used to deploy one procedure instance from a registered procedure type.
 remarks: ''
 example: []
 isPreview: false
@@ -20,9 +20,9 @@ properties:
     isPreview: false
     isDeprecated: false
     syntax:
-      content: 'args?: string[];'
+      content: 'args?: unknown[];'
       return:
-        type: string[]
+        type: unknown[]
   - name: chainId
     uid: '@organigram/js!DeployProceduresInput#chainId:member'
     package: '@organigram/js!'

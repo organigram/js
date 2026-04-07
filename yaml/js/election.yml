@@ -3,7 +3,7 @@ name: Election
 uid: '@organigram/js!Election:type'
 package: '@organigram/js!'
 fullName: Election
-summary: ''
+summary: Current election state for one vote-based proposal.
 remarks: ''
 example: []
 isPreview: false

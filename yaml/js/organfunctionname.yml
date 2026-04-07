@@ -3,7 +3,7 @@ name: OrganFunctionName
 uid: '@organigram/js!OrganFunctionName:enum'
 package: '@organigram/js!'
 fullName: OrganFunctionName
-summary: ''
+summary: High-level names for the writable organ functions exposed by the SDK.
 remarks: ''
 example: []
 isPreview: false

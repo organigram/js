@@ -3,7 +3,7 @@ name: DeployOrganInput
 uid: '@organigram/js!DeployOrganInput:interface'
 package: '@organigram/js!'
 fullName: DeployOrganInput
-summary: ''
+summary: Input used to deploy one organ through an [OrganigramClient](xref:@organigram/js!OrganigramClient:class)<!-- -->.
 remarks: ''
 example: []
 isPreview: false
@@ -72,6 +72,6 @@ properties:
     isPreview: false
     isDeprecated: false
     syntax:
-      content: 'salt?: string;'
+      content: 'salt?: string | null;'
       return:
-        type: string
+        type: string | null

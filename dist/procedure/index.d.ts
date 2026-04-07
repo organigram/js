@@ -2,6 +2,9 @@ import { type PublicClient, type WalletClient } from 'viem';
 import type { TransactionOptions } from '../organigramClient';
 import { type PopulateInitializeInput, type PopulatedTransactionData, ProcedureTypeName } from './utils';
 import { type ContractClients, type OrganigramTransaction, type OrganigramTransactionReceipt } from '../contracts';
+/**
+ * Declarative description of one procedure configuration field.
+ */
 export interface ProcedureTypeField {
     name: string;
     label: string;
@@ -9,6 +12,9 @@ export interface ProcedureTypeField {
     defaultValue: string;
     type: any;
 }
+/**
+ * Metadata describing one registered procedure implementation.
+ */
 export interface ProcedureType {
     key: string;
     address: string;
@@ -30,6 +36,9 @@ type ProcedureContractData = {
     proposalsLength: bigint;
     interfaceId?: string;
 };
+/**
+ * JSON-safe serialized representation of one procedure.
+ */
 export type ProcedureJson = {
     isDeployed: boolean;
     address: string;
@@ -51,6 +60,9 @@ export type ProcedureJson = {
     type: ProcedureType;
     organigramId?: string | null;
 };
+/**
+ * Current election state for one vote-based proposal.
+ */
 export type Election = {
     proposalKey: string;
     start: string;
@@ -103,6 +115,9 @@ export interface SignedProposalActionInput {
 export interface SignedBlockProposalInput extends SignedProposalActionInput {
     reason: string;
 }
+/**
+ * One low-level operation bundled into a proposal.
+ */
 export interface ProcedureProposalOperation {
     index: string;
     functionSelector: string;
@@ -116,6 +131,9 @@ export interface ProcedureProposalOperation {
     userIsInEntry?: boolean;
     description?: string;
 }
+/**
+ * Hydrated proposal state exposed by the SDK.
+ */
 export interface ProcedureProposal {
     key: ProposalKey;
     creator: string;
@@ -129,6 +147,9 @@ export interface ProcedureProposal {
     metadata?: ProposalMetadata;
 }
 export type ProposalKey = 'addEntries' | 'removeEntries' | 'replaceEntry' | 'addPermission' | 'removePermission' | 'replacePermission' | 'updateMetadata' | 'transfer' | 'externalCall' | string;
+/**
+ * Rich content attached to a proposal, usually stored off-chain.
+ */
 export interface ProposalMetadata {
     title: string;
     subtitle?: string;
@@ -137,6 +158,9 @@ export interface ProposalMetadata {
     file?: string;
     cid?: string;
 }
+/**
+ * Input used to create or hydrate a procedure model.
+ */
 export interface ProcedureInput {
     address?: string | null;
     deciders: string;
@@ -160,6 +184,9 @@ export interface ProcedureInput {
     data?: string | null;
 }
 export declare const procedureFunctions: ProcedureProposalOperationFunction[];
+/**
+ * Base SDK model shared by every procedure implementation.
+ */
 export declare class Procedure {
     static INTERFACE: string;
     static OPERATIONS_FUNCTIONS: ProcedureProposalOperationFunction[];

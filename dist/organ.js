@@ -3,6 +3,9 @@ import { decodeFunctionResult, encodeFunctionData, padHex, toHex, zeroAddress } 
 import { createRandom32BytesHexId, deployedAddresses, predictContractAddress } from './utils';
 import { tryMulticall } from './multicall';
 import { createContractWriteTransaction, getContractInstance, getWalletAddress } from './contracts';
+/**
+ * High-level names for the writable organ functions exposed by the SDK.
+ */
 export var OrganFunctionName;
 (function (OrganFunctionName) {
     OrganFunctionName["addEntries"] = "addEntries";
@@ -130,6 +133,9 @@ const normalizeOrganFunctionCall = async ({ functionName, args, walletClient }) 
             return { functionName: String(functionName), args };
     }
 };
+/**
+ * In-memory representation of one deployed or planned organ.
+ */
 export class Organ {
     static INTERFACE = '0xf81b1307';
     name;

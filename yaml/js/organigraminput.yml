@@ -3,7 +3,7 @@ name: OrganigramInput
 uid: '@organigram/js!OrganigramInput:type'
 package: '@organigram/js!'
 fullName: OrganigramInput
-summary: ''
+summary: Input used to create an in-memory organigram model.
 remarks: ''
 example: []
 isPreview: false

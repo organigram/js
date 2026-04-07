@@ -3,7 +3,7 @@ name: Procedure
 uid: '@organigram/js!Procedure:class'
 package: '@organigram/js!'
 fullName: Procedure
-summary: ''
+summary: Base SDK model shared by every procedure implementation.
 remarks: ''
 example: []
 isPreview: false

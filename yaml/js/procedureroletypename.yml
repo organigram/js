@@ -3,7 +3,7 @@ name: ProcedureRoleTypeName
 uid: '@organigram/js!ProcedureRoleTypeName:type'
 package: '@organigram/js!'
 fullName: ProcedureRoleTypeName
-summary: ''
+summary: Named organ roles used by procedure access control.
 remarks: ''
 example: []
 isPreview: false

@@ -3,7 +3,7 @@ name: DeployAssetInput
 uid: '@organigram/js!DeployAssetInput:interface'
 package: '@organigram/js!'
 fullName: DeployAssetInput
-summary: ''
+summary: Input used to deploy one ERC-20 asset contract.
 remarks: ''
 example: []
 isPreview: false

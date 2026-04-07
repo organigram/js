@@ -44,6 +44,7 @@ export const formatSalt = (salt) => {
     else
         return salt;
 };
+// Organ permissions granted to procedures
 export const PERMISSIONS = {
     ADMIN: 0xffff,
     ALL: 0x1fff,
