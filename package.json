@@ -42,8 +42,7 @@
     "uint8arrays": "^5.1.0"
   },
   "scripts": {
-    "docs:generate": "pnpm api-extractor run --local && pnpm api-documenter yaml --input-folder .",
-    "docs": "env-cmd --silent tsx ./scripts/docs.ts",
+    "docs:generate": "env-cmd --silent pnpm api-extractor run --local && pnpm api-documenter yaml --input-folder . && tsx ./scripts/docs.ts",
     "build": "tsc --pretty",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
