@@ -109,7 +109,31 @@ export declare const templates: {
         }[];
         assets: never[];
     };
+    participatoryBudget: {
+        name: string;
+        organs: {
+            name: string;
+            address: string;
+            salt: string;
+            entries: never[];
+            permissions: {
+                permissionValue: number;
+                permissionAddress: string;
+            }[];
+        }[];
+        assets: never[];
+        procedures: {
+            address: string;
+            salt: string;
+            name: string;
+            typeName: string;
+            deciders: string;
+            proposers: string;
+            data: string;
+        }[];
+    };
 };
+export type TemplateName = keyof typeof templates;
 export declare const renewSaltsAndAddresses: (organigram: OrganigramInput, chainId: string) => {
     chainId: string;
     organs: {
@@ -180,7 +204,7 @@ export declare const renewSaltsAndAddresses: (organigram: OrganigramInput, chain
     contractAddresses?: string[] | null;
     workspaceId?: string | null;
 };
-export declare const getTemplate: (templateName: keyof typeof templates, chainId: string) => {
+export declare const getTemplate: (templateName: TemplateName, chainId: string) => {
     chainId: string;
     organs: {
         salt: string;
