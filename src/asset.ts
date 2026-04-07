@@ -15,6 +15,9 @@ import {
 
 export const ERC20_INITIAL_SUPPLY = 10_000_000 // 10 million tokens.
 
+/**
+ * JSON-safe serialized representation of one asset.
+ */
 export interface AssetJson {
   address: string
   isDeployed: boolean
@@ -28,6 +31,9 @@ export interface AssetJson {
   organigramId?: string | null
 }
 
+/**
+ * Input used to create or hydrate an asset model.
+ */
 export interface AssetInput {
   name?: string | null
   description?: string | null
@@ -42,6 +48,9 @@ export interface AssetInput {
   organigramId?: string | null
 }
 
+/**
+ * In-memory representation of one ERC-20 asset managed by an organigram.
+ */
 export class Asset {
   address: string
   name: string
@@ -81,6 +90,13 @@ export class Asset {
     this.organigramId = input.organigramId ?? null
   }
 
+  /**
+   * Hydrate an asset from chain state.
+   *
+   * @param address Asset contract address.
+   * @param clients viem clients used to query the contract.
+   * @param initialAsset Optional fallback metadata merged into the loaded asset.
+   */
   static load = async (
     address: string,
     clients: ContractClients,
@@ -199,6 +215,9 @@ export class Asset {
     })
   }
 
+  /**
+   * Convert the asset into a JSON-safe structure.
+   */
   toJson(): AssetJson {
     return {
       address: this.address,

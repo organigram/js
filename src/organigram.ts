@@ -6,14 +6,23 @@ import { getTemplate, templates } from './template'
 import { handleJsonBigInt } from './utils'
 import type { PublicClient, WalletClient } from 'viem'
 
+/**
+ * Named organ roles used by procedure access control.
+ */
 export type ProcedureRoleTypeName = 'proposers' | 'moderators' | 'deciders'
 
+/**
+ * Human-readable labels for the procedure role slots expected by the protocol.
+ */
 export const procedureRoleTypes = [
   { label: 'Create proposals', name: 'proposers' },
   { label: 'Approve proposals', name: 'deciders' },
   { label: 'Filter proposals', name: 'moderators' }
 ]
 
+/**
+ * JSON-safe serialized representation of an organigram.
+ */
 export type OrganigramJson = {
   id: string
   slug: string
@@ -26,6 +35,9 @@ export type OrganigramJson = {
   workspaceId?: string | null
 }
 
+/**
+ * Input used to create an in-memory organigram model.
+ */
 export type OrganigramInput = {
   id?: string | null
   slug?: string | null
@@ -42,8 +54,17 @@ export type OrganigramInput = {
   workspaceId?: string | null
 }
 
+/**
+ * Default Sepolia chain id used by the SDK templates.
+ */
 export const defaultChainId = '11155111'
 
+/**
+ * In-memory representation of an Organigram project.
+ *
+ * The class can be created from raw inputs, a built-in template name, or left
+ * blank to start from the default empty template.
+ */
 export class Organigram {
   id: string
   organs: Organ[] = []
@@ -102,6 +123,11 @@ export class Organigram {
   setAssets(assets: Asset[]) {}
   setProcedures(procedures: Procedure[]) {}
 
+  /**
+   * Hydrate every deployed object referenced by this organigram.
+   *
+   * @param input Optional viem clients used when the organigram has no attached client yet.
+   */
   load = async (input?: {
     walletClient?: WalletClient | null
     publicClient?: PublicClient | null
@@ -135,6 +161,9 @@ export class Organigram {
     return await client.loadOrganigram(this)
   }
 
+  /**
+   * Deploy the full organigram through its attached client, then reload it from chain state.
+   */
   async deploy() {
     if (!this.organigramClient) {
       throw new Error('Organigram client not set.')
@@ -144,6 +173,9 @@ export class Organigram {
       .then(async () => await this.load())
   }
 
+  /**
+   * Convert the organigram into a JSON-safe structure suitable for persistence or transport.
+   */
   toJson = (): OrganigramJson =>
     JSON.parse(
       JSON.stringify(

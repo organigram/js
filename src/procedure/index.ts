@@ -39,6 +39,9 @@ import {
   getWalletAccount
 } from '../contracts'
 
+/**
+ * Declarative description of one procedure configuration field.
+ */
 export interface ProcedureTypeField {
   name: string
   label: string
@@ -47,6 +50,9 @@ export interface ProcedureTypeField {
   type: any
 }
 
+/**
+ * Metadata describing one registered procedure implementation.
+ */
 export interface ProcedureType {
   key: string
   address: string
@@ -70,6 +76,9 @@ type ProcedureContractData = {
   interfaceId?: string
 }
 
+/**
+ * JSON-safe serialized representation of one procedure.
+ */
 export type ProcedureJson = {
   isDeployed: boolean
   address: string
@@ -92,6 +101,9 @@ export type ProcedureJson = {
   organigramId?: string | null
 }
 
+/**
+ * Current election state for one vote-based proposal.
+ */
 export type Election = {
   proposalKey: string
   start: string
@@ -195,6 +207,9 @@ export interface SignedBlockProposalInput extends SignedProposalActionInput {
   reason: string
 }
 
+/**
+ * One low-level operation bundled into a proposal.
+ */
 export interface ProcedureProposalOperation {
   index: string
   functionSelector: string
@@ -209,6 +224,9 @@ export interface ProcedureProposalOperation {
   description?: string
 }
 
+/**
+ * Hydrated proposal state exposed by the SDK.
+ */
 export interface ProcedureProposal {
   key: ProposalKey
   creator: string
@@ -234,6 +252,9 @@ export type ProposalKey =
   | 'externalCall'
   | string
 
+/**
+ * Rich content attached to a proposal, usually stored off-chain.
+ */
 export interface ProposalMetadata {
   title: string
   subtitle?: string
@@ -243,6 +264,9 @@ export interface ProposalMetadata {
   cid?: string
 }
 
+/**
+ * Input used to create or hydrate a procedure model.
+ */
 export interface ProcedureInput {
   address?: string | null
   deciders: string
@@ -397,6 +421,9 @@ export const procedureFunctions: ProcedureProposalOperationFunction[] = [
   }
 ]
 
+/**
+ * Base SDK model shared by every procedure implementation.
+ */
 export class Procedure {
   static INTERFACE = '0x71dbd330'
 

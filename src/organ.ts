@@ -31,11 +31,17 @@ export interface OrganEntry {
   cid: string
 }
 
+/**
+ * Entry payload used when creating or updating an organ entry.
+ */
 export interface IOrganEntry {
   address?: string
   cid?: string
 }
 
+/**
+ * Permission grant applied to a procedure or address on an organ.
+ */
 export interface OrganPermission {
   permissionAddress: string
   permissionValue: number
@@ -69,6 +75,9 @@ export interface OrganInput {
   forwarder?: string | null
 }
 
+/**
+ * JSON-safe serialized representation of one organ.
+ */
 export interface OrganJson {
   address: string
   name: string
@@ -83,6 +92,9 @@ export interface OrganJson {
   balance: string
 }
 
+/**
+ * High-level names for the writable organ functions exposed by the SDK.
+ */
 export enum OrganFunctionName {
   addEntries = 'addEntries',
   removeEntries = 'removeEntries',
@@ -234,6 +246,9 @@ const normalizeOrganFunctionCall = async ({
   }
 }
 
+/**
+ * In-memory representation of one deployed or planned organ.
+ */
 export class Organ {
   static INTERFACE = '0xf81b1307'
 
