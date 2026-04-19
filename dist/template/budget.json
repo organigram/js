@@ -1,0 +1,55 @@
+{
+    "name": "Budget",
+    "organs": [
+        {
+            "name": "Treasury",
+            "address": "treasury-address",
+            "salt": "treasury-salt",
+            "entries": [],
+            "permissions": [
+                {
+                    "permissionValue": 12,
+                    "permissionAddress": "manage-admins-address"
+                },
+                {
+                    "permissionValue": 1344,
+                    "permissionAddress": "manage-funds-address"
+                },
+                {
+                    "permissionValue": 19,
+                    "permissionAddress": "manage-permissions-address"
+                }
+            ]
+        }
+    ],
+    "assets": [],
+    "procedures": [
+        {
+            "address": "manage-admins-address",
+            "salt": "manage-admins-salt",
+            "name": "Manage admins",
+            "typeName": "vote",
+            "deciders": "treasury-address",
+            "proposers": "treasury-address",
+            "data": "{\"quorumSize\":\"20001\",\"voteDuration\":\"3600\",\"majoritySize\":\"50001\"}"
+        },
+        {
+            "address": "manage-permissions-address",
+            "salt": "manage-permissions-salt",
+            "name": "Manage permissions",
+            "typeName": "vote",
+            "deciders": "treasury-address",
+            "proposers": "treasury-address",
+            "data": "{\"quorumSize\":\"20001\",\"voteDuration\":\"3600\",\"majoritySize\":\"50001\"}"
+        },
+        {
+            "address": "manage-funds-address",
+            "salt": "manage-funds-salt",
+            "name": "Manage funds",
+            "typeName": "vote",
+            "deciders": "treasury-address",
+            "proposers": "treasury-address",
+            "data": "{\"quorumSize\":\"20001\",\"voteDuration\":\"3600\",\"majoritySize\":\"50001\"}"
+        }
+    ]
+}

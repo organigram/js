@@ -1,0 +1,77 @@
+### YamlMime:TSType
+name: DeployOrganInput
+uid: '@organigram/js!DeployOrganInput:interface'
+package: '@organigram/js!'
+fullName: DeployOrganInput
+summary: Input used to deploy one organ through an [OrganigramClient](xref:@organigram/js!OrganigramClient:class)<!-- -->.
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: cid
+    uid: '@organigram/js!DeployOrganInput#cid:member'
+    package: '@organigram/js!'
+    fullName: cid
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'cid?: string;'
+      return:
+        type: string
+  - name: entries
+    uid: '@organigram/js!DeployOrganInput#entries:member'
+    package: '@organigram/js!'
+    fullName: entries
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'entries?: OrganEntry[];'
+      return:
+        type: <xref uid="@organigram/js!OrganEntry:interface" />[]
+  - name: options
+    uid: '@organigram/js!DeployOrganInput#options:member'
+    package: '@organigram/js!'
+    fullName: options
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'options?: TransactionOptions;'
+      return:
+        type: <xref uid="@organigram/js!TransactionOptions:interface" />
+  - name: permissions
+    uid: '@organigram/js!DeployOrganInput#permissions:member'
+    package: '@organigram/js!'
+    fullName: permissions
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'permissions?: OrganPermission[];'
+      return:
+        type: <xref uid="@organigram/js!OrganPermission:interface" />[]
+  - name: salt
+    uid: '@organigram/js!DeployOrganInput#salt:member'
+    package: '@organigram/js!'
+    fullName: salt
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'salt?: string | null;'
+      return:
+        type: string | null

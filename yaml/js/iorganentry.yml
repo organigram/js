@@ -1,0 +1,38 @@
+### YamlMime:TSType
+name: IOrganEntry
+uid: '@organigram/js!IOrganEntry:interface'
+package: '@organigram/js!'
+fullName: IOrganEntry
+summary: Entry payload used when creating or updating an organ entry.
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: address
+    uid: '@organigram/js!IOrganEntry#address:member'
+    package: '@organigram/js!'
+    fullName: address
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'address?: string;'
+      return:
+        type: string
+  - name: cid
+    uid: '@organigram/js!IOrganEntry#cid:member'
+    package: '@organigram/js!'
+    fullName: cid
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'cid?: string;'
+      return:
+        type: string

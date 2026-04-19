@@ -1,6 +1,10 @@
-import { type ContractTransactionReceipt, ethers } from 'ethers';
+import { type PublicClient, type WalletClient } from 'viem';
 import type { TransactionOptions } from '../organigramClient';
-import { PopulateInitializeInput, ProcedureTypeName } from './utils';
+import { type PopulateInitializeInput, type PopulatedTransactionData, ProcedureTypeName } from './utils';
+import { type ContractClients, type OrganigramTransaction, type OrganigramTransactionReceipt } from '../contracts';
+/**
+ * Declarative description of one procedure configuration field.
+ */
 export interface ProcedureTypeField {
     name: string;
     label: string;
@@ -8,6 +12,9 @@ export interface ProcedureTypeField {
     defaultValue: string;
     type: any;
 }
+/**
+ * Metadata describing one registered procedure implementation.
+ */
 export interface ProcedureType {
     key: string;
     address: string;
@@ -22,19 +29,21 @@ export interface ProcedureType {
 }
 type ProcedureContractData = {
     cid: string;
-    metadata?: string;
     proposers: string;
     moderators: string;
     deciders: string;
     withModeration: boolean;
-    forwarder: string;
-    proposalsLength: string;
+    proposalsLength: bigint;
+    interfaceId?: string;
 };
+/**
+ * JSON-safe serialized representation of one procedure.
+ */
 export type ProcedureJson = {
     isDeployed: boolean;
     address: string;
     deciders: string;
-    typeName: string;
+    typeName: ProcedureTypeName;
     name: string;
     description: string;
     cid: string;
@@ -51,6 +60,9 @@ export type ProcedureJson = {
     type: ProcedureType;
     organigramId?: string | null;
 };
+/**
+ * Current election state for one vote-based proposal.
+ */
 export type Election = {
     proposalKey: string;
     start: string;
@@ -64,7 +76,7 @@ export type AccountInOrgans = {
     deciders?: boolean;
 };
 export type OperationTag = 'cid' | 'entries' | 'permissions' | 'coins' | 'collectibles' | 'erc721' | 'erc20' | 'erc1155' | 'ether' | 'add' | 'replace' | 'remove' | 'deposit' | 'withdraw' | 'transfer';
-export type OperationParamType = 'cid' | 'entry' | 'entries' | 'address' | 'addresses' | 'index' | 'indexes' | 'organ' | 'oldPermissionAddress' | 'newPermissionAddress' | 'permissionAddress' | 'permissionValue' | 'proposal' | 'proposals' | 'amount' | 'tokenId';
+export type OperationParamType = 'cid' | 'entry' | 'entries' | 'address' | 'bytes' | 'addresses' | 'index' | 'indexes' | 'organ' | 'oldPermissionAddress' | 'newPermissionAddress' | 'permissionAddress' | 'permissionValue' | 'proposal' | 'proposals' | 'amount' | 'tokenId';
 export type OperationParamAction = 'select' | 'create' | 'update' | 'delete' | 'withdraw' | 'deposit' | 'transfer' | 'block';
 export interface OperationParam {
     type: OperationParamType;
@@ -82,6 +94,30 @@ export interface ProcedureProposalOperationFunction {
     abi?: unknown;
     target?: 'organ' | 'self';
 }
+export interface ExternalCallOperationInput {
+    organAddress: string;
+    target: string;
+    data: string;
+    value?: string | bigint | number;
+    index?: string | number;
+}
+export interface SignedProposalInput {
+    cid: string;
+    operations: ProcedureProposalOperation[];
+    nonce: bigint;
+    deadline: bigint | number;
+}
+export interface SignedProposalActionInput {
+    proposalKey: string;
+    nonce: bigint;
+    deadline: bigint | number;
+}
+export interface SignedBlockProposalInput extends SignedProposalActionInput {
+    reason: string;
+}
+/**
+ * One low-level operation bundled into a proposal.
+ */
 export interface ProcedureProposalOperation {
     index: string;
     functionSelector: string;
@@ -95,6 +131,9 @@ export interface ProcedureProposalOperation {
     userIsInEntry?: boolean;
     description?: string;
 }
+/**
+ * Hydrated proposal state exposed by the SDK.
+ */
 export interface ProcedureProposal {
     key: ProposalKey;
     creator: string;
@@ -107,7 +146,10 @@ export interface ProcedureProposal {
     operations: ProcedureProposalOperation[];
     metadata?: ProposalMetadata;
 }
-export type ProposalKey = 'addEntries' | 'removeEntries' | 'replaceEntry' | 'addPermission' | 'removePermission' | 'replacePermission' | 'updateMetadata' | 'transfer' | string;
+export type ProposalKey = 'addEntries' | 'removeEntries' | 'replaceEntry' | 'addPermission' | 'removePermission' | 'replacePermission' | 'updateMetadata' | 'transfer' | 'externalCall' | string;
+/**
+ * Rich content attached to a proposal, usually stored off-chain.
+ */
 export interface ProposalMetadata {
     title: string;
     subtitle?: string;
@@ -116,6 +158,9 @@ export interface ProposalMetadata {
     file?: string;
     cid?: string;
 }
+/**
+ * Input used to create or hydrate a procedure model.
+ */
 export interface ProcedureInput {
     address?: string | null;
     deciders: string;
@@ -126,7 +171,8 @@ export interface ProcedureInput {
     salt?: string | null;
     chainId?: string | null;
     cid?: string | null;
-    signerOrProvider?: ethers.Signer | ethers.Provider | null;
+    publicClient?: PublicClient | null;
+    walletClient?: WalletClient | null;
     metadata?: string | null;
     proposers?: string | null;
     withModeration?: boolean | null;
@@ -138,6 +184,9 @@ export interface ProcedureInput {
     data?: string | null;
 }
 export declare const procedureFunctions: ProcedureProposalOperationFunction[];
+/**
+ * Base SDK model shared by every procedure implementation.
+ */
 export declare class Procedure {
     static INTERFACE: string;
     static OPERATIONS_FUNCTIONS: ProcedureProposalOperationFunction[];
@@ -155,34 +204,58 @@ export declare class Procedure {
     data: string;
     forwarder: string;
     proposals: ProcedureProposal[];
-    _contract: ethers.Contract;
+    contract?: any;
     salt?: string;
     chainId: string;
-    signer?: ethers.Signer;
-    provider?: ethers.Provider;
+    walletClient?: WalletClient;
+    publicClient?: PublicClient;
     organigramId: string;
     type: ProcedureType;
-    constructor({ address, deciders, typeName, name, description, salt, cid, chainId, signerOrProvider, metadata, proposers, withModeration, forwarder, moderators, proposals, isDeployed, type, data, organigramId }: ProcedureInput);
-    static _populateInitialize(_populateInitializeInput: PopulateInitializeInput): Promise<ethers.ContractTransaction>;
-    static loadData(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<ProcedureContractData>;
-    static loadProposal(address: string, proposalKey: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<ProcedureProposal>;
-    static loadProposals(address: string, signerOrProvider: ethers.Signer | ethers.Provider, data?: ProcedureContractData): Promise<ProcedureProposal[]>;
-    static load(address: string, signerOrProvider: ethers.Signer | ethers.Provider, initialProcedure?: ProcedureInput): Promise<Procedure>;
+    constructor({ address, deciders, typeName, name, description, salt, cid, chainId, publicClient, walletClient, metadata, proposers, withModeration, forwarder, moderators, proposals, isDeployed, type, data, organigramId }: ProcedureInput);
+    protected getClients(): ContractClients;
+    static _populateInitialize(_populateInitializeInput: PopulateInitializeInput, _clients: ContractClients): Promise<PopulatedTransactionData>;
+    static loadData(address: string, clients: ContractClients): Promise<ProcedureContractData>;
+    static loadProposal(address: string, proposalKey: string, clients: ContractClients): Promise<ProcedureProposal>;
+    static loadProposals(address: string, clients: ContractClients, data?: ProcedureContractData): Promise<ProcedureProposal[]>;
+    static load(address: string, clients: ContractClients, initialProcedure?: ProcedureInput): Promise<Procedure>;
     static _stringifyParamType(type: OperationParamType): string;
     static _extractParams(types: OperationParamType[], operation?: ProcedureProposalOperation): OperationParam[];
-    static parseOperation(_operation: unknown): ProcedureProposalOperation;
-    static isProcedure(address: string, signerOrProvider: ethers.Signer | ethers.Provider): Promise<boolean>;
-    updateCid(cid: string, options?: TransactionOptions): Promise<ethers.Transaction>;
-    updateAdmin(address: string, options?: TransactionOptions): Promise<ethers.Transaction>;
+    static parseOperation(rawOperation: unknown): ProcedureProposalOperation;
+    static isProcedure(address: string, clients: ContractClients): Promise<boolean>;
+    updateCid(cid: string, options?: TransactionOptions): Promise<OrganigramTransaction>;
+    updateAdmin(address: string, options?: TransactionOptions): Promise<OrganigramTransaction>;
     propose(input: {
         cid: string;
         operations: ProcedureProposalOperation[];
         options?: TransactionOptions;
     }): Promise<ProcedureProposal>;
-    blockProposal(proposalKey: string, reason: string, options?: TransactionOptions): Promise<ContractTransactionReceipt>;
-    presentProposal(proposalKey: string, options?: TransactionOptions): Promise<ContractTransactionReceipt>;
-    adoptProposal(proposalKey: string, options?: TransactionOptions): Promise<ContractTransactionReceipt>;
-    applyProposal(proposalKey: string, options?: TransactionOptions): Promise<ContractTransactionReceipt>;
+    signProposal(input: SignedProposalInput): Promise<string>;
+    signPresentProposal(input: SignedProposalActionInput): Promise<string>;
+    signBlockProposal(input: SignedBlockProposalInput): Promise<string>;
+    signApplyProposal(input: SignedProposalActionInput): Promise<string>;
+    proposeBySig(input: SignedProposalInput & {
+        signature: string;
+    }): Promise<OrganigramTransaction>;
+    getNonce(account: string): Promise<bigint>;
+    getTypedDataDomain(): {
+        name: string;
+        version: string;
+        chainId: bigint;
+        verifyingContract: `0x${string}`;
+    };
+    static createExternalCallOperation({ organAddress, target, data, value, index }: ExternalCallOperationInput): ProcedureProposalOperation;
+    blockProposal(proposalKey: string, reason: string, options?: TransactionOptions): Promise<OrganigramTransactionReceipt>;
+    blockProposalBySig(input: SignedBlockProposalInput & {
+        signature: string;
+    }, options?: TransactionOptions): Promise<OrganigramTransactionReceipt>;
+    presentProposal(proposalKey: string, options?: TransactionOptions): Promise<OrganigramTransactionReceipt>;
+    presentProposalBySig(input: SignedProposalActionInput & {
+        signature: string;
+    }, options?: TransactionOptions): Promise<OrganigramTransactionReceipt>;
+    applyProposal(proposalKey: string, options?: TransactionOptions): Promise<OrganigramTransactionReceipt>;
+    applyProposalBySig(input: SignedProposalActionInput & {
+        signature: string;
+    }, options?: TransactionOptions): Promise<OrganigramTransactionReceipt>;
     reloadProposals(): Promise<Procedure>;
     reloadProposal(proposalKey: string): Promise<Procedure>;
     reloadData(): Promise<Procedure>;

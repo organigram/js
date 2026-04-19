@@ -1,0 +1,11 @@
+### YamlMime:TSTypeAlias
+name: TemplateName
+uid: '@organigram/js!TemplateName:type'
+package: '@organigram/js!'
+fullName: TemplateName
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+syntax: export type TemplateName = keyof typeof templates;

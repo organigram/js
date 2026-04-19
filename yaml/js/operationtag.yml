@@ -1,0 +1,13 @@
+### YamlMime:TSTypeAlias
+name: OperationTag
+uid: '@organigram/js!OperationTag:type'
+package: '@organigram/js!'
+fullName: OperationTag
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+syntax: >-
+  export type OperationTag = 'cid' | 'entries' | 'permissions' | 'coins' | 'collectibles' | 'erc721' | 'erc20' |
+  'erc1155' | 'ether' | 'add' | 'replace' | 'remove' | 'deposit' | 'withdraw' | 'transfer';

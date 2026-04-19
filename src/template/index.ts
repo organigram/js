@@ -1,7 +1,8 @@
-import none from './none.json'
-import forProfit from './for-profit.json'
-import nonProfit from './non-profit.json'
-import openSource from './open-source.json'
+import none from './none.json' with { type: 'json' }
+import forProfit from './for-profit.json' with { type: 'json' }
+import nonProfit from './non-profit.json' with { type: 'json' }
+import openSource from './open-source.json' with { type: 'json' }
+import participatoryBudget from './budget.json' with { type: 'json' }
 import {
   capitalize,
   createRandom32BytesHexId,
@@ -16,8 +17,11 @@ export const templates = {
   none,
   forProfit,
   nonProfit,
-  openSource
+  openSource,
+  participatoryBudget
 }
+
+export type TemplateName = keyof typeof templates
 
 const renewSalts = <T extends { salt?: string | null }>(
   pv: Record<string, any>,
@@ -129,6 +133,6 @@ export const renewSaltsAndAddresses = (
 }
 
 export const getTemplate = (
-  templateName: keyof typeof templates,
+  templateName: TemplateName,
   chainId: string
 ) => renewSaltsAndAddresses(templates[templateName], chainId)

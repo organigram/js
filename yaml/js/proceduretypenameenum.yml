@@ -1,0 +1,26 @@
+### YamlMime:TSEnum
+name: ProcedureTypeNameEnum
+uid: '@organigram/js!ProcedureTypeNameEnum:enum'
+package: '@organigram/js!'
+fullName: ProcedureTypeNameEnum
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+fields:
+  - name: erc20Vote
+    uid: '@organigram/js!ProcedureTypeNameEnum.erc20Vote:member'
+    package: '@organigram/js!'
+    summary: ''
+    value: '"erc20Vote"'
+  - name: nomination
+    uid: '@organigram/js!ProcedureTypeNameEnum.nomination:member'
+    package: '@organigram/js!'
+    summary: ''
+    value: '"nomination"'
+  - name: vote
+    uid: '@organigram/js!ProcedureTypeNameEnum.vote:member'
+    package: '@organigram/js!'
+    summary: ''
+    value: '"vote"'

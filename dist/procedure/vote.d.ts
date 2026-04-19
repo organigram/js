@@ -1,7 +1,7 @@
-import { ethers } from 'ethers';
-import { Procedure, type Election, ProcedureInput, ProcedureJson } from '../procedure';
+import { Procedure, type Election, type ProcedureInput, type ProcedureJson } from '../procedure';
 import { type TransactionOptions } from '../organigramClient';
-import { PopulateInitializeInput, ProcedureTypeName } from './utils';
+import { type PopulateInitializeInput, type PopulatedTransactionData, ProcedureTypeName } from './utils';
+import { type ContractClients } from '../contracts';
 export type VoteProcedureInput = ProcedureInput & {
     quorumSize: string;
     voteDuration: string;
@@ -10,7 +10,7 @@ export type VoteProcedureInput = ProcedureInput & {
 };
 export declare class VoteProcedure extends Procedure {
     static INTERFACE: string;
-    contract: ethers.Contract;
+    contract?: any;
     quorumSize: string;
     voteDuration: string;
     majoritySize: string;
@@ -48,11 +48,24 @@ export declare class VoteProcedure extends Procedure {
         };
     };
     constructor({ quorumSize, voteDuration, majoritySize, elections, ...procedureInput }: VoteProcedureInput);
-    static _populateInitialize(input: PopulateInitializeInput): Promise<ethers.ContractTransaction>;
-    static loadElection(address: string, proposalKey: string, signer: ethers.Signer, voteDuration?: bigint, contract?: ethers.Contract): Promise<Election>;
-    static loadElections(address: string, signerOrProvider: ethers.Signer | ethers.Provider, proposalsLength?: number): Promise<Election[]>;
-    static load(address: string, signerOrProvider: ethers.Signer | ethers.Provider, initialProcedure?: ProcedureInput): Promise<VoteProcedure>;
+    static _populateInitialize(input: PopulateInitializeInput, clients: ContractClients): Promise<PopulatedTransactionData>;
+    static loadElection(address: string, proposalKey: string, clients: ContractClients, voteDuration?: bigint, contract?: any): Promise<Election>;
+    static loadElections(address: string, clients: ContractClients, proposalsLength?: number): Promise<Election[]>;
+    static load(address: string, clients: ContractClients, initialProcedure?: ProcedureInput): Promise<VoteProcedure>;
     vote(proposalKey: string, approval: boolean, options?: TransactionOptions): Promise<boolean>;
+    signVote(input: {
+        proposalKey: string;
+        approval: boolean;
+        nonce: bigint;
+        deadline: bigint | number;
+    }): Promise<string>;
+    voteBySig(input: {
+        proposalKey: string;
+        approval: boolean;
+        nonce: bigint;
+        deadline: bigint | number;
+        signature: string;
+    }): Promise<boolean>;
     count(proposalKey: string): Promise<boolean>;
     toJson: () => ProcedureJson;
 }

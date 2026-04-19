@@ -1,0 +1,13 @@
+### YamlMime:TSTypeAlias
+name: ContractName
+uid: '@organigram/js!ContractName:type'
+package: '@organigram/js!'
+fullName: ContractName
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+syntax: >-
+  export type ContractName = 'Organ' | 'Asset' | 'ERC20VoteProcedure' | 'VoteProcedure' | 'NominationProcedure' |
+  'OrganigramClient';

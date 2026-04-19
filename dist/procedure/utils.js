@@ -1,11 +1,12 @@
-import { ethers } from 'ethers';
 import { createRandom32BytesHexId, deployedAddresses, formatSalt } from '../utils';
+import { encodeFunctionData, isAddress, padHex, toHex, zeroAddress } from 'viem';
 export var ProcedureTypeNameEnum;
 (function (ProcedureTypeNameEnum) {
     ProcedureTypeNameEnum["erc20Vote"] = "erc20Vote";
     ProcedureTypeNameEnum["nomination"] = "nomination";
     ProcedureTypeNameEnum["vote"] = "vote";
 })(ProcedureTypeNameEnum || (ProcedureTypeNameEnum = {}));
+const encodeDynamicFunctionData = encodeFunctionData;
 export const nomination = {
     key: 'nomination',
     address: deployedAddresses[11155111].NominationProcedure,
@@ -78,25 +79,25 @@ export const procedureTypes = {
     vote
 };
 export const prepareDeployOrgansInput = (deployOrgansInput) => deployOrgansInput.map(organ => {
-    const _permissionAddresses = [];
-    const _permissionValues = [];
-    organ.permissions?.forEach(p => {
-        _permissionAddresses.push(p.permissionAddress);
-        _permissionValues.push(ethers.zeroPadValue(ethers.toBeHex(p.permissionValue), 2));
+    const permissionAddresses = [];
+    const permissionValues = [];
+    organ.permissions?.forEach(permission => {
+        permissionAddresses.push(permission.permissionAddress);
+        permissionValues.push(padHex(toHex(permission.permissionValue), { size: 2 }));
     });
-    const entries = organ.entries?.map((e) => ({
-        addr: e.address,
-        cid: e.cid ?? ''
+    const entries = organ.entries?.map((entry) => ({
+        addr: entry.address,
+        cid: entry.cid ?? ''
     })) ?? [];
     return {
-        permissionAddresses: _permissionAddresses,
-        permissionValues: _permissionValues,
+        permissionAddresses,
+        permissionValues,
         cid: organ.cid ?? '',
         entries,
         salt: organ.salt ?? createRandom32BytesHexId()
     };
 });
-export const prepareDeployProceduresInput = async (deployProceduresInput, signer) => await Promise.all(deployProceduresInput.map(async (procedure) => {
+export const prepareDeployProceduresInput = async (deployProceduresInput, clients) => await Promise.all(deployProceduresInput.map(async (procedure) => {
     if (procedure.typeName !== 'nomination' &&
         procedure.data == null &&
         procedure.args == null) {
@@ -105,23 +106,25 @@ export const prepareDeployProceduresInput = async (deployProceduresInput, signer
             ' procedure input.');
     }
     const parsedData = procedure.data ? JSON.parse(procedure.data) : {};
-    const _args = procedure.args ?? Object.values(parsedData);
+    const rawArgs = procedure.args ?? Object.values(parsedData);
     const initialize = await populateInitializeProcedure({
         typeName: procedure.typeName,
         options: procedure.options ?? {},
         cid: procedure.cid ?? '',
-        moderators: procedure.moderators ?? ethers.ZeroAddress,
+        moderators: procedure.moderators ?? zeroAddress,
         deciders: procedure.deciders,
         proposers: procedure.proposers ?? procedure.deciders,
         withModeration: procedure.withModeration ?? false,
         forwarder: procedure.forwarder ??
             deployedAddresses[procedure.chainId]?.MetaGasStation,
-        args: _args.map(arg => typeof arg === 'string'
-            ? ethers.isHexString(arg)
+        args: rawArgs.map(arg => typeof arg === 'string'
+            ? isAddress(arg) || arg.startsWith('0x')
                 ? arg
-                : ethers.toBeHex(arg)
+                : /^-?\d+$/.test(arg)
+                    ? toHex(BigInt(arg))
+                    : toHex(arg)
             : arg)
-    }, signer);
+    }, clients);
     return {
         procedureType: procedureTypes[procedure.typeName]
             .address,
@@ -153,29 +156,23 @@ export const getProcedureClass = async (typeName) => {
         throw error;
     }
 };
-export const populateInitializeProcedure = async (input, signer) => {
-    if (signer == null) {
-        throw new Error('Signer not connected.');
+export const populateInitializeProcedure = async (input, clients) => {
+    if (clients.walletClient == null) {
+        throw new Error('Wallet client not connected.');
     }
     const procedureClass = await getProcedureClass(input.typeName);
     try {
-        const chainId = await signer.provider
-            ?.getNetwork()
-            .then(n => n.chainId.toString());
-        return await procedureClass._populateInitialize({
-            options: { ...input.options, signer },
-            cid: input.cid ?? '',
-            proposers: input.proposers ?? input.deciders,
-            moderators: input.moderators ?? ethers.ZeroAddress,
-            deciders: input.deciders,
-            withModeration: input.withModeration ?? false,
-            forwarder: input.forwarder ??
-                deployedAddresses[chainId]?.MetaGasStation,
-            args: input.args
-        });
+        return await procedureClass._populateInitialize(input, clients);
     }
     catch (error) {
         console.error('populateInitializeProcedure', error.message);
         throw error;
     }
 };
+export const encodeProcedureInitialization = (abi, functionName, args) => ({
+    data: encodeDynamicFunctionData({
+        abi,
+        functionName,
+        args
+    })
+});

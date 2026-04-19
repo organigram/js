@@ -1,0 +1,51 @@
+### YamlMime:TSType
+name: OrganEntry
+uid: '@organigram/js!OrganEntry:interface'
+package: '@organigram/js!'
+fullName: OrganEntry
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: address
+    uid: '@organigram/js!OrganEntry#address:member'
+    package: '@organigram/js!'
+    fullName: address
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'address: string;'
+      return:
+        type: string
+  - name: cid
+    uid: '@organigram/js!OrganEntry#cid:member'
+    package: '@organigram/js!'
+    fullName: cid
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'cid: string;'
+      return:
+        type: string
+  - name: index
+    uid: '@organigram/js!OrganEntry#index:member'
+    package: '@organigram/js!'
+    fullName: index
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'index: string;'
+      return:
+        type: string

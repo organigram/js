@@ -1,0 +1,64 @@
+### YamlMime:TSType
+name: DeployAssetInput
+uid: '@organigram/js!DeployAssetInput:interface'
+package: '@organigram/js!'
+fullName: DeployAssetInput
+summary: Input used to deploy one ERC-20 asset contract.
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: initialSupply
+    uid: '@organigram/js!DeployAssetInput#initialSupply:member'
+    package: '@organigram/js!'
+    fullName: initialSupply
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'initialSupply?: number | null;'
+      return:
+        type: number | null
+  - name: name
+    uid: '@organigram/js!DeployAssetInput#name:member'
+    package: '@organigram/js!'
+    fullName: name
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'name: string;'
+      return:
+        type: string
+  - name: salt
+    uid: '@organigram/js!DeployAssetInput#salt:member'
+    package: '@organigram/js!'
+    fullName: salt
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'salt?: string | null;'
+      return:
+        type: string | null
+  - name: symbol
+    uid: '@organigram/js!DeployAssetInput#symbol:member'
+    package: '@organigram/js!'
+    fullName: symbol
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'symbol: string;'
+      return:
+        type: string

@@ -109,7 +109,31 @@ export declare const templates: {
         }[];
         assets: never[];
     };
+    participatoryBudget: {
+        name: string;
+        organs: {
+            name: string;
+            address: string;
+            salt: string;
+            entries: never[];
+            permissions: {
+                permissionValue: number;
+                permissionAddress: string;
+            }[];
+        }[];
+        assets: never[];
+        procedures: {
+            address: string;
+            salt: string;
+            name: string;
+            typeName: string;
+            deciders: string;
+            proposers: string;
+            data: string;
+        }[];
+    };
 };
+export type TemplateName = keyof typeof templates;
 export declare const renewSaltsAndAddresses: (organigram: OrganigramInput, chainId: string) => {
     chainId: string;
     organs: {
@@ -121,7 +145,8 @@ export declare const renewSaltsAndAddresses: (organigram: OrganigramInput, chain
             permissionAddress: string;
             permissionValue: number;
         }[] | undefined;
-        signerOrProvider?: import("ethers").Signer | import("ethers").Provider | null;
+        publicClient?: import("viem").PublicClient | null;
+        walletClient?: import("viem").WalletClient | null;
         balance?: string | null;
         cid?: string | null;
         entries?: Array<{
@@ -148,7 +173,8 @@ export declare const renewSaltsAndAddresses: (organigram: OrganigramInput, chain
         name?: string | null;
         description?: string | null;
         cid?: string | null;
-        signerOrProvider?: import("ethers").Signer | import("ethers").Provider | null;
+        publicClient?: import("viem").PublicClient | null;
+        walletClient?: import("viem").WalletClient | null;
         metadata?: string | null;
         withModeration?: boolean | null;
         forwarder?: string | null;
@@ -162,7 +188,6 @@ export declare const renewSaltsAndAddresses: (organigram: OrganigramInput, chain
         address: string;
         name?: string | null;
         description?: string | null;
-        contract?: import("ethers").Contract | null;
         symbol?: string | null;
         initialSupply?: number | null;
         image?: string | null;
@@ -174,11 +199,12 @@ export declare const renewSaltsAndAddresses: (organigram: OrganigramInput, chain
     name?: string | null;
     description?: string | null;
     organigramClient?: import("..").OrganigramClient | null;
-    signer?: import("ethers").Signer | null;
+    walletClient?: import("viem").WalletClient | null;
+    publicClient?: import("viem").PublicClient | null;
     contractAddresses?: string[] | null;
     workspaceId?: string | null;
 };
-export declare const getTemplate: (templateName: keyof typeof templates, chainId: string) => {
+export declare const getTemplate: (templateName: TemplateName, chainId: string) => {
     chainId: string;
     organs: {
         salt: string;
@@ -189,7 +215,8 @@ export declare const getTemplate: (templateName: keyof typeof templates, chainId
             permissionAddress: string;
             permissionValue: number;
         }[] | undefined;
-        signerOrProvider?: import("ethers").Signer | import("ethers").Provider | null;
+        publicClient?: import("viem").PublicClient | null;
+        walletClient?: import("viem").WalletClient | null;
         balance?: string | null;
         cid?: string | null;
         entries?: Array<{
@@ -216,7 +243,8 @@ export declare const getTemplate: (templateName: keyof typeof templates, chainId
         name?: string | null;
         description?: string | null;
         cid?: string | null;
-        signerOrProvider?: import("ethers").Signer | import("ethers").Provider | null;
+        publicClient?: import("viem").PublicClient | null;
+        walletClient?: import("viem").WalletClient | null;
         metadata?: string | null;
         withModeration?: boolean | null;
         forwarder?: string | null;
@@ -230,7 +258,6 @@ export declare const getTemplate: (templateName: keyof typeof templates, chainId
         address: string;
         name?: string | null;
         description?: string | null;
-        contract?: import("ethers").Contract | null;
         symbol?: string | null;
         initialSupply?: number | null;
         image?: string | null;
@@ -242,7 +269,8 @@ export declare const getTemplate: (templateName: keyof typeof templates, chainId
     name?: string | null;
     description?: string | null;
     organigramClient?: import("..").OrganigramClient | null;
-    signer?: import("ethers").Signer | null;
+    walletClient?: import("viem").WalletClient | null;
+    publicClient?: import("viem").PublicClient | null;
     contractAddresses?: string[] | null;
     workspaceId?: string | null;
 };

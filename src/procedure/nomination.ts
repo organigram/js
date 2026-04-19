@@ -1,72 +1,75 @@
-import { ethers } from 'ethers'
-import NominationProcedureContractABI from '@organigram/protocol/artifacts/contracts/procedures/Nomination.sol/NominationProcedure.json'
+import NominationProcedureContractABI from '@organigram/protocol/abi/Nomination.sol/NominationProcedure.json' with { type: 'json' }
+import { encodeFunctionData, zeroAddress } from 'viem'
 
-import { Procedure, ProcedureInput } from '.'
+import { Procedure, type ProcedureInput } from '.'
 import { TransactionOptions } from '../organigramClient'
 import { deployedAddresses } from '../utils'
-import { nomination, PopulateInitializeInput, ProcedureTypeName } from './utils'
+import {
+  nomination,
+  PopulateInitializeInput,
+  PopulatedTransactionData,
+  ProcedureTypeName
+} from './utils'
+import {
+  type ContractClients,
+  createContractWriteTransaction,
+  getContractInstance,
+  getWalletAccount
+} from '../contracts'
 
 export class NominationProcedure extends Procedure {
-  static INTERFACE = '0xc5f28e49' // nominate() signature.
-  contract: ethers.Contract
+  static INTERFACE = '0xc5f28e49'
+
+  contract?: any
   type = nomination
   typeName = 'nomination' as ProcedureTypeName
 
-  // Constructor needs to call Procedure constructor.
-  constructor(procedureInput: ProcedureInput & { contract?: ethers.Contract }) {
+  constructor(procedureInput: ProcedureInput) {
     super({ ...procedureInput, typeName: 'nomination', type: nomination })
     this.contract =
-      procedureInput.contract ??
-      new ethers.Contract(
-        this.address,
-        NominationProcedureContractABI.abi,
-        procedureInput.signerOrProvider
-      )
+      this.publicClient != null
+        ? getContractInstance({
+            address: this.address,
+            abi: NominationProcedureContractABI.abi,
+            publicClient: this.publicClient,
+            walletClient: this.walletClient
+          })
+        : undefined
   }
 
-  // _populateInitialize() overrides Procedure _populateInitialize.
   static async _populateInitialize(
-    input: PopulateInitializeInput
-  ): Promise<ethers.ContractTransaction> {
-    if (input.options?.signer == null) {
-      throw new Error('Not connected.')
+    input: PopulateInitializeInput,
+    _clients: ContractClients
+  ): Promise<PopulatedTransactionData> {
+    return {
+      data: encodeFunctionData({
+        abi: NominationProcedureContractABI.abi,
+        functionName: 'initialize',
+        args: [
+          input.cid ?? 'nomination',
+          input.proposers ?? input.deciders ?? zeroAddress,
+          input.moderators ?? zeroAddress,
+          input.deciders,
+          input.withModeration ?? false,
+          input.forwarder ?? deployedAddresses[11155111].MetaGasStation
+        ]
+      })
     }
-    const contract = new ethers.Contract(
-      nomination.address,
-      NominationProcedureContractABI.abi,
-      input.options.signer
-    )
-    return await contract.initialize.populateTransaction(
-      input.cid ?? 'nomination',
-      input.proposers ?? input.deciders ?? ethers.ZeroAddress,
-      input.moderators ?? ethers.ZeroAddress,
-      input.deciders,
-      input.withModeration ?? false,
-      input.forwarder ?? deployedAddresses[11155111].MetaGasStation
-    )
   }
 
   static async load(
     address: string,
-    signerOrProvider: ethers.Signer | ethers.Provider,
+    clients: ContractClients,
     initialProcedure?: ProcedureInput
   ): Promise<NominationProcedure> {
-    const procedure = await Procedure.load(
-      address,
-      signerOrProvider,
-      initialProcedure
-    )
-    const contract = new ethers.Contract(
-      address,
-      NominationProcedureContractABI.abi,
-      signerOrProvider
-    )
+    const procedure = await Procedure.load(address, clients, initialProcedure)
     return new NominationProcedure({
       ...initialProcedure,
       cid: procedure.cid,
       address: procedure.address,
       chainId: procedure.chainId,
-      signerOrProvider,
+      publicClient: clients.publicClient,
+      walletClient: clients.walletClient,
       metadata: procedure.metadata,
       proposers: procedure.proposers,
       moderators: procedure.moderators,
@@ -76,8 +79,9 @@ export class NominationProcedure extends Procedure {
       proposals: procedure.proposals,
       isDeployed: true,
       salt: procedure.salt,
-      contract,
-      typeName: 'nomination'
+      typeName: 'nomination',
+      type: nomination,
+      data: initialProcedure?.data ?? ''
     })
   }
 
@@ -85,12 +89,66 @@ export class NominationProcedure extends Procedure {
     proposalKey: string,
     options?: TransactionOptions
   ): Promise<boolean> {
-    // @todo Check gasLimit amount
-    const tx = await this.contract.nominate(proposalKey)
-    if (options?.onTransaction != null) {
-      options.onTransaction(tx, 'Initialize Nomination procedure.')
-    }
+    const tx = await createContractWriteTransaction({
+      address: this.address,
+      abi: NominationProcedureContractABI.abi,
+      functionName: 'nominate',
+      args: [BigInt(proposalKey)],
+      clients: this.getClients(),
+      nonce: options?.nonce
+    })
+    options?.onTransaction?.(tx, 'Initialize Nomination procedure.')
     const receipt = await tx.wait()
-    return receipt.status === 1
+    return receipt.status === 'success'
+  }
+
+  async signNomination(input: {
+    proposalKey: string
+    nonce: bigint
+    deadline: bigint | number
+  }): Promise<string> {
+    if (this.walletClient == null) {
+      throw new Error('Connected wallet cannot sign typed data.')
+    }
+    const account = await getWalletAccount(this.walletClient)
+    return await this.walletClient.signTypedData({
+      account,
+      domain: this.getTypedDataDomain(),
+      primaryType: 'Nomination',
+      types: {
+        Nomination: [
+          { name: 'proposalKey', type: 'uint256' },
+          { name: 'nonce', type: 'uint256' },
+          { name: 'deadline', type: 'uint256' }
+        ]
+      },
+      message: {
+        proposalKey: BigInt(input.proposalKey),
+        nonce: input.nonce,
+        deadline: BigInt(input.deadline)
+      }
+    })
+  }
+
+  async nominateBySig(input: {
+    proposalKey: string
+    nonce: bigint
+    deadline: bigint | number
+    signature: string
+  }): Promise<boolean> {
+    const tx = await createContractWriteTransaction({
+      address: this.address,
+      abi: NominationProcedureContractABI.abi,
+      functionName: 'nominateBySig',
+      args: [
+        BigInt(input.proposalKey),
+        input.nonce,
+        BigInt(input.deadline),
+        input.signature
+      ],
+      clients: this.getClients()
+    })
+    const receipt = await tx.wait()
+    return receipt.status === 'success'
   }
 }

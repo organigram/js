@@ -1,0 +1,32 @@
+### YamlMime:TSTypeAlias
+name: ProcedureJson
+uid: '@organigram/js!ProcedureJson:type'
+package: '@organigram/js!'
+fullName: ProcedureJson
+summary: JSON-safe serialized representation of one procedure.
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+syntax: |-
+  export type ProcedureJson = {
+      isDeployed: boolean;
+      address: string;
+      deciders: string;
+      typeName: ProcedureTypeName;
+      name: string;
+      description: string;
+      cid: string;
+      salt?: string | null;
+      chainId: string;
+      data: string;
+      metadata?: string;
+      proposers: string;
+      moderators: string;
+      withModeration: boolean;
+      forwarder: string;
+      proposals?: ProcedureProposal[];
+      args?: unknown[];
+      type: ProcedureType;
+      organigramId?: string | null;
+  };

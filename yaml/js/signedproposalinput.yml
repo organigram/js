@@ -1,0 +1,64 @@
+### YamlMime:TSType
+name: SignedProposalInput
+uid: '@organigram/js!SignedProposalInput:interface'
+package: '@organigram/js!'
+fullName: SignedProposalInput
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: cid
+    uid: '@organigram/js!SignedProposalInput#cid:member'
+    package: '@organigram/js!'
+    fullName: cid
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'cid: string;'
+      return:
+        type: string
+  - name: deadline
+    uid: '@organigram/js!SignedProposalInput#deadline:member'
+    package: '@organigram/js!'
+    fullName: deadline
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'deadline: bigint | number;'
+      return:
+        type: bigint | number
+  - name: nonce
+    uid: '@organigram/js!SignedProposalInput#nonce:member'
+    package: '@organigram/js!'
+    fullName: nonce
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'nonce: bigint;'
+      return:
+        type: bigint
+  - name: operations
+    uid: '@organigram/js!SignedProposalInput#operations:member'
+    package: '@organigram/js!'
+    fullName: operations
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'operations: ProcedureProposalOperation[];'
+      return:
+        type: <xref uid="@organigram/js!ProcedureProposalOperation:interface" />[]

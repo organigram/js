@@ -1,0 +1,77 @@
+### YamlMime:TSType
+name: ExternalCallOperationInput
+uid: '@organigram/js!ExternalCallOperationInput:interface'
+package: '@organigram/js!'
+fullName: ExternalCallOperationInput
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: data
+    uid: '@organigram/js!ExternalCallOperationInput#data:member'
+    package: '@organigram/js!'
+    fullName: data
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'data: string;'
+      return:
+        type: string
+  - name: index
+    uid: '@organigram/js!ExternalCallOperationInput#index:member'
+    package: '@organigram/js!'
+    fullName: index
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'index?: string | number;'
+      return:
+        type: string | number
+  - name: organAddress
+    uid: '@organigram/js!ExternalCallOperationInput#organAddress:member'
+    package: '@organigram/js!'
+    fullName: organAddress
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'organAddress: string;'
+      return:
+        type: string
+  - name: target
+    uid: '@organigram/js!ExternalCallOperationInput#target:member'
+    package: '@organigram/js!'
+    fullName: target
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'target: string;'
+      return:
+        type: string
+  - name: value
+    uid: '@organigram/js!ExternalCallOperationInput#value:member'
+    package: '@organigram/js!'
+    fullName: value
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'value?: string | bigint | number;'
+      return:
+        type: string | bigint | number

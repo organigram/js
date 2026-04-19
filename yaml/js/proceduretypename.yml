@@ -1,0 +1,11 @@
+### YamlMime:TSTypeAlias
+name: ProcedureTypeName
+uid: '@organigram/js!ProcedureTypeName:type'
+package: '@organigram/js!'
+fullName: ProcedureTypeName
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+syntax: export type ProcedureTypeName = 'erc20Vote' | 'nomination' | 'vote';

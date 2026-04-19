@@ -2,34 +2,116 @@ items:
   - name: SharePoint Framework reference
     href: ~/overview/sharepoint.md
     items:
-      - name: client-js
-        uid: '@organigram/client-js!'
+      - name: js
+        uid: '@organigram/js!'
         items:
-          - name: LibraryKey
-            uid: '@organigram/client-js!LibraryKey:type'
-          - name: Multihash
-            uid: '@organigram/client-js!Multihash:interface'
-          - name: Network
-            uid: '@organigram/client-js!Network:type'
+          - name: AccountInOrgans
+            uid: '@organigram/js!AccountInOrgans:type'
+          - name: Asset
+            uid: '@organigram/js!Asset:class'
+          - name: AssetInput
+            uid: '@organigram/js!AssetInput:interface'
+          - name: AssetJson
+            uid: '@organigram/js!AssetJson:interface'
+          - name: ContractClients
+            uid: '@organigram/js!ContractClients:type'
+          - name: ContractName
+            uid: '@organigram/js!ContractName:type'
+          - name: DeployAssetInput
+            uid: '@organigram/js!DeployAssetInput:interface'
+          - name: DeployOrganigramInput
+            uid: '@organigram/js!DeployOrganigramInput:interface'
+          - name: DeployOrganInput
+            uid: '@organigram/js!DeployOrganInput:interface'
+          - name: DeployProceduresInput
+            uid: '@organigram/js!DeployProceduresInput:interface'
+          - name: Election
+            uid: '@organigram/js!Election:type'
+          - name: ERC20VoteProcedure
+            uid: '@organigram/js!ERC20VoteProcedure:class'
+          - name: ERC20VoteProcedureInput
+            uid: '@organigram/js!ERC20VoteProcedureInput:type'
+          - name: ExternalCallOperationInput
+            uid: '@organigram/js!ExternalCallOperationInput:interface'
+          - name: File_2
+            uid: '@organigram/js!File_2:interface'
+          - name: IOrganEntry
+            uid: '@organigram/js!IOrganEntry:interface'
+          - name: NominationProcedure
+            uid: '@organigram/js!NominationProcedure:class'
+          - name: OperationParam
+            uid: '@organigram/js!OperationParam:interface'
+          - name: OperationParamAction
+            uid: '@organigram/js!OperationParamAction:type'
+          - name: OperationParamType
+            uid: '@organigram/js!OperationParamType:type'
+          - name: OperationTag
+            uid: '@organigram/js!OperationTag:type'
           - name: Organ
-            uid: '@organigram/client-js!Organ:class'
-          - name: OrganData
-            uid: '@organigram/client-js!OrganData:interface'
+            uid: '@organigram/js!Organ:class'
           - name: OrganEntry
-            uid: '@organigram/client-js!OrganEntry:interface'
+            uid: '@organigram/js!OrganEntry:interface'
           - name: OrganFunctionName
-            uid: '@organigram/client-js!OrganFunctionName:enum'
+            uid: '@organigram/js!OrganFunctionName:enum'
           - name: Organigram
-            uid: '@organigram/client-js!Organigram:class'
-          - name: OrganProcedure
-            uid: '@organigram/client-js!OrganProcedure:interface'
+            uid: '@organigram/js!Organigram:class'
+          - name: OrganigramClient
+            uid: '@organigram/js!OrganigramClient:class'
+          - name: OrganigramInput
+            uid: '@organigram/js!OrganigramInput:type'
+          - name: OrganigramJson
+            uid: '@organigram/js!OrganigramJson:type'
+          - name: OrganigramTransaction
+            uid: '@organigram/js!OrganigramTransaction:type'
+          - name: OrganigramTransactionReceipt
+            uid: '@organigram/js!OrganigramTransactionReceipt:type'
+          - name: OrganInput
+            uid: '@organigram/js!OrganInput:interface'
+          - name: OrganJson
+            uid: '@organigram/js!OrganJson:interface'
+          - name: OrganPermission
+            uid: '@organigram/js!OrganPermission:interface'
+          - name: PopulatedTransactionData
+            uid: '@organigram/js!PopulatedTransactionData:type'
+          - name: PopulateInitializeInput
+            uid: '@organigram/js!PopulateInitializeInput:interface'
           - name: Procedure
-            uid: '@organigram/client-js!Procedure:class'
+            uid: '@organigram/js!Procedure:class'
+          - name: ProcedureInput
+            uid: '@organigram/js!ProcedureInput:interface'
+          - name: ProcedureJson
+            uid: '@organigram/js!ProcedureJson:type'
           - name: ProcedureProposal
-            uid: '@organigram/client-js!ProcedureProposal:interface'
+            uid: '@organigram/js!ProcedureProposal:interface'
           - name: ProcedureProposalOperation
-            uid: '@organigram/client-js!ProcedureProposalOperation:interface'
+            uid: '@organigram/js!ProcedureProposalOperation:interface'
           - name: ProcedureProposalOperationFunction
-            uid: '@organigram/client-js!ProcedureProposalOperationFunction:interface'
+            uid: '@organigram/js!ProcedureProposalOperationFunction:interface'
+          - name: ProcedureRoleTypeName
+            uid: '@organigram/js!ProcedureRoleTypeName:type'
           - name: ProcedureType
-            uid: '@organigram/client-js!ProcedureType:interface'
+            uid: '@organigram/js!ProcedureType:interface'
+          - name: ProcedureTypeField
+            uid: '@organigram/js!ProcedureTypeField:interface'
+          - name: ProcedureTypeName
+            uid: '@organigram/js!ProcedureTypeName:type'
+          - name: ProcedureTypeNameEnum
+            uid: '@organigram/js!ProcedureTypeNameEnum:enum'
+          - name: ProposalKey
+            uid: '@organigram/js!ProposalKey:type'
+          - name: ProposalMetadata
+            uid: '@organigram/js!ProposalMetadata:interface'
+          - name: SignedBlockProposalInput
+            uid: '@organigram/js!SignedBlockProposalInput:interface'
+          - name: SignedProposalActionInput
+            uid: '@organigram/js!SignedProposalActionInput:interface'
+          - name: SignedProposalInput
+            uid: '@organigram/js!SignedProposalInput:interface'
+          - name: TemplateName
+            uid: '@organigram/js!TemplateName:type'
+          - name: TransactionOptions
+            uid: '@organigram/js!TransactionOptions:interface'
+          - name: VoteProcedure
+            uid: '@organigram/js!VoteProcedure:class'
+          - name: VoteProcedureInput
+            uid: '@organigram/js!VoteProcedureInput:type'

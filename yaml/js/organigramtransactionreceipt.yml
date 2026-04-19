@@ -1,0 +1,14 @@
+### YamlMime:TSTypeAlias
+name: OrganigramTransactionReceipt
+uid: '@organigram/js!OrganigramTransactionReceipt:type'
+package: '@organigram/js!'
+fullName: OrganigramTransactionReceipt
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+syntax: |-
+  export type OrganigramTransactionReceipt = TransactionReceipt & {
+      gasPrice?: bigint | null;
+  };

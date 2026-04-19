@@ -1,0 +1,116 @@
+### YamlMime:TSType
+name: ProcedureProposalOperationFunction
+uid: '@organigram/js!ProcedureProposalOperationFunction:interface'
+package: '@organigram/js!'
+fullName: ProcedureProposalOperationFunction
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: abi
+    uid: '@organigram/js!ProcedureProposalOperationFunction#abi:member'
+    package: '@organigram/js!'
+    fullName: abi
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'abi?: unknown;'
+      return:
+        type: unknown
+  - name: funcSig
+    uid: '@organigram/js!ProcedureProposalOperationFunction#funcSig:member'
+    package: '@organigram/js!'
+    fullName: funcSig
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'funcSig: string;'
+      return:
+        type: string
+  - name: key
+    uid: '@organigram/js!ProcedureProposalOperationFunction#key:member'
+    package: '@organigram/js!'
+    fullName: key
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'key: ProposalKey;'
+      return:
+        type: <xref uid="@organigram/js!ProposalKey:type" />
+  - name: label
+    uid: '@organigram/js!ProcedureProposalOperationFunction#label:member'
+    package: '@organigram/js!'
+    fullName: label
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'label?: string;'
+      return:
+        type: string
+  - name: params
+    uid: '@organigram/js!ProcedureProposalOperationFunction#params:member'
+    package: '@organigram/js!'
+    fullName: params
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'params?: OperationParamType[];'
+      return:
+        type: <xref uid="@organigram/js!OperationParamType:type" />[]
+  - name: signature
+    uid: '@organigram/js!ProcedureProposalOperationFunction#signature:member'
+    package: '@organigram/js!'
+    fullName: signature
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'signature?: string;'
+      return:
+        type: string
+  - name: tags
+    uid: '@organigram/js!ProcedureProposalOperationFunction#tags:member'
+    package: '@organigram/js!'
+    fullName: tags
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'tags?: OperationTag[];'
+      return:
+        type: <xref uid="@organigram/js!OperationTag:type" />[]
+  - name: target
+    uid: '@organigram/js!ProcedureProposalOperationFunction#target:member'
+    package: '@organigram/js!'
+    fullName: target
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'target?: ''organ'' | ''self'';'
+      return:
+        type: '''organ'' | ''self'''

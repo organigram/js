@@ -1,0 +1,155 @@
+### YamlMime:TSType
+name: AssetInput
+uid: '@organigram/js!AssetInput:interface'
+package: '@organigram/js!'
+fullName: AssetInput
+summary: Input used to create or hydrate an asset model.
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: address
+    uid: '@organigram/js!AssetInput#address:member'
+    package: '@organigram/js!'
+    fullName: address
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'address?: string | null;'
+      return:
+        type: string | null
+  - name: chainId
+    uid: '@organigram/js!AssetInput#chainId:member'
+    package: '@organigram/js!'
+    fullName: chainId
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'chainId?: string | null;'
+      return:
+        type: string | null
+  - name: description
+    uid: '@organigram/js!AssetInput#description:member'
+    package: '@organigram/js!'
+    fullName: description
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'description?: string | null;'
+      return:
+        type: string | null
+  - name: image
+    uid: '@organigram/js!AssetInput#image:member'
+    package: '@organigram/js!'
+    fullName: image
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'image?: string | null;'
+      return:
+        type: string | null
+  - name: initialSupply
+    uid: '@organigram/js!AssetInput#initialSupply:member'
+    package: '@organigram/js!'
+    fullName: initialSupply
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'initialSupply?: number | null;'
+      return:
+        type: number | null
+  - name: isDeployed
+    uid: '@organigram/js!AssetInput#isDeployed:member'
+    package: '@organigram/js!'
+    fullName: isDeployed
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'isDeployed?: boolean;'
+      return:
+        type: boolean
+  - name: name
+    uid: '@organigram/js!AssetInput#name:member'
+    package: '@organigram/js!'
+    fullName: name
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'name?: string | null;'
+      return:
+        type: string | null
+  - name: organigramId
+    uid: '@organigram/js!AssetInput#organigramId:member'
+    package: '@organigram/js!'
+    fullName: organigramId
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'organigramId?: string | null;'
+      return:
+        type: string | null
+  - name: salt
+    uid: '@organigram/js!AssetInput#salt:member'
+    package: '@organigram/js!'
+    fullName: salt
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'salt?: string | null;'
+      return:
+        type: string | null
+  - name: symbol
+    uid: '@organigram/js!AssetInput#symbol:member'
+    package: '@organigram/js!'
+    fullName: symbol
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'symbol?: string | null;'
+      return:
+        type: string | null
+  - name: userBalance
+    uid: '@organigram/js!AssetInput#userBalance:member'
+    package: '@organigram/js!'
+    fullName: userBalance
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'userBalance?: string | null;'
+      return:
+        type: string | null

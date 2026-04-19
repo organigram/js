@@ -1,19 +1,141 @@
-import { ethers } from 'ethers';
-import OrganContractABI from '@organigram/protocol/artifacts/contracts/Organ.sol/Organ.json';
+import OrganContractABI from '@organigram/protocol/abi/Organ.sol/Organ.json' with { type: 'json' };
+import { decodeFunctionResult, encodeFunctionData, padHex, toHex, zeroAddress } from 'viem';
 import { createRandom32BytesHexId, deployedAddresses, predictContractAddress } from './utils';
 import { tryMulticall } from './multicall';
+import { createContractWriteTransaction, getContractInstance, getWalletAddress } from './contracts';
+/**
+ * High-level names for the writable organ functions exposed by the SDK.
+ */
 export var OrganFunctionName;
 (function (OrganFunctionName) {
-    OrganFunctionName[OrganFunctionName["addEntries"] = 0] = "addEntries";
-    OrganFunctionName[OrganFunctionName["removeEntries"] = 1] = "removeEntries";
-    OrganFunctionName[OrganFunctionName["replaceEntry"] = 2] = "replaceEntry";
-    OrganFunctionName[OrganFunctionName["addPermission"] = 3] = "addPermission";
-    OrganFunctionName[OrganFunctionName["removePermission"] = 4] = "removePermission";
-    OrganFunctionName[OrganFunctionName["replacePermission"] = 5] = "replacePermission";
-    OrganFunctionName[OrganFunctionName["withdrawEther"] = 6] = "withdrawEther";
-    OrganFunctionName[OrganFunctionName["withdrawERC20"] = 7] = "withdrawERC20";
-    OrganFunctionName[OrganFunctionName["withdrawERC721"] = 8] = "withdrawERC721";
+    OrganFunctionName["addEntries"] = "addEntries";
+    OrganFunctionName["removeEntries"] = "removeEntries";
+    OrganFunctionName["replaceEntry"] = "replaceEntry";
+    OrganFunctionName["addPermission"] = "addPermission";
+    OrganFunctionName["removePermission"] = "removePermission";
+    OrganFunctionName["replacePermission"] = "replacePermission";
+    OrganFunctionName["withdrawEther"] = "withdrawEther";
+    OrganFunctionName["withdrawERC20"] = "withdrawERC20";
+    OrganFunctionName["withdrawERC721"] = "withdrawERC721";
 })(OrganFunctionName || (OrganFunctionName = {}));
+const formatPermissionValue = (value) => padHex((typeof value === 'string' && value.startsWith('0x')
+    ? value
+    : toHex(value)), { size: 2 });
+const normalizeEntry = (entry) => ({
+    addr: entry.address ?? zeroAddress,
+    cid: entry.cid ?? ''
+});
+const normalizeLoadedOrganData = (data) => ({
+    cid: data.cid ?? data[0],
+    permissionsLength: BigInt(data.permissionsLength ?? data[1] ?? 0),
+    entriesLength: BigInt(data.entriesLength ?? data[2] ?? 0),
+    entriesCount: BigInt(data.entriesCount ?? data[3] ?? 0)
+});
+const normalizeLoadedPermission = (permission) => ({
+    permissionAddress: permission.addr ?? permission.address ?? permission[0],
+    permissionValue: typeof (permission.perms ?? permission[1]) === 'string'
+        ? parseInt(permission.perms ?? permission[1], 16)
+        : Number(permission.perms ?? permission[1])
+});
+const normalizeLoadedEntry = (entry, index) => ({
+    index,
+    address: entry.addr ?? entry.address ?? entry[0],
+    cid: entry.cid ?? entry[1]
+});
+const normalizeOrganFunctionCall = async ({ functionName, args, walletClient }) => {
+    switch (functionName) {
+        case OrganFunctionName.addEntries:
+            return {
+                functionName: 'addEntries',
+                args: [args[0].map(normalizeEntry)]
+            };
+        case OrganFunctionName.removeEntries:
+            return {
+                functionName: 'removeEntries',
+                args: [args[0].map(index => BigInt(index))]
+            };
+        case OrganFunctionName.replaceEntry: {
+            const [index, entry] = args;
+            return {
+                functionName: 'replaceEntry',
+                args: [BigInt(index), entry.address ?? '', entry.cid ?? '']
+            };
+        }
+        case OrganFunctionName.addPermission: {
+            const [permissionAddress, permissionValue] = args;
+            return {
+                functionName: 'addPermission',
+                args: [permissionAddress, formatPermissionValue(permissionValue)]
+            };
+        }
+        case OrganFunctionName.removePermission:
+            return {
+                functionName: 'removePermission',
+                args
+            };
+        case OrganFunctionName.replacePermission: {
+            const [oldPermissionAddress, newPermissionAddress, permissionValue] = args;
+            return {
+                functionName: 'replacePermission',
+                args: [
+                    oldPermissionAddress,
+                    newPermissionAddress,
+                    formatPermissionValue(permissionValue)
+                ]
+            };
+        }
+        case OrganFunctionName.withdrawEther: {
+            const [to, value] = args;
+            return {
+                functionName: 'transfer',
+                args: [to, BigInt(value)]
+            };
+        }
+        case OrganFunctionName.withdrawERC20: {
+            const [token, maybeFromOrTo, maybeToOrAmount, maybeAmount] = args;
+            const from = maybeAmount == null
+                ? walletClient != null
+                    ? await getWalletAddress(walletClient)
+                    : undefined
+                : maybeFromOrTo;
+            const to = maybeAmount == null
+                ? maybeFromOrTo
+                : maybeToOrAmount;
+            const amount = maybeAmount ?? maybeToOrAmount;
+            if (from == null) {
+                throw new Error('Wallet client not connected.');
+            }
+            return {
+                functionName: 'transferCoins',
+                args: [token, from, to, BigInt(amount)]
+            };
+        }
+        case OrganFunctionName.withdrawERC721: {
+            const [token, maybeFromOrTo, maybeToOrTokenId, maybeTokenId] = args;
+            const from = maybeTokenId == null
+                ? walletClient != null
+                    ? await getWalletAddress(walletClient)
+                    : undefined
+                : maybeFromOrTo;
+            const to = maybeTokenId == null
+                ? maybeFromOrTo
+                : maybeToOrTokenId;
+            const tokenId = maybeTokenId ?? maybeToOrTokenId;
+            if (from == null) {
+                throw new Error('Wallet client not connected.');
+            }
+            return {
+                functionName: 'transferCollectible',
+                args: [token, from, to, BigInt(tokenId)]
+            };
+        }
+        default:
+            return { functionName: String(functionName), args };
+    }
+};
+/**
+ * In-memory representation of one deployed or planned organ.
+ */
 export class Organ {
     static INTERFACE = '0xf81b1307';
     name;
@@ -25,13 +147,13 @@ export class Organ {
     permissions = [];
     cid;
     entries = [];
-    signer;
-    provider;
+    walletClient;
+    publicClient;
     contract;
     isDeployed;
     organigramId;
     forwarder;
-    constructor({ address, chainId, signerOrProvider, balance, permissions, cid, entries, salt, isDeployed, name, description, organigramId, forwarder }) {
+    constructor({ address, chainId, publicClient, walletClient, balance, permissions, cid, entries, salt, isDeployed, name, description, organigramId, forwarder }) {
         this.name = name ?? 'Unnamed Organ';
         this.description = description ?? 'This organ does not have a description.';
         this.isDeployed = isDeployed ?? false;
@@ -48,157 +170,199 @@ export class Organ {
         this.organigramId = organigramId ?? 'default-organigram-id';
         this.forwarder =
             forwarder ?? deployedAddresses[this.chainId]?.MetaGasStation;
-        this.balance = balance ?? '0n';
+        this.balance = balance ?? '0';
         this.permissions = permissions ?? [];
         this.cid = cid ?? '';
         this.entries = entries ?? [];
-        if (signerOrProvider?.provider != null) {
-            this.signer = signerOrProvider;
-            this.provider = this.signer.provider;
+        this.publicClient = publicClient ?? undefined;
+        this.walletClient = walletClient ?? undefined;
+        this.contract =
+            this.publicClient != null
+                ? getContractInstance({
+                    address: this.address,
+                    abi: OrganContractABI.abi,
+                    publicClient: this.publicClient,
+                    walletClient: this.walletClient
+                })
+                : undefined;
+    }
+    getClients() {
+        if (this.publicClient == null) {
+            throw new Error('Public client not connected.');
         }
-        else if (signerOrProvider instanceof ethers.JsonRpcProvider) {
-            this.provider = signerOrProvider;
-            signerOrProvider
-                .getSigner()
-                .then(signer => {
-                this.signer = signer;
-            })
-                .catch((error) => {
-                console.warn('Error while getting signer from provider.', error.message);
+        return {
+            publicClient: this.publicClient,
+            walletClient: this.walletClient
+        };
+    }
+    getContract() {
+        if (this.contract == null) {
+            const clients = this.getClients();
+            this.contract = getContractInstance({
+                address: this.address,
+                abi: OrganContractABI.abi,
+                ...clients
             });
         }
-        this.contract = new ethers.Contract(this.address, OrganContractABI.abi, signerOrProvider);
+        return this.contract;
     }
     updateCid = async (cid, options) => {
-        const tx = await this.contract.updateCid(cid, { nonce: options?.nonce });
-        if (options?.onTransaction != null) {
-            options.onTransaction(tx, `Update CID of organ ${this.address} to ${cid}.`);
-        }
+        const tx = await createContractWriteTransaction({
+            address: this.address,
+            abi: OrganContractABI.abi,
+            functionName: 'updateCid',
+            args: [cid],
+            clients: this.getClients(),
+            nonce: options?.nonce
+        });
+        options?.onTransaction?.(tx, `Update CID of organ ${this.address} to ${cid}.`);
         return await tx.wait();
     };
     addEntries = async (entries, options) => {
-        const _entries = entries
-            .map(e => {
-            if ((e.address == null || e.address === '') &&
-                (e.cid == null || e.cid === '')) {
+        const normalizedEntries = entries
+            .map(entry => {
+            if ((entry.address == null || entry.address === '') &&
+                (entry.cid == null || entry.cid === '')) {
                 return undefined;
             }
-            return {
-                addr: e.address ?? ethers.ZeroAddress,
-                cid: e.cid
-            };
+            return normalizeEntry(entry);
         })
-            .filter(i => i != null);
-        const tx = await this.contract.addEntries(_entries, {
-            ...(options?.nonce != null ? { nonce: options.nonce } : {})
+            .filter(entry => entry != null);
+        const tx = await createContractWriteTransaction({
+            address: this.address,
+            abi: OrganContractABI.abi,
+            functionName: 'addEntries',
+            args: [normalizedEntries],
+            clients: this.getClients(),
+            nonce: options?.nonce
         });
-        if (options?.onTransaction != null) {
-            options.onTransaction(tx, `Add ${_entries.length} entries to organ ${this.address}.`);
-        }
+        options?.onTransaction?.(tx, `Add ${normalizedEntries.length} entries to organ ${this.address}.`);
         return await tx.wait();
     };
     removeEntries = async (indexes, options) => {
-        const tx = await this.contract.removeEntries(indexes, {
-            ...(options?.nonce != null ? { nonce: options.nonce } : {})
+        const tx = await createContractWriteTransaction({
+            address: this.address,
+            abi: OrganContractABI.abi,
+            functionName: 'removeEntries',
+            args: [indexes.map(index => BigInt(index))],
+            clients: this.getClients(),
+            nonce: options?.nonce
         });
-        if (options?.onTransaction != null) {
-            options.onTransaction(tx, `Remove ${indexes.length} entries from organ ${this.address}.`);
-        }
+        options?.onTransaction?.(tx, `Remove ${indexes.length} entries from organ ${this.address}.`);
         return await tx.wait();
     };
     replaceEntry = async (index, entry, options) => {
-        const tx = await this.contract.replaceEntry(index, entry.address ?? '', entry.cid ?? '', { ...(options?.nonce != null ? { nonce: options.nonce } : {}) });
-        if (options?.onTransaction != null) {
-            options.onTransaction(tx, `Replace entry ${index} of organ ${this.address}.`);
-        }
+        const tx = await createContractWriteTransaction({
+            address: this.address,
+            abi: OrganContractABI.abi,
+            functionName: 'replaceEntry',
+            args: [BigInt(index), entry.address ?? '', entry.cid ?? ''],
+            clients: this.getClients(),
+            nonce: options?.nonce
+        });
+        options?.onTransaction?.(tx, `Replace entry ${index} of organ ${this.address}.`);
         return await tx.wait();
     };
     addPermission = async (permission, options) => {
-        const permissions = `0x${permission.permissionValue
-            .toString(16)
-            .padStart(4, '0')}`;
-        const tx = await this.contract.addPermission(permission.permissionAddress, permissions, { ...(options?.nonce != null ? { nonce: options.nonce } : {}) });
-        if (options?.onTransaction != null) {
-            options.onTransaction(tx, `Add permission ${permission.permissionAddress} to organ ${this.address}.`);
-        }
+        const tx = await createContractWriteTransaction({
+            address: this.address,
+            abi: OrganContractABI.abi,
+            functionName: 'addPermission',
+            args: [
+                permission.permissionAddress,
+                formatPermissionValue(permission.permissionValue)
+            ],
+            clients: this.getClients(),
+            nonce: options?.nonce
+        });
+        options?.onTransaction?.(tx, `Add permission ${permission.permissionAddress} to organ ${this.address}.`);
         return await tx.wait();
     };
     removePermission = async (permission, options) => {
-        const tx = await this.contract.removePermission(permission, {
-            ...(options?.nonce != null ? { nonce: options.nonce } : {})
+        const tx = await createContractWriteTransaction({
+            address: this.address,
+            abi: OrganContractABI.abi,
+            functionName: 'removePermission',
+            args: [permission],
+            clients: this.getClients(),
+            nonce: options?.nonce
         });
-        if (options?.onTransaction != null) {
-            options.onTransaction(tx, `Remove permission ${permission} from organ ${this.address}.`);
-        }
+        options?.onTransaction?.(tx, `Remove permission ${permission} from organ ${this.address}.`);
         return await tx.wait();
     };
     replacePermission = async (oldPermissionAddress, newOrganPermission, options) => {
-        const permissions = `0x${newOrganPermission.permissionValue
-            .toString(16)
-            .padStart(4, '0')}`;
-        const tx = await this.contract.replacePermission(oldPermissionAddress, newOrganPermission.permissionAddress, permissions, { ...(options?.nonce != null ? { nonce: options.nonce } : {}) });
-        if (options?.onTransaction != null) {
-            options.onTransaction(tx, `Replace procedure ${oldPermissionAddress} with ${newOrganPermission.permissionAddress} in organ ${this.address}.`);
-        }
+        const tx = await createContractWriteTransaction({
+            address: this.address,
+            abi: OrganContractABI.abi,
+            functionName: 'replacePermission',
+            args: [
+                oldPermissionAddress,
+                newOrganPermission.permissionAddress,
+                formatPermissionValue(newOrganPermission.permissionValue)
+            ],
+            clients: this.getClients(),
+            nonce: options?.nonce
+        });
+        options?.onTransaction?.(tx, `Replace procedure ${oldPermissionAddress} with ${newOrganPermission.permissionAddress} in organ ${this.address}.`);
         return await tx.wait();
     };
     withdrawEther = async (to, value, options) => {
-        const tx = await this.contract.transfer(to, value, {
-            ...(options?.nonce != null ? { nonce: options.nonce } : {})
+        const tx = await createContractWriteTransaction({
+            address: this.address,
+            abi: OrganContractABI.abi,
+            functionName: 'transfer',
+            args: [to, BigInt(value)],
+            clients: this.getClients(),
+            nonce: options?.nonce
         });
-        if (options?.onTransaction != null) {
-            options.onTransaction(tx, `Withdraw ${value.toString()} wei from organ ${this.address} to ${to}.`);
-        }
+        options?.onTransaction?.(tx, `Withdraw ${value.toString()} wei from organ ${this.address} to ${to}.`);
         return await tx.wait();
     };
     withdrawERC20 = async (token, to, amount, options) => {
-        const from = await this.signer?.getAddress();
-        if (from == null) {
-            throw new Error('Signer not connected.');
+        if (this.walletClient == null) {
+            throw new Error('Wallet client not connected.');
         }
-        const tx = await this.contract.transferCoins(token, from, to, amount, {
-            ...(options?.nonce != null ? { nonce: options.nonce } : {})
+        const from = await getWalletAddress(this.walletClient);
+        const tx = await createContractWriteTransaction({
+            address: this.address,
+            abi: OrganContractABI.abi,
+            functionName: 'transferCoins',
+            args: [token, from, to, BigInt(amount)],
+            clients: this.getClients(),
+            nonce: options?.nonce
         });
-        if (options?.onTransaction != null) {
-            options.onTransaction(tx, `Withdraw ${amount.toString()} ERC20 units from organ ${this.address} to ${to}.`);
-        }
+        options?.onTransaction?.(tx, `Withdraw ${amount.toString()} ERC20 units from organ ${this.address} to ${to}.`);
         return await tx.wait();
     };
     withdrawERC721 = async (token, to, tokenId, options) => {
-        const from = await this.signer?.getAddress();
-        if (from == null) {
-            throw new Error('Signer not connected.');
+        if (this.walletClient == null) {
+            throw new Error('Wallet client not connected.');
         }
-        const tx = await this.contract.transferCollectible(token, from, to, tokenId, { ...(options?.nonce != null ? { nonce: options.nonce } : {}) });
-        if (options?.onTransaction != null) {
-            options.onTransaction(tx, `Withdraw ERC721 token ${tokenId.toString()} from organ ${this.address} to ${to}.`);
-        }
+        const from = await getWalletAddress(this.walletClient);
+        const tx = await createContractWriteTransaction({
+            address: this.address,
+            abi: OrganContractABI.abi,
+            functionName: 'transferCollectible',
+            args: [token, from, to, BigInt(tokenId)],
+            clients: this.getClients(),
+            nonce: options?.nonce
+        });
+        options?.onTransaction?.(tx, `Withdraw ERC721 token ${tokenId.toString()} from organ ${this.address} to ${to}.`);
         return await tx.wait();
     };
-    static async load(address, signerOrProvider, initialOrgan) {
+    static async load(address, clients, initialOrgan) {
         if (!address) {
             throw new Error('Cannot load organ: No address provided.');
         }
-        if (!signerOrProvider) {
-            throw new Error('Cannot load organ: No signer or provider provided.');
-        }
-        const provider = signerOrProvider.provider ?? signerOrProvider;
-        const chainId = initialOrgan?.chainId ??
-            (signerOrProvider.provider != null
-                ? await provider?.getNetwork().then(network => network.chainId.toString())
-                : undefined) ??
-            '1';
-        if (chainId == null) {
-            throw new Error('Cannot load organ: No chainId found.');
-        }
-        const data = await Organ.loadData(address, signerOrProvider);
-        const balance = await provider
-            ?.getBalance(address)
-            .then(balance => balance.toString())
-            .catch(() => '0n');
+        const chainId = initialOrgan?.chainId ?? String(await clients.publicClient.getChainId());
+        const data = await Organ.loadData(address, clients);
+        const balance = await clients.publicClient
+            .getBalance({ address: address })
+            .then((value) => value.toString())
+            .catch(() => '0');
         const [permissions, entries] = await Promise.all([
-            Organ.loadPermissions(address, signerOrProvider, data),
-            Organ.loadEntries(address, signerOrProvider, data).catch((error) => {
+            Organ.loadPermissions(address, clients, data),
+            Organ.loadEntries(address, clients, data).catch((error) => {
                 console.warn(error.message);
                 return [];
             })
@@ -207,168 +371,190 @@ export class Organ {
             ...initialOrgan,
             address,
             chainId,
-            signerOrProvider,
+            publicClient: clients.publicClient,
+            walletClient: clients.walletClient,
             balance,
             permissions,
             cid: data?.cid,
-            entries
+            entries,
+            isDeployed: true
         });
     }
-    static async isOrgan(address, signerOrProvider) {
-        const contract = new ethers.Contract(address, OrganContractABI.abi, signerOrProvider);
-        const isERC165 = await contract.supportsInterface('0x01ffc9a7');
+    static async isOrgan(address, clients) {
+        const contract = getContractInstance({
+            address,
+            abi: OrganContractABI.abi,
+            publicClient: clients.publicClient
+        });
+        const isERC165 = await contract.read.supportsInterface(['0x01ffc9a7']);
         if (isERC165 === false)
             return false;
-        return await contract.supportsInterface(Organ.INTERFACE);
+        return Boolean(await contract.read.supportsInterface([Organ.INTERFACE]));
     }
-    static async getBalance(address, signerOrProvider) {
-        const provider = signerOrProvider.provider ?? signerOrProvider;
-        const balance = provider?.getBalance(address);
-        if (balance == null)
-            return 0n;
-        return await balance;
-    }
-    static async loadData(address, signerOrProvider) {
-        const contract = new ethers.Contract(address, OrganContractABI.abi, signerOrProvider);
-        return await contract.getOrgan().catch((e) => {
-            console.error(e.message);
+    static async getBalance(address, clients) {
+        return await clients.publicClient.getBalance({
+            address: address
         });
     }
-    static async loadEntryForAccount(address, account, signerOrProvider) {
-        const contract = new ethers.Contract(address, OrganContractABI.abi, signerOrProvider);
-        const index = await contract.getEntryIndexForAddress(account, {});
-        return await Organ.loadEntry(address, index, signerOrProvider).catch(() => undefined);
+    static async loadData(address, clients) {
+        const contract = getContractInstance({
+            address,
+            abi: OrganContractABI.abi,
+            publicClient: clients.publicClient
+        });
+        return await contract.read
+            .getOrgan()
+            .then(data => normalizeLoadedOrganData(data))
+            .catch((error) => {
+            console.error(error.message);
+            throw error;
+        });
     }
-    static async checkAddressPermissions(organAddress, addressToCheck, signerOrProvider) {
-        const contract = new ethers.Contract(organAddress, OrganContractABI.abi, signerOrProvider);
-        return await contract
-            .getPermissions(addressToCheck)
-            .catch((e) => {
-            console.error('Error', e.message);
-        })
-            .then((res) => typeof res.perms === 'string' ? parseInt(res.perms, 16) : res.perms);
+    static async loadEntryForAccount(address, account, clients) {
+        const contract = getContractInstance({
+            address,
+            abi: OrganContractABI.abi,
+            publicClient: clients.publicClient
+        });
+        const index = (await contract.read.getEntryIndexForAddress([account]));
+        return await Organ.loadEntry(address, index.toString(), clients).catch(() => undefined);
     }
-    static async loadPermission(address, index, signerOrProvider) {
-        const contract = new ethers.Contract(address, OrganContractABI.abi, signerOrProvider);
-        const permission = await contract.getPermission(index).catch((e) => {
-            console.error(e.message);
+    static async checkAddressPermissions(organAddress, addressToCheck, clients) {
+        const contract = getContractInstance({
+            address: organAddress,
+            abi: OrganContractABI.abi,
+            publicClient: clients.publicClient
+        });
+        const result = await contract.read.getPermissions([addressToCheck]).catch((error) => {
+            console.error('Error', error.message);
+            return '0x0000';
+        });
+        return typeof result === 'string' ? parseInt(result, 16) : Number(result);
+    }
+    static async loadPermission(address, index, clients) {
+        const contract = getContractInstance({
+            address,
+            abi: OrganContractABI.abi,
+            publicClient: clients.publicClient
+        });
+        const permission = await contract.read
+            .getPermission([BigInt(index)])
+            .catch((error) => {
+            console.error(error.message);
         });
         if (permission == null) {
             throw new Error('Unable to load permission.');
         }
-        return {
-            permissionAddress: permission.addr,
-            permissionValue: typeof permission.perms === 'string'
-                ? parseInt(permission.perms, 16)
-                : permission.perms
-        };
+        return normalizeLoadedPermission(permission);
     }
-    static async loadPermissions(address, signerOrProvider, data) {
-        const organData = data ?? (await Organ.loadData(address, signerOrProvider));
-        const contractInterface = new ethers.Interface(OrganContractABI.abi);
-        const multicallPermissions = await tryMulticall(signerOrProvider, Array.from({ length: Number(organData.permissionsLength) }).map((_, i) => ({
+    static async loadPermissions(address, clients, data) {
+        const organData = data ?? (await Organ.loadData(address, clients));
+        const multicallPermissions = await tryMulticall(clients, Array.from({ length: Number(organData.permissionsLength) }).map((_, index) => ({
             target: address,
-            callData: contractInterface.encodeFunctionData('getPermission', [
-                i.toString()
-            ]),
+            callData: encodeFunctionData({
+                abi: OrganContractABI.abi,
+                functionName: 'getPermission',
+                args: [BigInt(index)]
+            }),
             decode: returnData => {
-                const [permission] = contractInterface.decodeFunctionResult('getPermission', returnData);
-                return {
-                    permissionAddress: permission.addr,
-                    permissionValue: typeof permission.perms === 'string'
-                        ? parseInt(permission.perms, 16)
-                        : permission.perms
-                };
+                const permission = decodeFunctionResult({
+                    abi: OrganContractABI.abi,
+                    functionName: 'getPermission',
+                    data: returnData
+                });
+                return normalizeLoadedPermission(permission);
             }
         })));
         if (multicallPermissions != null) {
             return multicallPermissions.filter((permission) => permission != null);
         }
-        return (await Promise.all(Array.from({ length: Number(organData.permissionsLength) }).map(async (_, i) => await Organ.loadPermission(address, i.toString(), signerOrProvider).catch((error) => {
-            console.warn('Error while loading permission in organ ', address, i.toString(), error.message);
+        return (await Promise.all(Array.from({ length: Number(organData.permissionsLength) }).map(async (_, index) => await Organ.loadPermission(address, index.toString(), clients).catch((error) => {
+            console.warn('Error while loading permission in organ.', address, index.toString(), error.message);
             return null;
-        })))).filter(permission => permission != null);
+        })))).filter((permission) => permission != null);
     }
-    static async loadEntry(address, index, signerOrProvider) {
-        const contract = new ethers.Contract(address, OrganContractABI.abi, signerOrProvider);
-        const entry = await contract.getEntry(index);
-        return { index, address: entry.addr, cid: entry.cid };
+    static async loadEntry(address, index, clients) {
+        const contract = getContractInstance({
+            address,
+            abi: OrganContractABI.abi,
+            publicClient: clients.publicClient
+        });
+        const entry = (await contract.read.getEntry([BigInt(index)]));
+        return normalizeLoadedEntry(entry, index);
     }
-    static async loadEntries(address, signerOrProvider, data) {
-        const length = (data ?? (await Organ.loadData(address, signerOrProvider)))
-            ?.entriesLength ?? 0n;
-        const contractInterface = new ethers.Interface(OrganContractABI.abi);
-        const multicallEntries = await tryMulticall(signerOrProvider, Array.from({ length: parseInt(length.toString()) }).map((_, i) => ({
+    static async loadEntries(address, clients, data) {
+        const organData = data ?? (await Organ.loadData(address, clients));
+        const indexes = Array.from({ length: Math.max(Number(organData.entriesLength) - 1, 0) }, (_, index) => index + 1);
+        const multicallEntries = await tryMulticall(clients, indexes.map(index => ({
             target: address,
-            callData: contractInterface.encodeFunctionData('getEntry', [
-                i.toString()
-            ]),
+            callData: encodeFunctionData({
+                abi: OrganContractABI.abi,
+                functionName: 'getEntry',
+                args: [BigInt(index)]
+            }),
             decode: returnData => {
-                const [entry] = contractInterface.decodeFunctionResult('getEntry', returnData);
-                return {
-                    index: i.toString(),
-                    address: entry.addr,
-                    cid: entry.cid
-                };
+                const entry = decodeFunctionResult({
+                    abi: OrganContractABI.abi,
+                    functionName: 'getEntry',
+                    data: returnData
+                });
+                return normalizeLoadedEntry(entry, index.toString());
             }
         })));
         if (multicallEntries != null) {
-            return multicallEntries.filter((entry) => entry != null && entry.address !== ethers.ZeroAddress);
+            return multicallEntries.filter((entry) => entry != null && entry.address !== zeroAddress);
         }
-        const entries = await Promise.all(Array.from({ length: parseInt(length.toString()) }).map(async (_, i) => {
-            const entry = await Organ.loadEntry(address, i.toString(), signerOrProvider).catch((error) => {
-                console.warn('Error while loading entry in organ.', address, i.toString(), error.message);
+        const entries = await Promise.all(indexes.map(async (index) => {
+            const entry = await Organ.loadEntry(address, index.toString(), clients).catch((error) => {
+                console.warn('Error while loading entry in organ.', address, index.toString(), error.message);
                 return null;
             });
-            if (entry != null && entry.address !== ethers.ZeroAddress) {
+            if (entry != null && entry.address !== zeroAddress) {
                 return entry;
             }
-        })).then(e => e.filter(i => i != null));
-        return entries;
+            return null;
+        }));
+        return entries.filter((entry) => entry != null);
     }
-    static async populateTransaction(address, signer, functionName, ...args) {
-        const contract = new ethers.Contract(address, OrganContractABI.abi, signer);
-        return await contract[functionName.toString()].populateTransaction(...args);
+    static async populateTransaction(address, walletClient, functionName, ...args) {
+        const normalizedCall = await normalizeOrganFunctionCall({
+            functionName,
+            args,
+            walletClient
+        });
+        return {
+            to: address,
+            functionName: normalizedCall.functionName,
+            data: encodeFunctionData({
+                abi: OrganContractABI.abi,
+                functionName: normalizedCall.functionName,
+                args: normalizedCall.args
+            })
+        };
     }
     async reload() {
-        const signerOrProvider = this.signer ?? this.provider;
-        if (signerOrProvider == null) {
-            throw new Error('Not connected.');
-        }
-        const { permissions, cid, entries } = await Organ.load(this.address, signerOrProvider);
+        const { permissions, cid, entries } = await Organ.load(this.address, this.getClients());
         this.cid = cid;
         this.permissions = permissions;
         this.entries = entries;
         return this;
     }
     async reloadEntries() {
-        const signerOrProvider = this.signer ?? this.provider;
-        if (signerOrProvider == null) {
-            throw new Error('Not connected.');
-        }
-        this.entries = await Organ.loadEntries(this.address, signerOrProvider).catch(error => {
+        this.entries = await Organ.loadEntries(this.address, this.getClients()).catch((error) => {
             console.warn("Error while reloading organ's entries", this.address, error.message);
             return this.entries;
         });
         return this;
     }
     async reloadPermissions() {
-        const signerOrProvider = this.signer ?? this.provider;
-        if (signerOrProvider == null) {
-            throw new Error('Not connected.');
-        }
-        this.permissions = await Organ.loadPermissions(this.address, signerOrProvider).catch(error => {
+        this.permissions = await Organ.loadPermissions(this.address, this.getClients()).catch((error) => {
             console.warn("Error while reloading organ's permissions", this.address, error.message);
             return this.permissions;
         });
         return this;
     }
     async reloadData() {
-        const signerOrProvider = this.signer ?? this.provider;
-        if (signerOrProvider == null) {
-            throw new Error('Not connected.');
-        }
-        const data = await Organ.loadData(this.address, signerOrProvider);
+        const data = await Organ.loadData(this.address, this.getClients());
         this.cid = data?.cid;
         return this;
     }

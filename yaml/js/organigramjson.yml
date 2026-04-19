@@ -1,0 +1,22 @@
+### YamlMime:TSTypeAlias
+name: OrganigramJson
+uid: '@organigram/js!OrganigramJson:type'
+package: '@organigram/js!'
+fullName: OrganigramJson
+summary: JSON-safe serialized representation of an organigram.
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+syntax: |-
+  export type OrganigramJson = {
+      id: string;
+      slug: string;
+      name: string;
+      description: string;
+      chainId: string;
+      organs: OrganJson[];
+      procedures: ProcedureJson[];
+      assets: AssetJson[];
+      workspaceId?: string | null;
+  };

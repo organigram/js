@@ -1,0 +1,142 @@
+### YamlMime:TSType
+name: ProcedureProposal
+uid: '@organigram/js!ProcedureProposal:interface'
+package: '@organigram/js!'
+fullName: ProcedureProposal
+summary: Hydrated proposal state exposed by the SDK.
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: adopted
+    uid: '@organigram/js!ProcedureProposal#adopted:member'
+    package: '@organigram/js!'
+    fullName: adopted
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'adopted: boolean;'
+      return:
+        type: boolean
+  - name: applied
+    uid: '@organigram/js!ProcedureProposal#applied:member'
+    package: '@organigram/js!'
+    fullName: applied
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'applied: boolean;'
+      return:
+        type: boolean
+  - name: blocked
+    uid: '@organigram/js!ProcedureProposal#blocked:member'
+    package: '@organigram/js!'
+    fullName: blocked
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'blocked: boolean;'
+      return:
+        type: boolean
+  - name: blockReason
+    uid: '@organigram/js!ProcedureProposal#blockReason:member'
+    package: '@organigram/js!'
+    fullName: blockReason
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'blockReason: string;'
+      return:
+        type: string
+  - name: cid
+    uid: '@organigram/js!ProcedureProposal#cid:member'
+    package: '@organigram/js!'
+    fullName: cid
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'cid: string;'
+      return:
+        type: string
+  - name: creator
+    uid: '@organigram/js!ProcedureProposal#creator:member'
+    package: '@organigram/js!'
+    fullName: creator
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'creator: string;'
+      return:
+        type: string
+  - name: key
+    uid: '@organigram/js!ProcedureProposal#key:member'
+    package: '@organigram/js!'
+    fullName: key
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'key: ProposalKey;'
+      return:
+        type: <xref uid="@organigram/js!ProposalKey:type" />
+  - name: metadata
+    uid: '@organigram/js!ProcedureProposal#metadata:member'
+    package: '@organigram/js!'
+    fullName: metadata
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'metadata?: ProposalMetadata;'
+      return:
+        type: <xref uid="@organigram/js!ProposalMetadata:interface" />
+  - name: operations
+    uid: '@organigram/js!ProcedureProposal#operations:member'
+    package: '@organigram/js!'
+    fullName: operations
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'operations: ProcedureProposalOperation[];'
+      return:
+        type: <xref uid="@organigram/js!ProcedureProposalOperation:interface" />[]
+  - name: presented
+    uid: '@organigram/js!ProcedureProposal#presented:member'
+    package: '@organigram/js!'
+    fullName: presented
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'presented: boolean;'
+      return:
+        type: boolean

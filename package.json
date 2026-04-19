@@ -22,33 +22,31 @@
     "@microsoft/api-extractor": "^7.47.4",
     "@tsconfig/recommended": "^1.0.7",
     "@types/jest": "^29.5.12",
+    "@types/node": "^20.19.37",
     "@types/openpgp": "^4.4.22",
     "assert": "^2.1.0",
     "babel-loader": "^9.1.3",
-    "ethers": "^6.16.0",
     "jest": "^29.7.0",
     "ts-jest": "^29.2.3",
     "ts-node": "^10.9.2",
     "typedoc-plugin-markdown": "^4.2.3",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "viem": "^2.18.2"
   },
   "peerDependencies": {
-    "ethers": "^6.16.0"
+    "viem": "^2.18.2"
   },
   "dependencies": {
     "@organigram/protocol": "workspace:^",
-    "js-sha3": "^0.9.3",
-    "openpgp": "^5.11.2",
     "typedoc": "^0.26.5",
     "uint8arrays": "^5.1.0"
   },
   "scripts": {
-    "docs:generate": "pnpm api-extractor run && pnpm api-documenter yaml --input-folder .",
-    "docs": "sudo node ./scripts/docs.js",
+    "docs:generate": "env-cmd --silent pnpm api-extractor run --local && pnpm api-documenter yaml --input-folder . && tsx ./scripts/docs.ts",
     "build": "tsc --pretty",
-    "test": "jest",
-    "test:coverage": "jest --coverage",
-    "test:watch": "jest --watch",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
+    "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
     "typecheck": "tsc --noEmit --incremental false"
   },
   "gitHead": "5aeceb89fcac23a06b21969c01c8bfdd36cea896"

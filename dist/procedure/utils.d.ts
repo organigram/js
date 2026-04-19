@@ -1,5 +1,5 @@
-import { ethers, ContractTransaction } from 'ethers';
 import { DeployOrganInput, DeployProceduresInput, TransactionOptions } from '../organigramClient';
+import type { ContractClients } from '../contracts';
 export type ProcedureTypeName = 'erc20Vote' | 'nomination' | 'vote';
 export declare enum ProcedureTypeNameEnum {
     erc20Vote = "erc20Vote",
@@ -7,9 +7,7 @@ export declare enum ProcedureTypeNameEnum {
     vote = "vote"
 }
 export interface PopulateInitializeInput {
-    options?: {
-        signer?: ethers.Signer;
-    } & TransactionOptions;
+    options?: TransactionOptions;
     typeName?: ProcedureTypeName;
     cid: string;
     proposers: string;
@@ -19,6 +17,9 @@ export interface PopulateInitializeInput {
     forwarder: string;
     args: unknown[];
 }
+export type PopulatedTransactionData = {
+    data: string;
+};
 export declare const nomination: {
     key: string;
     address: string;
@@ -223,11 +224,12 @@ export declare const prepareDeployOrgansInput: (deployOrgansInput: DeployOrganIn
     }[];
     salt: string;
 }[];
-export declare const prepareDeployProceduresInput: (deployProceduresInput: DeployProceduresInput[], signer: ethers.Signer) => Promise<{
+export declare const prepareDeployProceduresInput: (deployProceduresInput: DeployProceduresInput[], clients: ContractClients) => Promise<{
     procedureType: string;
     data: string;
     salt: string;
     options: TransactionOptions | undefined;
 }[]>;
 export declare const getProcedureClass: (typeName: string) => Promise<typeof import("./vote").VoteProcedure | typeof import("./erc20Vote").ERC20VoteProcedure | typeof import("./nomination").NominationProcedure>;
-export declare const populateInitializeProcedure: (input: PopulateInitializeInput, signer: ethers.Signer) => Promise<ContractTransaction>;
+export declare const populateInitializeProcedure: (input: PopulateInitializeInput, clients: ContractClients) => Promise<PopulatedTransactionData>;
+export declare const encodeProcedureInitialization: (abi: unknown, functionName: string, args: unknown[]) => PopulatedTransactionData;

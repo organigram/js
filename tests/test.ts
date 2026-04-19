@@ -1,9 +1,21 @@
-import { strictEqual } from 'assert'
-import deployedAddresses from '@organigram/protocol/deployments.json'
-import AssetContractABI from '@organigram/protocol/artifacts/contracts/Asset.sol/Asset.json'
-import { ethers, isAddress, JsonRpcProvider, Signer } from 'ethers'
+import deployedAddresses from '@organigram/protocol/deployments.json' with { type: 'json' }
+import AssetContractABI from '@organigram/protocol/abi/Asset.sol/Asset.json' with { type: 'json' }
+import {
+  createPublicClient,
+  createWalletClient,
+  getContract,
+  http,
+  isAddress,
+  parseEther,
+  type Address,
+  type PublicClient,
+  type WalletClient
+} from 'viem'
+import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
+import { sepolia } from 'viem/chains'
 
 import {
+  type ContractClients,
   ERC20_INITIAL_SUPPLY,
   Organ,
   OrganigramClient,
@@ -23,35 +35,46 @@ const txOptions: TransactionOptions = {
 }
 
 describe('Organigram JS Client', () => {
-  let provider: JsonRpcProvider
-  let signer: Signer
+  let publicClient: PublicClient
+  let walletClient: WalletClient
+  let clients: ContractClients
+  let signerAddress: Address
   // let ipfs: IPFS.IPFS
   let organ: Organ
   let asset: string
 
   beforeEach(async () => {
     // ipfs = await loadIpfs()
-    provider = new JsonRpcProvider('http://127.0.0.1:8545/')
-    signer = await provider.getSigner(0)
+    publicClient = createPublicClient({
+      chain: sepolia,
+      transport: http('http://127.0.0.1:8545/')
+    })
+    walletClient = createWalletClient({
+      chain: sepolia,
+      transport: http('http://127.0.0.1:8545/')
+    })
+    signerAddress = (await walletClient.getAddresses())[0] as Address
+    clients = {
+      publicClient,
+      walletClient
+    }
     await Promise.resolve()
   })
 
   describe('Web3', () => {
     it('should connect Web3 to a provider', async () => {
-      const network = await provider.getNetwork()
+      const chainId = await publicClient.getChainId()
 
-      strictEqual(network.chainId, 11155111n)
-      strictEqual(network.name, 'sepolia')
+      expect(chainId).toBe(11155111)
     })
 
     it('should provide signer with funds', async () => {
-      const chainId = (await signer.provider?.getNetwork())?.chainId
-      const address = await signer.getAddress()
-      const balance = await signer.provider?.getBalance(address)
+      const chainId = await publicClient.getChainId()
+      const balance = await publicClient.getBalance({ address: signerAddress })
 
-      strictEqual(chainId, 11155111n)
-      strictEqual(address != null && address !== '', true)
-      strictEqual(balance != null && balance > 0n, true)
+      expect(chainId).toBe(11155111)
+      expect(signerAddress).not.toBeNull()
+      expect(balance).toBeGreaterThan(0n)
     })
   })
 
@@ -60,23 +83,23 @@ describe('Organigram JS Client', () => {
 
     beforeEach(async () => {
       organigramClient = await OrganigramClient.load({
-        provider,
-        signer
+        publicClient,
+        walletClient
       })
     })
 
     it('should connect to the deployed client', async () => {
-      strictEqual(organigramClient?.address != null, true)
+      expect(organigramClient?.address).not.toBeNull()
     })
 
     it('should create an organ', async () => {
       organ = await organigramClient.deployOrgan()
-      strictEqual(organ?.address != null, true)
+      expect(organ?.address).not.toBeNull()
     })
 
     it('should create organs in batch', async () => {
       const organs = await organigramClient.deployOrgans([{}, {}])
-      strictEqual(organs?.length === 2, true)
+      expect(organs?.length).toBe(2)
     })
 
     it('should deploy an ERC20 asset', async () => {
@@ -87,7 +110,7 @@ describe('Organigram JS Client', () => {
         undefined,
         txOptions
       )
-      strictEqual(isAddress(asset), true)
+      expect(isAddress(asset)).toBe(true)
     })
 
     it('should deploy assets in batch', async () => {
@@ -104,60 +127,83 @@ describe('Organigram JS Client', () => {
         ],
         txOptions
       )
-      strictEqual(assets?.length === 2, true)
-      strictEqual(isAddress(assets[0]), true)
+      expect(assets?.length).toBe(2)
+      expect(isAddress(assets[0])).toBe(true)
     })
 
     it('should deposit ether into an organ', async () => {
-      const amount = ethers.parseEther('0.01')
+      const amount = parseEther('0.01')
+      const hash = await walletClient.sendTransaction({
+        account: signerAddress,
+        to: organ.address as Address,
+        value: amount,
+        chain: sepolia
+      })
 
-      await (
-        await signer.sendTransaction({ to: organ.address, value: amount })
-      ).wait()
+      await publicClient.waitForTransactionReceipt({ hash })
 
-      strictEqual(await provider.getBalance(organ.address), amount)
+      expect(
+        await publicClient.getBalance({ address: organ.address as Address })
+      ).toBe(amount)
     })
 
     it('should withdraw ether from an organ', async () => {
-      const amount = ethers.parseEther('0.01')
-      const recipientAddress = ethers.Wallet.createRandom().address
+      const amount = parseEther('0.01')
+      const recipientAddress = privateKeyToAccount(generatePrivateKey()).address
       const receipt = await organ.withdrawEther(
         recipientAddress,
         amount,
         txOptions
       )
 
-      strictEqual(
-        await provider.getBalance(organ.address, receipt!.blockNumber),
-        0n
-      )
-      strictEqual(
-        await provider.getBalance(recipientAddress, receipt!.blockNumber),
-        amount
-      )
+      expect(
+        await publicClient.getBalance({
+          address: organ.address as Address,
+          blockNumber: receipt.blockNumber
+        })
+      ).toBe(0n)
+      expect(
+        await publicClient.getBalance({
+          address: recipientAddress,
+          blockNumber: receipt.blockNumber
+        })
+      ).toBe(amount)
     })
 
     it('should withdraw ERC20 tokens from an organ', async () => {
-      const recipientAddress = ethers.Wallet.createRandom().address
-      const amount = ethers.parseEther('15')
-      const assetContract = new ethers.Contract(
-        asset,
-        AssetContractABI.abi,
-        signer
+      const recipientAddress = privateKeyToAccount(generatePrivateKey()).address
+      const amount = parseEther('15')
+      const assetContract = getContract({
+        address: asset as Address,
+        abi: AssetContractABI.abi,
+        client: {
+          public: publicClient,
+          wallet: walletClient
+        }
+      })
+
+      const transferHash = await assetContract.write.transfer(
+        [organ.address as Address, amount],
+        { account: signerAddress }
       )
+      await publicClient.waitForTransactionReceipt({ hash: transferHash })
 
-      await (await assetContract.transfer(organ.address, amount)).wait()
-
-      strictEqual(await assetContract.balanceOf(organ.address), amount)
+      expect(
+        await assetContract.read.balanceOf([organ.address as Address])
+      ).toBe(amount)
 
       await organ.withdrawERC20(asset, recipientAddress, amount, txOptions)
 
-      strictEqual(await assetContract.balanceOf(organ.address), 0n)
-      strictEqual(await assetContract.balanceOf(recipientAddress), amount)
-    })
+      expect(
+        await assetContract.read.balanceOf([organ.address as Address])
+      ).toBe(0n)
+      expect(
+        await assetContract.read.balanceOf([recipientAddress])
+      ).toBe(amount)
+      })
 
     it('should deploy procedures in batch', async () => {
-      const address = await signer.getAddress()
+      const address = signerAddress
       const procedures = await organigramClient.deployProcedures([
         {
           typeName: 'nomination',
@@ -169,11 +215,11 @@ describe('Organigram JS Client', () => {
           args: ['1', '8', '1']
         }
       ])
-      strictEqual(procedures?.length === 2, true)
+      expect(procedures?.length).toBe(2)
     })
 
     it('should deploy test organigram', async () => {
-      const address = await signer.getAddress()
+      const address = signerAddress
       const organigram = await organigramClient.deployOrganigram({
         organs: [{}, {}],
         assets: [
@@ -203,7 +249,7 @@ describe('Organigram JS Client', () => {
           }
         ]
       })
-      strictEqual(organigram != null, true)
+      expect(organigram).not.toBeNull()
     })
 
     it('should predict deterministic addresses', async () => {
@@ -301,12 +347,12 @@ describe('Organigram JS Client', () => {
       )) as unknown as string[][][]
       const [organs, assets, procedures] = deployed
 
-      strictEqual(organs[0], predictedAddress)
-      strictEqual(organs[1], predictedAddress2)
-      strictEqual(procedures[0], predictedAddress3)
-      strictEqual(procedures[1], predictedAddress4)
-      strictEqual(procedures[2], predictedAddress5)
-      strictEqual(assets[0], predictedAddress6)
+      expect(organs[0]).toBe(predictedAddress)
+      expect(organs[1]).toBe(predictedAddress2)
+      expect(procedures[0]).toBe(predictedAddress3)
+      expect(procedures[1]).toBe(predictedAddress4)
+      expect(procedures[2]).toBe(predictedAddress5)
+      expect(assets[0]).toBe(predictedAddress6)
     })
 
     describe('Nomination', () => {
@@ -314,14 +360,14 @@ describe('Organigram JS Client', () => {
       let proposalKey: string
 
       it('should create a nomination procedure', async () => {
-        const address = await signer.getAddress()
+        const address = signerAddress
 
         procedure = (await organigramClient.deployProcedure({
           typeName: 'nomination',
           deciders: address
         })) as NominationProcedure
 
-        strictEqual(procedure?.address != null, true)
+        expect(procedure?.address).not.toBeNull()
       })
 
       it('should add procedure to an organ', async () => {
@@ -330,26 +376,25 @@ describe('Organigram JS Client', () => {
           permissionValue: PERMISSIONS.ADMIN
         })
         organ = await organ.reload()
-        strictEqual(receipt.status, 1)
-        strictEqual(
+        expect(receipt.status).toBe('success')
+        expect(
           organ.permissions.some(
             p =>
               p.permissionAddress === procedure.address &&
               p.permissionValue === PERMISSIONS.ADMIN
-          ),
-          true
-        )
+          )
+        ).toBe(true)
       })
 
       it('should create a proposal', async () => {
         organ = await organ.reload()
-        const randomWallet = ethers.Wallet.createRandom()
-        const data = await organ.contract.addEntries.populateTransaction([
-          {
-            addr: randomWallet.address,
-            cid: ''
-          }
-        ])
+        const randomWallet = privateKeyToAccount(generatePrivateKey())
+        const data = await Organ.populateTransaction(
+          organ.address,
+          walletClient as any,
+          'addEntries',
+          [{ address: randomWallet.address, cid: '' }]
+        )
         const operation: ProcedureProposalOperation = {
           index: '0',
           target: data.to,
@@ -364,23 +409,44 @@ describe('Organigram JS Client', () => {
         })
         proposalKey = proposal?.key
 
-        strictEqual(proposal?.key != null, true)
+        expect(proposal?.key).not.toBeNull()
+      })
+
+      it('should reload a procedure with its proposals', async () => {
+        const reloadedProcedure = await NominationProcedure.load(
+          procedure.address,
+          clients,
+          {
+            typeName: 'nomination',
+            deciders: procedure.deciders,
+            proposers: procedure.proposers,
+            moderators: procedure.moderators
+          }
+        )
+
+        expect(reloadedProcedure.proposals.length).toBe(1)
+        expect(reloadedProcedure.proposals[0]?.presented).toBe(true)
       })
 
       it('should approve a proposal', async () => {
         const nominated = await procedure.nominate(proposalKey)
-        strictEqual(nominated, true)
+        expect(nominated).toBe(true)
+      })
+
+      it('should reload an organ with newly approved entries', async () => {
+        organ = await organ.reload()
+        expect(organ.entries.length).toBe(1)
       })
 
       it('should block a proposal', async () => {
         // Creating a new proposal
-        const randomWallet = ethers.Wallet.createRandom()
-        const data = await organ.contract.addEntries.populateTransaction([
-          {
-            addr: randomWallet.address,
-            cid: ''
-          }
-        ])
+        const randomWallet = privateKeyToAccount(generatePrivateKey())
+        const data = await Organ.populateTransaction(
+          organ.address,
+          walletClient as any,
+          'addEntries',
+          [{ address: randomWallet.address, cid: '' }]
+        )
         const operation: ProcedureProposalOperation = {
           index: '0',
           target: data.to,
@@ -400,10 +466,10 @@ describe('Organigram JS Client', () => {
         const payload = await NominationProcedure.loadProposal(
           procedure.address,
           proposal.key,
-          signer
+          clients
         )
-        strictEqual(receipt.status, 1)
-        strictEqual(payload.blocked, true)
+        expect(receipt.status).toBe('success')
+        expect(payload.blocked).toBe(true)
       })
     })
 
@@ -412,7 +478,7 @@ describe('Organigram JS Client', () => {
       let proposalKey: string
 
       it('should create a vote procedure', async () => {
-        const address = await signer.getAddress()
+        const address = signerAddress
         procedure = (await organigramClient.deployProcedure({
           typeName: 'vote',
           options: {},
@@ -426,7 +492,7 @@ describe('Organigram JS Client', () => {
           args: ['1', '1', '8']
         })) as unknown as VoteProcedure
 
-        strictEqual(procedure?.address != null, true)
+        expect(procedure?.address).not.toBeNull()
       })
 
       it('should add permission to an organ', async () => {
@@ -437,13 +503,13 @@ describe('Organigram JS Client', () => {
       })
 
       it('should create a proposal', async () => {
-        const randomWallet = ethers.Wallet.createRandom()
-        const data = await organ.contract.addEntries.populateTransaction([
-          {
-            addr: randomWallet.address,
-            cid: ''
-          }
-        ])
+        const randomWallet = privateKeyToAccount(generatePrivateKey())
+        const data = await Organ.populateTransaction(
+          organ.address,
+          walletClient as any,
+          'addEntries',
+          [{ address: randomWallet.address, cid: '' }]
+        )
         const operation: ProcedureProposalOperation = {
           index: '0',
           target: data.to,
@@ -458,7 +524,7 @@ describe('Organigram JS Client', () => {
         })
         proposalKey = proposal?.key
 
-        strictEqual(proposalKey != null, true)
+        expect(proposalKey).not.toBeNull()
       })
 
       it('should block a proposal', async () => {
@@ -467,10 +533,10 @@ describe('Organigram JS Client', () => {
         const payload = await VoteProcedure.loadProposal(
           procedure.address,
           proposalKey,
-          signer
+          clients
         )
-        strictEqual(receipt.status, 1)
-        strictEqual(payload.blocked, true)
+        expect(receipt.status).toBe('success')
+        expect(payload.blocked).toBe(true)
       })
     })
 
@@ -479,7 +545,7 @@ describe('Organigram JS Client', () => {
       let proposalKey: string
 
       it('should create an erc20Vote procedure', async () => {
-        const address = await signer.getAddress()
+        const address = signerAddress
         procedure = (await organigramClient.deployProcedure({
           typeName: 'erc20Vote',
           options: {},
@@ -493,7 +559,7 @@ describe('Organigram JS Client', () => {
           args: [ERC20_EXAMPLE, '1', '1', '8']
         })) as ERC20VoteProcedure
 
-        strictEqual(procedure?.address != null, true)
+        expect(procedure?.address).not.toBeNull()
       })
 
       it('should add procedure to an organ', async () => {
@@ -502,25 +568,24 @@ describe('Organigram JS Client', () => {
           permissionValue: parseInt('0xffff', 16)
         })
         organ = await organ.reload()
-        strictEqual(receipt.status, 1)
-        strictEqual(
+        expect(receipt.status).toBe('success')
+        expect(
           organ.permissions.some(
             p =>
               p.permissionAddress === procedure.address &&
               p.permissionValue === 65535
-          ),
-          true
-        )
+          )
+        ).toBe(true)
       })
 
       it('should create a proposal', async () => {
-        const randomWallet = ethers.Wallet.createRandom()
-        const data = await organ.contract.addEntries.populateTransaction([
-          {
-            addr: randomWallet.address,
-            cid: ''
-          }
-        ])
+        const randomWallet = privateKeyToAccount(generatePrivateKey())
+        const data = await Organ.populateTransaction(
+          organ.address,
+          walletClient as any,
+          'addEntries',
+          [{ address: randomWallet.address, cid: '' }]
+        )
         const operation: ProcedureProposalOperation = {
           index: '0',
           target: data.to,
@@ -535,7 +600,7 @@ describe('Organigram JS Client', () => {
         })
         proposalKey = proposal?.key
 
-        strictEqual(proposalKey != null, true)
+        expect(proposalKey).not.toBeNull()
       })
 
       it('should block a proposal', async () => {
@@ -544,10 +609,10 @@ describe('Organigram JS Client', () => {
         const payload = await ERC20VoteProcedure.loadProposal(
           procedure.address,
           proposalKey,
-          signer
+          clients
         )
-        strictEqual(receipt.status, 1)
-        strictEqual(payload.blocked, true)
+        expect(receipt.status).toBe('success')
+        expect(payload.blocked).toBe(true)
       })
     })
   })

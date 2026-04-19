@@ -45,7 +45,7 @@
    *
    * SUPPORTED TOKENS: <projectFolder>, <packageName>, <unscopedPackageName>
    */
-  "mainEntryPointFilePath": "<projectFolder>/types/index.d.ts",
+  "mainEntryPointFilePath": "<projectFolder>/dist/index.d.ts",
 
   /**
    * A list of NPM package names whose exports should be treated as part of this package.
@@ -135,7 +135,9 @@
     /**
      * (REQUIRED) Whether to generate an API report.
      */
-    "enabled": true
+    "enabled": true,
+    "reportFileName": "client-js.api.md",
+    "reportFolder": "<projectFolder>",
 
     /**
      * The filename for the API report files.  It will be combined with "reportFolder" or "reportTempFolder" to produce
@@ -195,7 +197,8 @@
     /**
      * (REQUIRED) Whether to generate a doc model file.
      */
-    "enabled": true
+    "enabled": true,
+    "apiJsonFilePath": "<projectFolder>/client-js.api.json",
 
     /**
      * The output path for the doc model file.  The file extension should be ".api.json".

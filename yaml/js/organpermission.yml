@@ -1,0 +1,38 @@
+### YamlMime:TSType
+name: OrganPermission
+uid: '@organigram/js!OrganPermission:interface'
+package: '@organigram/js!'
+fullName: OrganPermission
+summary: Permission grant applied to a procedure or address on an organ.
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: permissionAddress
+    uid: '@organigram/js!OrganPermission#permissionAddress:member'
+    package: '@organigram/js!'
+    fullName: permissionAddress
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'permissionAddress: string;'
+      return:
+        type: string
+  - name: permissionValue
+    uid: '@organigram/js!OrganPermission#permissionValue:member'
+    package: '@organigram/js!'
+    fullName: permissionValue
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'permissionValue: number;'
+      return:
+        type: number

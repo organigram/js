@@ -1,0 +1,14 @@
+### YamlMime:TSTypeAlias
+name: OperationParamType
+uid: '@organigram/js!OperationParamType:type'
+package: '@organigram/js!'
+fullName: OperationParamType
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+syntax: >-
+  export type OperationParamType = 'cid' | 'entry' | 'entries' | 'address' | 'bytes' | 'addresses' | 'index' | 'indexes'
+  | 'organ' | 'oldPermissionAddress' | 'newPermissionAddress' | 'permissionAddress' | 'permissionValue' | 'proposal' |
+  'proposals' | 'amount' | 'tokenId';

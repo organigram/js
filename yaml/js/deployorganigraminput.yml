@@ -1,0 +1,51 @@
+### YamlMime:TSType
+name: DeployOrganigramInput
+uid: '@organigram/js!DeployOrganigramInput:interface'
+package: '@organigram/js!'
+fullName: DeployOrganigramInput
+summary: Batch deployment input for a full organigram.
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: assets
+    uid: '@organigram/js!DeployOrganigramInput#assets:member'
+    package: '@organigram/js!'
+    fullName: assets
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'assets: DeployAssetInput[];'
+      return:
+        type: <xref uid="@organigram/js!DeployAssetInput:interface" />[]
+  - name: organs
+    uid: '@organigram/js!DeployOrganigramInput#organs:member'
+    package: '@organigram/js!'
+    fullName: organs
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'organs: DeployOrganInput[];'
+      return:
+        type: <xref uid="@organigram/js!DeployOrganInput:interface" />[]
+  - name: procedures
+    uid: '@organigram/js!DeployOrganigramInput#procedures:member'
+    package: '@organigram/js!'
+    fullName: procedures
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'procedures: DeployProceduresInput[];'
+      return:
+        type: <xref uid="@organigram/js!DeployProceduresInput:interface" />[]

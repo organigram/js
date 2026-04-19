@@ -1,5 +1,5 @@
-import deployedAddresses from '@organigram/protocol/deployments.json';
-import { ethers } from 'ethers';
+import deployedAddresses from './deployments';
+import { bytesToHex, getCreate2Address, keccak256, padHex, toHex } from 'viem';
 export { deployedAddresses };
 export const handleJsonBigInt = (key, value) => {
     if (typeof value === 'bigint') {
@@ -13,16 +13,23 @@ export function cloneInitCodeHash(implementation) {
         '363d3d373d3d3d363d73' +
         impl +
         '5af43d82803e903d91602b57fd5bf3';
-    return ethers.keccak256(initCode);
+    return keccak256(initCode);
 }
 export const predictContractAddress = ({ type, chainId, salt }) => {
-    return ethers.getCreate2Address(deployedAddresses[chainId]?.OrganigramClient, ethers.zeroPadValue(salt, 32), cloneInitCodeHash(type === 'Organ'
-        ? deployedAddresses[chainId]?.CloneableOrgan
-        : type === 'Asset'
-            ? deployedAddresses[chainId]?.CloneableAsset
-            : deployedAddresses[chainId]?.[type.replace('Erc', 'ERC')]));
+    const normalizedSalt = /^0x[0-9a-fA-F]{64}$/.test(salt)
+        ? salt
+        : padHex(toHex(salt), { size: 32 });
+    return getCreate2Address({
+        from: deployedAddresses[chainId]?.OrganigramClient,
+        salt: normalizedSalt,
+        bytecodeHash: cloneInitCodeHash(type === 'Organ'
+            ? deployedAddresses[chainId]?.CloneableOrgan
+            : type === 'Asset'
+                ? deployedAddresses[chainId]?.CloneableAsset
+                : deployedAddresses[chainId]?.[type.replace('Erc', 'ERC')])
+    });
 };
-export const createRandom32BytesHexId = () => ethers.hexlify(ethers.randomBytes(32));
+export const createRandom32BytesHexId = () => bytesToHex(crypto.getRandomValues(new Uint8Array(32)));
 export const formatSalt = (salt) => {
     if (salt == null) {
         return createRandom32BytesHexId();
@@ -37,9 +44,10 @@ export const formatSalt = (salt) => {
     else
         return salt;
 };
+// Organ permissions granted to procedures
 export const PERMISSIONS = {
     ADMIN: 0xffff,
-    ALL: 0x07ff,
+    ALL: 0x1fff,
     ALL_PERMISSIONS: 0x0003,
     ALL_ENTRIES: 0x000c,
     ADD_PERMISSIONS: 0x0001,
@@ -52,7 +60,9 @@ export const PERMISSIONS = {
     DEPOSIT_COINS: 0x0080,
     WITHDRAW_COINS: 0x0100,
     DEPOSIT_COLLECTIBLES: 0x0200,
-    WITHDRAW_COLLECTIBLES: 0x0400
+    WITHDRAW_COLLECTIBLES: 0x0400,
+    EXECUTE_WHITELISTED: 0x0800,
+    MANAGE_EXECUTION_WHITELIST: 0x1000
 };
 export const getPermissionsSet = (permissions) => Object.entries(PERMISSIONS)
     .filter((permission) => (permissions & permission[1]) === permission[1])

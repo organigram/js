@@ -1,5 +1,5 @@
-import deployedAddresses from '@organigram/protocol/deployments.json'
-import { ethers } from 'ethers'
+import deployedAddresses from './deployments'
+import { bytesToHex, getCreate2Address, keccak256, padHex, toHex } from 'viem'
 
 export { deployedAddresses }
 
@@ -27,7 +27,7 @@ export function cloneInitCodeHash(implementation: string): string {
     impl +
     '5af43d82803e903d91602b57fd5bf3'
 
-  return ethers.keccak256(initCode as `0x${string}`)
+  return keccak256(initCode as `0x${string}`)
 }
 
 export const predictContractAddress = ({
@@ -39,10 +39,14 @@ export const predictContractAddress = ({
   chainId: string
   salt: string
 }): string => {
-  return ethers.getCreate2Address(
-    deployedAddresses[chainId as '11155111']?.OrganigramClient,
-    ethers.zeroPadValue(salt, 32),
-    cloneInitCodeHash(
+  const normalizedSalt = /^0x[0-9a-fA-F]{64}$/.test(salt)
+    ? (salt as `0x${string}`)
+    : padHex(toHex(salt), { size: 32 })
+
+  return getCreate2Address({
+    from: deployedAddresses[chainId as '11155111']?.OrganigramClient as `0x${string}`,
+    salt: normalizedSalt,
+    bytecodeHash: cloneInitCodeHash(
       type === 'Organ'
         ? deployedAddresses[chainId as '11155111']?.CloneableOrgan
         : type === 'Asset'
@@ -50,12 +54,12 @@ export const predictContractAddress = ({
           : deployedAddresses[chainId as '11155111']?.[
               type.replace('Erc', 'ERC') as ContractName
             ]
-    )
-  )
+    ) as `0x${string}`
+  })
 }
 
 export const createRandom32BytesHexId = () =>
-  ethers.hexlify(ethers.randomBytes(32))
+  bytesToHex(crypto.getRandomValues(new Uint8Array(32)))
 
 export const formatSalt = (salt?: string | null) => {
   if (salt == null) {
@@ -76,7 +80,7 @@ export const formatSalt = (salt?: string | null) => {
 // Organ permissions granted to procedures
 export const PERMISSIONS = {
   ADMIN: 0xffff,
-  ALL: 0x07ff,
+  ALL: 0x1fff,
   ALL_PERMISSIONS: 0x0003,
   ALL_ENTRIES: 0x000c,
   ADD_PERMISSIONS: 0x0001,
@@ -89,7 +93,9 @@ export const PERMISSIONS = {
   DEPOSIT_COINS: 0x0080,
   WITHDRAW_COINS: 0x0100,
   DEPOSIT_COLLECTIBLES: 0x0200,
-  WITHDRAW_COLLECTIBLES: 0x0400
+  WITHDRAW_COLLECTIBLES: 0x0400,
+  EXECUTE_WHITELISTED: 0x0800,
+  MANAGE_EXECUTION_WHITELIST: 0x1000
 }
 
 export const getPermissionsSet = (permissions: number): string[] =>

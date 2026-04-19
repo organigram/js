@@ -1,0 +1,155 @@
+### YamlMime:TSType
+name: ProcedureProposalOperation
+uid: '@organigram/js!ProcedureProposalOperation:interface'
+package: '@organigram/js!'
+fullName: ProcedureProposalOperation
+summary: One low-level operation bundled into a proposal.
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: data
+    uid: '@organigram/js!ProcedureProposalOperation#data:member'
+    package: '@organigram/js!'
+    fullName: data
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'data: string;'
+      return:
+        type: string
+  - name: description
+    uid: '@organigram/js!ProcedureProposalOperation#description:member'
+    package: '@organigram/js!'
+    fullName: description
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'description?: string;'
+      return:
+        type: string
+  - name: function
+    uid: '@organigram/js!ProcedureProposalOperation#function:member'
+    package: '@organigram/js!'
+    fullName: function
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'function?: ProcedureProposalOperationFunction;'
+      return:
+        type: <xref uid="@organigram/js!ProcedureProposalOperationFunction:interface" />
+  - name: functionSelector
+    uid: '@organigram/js!ProcedureProposalOperation#functionSelector:member'
+    package: '@organigram/js!'
+    fullName: functionSelector
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'functionSelector: string;'
+      return:
+        type: string
+  - name: index
+    uid: '@organigram/js!ProcedureProposalOperation#index:member'
+    package: '@organigram/js!'
+    fullName: index
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'index: string;'
+      return:
+        type: string
+  - name: params
+    uid: '@organigram/js!ProcedureProposalOperation#params:member'
+    package: '@organigram/js!'
+    fullName: params
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'params?: OperationParam[];'
+      return:
+        type: <xref uid="@organigram/js!OperationParam:interface" />[]
+  - name: processed
+    uid: '@organigram/js!ProcedureProposalOperation#processed:member'
+    package: '@organigram/js!'
+    fullName: processed
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'processed?: boolean;'
+      return:
+        type: boolean
+  - name: target
+    uid: '@organigram/js!ProcedureProposalOperation#target:member'
+    package: '@organigram/js!'
+    fullName: target
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'target?: string;'
+      return:
+        type: string
+  - name: userIsInEntry
+    uid: '@organigram/js!ProcedureProposalOperation#userIsInEntry:member'
+    package: '@organigram/js!'
+    fullName: userIsInEntry
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'userIsInEntry?: boolean;'
+      return:
+        type: boolean
+  - name: userIsInOrgan
+    uid: '@organigram/js!ProcedureProposalOperation#userIsInOrgan:member'
+    package: '@organigram/js!'
+    fullName: userIsInOrgan
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'userIsInOrgan?: boolean;'
+      return:
+        type: boolean
+  - name: value
+    uid: '@organigram/js!ProcedureProposalOperation#value:member'
+    package: '@organigram/js!'
+    fullName: value
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'value?: string;'
+      return:
+        type: string
