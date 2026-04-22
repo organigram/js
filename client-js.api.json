@@ -1717,28 +1717,24 @@
         {
           "kind": "Variable",
           "canonicalReference": "@organigram/js!defaultChainId:var",
-          "docComment": "/**\n * Default Sepolia chain id used by the SDK templates.\n */\n",
+          "docComment": "/**\n * Default chain id used by the SDK templates.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "defaultChainId = "
+              "text": "defaultChainId: "
             },
             {
               "kind": "Content",
-              "text": "\"11155111\""
+              "text": "string"
             }
           ],
           "fileUrlPath": "dist/organigram.d.ts",
-          "initializerTokenRange": {
-            "startIndex": 1,
-            "endIndex": 2
-          },
           "isReadonly": true,
           "releaseTag": "Public",
           "name": "defaultChainId",
           "variableTypeTokenRange": {
-            "startIndex": 0,
-            "endIndex": 0
+            "startIndex": 1,
+            "endIndex": 2
           }
         },
         {
@@ -2664,29 +2660,6 @@
           }
         },
         {
-          "kind": "Variable",
-          "canonicalReference": "@organigram/js!erc20Vote:var",
-          "docComment": "",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "erc20Vote: "
-            },
-            {
-              "kind": "Content",
-              "text": "{\n    address: string;\n    key: string;\n    fields: {\n        erc20: {\n            name: string;\n            label: string;\n            description: string;\n            defaultValue: string;\n            type: string;\n        };\n        quorumSize: {\n            name: string;\n            label: string;\n            description: string;\n            defaultValue: string;\n            type: string;\n        };\n        voteDuration: {\n            name: string;\n            label: string;\n            description: string;\n            defaultValue: string;\n            type: string;\n        };\n        majoritySize: {\n            name: string;\n            label: string;\n            description: string;\n            defaultValue: string;\n            type: string;\n        };\n    };\n    metadata: {\n        label: string;\n        description: string;\n        type: string;\n        _type: string;\n        _generator: string;\n        _generatedAt: number;\n    };\n}"
-            }
-          ],
-          "fileUrlPath": "dist/procedure/utils.d.ts",
-          "isReadonly": true,
-          "releaseTag": "Public",
-          "name": "erc20Vote",
-          "variableTypeTokenRange": {
-            "startIndex": 1,
-            "endIndex": 2
-          }
-        },
-        {
           "kind": "Class",
           "canonicalReference": "@organigram/js!ERC20VoteProcedure:class",
           "docComment": "",
@@ -3101,36 +3074,6 @@
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 3
-              },
-              "isStatic": false,
-              "isProtected": false,
-              "isAbstract": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "@organigram/js!ERC20VoteProcedure#type:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "type: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "{\n        address: string;\n        key: string;\n        fields: {\n            erc20: {\n                name: string;\n                label: string;\n                description: string;\n                defaultValue: string;\n                type: string;\n            };\n            quorumSize: {\n                name: string;\n                label: string;\n                description: string;\n                defaultValue: string;\n                type: string;\n            };\n            voteDuration: {\n                name: string;\n                label: string;\n                description: string;\n                defaultValue: string;\n                type: string;\n            };\n            majoritySize: {\n                name: string;\n                label: string;\n                description: string;\n                defaultValue: string;\n                type: string;\n            };\n        };\n        metadata: {\n            label: string;\n            description: string;\n            type: string;\n            _type: string;\n            _generator: string;\n            _generatedAt: number;\n        };\n    }"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "type",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
               },
               "isStatic": false,
               "isProtected": false,
@@ -5007,6 +4950,88 @@
         },
         {
           "kind": "Function",
+          "canonicalReference": "@organigram/js!getDefaultChainId:function(1)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "getDefaultChainId: () => "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            }
+          ],
+          "fileUrlPath": "dist/deployments.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [],
+          "name": "getDefaultChainId"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@organigram/js!getDeployment:function(1)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "getDeployment: (chainId: "
+            },
+            {
+              "kind": "Content",
+              "text": "string | number | bigint | null | undefined"
+            },
+            {
+              "kind": "Content",
+              "text": ", deploymentName: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ProtocolDeploymentName",
+              "canonicalReference": "@organigram/js!~ProtocolDeploymentName:type"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            }
+          ],
+          "fileUrlPath": "dist/deployments.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 5,
+            "endIndex": 6
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "chainId",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "deploymentName",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "getDeployment"
+        },
+        {
+          "kind": "Function",
           "canonicalReference": "@organigram/js!getPermissionsSet:function(1)",
           "docComment": "",
           "excerptTokens": [
@@ -5118,6 +5143,157 @@
             }
           ],
           "name": "getProcedureClass"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@organigram/js!getProcedureType:function(1)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "getProcedureType: (chainId: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ", typeName: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ProcedureTypeName",
+              "canonicalReference": "@organigram/js!ProcedureTypeName:type"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "ProcedureType",
+              "canonicalReference": "@organigram/js!ProcedureType:interface"
+            }
+          ],
+          "fileUrlPath": "dist/procedure/utils.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 5,
+            "endIndex": 6
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "chainId",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "typeName",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "getProcedureType"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@organigram/js!getProcedureTypes:function(1)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "getProcedureTypes: (chainId?: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    erc20Vote: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ProcedureType",
+              "canonicalReference": "@organigram/js!ProcedureType:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    nomination: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ProcedureType",
+              "canonicalReference": "@organigram/js!ProcedureType:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    vote: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ProcedureType",
+              "canonicalReference": "@organigram/js!ProcedureType:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
+            }
+          ],
+          "fileUrlPath": "dist/procedure/utils.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 10
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "chainId",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": true
+            }
+          ],
+          "name": "getProcedureTypes"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@organigram/js!getSupportedChainIds:function(1)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "getSupportedChainIds: () => "
+            },
+            {
+              "kind": "Content",
+              "text": "string[]"
+            }
+          ],
+          "fileUrlPath": "dist/deployments.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [],
+          "name": "getSupportedChainIds"
         },
         {
           "kind": "Function",
@@ -5518,27 +5694,45 @@
           "extendsTokenRanges": []
         },
         {
-          "kind": "Variable",
-          "canonicalReference": "@organigram/js!nomination:var",
+          "kind": "Function",
+          "canonicalReference": "@organigram/js!isSupportedChainId:function(1)",
           "docComment": "",
           "excerptTokens": [
             {
               "kind": "Content",
-              "text": "nomination: "
+              "text": "isSupportedChainId: (chainId: "
             },
             {
               "kind": "Content",
-              "text": "{\n    key: string;\n    address: string;\n    metadata: {\n        label: string;\n        description: string;\n    };\n    fields: {};\n}"
+              "text": "string | number | bigint | null | undefined"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "boolean"
             }
           ],
-          "fileUrlPath": "dist/procedure/utils.d.ts",
-          "isReadonly": true,
+          "fileUrlPath": "dist/deployments.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 4
+          },
           "releaseTag": "Public",
-          "name": "nomination",
-          "variableTypeTokenRange": {
-            "startIndex": 1,
-            "endIndex": 2
-          }
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "chainId",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "isSupportedChainId"
         },
         {
           "kind": "Class",
@@ -6009,36 +6203,6 @@
               "isOptional": false,
               "isAbstract": false,
               "name": "signNomination"
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "@organigram/js!NominationProcedure#type:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "type: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "{\n        key: string;\n        address: string;\n        metadata: {\n            label: string;\n            description: string;\n        };\n        fields: {};\n    }"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "type",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
-              },
-              "isStatic": false,
-              "isProtected": false,
-              "isAbstract": false
             },
             {
               "kind": "Property",
@@ -17898,6 +18062,29 @@
           "extendsTokenRanges": []
         },
         {
+          "kind": "Variable",
+          "canonicalReference": "@organigram/js!procedureTypeMetadata:var",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "procedureTypeMetadata: "
+            },
+            {
+              "kind": "Content",
+              "text": "{\n    readonly erc20Vote: {\n        readonly key: \"erc20Vote\";\n        readonly fields: {\n            readonly erc20: {\n                readonly name: \"erc20\";\n                readonly label: \"ERC20 Token\";\n                readonly description: \"Address of the ERC20 Token used for weighting the voting power.\";\n                readonly defaultValue: \"\";\n                readonly type: \"string\";\n            };\n            readonly quorumSize: {\n                name: string;\n                label: string;\n                description: string;\n                defaultValue: string;\n                type: string;\n            };\n            readonly voteDuration: {\n                name: string;\n                label: string;\n                description: string;\n                defaultValue: string;\n                type: string;\n            };\n            readonly majoritySize: {\n                name: string;\n                label: string;\n                description: string;\n                defaultValue: string;\n                type: string;\n            };\n        };\n        readonly metadata: {\n            readonly label: \"Token-weighted Vote\";\n            readonly description: \"A token vote allows any member in the source organ to vote on proposals, where their voting power is based on the amount of tokens they hold.\";\n            readonly type: \"erc20Vote\";\n            readonly _type: string;\n            readonly _generator: string;\n            readonly _generatedAt: number;\n        };\n    };\n    readonly nomination: {\n        readonly key: \"nomination\";\n        readonly fields: {};\n        readonly metadata: {\n            readonly label: \"Nomination\";\n            readonly description: \"A nomination allows any member in the source organ to directly edit entries, assets or permissions in the target organ.\";\n        };\n    };\n    readonly vote: {\n        readonly key: \"vote\";\n        readonly fields: {\n            quorumSize: {\n                name: string;\n                label: string;\n                description: string;\n                defaultValue: string;\n                type: string;\n            };\n            voteDuration: {\n                name: string;\n                label: string;\n                description: string;\n                defaultValue: string;\n                type: string;\n            };\n            majoritySize: {\n                name: string;\n                label: string;\n                description: string;\n                defaultValue: string;\n                type: string;\n            };\n        };\n        readonly metadata: {\n            readonly label: \"Simple Majority Vote\";\n            readonly description: \"A vote allows any user in the source organ to vote on proposals to add, edit or replace one or many entries, assets or permissions in the target organ.\";\n        };\n    };\n}"
+            }
+          ],
+          "fileUrlPath": "dist/procedure/utils.d.ts",
+          "isReadonly": true,
+          "releaseTag": "Public",
+          "name": "procedureTypeMetadata",
+          "variableTypeTokenRange": {
+            "startIndex": 1,
+            "endIndex": 2
+          }
+        },
+        {
           "kind": "TypeAlias",
           "canonicalReference": "@organigram/js!ProcedureTypeName:type",
           "docComment": "",
@@ -18014,7 +18201,34 @@
             },
             {
               "kind": "Content",
-              "text": "{\n    erc20Vote: {\n        address: string;\n        key: string;\n        fields: {\n            erc20: {\n                name: string;\n                label: string;\n                description: string;\n                defaultValue: string;\n                type: string;\n            };\n            quorumSize: {\n                name: string;\n                label: string;\n                description: string;\n                defaultValue: string;\n                type: string;\n            };\n            voteDuration: {\n                name: string;\n                label: string;\n                description: string;\n                defaultValue: string;\n                type: string;\n            };\n            majoritySize: {\n                name: string;\n                label: string;\n                description: string;\n                defaultValue: string;\n                type: string;\n            };\n        };\n        metadata: {\n            label: string;\n            description: string;\n            type: string;\n            _type: string;\n            _generator: string;\n            _generatedAt: number;\n        };\n    };\n    nomination: {\n        key: string;\n        address: string;\n        metadata: {\n            label: string;\n            description: string;\n        };\n        fields: {};\n    };\n    vote: {\n        key: string;\n        address: string;\n        metadata: {\n            label: string;\n            description: string;\n        };\n        fields: {\n            quorumSize: {\n                name: string;\n                label: string;\n                description: string;\n                defaultValue: string;\n                type: string;\n            };\n            voteDuration: {\n                name: string;\n                label: string;\n                description: string;\n                defaultValue: string;\n                type: string;\n            };\n            majoritySize: {\n                name: string;\n                label: string;\n                description: string;\n                defaultValue: string;\n                type: string;\n            };\n        };\n    };\n}"
+              "text": "{\n    erc20Vote: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ProcedureType",
+              "canonicalReference": "@organigram/js!ProcedureType:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    nomination: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ProcedureType",
+              "canonicalReference": "@organigram/js!ProcedureType:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n    vote: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ProcedureType",
+              "canonicalReference": "@organigram/js!ProcedureType:interface"
+            },
+            {
+              "kind": "Content",
+              "text": ";\n}"
             }
           ],
           "fileUrlPath": "dist/procedure/utils.d.ts",
@@ -18023,7 +18237,7 @@
           "name": "procedureTypes",
           "variableTypeTokenRange": {
             "startIndex": 1,
-            "endIndex": 2
+            "endIndex": 8
           }
         },
         {
@@ -18379,6 +18593,64 @@
             }
           ],
           "name": "renewSaltsAndAddresses"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@organigram/js!resolveDeployment:function(1)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "resolveDeployment: (chainId: "
+            },
+            {
+              "kind": "Content",
+              "text": "string | number | bigint | null | undefined"
+            },
+            {
+              "kind": "Content",
+              "text": ", deploymentName: "
+            },
+            {
+              "kind": "Reference",
+              "text": "ProtocolDeploymentName",
+              "canonicalReference": "@organigram/js!~ProtocolDeploymentName:type"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "string | undefined"
+            }
+          ],
+          "fileUrlPath": "dist/deployments.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 5,
+            "endIndex": 6
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "chainId",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "deploymentName",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "resolveDeployment"
         },
         {
           "kind": "Interface",
@@ -18830,29 +19102,6 @@
             }
           ],
           "extendsTokenRanges": []
-        },
-        {
-          "kind": "Variable",
-          "canonicalReference": "@organigram/js!vote:var",
-          "docComment": "",
-          "excerptTokens": [
-            {
-              "kind": "Content",
-              "text": "vote: "
-            },
-            {
-              "kind": "Content",
-              "text": "{\n    key: string;\n    address: string;\n    metadata: {\n        label: string;\n        description: string;\n    };\n    fields: {\n        quorumSize: {\n            name: string;\n            label: string;\n            description: string;\n            defaultValue: string;\n            type: string;\n        };\n        voteDuration: {\n            name: string;\n            label: string;\n            description: string;\n            defaultValue: string;\n            type: string;\n        };\n        majoritySize: {\n            name: string;\n            label: string;\n            description: string;\n            defaultValue: string;\n            type: string;\n        };\n    };\n}"
-            }
-          ],
-          "fileUrlPath": "dist/procedure/utils.d.ts",
-          "isReadonly": true,
-          "releaseTag": "Public",
-          "name": "vote",
-          "variableTypeTokenRange": {
-            "startIndex": 1,
-            "endIndex": 2
-          }
         },
         {
           "kind": "Class",
@@ -19609,36 +19858,6 @@
               "propertyTypeTokenRange": {
                 "startIndex": 1,
                 "endIndex": 3
-              },
-              "isStatic": false,
-              "isProtected": false,
-              "isAbstract": false
-            },
-            {
-              "kind": "Property",
-              "canonicalReference": "@organigram/js!VoteProcedure#type:member",
-              "docComment": "",
-              "excerptTokens": [
-                {
-                  "kind": "Content",
-                  "text": "type: "
-                },
-                {
-                  "kind": "Content",
-                  "text": "{\n        key: string;\n        address: string;\n        metadata: {\n            label: string;\n            description: string;\n        };\n        fields: {\n            quorumSize: {\n                name: string;\n                label: string;\n                description: string;\n                defaultValue: string;\n                type: string;\n            };\n            voteDuration: {\n                name: string;\n                label: string;\n                description: string;\n                defaultValue: string;\n                type: string;\n            };\n            majoritySize: {\n                name: string;\n                label: string;\n                description: string;\n                defaultValue: string;\n                type: string;\n            };\n        };\n    }"
-                },
-                {
-                  "kind": "Content",
-                  "text": ";"
-                }
-              ],
-              "isReadonly": false,
-              "isOptional": false,
-              "releaseTag": "Public",
-              "name": "type",
-              "propertyTypeTokenRange": {
-                "startIndex": 1,
-                "endIndex": 2
               },
               "isStatic": false,
               "isProtected": false,

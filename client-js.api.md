@@ -159,7 +159,7 @@ export const createDeployTransaction: <TAbi extends Abi | readonly unknown[]>(in
 export const createRandom32BytesHexId: () => `0x${string}`;
 
 // @public
-export const defaultChainId = "11155111";
+export const defaultChainId: string;
 
 // @public
 export interface DeployAssetInput {
@@ -271,50 +271,6 @@ export const encodeProcedureInitialization: (abi: unknown, functionName: string,
 export const ERC20_INITIAL_SUPPLY = 10000000;
 
 // @public (undocumented)
-export const erc20Vote: {
-    address: string;
-    key: string;
-    fields: {
-        erc20: {
-            name: string;
-            label: string;
-            description: string;
-            defaultValue: string;
-            type: string;
-        };
-        quorumSize: {
-            name: string;
-            label: string;
-            description: string;
-            defaultValue: string;
-            type: string;
-        };
-        voteDuration: {
-            name: string;
-            label: string;
-            description: string;
-            defaultValue: string;
-            type: string;
-        };
-        majoritySize: {
-            name: string;
-            label: string;
-            description: string;
-            defaultValue: string;
-            type: string;
-        };
-    };
-    metadata: {
-        label: string;
-        description: string;
-        type: string;
-        _type: string;
-        _generator: string;
-        _generatedAt: number;
-    };
-};
-
-// @public (undocumented)
 export class ERC20VoteProcedure extends VoteProcedure {
     constructor(input: ERC20VoteProcedureInput);
     // (undocumented)
@@ -331,49 +287,6 @@ export class ERC20VoteProcedure extends VoteProcedure {
     static _populateInitialize(input: PopulateInitializeInput, _clients: ContractClients): Promise<PopulatedTransactionData>;
     // (undocumented)
     toJson: () => ProcedureJson;
-    // (undocumented)
-    type: {
-        address: string;
-        key: string;
-        fields: {
-            erc20: {
-                name: string;
-                label: string;
-                description: string;
-                defaultValue: string;
-                type: string;
-            };
-            quorumSize: {
-                name: string;
-                label: string;
-                description: string;
-                defaultValue: string;
-                type: string;
-            };
-            voteDuration: {
-                name: string;
-                label: string;
-                description: string;
-                defaultValue: string;
-                type: string;
-            };
-            majoritySize: {
-                name: string;
-                label: string;
-                description: string;
-                defaultValue: string;
-                type: string;
-            };
-        };
-        metadata: {
-            label: string;
-            description: string;
-            type: string;
-            _type: string;
-            _generator: string;
-            _generatedAt: number;
-        };
-    };
     // (undocumented)
     typeName: ProcedureTypeName;
     // (undocumented)
@@ -612,10 +525,31 @@ export const getContractInstance: <TAbi extends Abi | readonly unknown[]>(input:
 };
 
 // @public (undocumented)
+export const getDefaultChainId: () => string;
+
+// Warning: (ae-forgotten-export) The symbol "ProtocolDeploymentName" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export const getDeployment: (chainId: string | number | bigint | null | undefined, deploymentName: ProtocolDeploymentName) => string;
+
+// @public (undocumented)
 export const getPermissionsSet: (permissions: number) => string[];
 
 // @public (undocumented)
 export const getProcedureClass: (typeName: string) => Promise<VoteProcedure | ERC20VoteProcedure | NominationProcedure>;
+
+// @public (undocumented)
+export const getProcedureType: (chainId: string, typeName: ProcedureTypeName) => ProcedureType;
+
+// @public (undocumented)
+export const getProcedureTypes: (chainId?: string) => {
+    erc20Vote: ProcedureType;
+    nomination: ProcedureType;
+    vote: ProcedureType;
+};
+
+// @public (undocumented)
+export const getSupportedChainIds: () => string[];
 
 // @public (undocumented)
 export const getTemplate: (templateName: TemplateName, chainId: string) => {
@@ -707,15 +641,7 @@ export interface IOrganEntry {
 }
 
 // @public (undocumented)
-export const nomination: {
-    key: string;
-    address: string;
-    metadata: {
-        label: string;
-        description: string;
-    };
-    fields: {};
-};
+export const isSupportedChainId: (chainId: string | number | bigint | null | undefined) => boolean;
 
 // @public (undocumented)
 export class NominationProcedure extends Procedure {
@@ -743,16 +669,6 @@ export class NominationProcedure extends Procedure {
         nonce: bigint;
         deadline: bigint | number;
     }): Promise<string>;
-    // (undocumented)
-    type: {
-        key: string;
-        address: string;
-        metadata: {
-            label: string;
-            description: string;
-        };
-        fields: {};
-    };
     // (undocumented)
     typeName: ProcedureTypeName;
 }
@@ -1525,6 +1441,89 @@ export interface ProcedureTypeField {
 }
 
 // @public (undocumented)
+export const procedureTypeMetadata: {
+    readonly erc20Vote: {
+        readonly key: "erc20Vote";
+        readonly fields: {
+            readonly erc20: {
+                readonly name: "erc20";
+                readonly label: "ERC20 Token";
+                readonly description: "Address of the ERC20 Token used for weighting the voting power.";
+                readonly defaultValue: "";
+                readonly type: "string";
+            };
+            readonly quorumSize: {
+                name: string;
+                label: string;
+                description: string;
+                defaultValue: string;
+                type: string;
+            };
+            readonly voteDuration: {
+                name: string;
+                label: string;
+                description: string;
+                defaultValue: string;
+                type: string;
+            };
+            readonly majoritySize: {
+                name: string;
+                label: string;
+                description: string;
+                defaultValue: string;
+                type: string;
+            };
+        };
+        readonly metadata: {
+            readonly label: "Token-weighted Vote";
+            readonly description: "A token vote allows any member in the source organ to vote on proposals, where their voting power is based on the amount of tokens they hold.";
+            readonly type: "erc20Vote";
+            readonly _type: string;
+            readonly _generator: string;
+            readonly _generatedAt: number;
+        };
+    };
+    readonly nomination: {
+        readonly key: "nomination";
+        readonly fields: {};
+        readonly metadata: {
+            readonly label: "Nomination";
+            readonly description: "A nomination allows any member in the source organ to directly edit entries, assets or permissions in the target organ.";
+        };
+    };
+    readonly vote: {
+        readonly key: "vote";
+        readonly fields: {
+            quorumSize: {
+                name: string;
+                label: string;
+                description: string;
+                defaultValue: string;
+                type: string;
+            };
+            voteDuration: {
+                name: string;
+                label: string;
+                description: string;
+                defaultValue: string;
+                type: string;
+            };
+            majoritySize: {
+                name: string;
+                label: string;
+                description: string;
+                defaultValue: string;
+                type: string;
+            };
+        };
+        readonly metadata: {
+            readonly label: "Simple Majority Vote";
+            readonly description: "A vote allows any user in the source organ to vote on proposals to add, edit or replace one or many entries, assets or permissions in the target organ.";
+        };
+    };
+};
+
+// @public (undocumented)
 export type ProcedureTypeName = 'erc20Vote' | 'nomination' | 'vote';
 
 // @public (undocumented)
@@ -1539,88 +1538,9 @@ export enum ProcedureTypeNameEnum {
 
 // @public (undocumented)
 export const procedureTypes: {
-    erc20Vote: {
-        address: string;
-        key: string;
-        fields: {
-            erc20: {
-                name: string;
-                label: string;
-                description: string;
-                defaultValue: string;
-                type: string;
-            };
-            quorumSize: {
-                name: string;
-                label: string;
-                description: string;
-                defaultValue: string;
-                type: string;
-            };
-            voteDuration: {
-                name: string;
-                label: string;
-                description: string;
-                defaultValue: string;
-                type: string;
-            };
-            majoritySize: {
-                name: string;
-                label: string;
-                description: string;
-                defaultValue: string;
-                type: string;
-            };
-        };
-        metadata: {
-            label: string;
-            description: string;
-            type: string;
-            _type: string;
-            _generator: string;
-            _generatedAt: number;
-        };
-    };
-    nomination: {
-        key: string;
-        address: string;
-        metadata: {
-            label: string;
-            description: string;
-        };
-        fields: {};
-    };
-    vote: {
-        key: string;
-        address: string;
-        metadata: {
-            label: string;
-            description: string;
-        };
-        fields: {
-            quorumSize: {
-                name: string;
-                label: string;
-                description: string;
-                defaultValue: string;
-                type: string;
-            };
-            voteDuration: {
-                name: string;
-                label: string;
-                description: string;
-                defaultValue: string;
-                type: string;
-            };
-            majoritySize: {
-                name: string;
-                label: string;
-                description: string;
-                defaultValue: string;
-                type: string;
-            };
-        };
-    };
+    erc20Vote: ProcedureType;
+    nomination: ProcedureType;
+    vote: ProcedureType;
 };
 
 // @public (undocumented)
@@ -1713,6 +1633,9 @@ export const renewSaltsAndAddresses: (organigram: OrganigramInput, chainId: stri
     contractAddresses?: string[] | null;
     workspaceId?: string | null;
 };
+
+// @public (undocumented)
+export const resolveDeployment: (chainId: string | number | bigint | null | undefined, deploymentName: ProtocolDeploymentName) => string | undefined;
 
 // @public (undocumented)
 export interface SignedBlockProposalInput extends SignedProposalActionInput {
@@ -1894,39 +1817,6 @@ export interface TransactionOptions {
 }
 
 // @public (undocumented)
-export const vote: {
-    key: string;
-    address: string;
-    metadata: {
-        label: string;
-        description: string;
-    };
-    fields: {
-        quorumSize: {
-            name: string;
-            label: string;
-            description: string;
-            defaultValue: string;
-            type: string;
-        };
-        voteDuration: {
-            name: string;
-            label: string;
-            description: string;
-            defaultValue: string;
-            type: string;
-        };
-        majoritySize: {
-            name: string;
-            label: string;
-            description: string;
-            defaultValue: string;
-            type: string;
-        };
-    };
-};
-
-// @public (undocumented)
 export class VoteProcedure extends Procedure {
     constructor(input: VoteProcedureInput);
     // (undocumented)
@@ -1958,38 +1848,6 @@ export class VoteProcedure extends Procedure {
     }): Promise<string>;
     // (undocumented)
     toJson: () => ProcedureJson;
-    // (undocumented)
-    type: {
-        key: string;
-        address: string;
-        metadata: {
-            label: string;
-            description: string;
-        };
-        fields: {
-            quorumSize: {
-                name: string;
-                label: string;
-                description: string;
-                defaultValue: string;
-                type: string;
-            };
-            voteDuration: {
-                name: string;
-                label: string;
-                description: string;
-                defaultValue: string;
-                type: string;
-            };
-            majoritySize: {
-                name: string;
-                label: string;
-                description: string;
-                defaultValue: string;
-                type: string;
-            };
-        };
-    };
     // (undocumented)
     typeName: ProcedureTypeName;
     // (undocumented)

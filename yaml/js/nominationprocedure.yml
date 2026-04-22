@@ -52,37 +52,6 @@ properties:
       content: 'static INTERFACE: string;'
       return:
         type: string
-  - name: type
-    uid: '@organigram/js!NominationProcedure#type:member'
-    package: '@organigram/js!'
-    fullName: type
-    summary: ''
-    remarks: ''
-    example: []
-    isPreview: false
-    isDeprecated: false
-    syntax:
-      content: |-
-        type: {
-                key: string;
-                address: string;
-                metadata: {
-                    label: string;
-                    description: string;
-                };
-                fields: {};
-            };
-      return:
-        type: |-
-          {
-                  key: string;
-                  address: string;
-                  metadata: {
-                      label: string;
-                      description: string;
-                  };
-                  fields: {};
-              }
   - name: typeName
     uid: '@organigram/js!NominationProcedure#typeName:member'
     package: '@organigram/js!'

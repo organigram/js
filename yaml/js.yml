@@ -658,6 +658,41 @@ functions:
               abi: <xref uid="abitype!Abi:type" />;
           }
         description: ''
+  - name: getDefaultChainId()
+    uid: '@organigram/js!getDefaultChainId:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'getDefaultChainId: () => string'
+      return:
+        type: string
+        description: ''
+  - name: getDeployment(chainId, deploymentName)
+    uid: '@organigram/js!getDeployment:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        getDeployment: (chainId: string | number | bigint | null | undefined, deploymentName: ProtocolDeploymentName) =>
+        string
+      parameters:
+        - id: chainId
+          description: ''
+          type: string | number | bigint | null | undefined
+        - id: deploymentName
+          description: ''
+          type: <xref uid="@organigram/js!~ProtocolDeploymentName:type" />
+      return:
+        type: string
+        description: ''
   - name: getPermissionsSet(permissions)
     uid: '@organigram/js!getPermissionsSet:function(1)'
     package: '@organigram/js!'
@@ -696,6 +731,66 @@ functions:
           Promise&lt;typeof import("./vote").<xref uid="@organigram/js!VoteProcedure:class" /> | typeof
           import("./erc20Vote").<xref uid="@organigram/js!ERC20VoteProcedure:class" /> | typeof
           import("./nomination").<xref uid="@organigram/js!NominationProcedure:class" />&gt;
+        description: ''
+  - name: getProcedureType(chainId, typeName)
+    uid: '@organigram/js!getProcedureType:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'getProcedureType: (chainId: string, typeName: ProcedureTypeName) => ProcedureType'
+      parameters:
+        - id: chainId
+          description: ''
+          type: string
+        - id: typeName
+          description: ''
+          type: <xref uid="@organigram/js!ProcedureTypeName:type" />
+      return:
+        type: <xref uid="@organigram/js!ProcedureType:interface" />
+        description: ''
+  - name: getProcedureTypes(chainId)
+    uid: '@organigram/js!getProcedureTypes:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        getProcedureTypes: (chainId?: string) => {
+            erc20Vote: ProcedureType;
+            nomination: ProcedureType;
+            vote: ProcedureType;
+        }
+      parameters:
+        - id: chainId
+          description: ''
+          type: string
+      return:
+        type: |-
+          {
+              erc20Vote: <xref uid="@organigram/js!ProcedureType:interface" />;
+              nomination: <xref uid="@organigram/js!ProcedureType:interface" />;
+              vote: <xref uid="@organigram/js!ProcedureType:interface" />;
+          }
+        description: ''
+  - name: getSupportedChainIds()
+    uid: '@organigram/js!getSupportedChainIds:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'getSupportedChainIds: () => string[]'
+      return:
+        type: string[]
         description: ''
   - name: getTemplate(templateName, chainId)
     uid: '@organigram/js!getTemplate:function(1)'
@@ -910,6 +1005,23 @@ functions:
           type: any
       return:
         type: any
+        description: ''
+  - name: isSupportedChainId(chainId)
+    uid: '@organigram/js!isSupportedChainId:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'isSupportedChainId: (chainId: string | number | bigint | null | undefined) => boolean'
+      parameters:
+        - id: chainId
+          description: ''
+          type: string | number | bigint | null | undefined
+      return:
+        type: boolean
         description: ''
   - name: populateInitializeProcedure(input, clients)
     uid: '@organigram/js!populateInitializeProcedure:function(1)'
@@ -1192,4 +1304,26 @@ functions:
               contractAddresses?: string[] | null;
               workspaceId?: string | null;
           }
+        description: ''
+  - name: resolveDeployment(chainId, deploymentName)
+    uid: '@organigram/js!resolveDeployment:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        resolveDeployment: (chainId: string | number | bigint | null | undefined, deploymentName:
+        ProtocolDeploymentName) => string | undefined
+      parameters:
+        - id: chainId
+          description: ''
+          type: string | number | bigint | null | undefined
+        - id: deploymentName
+          description: ''
+          type: <xref uid="@organigram/js!~ProtocolDeploymentName:type" />
+      return:
+        type: string | undefined
         description: ''
