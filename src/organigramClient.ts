@@ -12,7 +12,8 @@ import {
 } from 'viem'
 import {
   createRandom32BytesHexId,
-  deployedAddresses,
+  getDefaultChainId,
+  getDeployment,
   formatSalt,
   PERMISSIONS
 } from './utils'
@@ -25,8 +26,10 @@ import {
   populateInitializeProcedure,
   prepareDeployOrgansInput,
   prepareDeployProceduresInput,
+  procedureTypeMetadata,
   ProcedureTypeName,
-  procedureTypes
+  getProcedureType,
+  getProcedureTypes
 } from './procedure/utils'
 import { Asset, ERC20_INITIAL_SUPPLY } from './asset'
 import {
@@ -183,15 +186,14 @@ const createInitialProcedureInput = (
   chainId: string
 ): ProcedureInput => ({
   typeName: input.typeName,
-  type: procedureTypes[input.typeName as keyof typeof procedureTypes],
+  type: getProcedureType(chainId, input.typeName),
   chainId,
   cid: input.cid ?? '',
   deciders: input.deciders,
   proposers: input.proposers ?? input.deciders,
   moderators: input.moderators ?? zeroAddress,
   withModeration: input.withModeration ?? false,
-  forwarder:
-    input.forwarder ?? deployedAddresses[chainId as '11155111']?.MetaGasStation,
+  forwarder: input.forwarder ?? getDeployment(chainId, 'MetaGasStation'),
   salt: formatSalt(input.salt),
   ...(input.data != null ? { data: input.data } : {})
 })
@@ -223,11 +225,11 @@ export class OrganigramClient {
     contract?: any
     walletClient?: WalletClient
   }) {
-    const resolvedChainId = input.chainId ?? '11155111'
+    const resolvedChainId = input.chainId ?? getDefaultChainId()
     const resolvedAddress =
       input.address ??
       input.contract?.address ??
-      deployedAddresses[resolvedChainId as '11155111']?.OrganigramClient
+      getDeployment(resolvedChainId, 'OrganigramClient')
     if (input.contract == null && !resolvedAddress) {
       throw new Error(
         'OrganigramClient address not configured. Provide an address or a chainId with deployments.'
@@ -235,7 +237,7 @@ export class OrganigramClient {
     }
     this.address = resolvedAddress ?? ''
     this.chainId = resolvedChainId
-    this.procedureTypes = input.procedureTypes ?? Object.values(procedureTypes)
+    this.procedureTypes = input.procedureTypes ?? Object.values(getProcedureTypes(resolvedChainId))
     this.organs = []
     this.procedures = []
     this.assets = []
@@ -327,7 +329,9 @@ export class OrganigramClient {
       throw new Error('Contract is not a procedure.')
     }
     if (cid === 'nomination' || cid === 'vote' || cid === 'erc20Vote') {
-      metadata = procedureTypes[cid as keyof typeof procedureTypes].metadata
+      metadata =
+        procedureTypeMetadata[cid as keyof typeof procedureTypeMetadata]
+          .metadata
     }
     return {
       key: cid ?? '',
@@ -353,8 +357,7 @@ export class OrganigramClient {
   }): Promise<ProcedureType[]> {
     const chainId = String(await publicClient.getChainId())
     const contract = getContractInstance({
-      address:
-        address ?? deployedAddresses[chainId as '11155111'].OrganigramClient,
+      address: address ?? getDeployment(chainId, 'OrganigramClient'),
       abi: OrganigramClientContractABI.abi,
       publicClient
     })
@@ -395,9 +398,7 @@ export class OrganigramClient {
       .then(String)
       .catch(() => '')
     const contract = getContractInstance({
-      address:
-        input.address ??
-        deployedAddresses[chainId as '11155111'].OrganigramClient,
+      address: input.address ?? getDeployment(chainId, 'OrganigramClient'),
       abi: OrganigramClientContractABI.abi,
       publicClient: input.publicClient,
       walletClient: input.walletClient
@@ -554,9 +555,12 @@ export class OrganigramClient {
   ): Promise<Procedure> {
     const procedureType =
       initialProcedure?.type ??
-      procedureTypes[
-        initialProcedure?.typeName as keyof typeof procedureTypes
-      ] ??
+      (initialProcedure?.typeName != null
+        ? getProcedureType(
+            initialProcedure.chainId ?? this.chainId,
+            initialProcedure.typeName as ProcedureTypeName
+          )
+        : undefined) ??
       (await this.getProcedureType(address).catch((error: Error) => {
         console.error(error.message)
         return null
@@ -802,15 +806,14 @@ export class OrganigramClient {
         proposers: input.proposers ?? input.deciders,
         moderators: input.moderators ?? zeroAddress,
         withModeration: input.withModeration ?? false,
-        forwarder:
-          input.forwarder ??
-          deployedAddresses[this.chainId as '11155111']?.MetaGasStation,
+        forwarder: input.forwarder ?? getDeployment(this.chainId, 'MetaGasStation'),
         args: input.args ?? []
       },
       this.getClients()
     )
     const typeAddress =
-      procedureTypes[input.typeName as keyof typeof procedureTypes].address
+      initialProcedure.type?.address ??
+      getProcedureType(this.chainId, input.typeName).address
     const tx = await createContractWriteTransaction({
       address: this.address,
       abi: OrganigramClientContractABI.abi,

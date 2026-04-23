@@ -1,4 +1,3 @@
-import deployedAddresses from '@organigram/protocol/deployments.json' with { type: 'json' }
 import AssetContractABI from '@organigram/protocol/abi/Asset.sol/Asset.json' with { type: 'json' }
 import {
   createPublicClient,
@@ -17,6 +16,7 @@ import { sepolia } from 'viem/chains'
 import {
   type ContractClients,
   ERC20_INITIAL_SUPPLY,
+  getDeployment,
   Organ,
   OrganigramClient,
   predictContractAddress,
@@ -29,6 +29,7 @@ import { VoteProcedure } from '../src/procedure/vote'
 import { ERC20VoteProcedure } from '../src/procedure/erc20Vote'
 
 const ERC20_EXAMPLE = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238' // Sepolia USDC
+const SEPOLIA_CHAIN_ID = sepolia.id.toString()
 
 const txOptions: TransactionOptions = {
   onTransaction: (tx, description) => {}
@@ -65,14 +66,14 @@ describe('Organigram JS Client', () => {
     it('should connect Web3 to a provider', async () => {
       const chainId = await publicClient.getChainId()
 
-      expect(chainId).toBe(11155111)
+      expect(chainId).toBe(sepolia.id)
     })
 
     it('should provide signer with funds', async () => {
       const chainId = await publicClient.getChainId()
       const balance = await publicClient.getBalance({ address: signerAddress })
 
-      expect(chainId).toBe(11155111)
+      expect(chainId).toBe(sepolia.id)
       expect(signerAddress).not.toBeNull()
       expect(balance).toBeGreaterThan(0n)
     })
@@ -262,32 +263,32 @@ describe('Organigram JS Client', () => {
 
       const predictedAddress = predictContractAddress({
         type: 'Organ',
-        chainId: '11155111',
+        chainId: SEPOLIA_CHAIN_ID,
         salt
       })
       const predictedAddress2 = predictContractAddress({
         type: 'Organ',
-        chainId: '11155111',
+        chainId: SEPOLIA_CHAIN_ID,
         salt: salt2
       })
       const predictedAddress3 = predictContractAddress({
         type: 'NominationProcedure',
-        chainId: '11155111',
+        chainId: SEPOLIA_CHAIN_ID,
         salt: salt3
       })
       const predictedAddress4 = predictContractAddress({
         type: 'ERC20VoteProcedure',
-        chainId: '11155111',
+        chainId: SEPOLIA_CHAIN_ID,
         salt: salt4
       })
       const predictedAddress5 = predictContractAddress({
         type: 'VoteProcedure',
-        chainId: '11155111',
+        chainId: SEPOLIA_CHAIN_ID,
         salt: salt5
       })
       const predictedAddress6 = predictContractAddress({
         type: 'Asset',
-        chainId: '11155111',
+        chainId: SEPOLIA_CHAIN_ID,
         salt: salt6
       })
       const organigram = {
@@ -310,7 +311,7 @@ describe('Organigram JS Client', () => {
             moderators: predictedAddress,
             deciders: predictedAddress,
             withModeration: false,
-            forwarder: deployedAddresses['11155111'].MetaGasStation,
+            forwarder: getDeployment(SEPOLIA_CHAIN_ID, 'MetaGasStation'),
             salt: salt3
           },
           {
@@ -319,7 +320,7 @@ describe('Organigram JS Client', () => {
             moderators: predictedAddress,
             deciders: predictedAddress,
             withModeration: false,
-            forwarder: deployedAddresses['11155111'].MetaGasStation,
+            forwarder: getDeployment(SEPOLIA_CHAIN_ID, 'MetaGasStation'),
             salt: salt4,
             args: [ERC20_EXAMPLE, '1', '8', '1']
           },
@@ -329,7 +330,7 @@ describe('Organigram JS Client', () => {
             moderators: predictedAddress,
             deciders: predictedAddress,
             withModeration: false,
-            forwarder: deployedAddresses['11155111'].MetaGasStation,
+            forwarder: getDeployment(SEPOLIA_CHAIN_ID, 'MetaGasStation'),
             salt: salt5,
             args: ['1', '8', '1']
           }
@@ -487,7 +488,7 @@ describe('Organigram JS Client', () => {
           moderators: address,
           deciders: address,
           withModeration: false,
-          forwarder: deployedAddresses['11155111'].MetaGasStation,
+          forwarder: getDeployment(SEPOLIA_CHAIN_ID, 'MetaGasStation'),
           salt: createRandom32BytesHexId(),
           args: ['1', '1', '8']
         })) as unknown as VoteProcedure
@@ -554,7 +555,7 @@ describe('Organigram JS Client', () => {
           moderators: address,
           deciders: address,
           withModeration: false,
-          forwarder: deployedAddresses['11155111'].MetaGasStation,
+          forwarder: getDeployment(SEPOLIA_CHAIN_ID, 'MetaGasStation'),
           salt: createRandom32BytesHexId(),
           args: [ERC20_EXAMPLE, '1', '1', '8']
         })) as ERC20VoteProcedure

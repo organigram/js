@@ -6,6 +6,7 @@ import {
   zeroAddress
 } from 'viem'
 import { createRandom32BytesHexId, predictContractAddress } from './utils'
+import { getDefaultChainId } from './deployments'
 import { tryMulticall } from './multicall'
 import {
   type ContractClients,
@@ -75,7 +76,7 @@ export class Asset {
     this.isDeployed = input.isDeployed ?? false
     this.salt =
       input.salt || (this.isDeployed ? undefined : createRandom32BytesHexId())
-    this.chainId = input.chainId ?? '11155111'
+    this.chainId = input.chainId ?? getDefaultChainId()
     this.address =
       input.address ??
       predictContractAddress({

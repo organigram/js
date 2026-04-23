@@ -18,17 +18,17 @@ import type { TransactionOptions } from '../organigramClient'
 import {
   capitalize,
   createRandom32BytesHexId,
-  deployedAddresses,
   handleJsonBigInt,
   predictContractAddress
 } from '../utils'
+import { getDefaultChainId, getDeployment } from '../deployments'
 import { tryMulticall } from '../multicall'
 import {
   type PopulateInitializeInput,
   type PopulatedTransactionData,
   ProcedureTypeName,
   ProcedureTypeNameEnum,
-  procedureTypes
+  getProcedureTypes
 } from './utils'
 import {
   type ContractClients,
@@ -489,7 +489,7 @@ export class Procedure {
       address ??
       predictContractAddress({
         type: (capitalize(typeName) + 'Procedure') as 'NominationProcedure',
-        chainId: chainId ?? '11155111',
+        chainId: chainId ?? getDefaultChainId(),
         salt: this.salt!
       })
     this.deciders = deciders
@@ -498,14 +498,13 @@ export class Procedure {
     this.cid = cid ?? this.typeName
     this.name = name ?? 'Unnamed procedure'
     this.description = description ?? ''
-    this.chainId = chainId ?? '11155111'
+    this.chainId = chainId ?? getDefaultChainId()
     this.organigramId = organigramId ?? 'default-organigram-id'
     this.metadata = metadata ?? '{}'
     this.proposers = proposers ?? deciders
     this.moderators = moderators ?? zeroAddress
     this.withModeration = withModeration ?? false
-    this.forwarder =
-      forwarder ?? deployedAddresses[this.chainId as '11155111']?.MetaGasStation
+    this.forwarder = forwarder ?? getDeployment(this.chainId, 'MetaGasStation')
     this.proposals = proposals ?? []
     this.walletClient = walletClient ?? undefined
     this.publicClient = publicClient ?? undefined
@@ -518,8 +517,7 @@ export class Procedure {
             walletClient: this.walletClient
           })
         : undefined
-    this.type =
-      type ?? procedureTypes[this.typeName as keyof typeof procedureTypes]
+    this.type = type ?? getProcedureTypes(this.chainId)[this.typeName]
     this.data = data ?? ''
   }
 
@@ -657,7 +655,7 @@ export class Procedure {
       withModeration: data.withModeration,
       forwarder:
         initialProcedure?.forwarder ??
-        deployedAddresses[chainId as '11155111']?.MetaGasStation,
+        getDeployment(chainId, 'MetaGasStation'),
       proposals,
       isDeployed: true
     })

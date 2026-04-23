@@ -3,6 +3,7 @@ import { Organ, type OrganInput, type OrganJson } from './organ'
 import { Procedure, type ProcedureInput, type ProcedureJson } from './procedure'
 import OrganigramClient from './organigramClient'
 import { getTemplate, templates } from './template'
+import { getDefaultChainId } from './deployments'
 import { handleJsonBigInt } from './utils'
 import type { PublicClient, WalletClient } from 'viem'
 
@@ -55,9 +56,9 @@ export type OrganigramInput = {
 }
 
 /**
- * Default Sepolia chain id used by the SDK templates.
+ * Default chain id used by the SDK templates.
  */
-export const defaultChainId = '11155111'
+export const defaultChainId = getDefaultChainId()
 
 /**
  * In-memory representation of an Organigram project.

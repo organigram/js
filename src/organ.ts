@@ -12,9 +12,9 @@ import {
 
 import {
   createRandom32BytesHexId,
-  deployedAddresses,
   predictContractAddress
 } from './utils'
+import { getDefaultChainId, getDeployment } from './deployments'
 import type { TransactionOptions } from './organigramClient'
 import { tryMulticall } from './multicall'
 import {
@@ -289,7 +289,7 @@ export class Organ {
     this.isDeployed = isDeployed ?? false
     this.salt =
       salt || (this.isDeployed ? undefined : createRandom32BytesHexId())
-    this.chainId = chainId ?? '11155111'
+    this.chainId = chainId ?? getDefaultChainId()
     this.address =
       address ??
       predictContractAddress({
@@ -298,8 +298,7 @@ export class Organ {
         salt: this.salt!
       })
     this.organigramId = organigramId ?? 'default-organigram-id'
-    this.forwarder =
-      forwarder ?? deployedAddresses[this.chainId as '11155111']?.MetaGasStation
+    this.forwarder = forwarder ?? getDeployment(this.chainId, 'MetaGasStation')
     this.balance = balance ?? '0'
     this.permissions = permissions ?? []
     this.cid = cid ?? ''

@@ -7,13 +7,14 @@ import {
   type ProcedureJson
 } from '../procedure'
 import { type TransactionOptions } from '../organigramClient'
-import { deployedAddresses, handleJsonBigInt } from '../utils'
+import { handleJsonBigInt } from '../utils'
+import { getDeployment } from '../deployments'
 import { tryMulticall } from '../multicall'
 import {
   type PopulateInitializeInput,
   type PopulatedTransactionData,
   ProcedureTypeName,
-  vote
+  getProcedureTypes
 } from './utils'
 import { decodeFunctionResult, encodeFunctionData, zeroAddress } from 'viem'
 import {
@@ -46,7 +47,6 @@ export class VoteProcedure extends Procedure {
   majoritySize: string
   elections: Election[]
   typeName: ProcedureTypeName = 'vote'
-  type = vote
 
   constructor({
     quorumSize,
@@ -57,13 +57,13 @@ export class VoteProcedure extends Procedure {
   }: VoteProcedureInput) {
     super({
       ...procedureInput,
-      typeName: 'vote',
-      type: vote
+      typeName: 'vote'
     })
     this.quorumSize = quorumSize
     this.voteDuration = voteDuration
     this.majoritySize = majoritySize
     this.elections = elections
+    this.type = getProcedureTypes(this.chainId).vote
     this.contract =
       this.publicClient != null
         ? getContractInstance({
@@ -100,9 +100,7 @@ export class VoteProcedure extends Procedure {
           input.moderators ?? zeroAddress,
           input.deciders,
           input.withModeration ?? false,
-          input.forwarder ??
-            deployedAddresses[(chainId.toString() ?? '11155111') as '11155111']
-              .MetaGasStation,
+          input.forwarder ?? getDeployment(chainId, 'MetaGasStation'),
           parseInt(quorumSize, 16),
           parseInt(voteDuration, 16),
           parseInt(majoritySize, 16)
@@ -313,7 +311,6 @@ export class VoteProcedure extends Procedure {
       majoritySize: majoritySize.toString(),
       elections,
       typeName: 'vote',
-      type: vote,
       isDeployed: true,
       data:
         initialProcedure?.data ??

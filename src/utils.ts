@@ -1,7 +1,30 @@
-import deployedAddresses from './deployments'
+import deployedAddresses, {
+  getChainExplorerBaseUrl,
+  getConfiguredChain,
+  getDefaultChainId,
+  getDeployment,
+  getHostUrl,
+  getSupportedChainIds,
+  getSupportedChains,
+  isSupportedChainId,
+  isLocalHost,
+  resolveDeployment
+} from './deployments'
 import { bytesToHex, getCreate2Address, keccak256, padHex, toHex } from 'viem'
 
-export { deployedAddresses }
+export {
+  deployedAddresses,
+  getChainExplorerBaseUrl,
+  getConfiguredChain,
+  getDefaultChainId,
+  getDeployment,
+  getHostUrl,
+  getSupportedChainIds,
+  getSupportedChains,
+  isSupportedChainId,
+  isLocalHost,
+  resolveDeployment
+}
 
 export type ContractName =
   | 'Organ'
@@ -44,16 +67,14 @@ export const predictContractAddress = ({
     : padHex(toHex(salt), { size: 32 })
 
   return getCreate2Address({
-    from: deployedAddresses[chainId as '11155111']?.OrganigramClient as `0x${string}`,
+    from: getDeployment(chainId, 'OrganigramClient') as `0x${string}`,
     salt: normalizedSalt,
     bytecodeHash: cloneInitCodeHash(
       type === 'Organ'
-        ? deployedAddresses[chainId as '11155111']?.CloneableOrgan
+        ? getDeployment(chainId, 'CloneableOrgan')
         : type === 'Asset'
-          ? deployedAddresses[chainId as '11155111']?.CloneableAsset
-          : deployedAddresses[chainId as '11155111']?.[
-              type.replace('Erc', 'ERC') as ContractName
-            ]
+          ? getDeployment(chainId, 'CloneableAsset')
+          : getDeployment(chainId, type.replace('Erc', 'ERC') as ContractName)
     ) as `0x${string}`
   })
 }

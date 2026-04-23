@@ -3,12 +3,12 @@ import { encodeFunctionData, zeroAddress } from 'viem'
 
 import { Procedure, type ProcedureInput } from '.'
 import { TransactionOptions } from '../organigramClient'
-import { deployedAddresses } from '../utils'
+import { getDefaultChainId, getDeployment } from '../deployments'
 import {
-  nomination,
   PopulateInitializeInput,
   PopulatedTransactionData,
-  ProcedureTypeName
+  ProcedureTypeName,
+  getProcedureTypes
 } from './utils'
 import {
   type ContractClients,
@@ -21,11 +21,11 @@ export class NominationProcedure extends Procedure {
   static INTERFACE = '0xc5f28e49'
 
   contract?: any
-  type = nomination
   typeName = 'nomination' as ProcedureTypeName
 
   constructor(procedureInput: ProcedureInput) {
-    super({ ...procedureInput, typeName: 'nomination', type: nomination })
+    super({ ...procedureInput, typeName: 'nomination' })
+    this.type = getProcedureTypes(this.chainId).nomination
     this.contract =
       this.publicClient != null
         ? getContractInstance({
@@ -51,7 +51,8 @@ export class NominationProcedure extends Procedure {
           input.moderators ?? zeroAddress,
           input.deciders,
           input.withModeration ?? false,
-          input.forwarder ?? deployedAddresses[11155111].MetaGasStation
+          input.forwarder ??
+            getDeployment(getDefaultChainId(), 'MetaGasStation')
         ]
       })
     }
@@ -80,7 +81,6 @@ export class NominationProcedure extends Procedure {
       isDeployed: true,
       salt: procedure.salt,
       typeName: 'nomination',
-      type: nomination,
       data: initialProcedure?.data ?? ''
     })
   }
