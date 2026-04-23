@@ -325,6 +325,12 @@ export { File_2 as File }
 export const formatSalt: (salt?: string | null) => string;
 
 // @public (undocumented)
+export const getChainExplorerBaseUrl: (chainId: string) => string | undefined;
+
+// @public (undocumented)
+export const getConfiguredChain: (chainId: string, hostUrl?: string, preferLocalHost?: boolean) => Chain | undefined;
+
+// @public (undocumented)
 export const getContractInstance: <TAbi extends Abi | readonly unknown[]>(input: {
     address: string;
     abi: TAbi;
@@ -364,8 +370,8 @@ export const getContractInstance: <TAbi extends Abi | readonly unknown[]>(input:
     };
     getEvents: {
         [x: string]: (...parameters: [options?: {
-            strict?: boolean | undefined;
             blockHash?: `0x${string}` | undefined;
+            strict?: boolean | undefined;
             fromBlock?: bigint | BlockTag | undefined;
             toBlock?: bigint | BlockTag | undefined;
         } | undefined] | [args?: readonly unknown[] | {
@@ -382,8 +388,8 @@ export const getContractInstance: <TAbi extends Abi | readonly unknown[]>(input:
             batch?: undefined;
             pollingInterval?: undefined;
         } | undefined, options?: {
-            strict?: boolean | undefined;
             blockHash?: `0x${string}` | undefined;
+            strict?: boolean | undefined;
             fromBlock?: bigint | BlockTag | undefined;
             toBlock?: bigint | BlockTag | undefined;
         } | undefined]) => Promise<GetContractEventsReturnType<Abi, string>>;
@@ -461,8 +467,8 @@ export const getContractInstance: <TAbi extends Abi | readonly unknown[]>(input:
     };
     getEvents: {
         [x: string]: (...parameters: [options?: {
-            strict?: boolean | undefined;
             blockHash?: `0x${string}` | undefined;
+            strict?: boolean | undefined;
             fromBlock?: bigint | BlockTag | undefined;
             toBlock?: bigint | BlockTag | undefined;
         } | undefined] | [args?: readonly unknown[] | {
@@ -479,8 +485,8 @@ export const getContractInstance: <TAbi extends Abi | readonly unknown[]>(input:
             batch?: undefined;
             pollingInterval?: undefined;
         } | undefined, options?: {
-            strict?: boolean | undefined;
             blockHash?: `0x${string}` | undefined;
+            strict?: boolean | undefined;
             fromBlock?: bigint | BlockTag | undefined;
             toBlock?: bigint | BlockTag | undefined;
         } | undefined]) => Promise<GetContractEventsReturnType<Abi, string>>;
@@ -533,6 +539,9 @@ export const getDefaultChainId: () => string;
 export const getDeployment: (chainId: string | number | bigint | null | undefined, deploymentName: ProtocolDeploymentName) => string;
 
 // @public (undocumented)
+export const getHostUrl: (hostUrl?: string | undefined) => URL | null;
+
+// @public (undocumented)
 export const getPermissionsSet: (permissions: number) => string[];
 
 // @public (undocumented)
@@ -550,6 +559,9 @@ export const getProcedureTypes: (chainId?: string) => {
 
 // @public (undocumented)
 export const getSupportedChainIds: () => string[];
+
+// @public (undocumented)
+export const getSupportedChains: (hostUrl?: string, preferLocalHost?: boolean) => Chain[];
 
 // @public (undocumented)
 export const getTemplate: (templateName: TemplateName, chainId: string) => {
@@ -639,6 +651,9 @@ export interface IOrganEntry {
     // (undocumented)
     cid?: string;
 }
+
+// @public (undocumented)
+export const isLocalHost: (hostUrl?: string) => boolean;
 
 // @public (undocumented)
 export const isSupportedChainId: (chainId: string | number | bigint | null | undefined) => boolean;

@@ -1,5 +1,6 @@
 import OrganigramClient from './organigramClient';
 import { getTemplate, templates } from './template';
+import { getDefaultChainId } from './deployments';
 import { handleJsonBigInt } from './utils';
 /**
  * Human-readable labels for the procedure role slots expected by the protocol.
@@ -10,9 +11,9 @@ export const procedureRoleTypes = [
     { label: 'Filter proposals', name: 'moderators' }
 ];
 /**
- * Default Sepolia chain id used by the SDK templates.
+ * Default chain id used by the SDK templates.
  */
-export const defaultChainId = '11155111';
+export const defaultChainId = getDefaultChainId();
 /**
  * In-memory representation of an Organigram project.
  *

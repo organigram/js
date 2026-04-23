@@ -1,6 +1,7 @@
 import AssetContract from '@organigram/protocol/abi/Asset.sol/Asset.json' with { type: 'json' };
 import { decodeFunctionResult, encodeFunctionData, formatEther, zeroAddress } from 'viem';
 import { createRandom32BytesHexId, predictContractAddress } from './utils';
+import { getDefaultChainId } from './deployments';
 import { tryMulticall } from './multicall';
 import { getContractInstance, getWalletAddress } from './contracts';
 export const ERC20_INITIAL_SUPPLY = 10_000_000; // 10 million tokens.
@@ -28,7 +29,7 @@ export class Asset {
         this.isDeployed = input.isDeployed ?? false;
         this.salt =
             input.salt || (this.isDeployed ? undefined : createRandom32BytesHexId());
-        this.chainId = input.chainId ?? '11155111';
+        this.chainId = input.chainId ?? getDefaultChainId();
         this.address =
             input.address ??
                 predictContractAddress({

@@ -1,16 +1,16 @@
 import NominationProcedureContractABI from '@organigram/protocol/abi/Nomination.sol/NominationProcedure.json' with { type: 'json' };
 import { encodeFunctionData, zeroAddress } from 'viem';
 import { Procedure } from '.';
-import { deployedAddresses } from '../utils';
-import { nomination } from './utils';
+import { getDefaultChainId, getDeployment } from '../deployments';
+import { getProcedureTypes } from './utils';
 import { createContractWriteTransaction, getContractInstance, getWalletAccount } from '../contracts';
 export class NominationProcedure extends Procedure {
     static INTERFACE = '0xc5f28e49';
     contract;
-    type = nomination;
     typeName = 'nomination';
     constructor(procedureInput) {
-        super({ ...procedureInput, typeName: 'nomination', type: nomination });
+        super({ ...procedureInput, typeName: 'nomination' });
+        this.type = getProcedureTypes(this.chainId).nomination;
         this.contract =
             this.publicClient != null
                 ? getContractInstance({
@@ -32,7 +32,8 @@ export class NominationProcedure extends Procedure {
                     input.moderators ?? zeroAddress,
                     input.deciders,
                     input.withModeration ?? false,
-                    input.forwarder ?? deployedAddresses[11155111].MetaGasStation
+                    input.forwarder ??
+                        getDeployment(getDefaultChainId(), 'MetaGasStation')
                 ]
             })
         };
@@ -56,7 +57,6 @@ export class NominationProcedure extends Procedure {
             isDeployed: true,
             salt: procedure.salt,
             typeName: 'nomination',
-            type: nomination,
             data: initialProcedure?.data ?? ''
         });
     }

@@ -1,6 +1,6 @@
-import deployedAddresses from './deployments';
+import deployedAddresses, { getChainExplorerBaseUrl, getConfiguredChain, getDefaultChainId, getDeployment, getHostUrl, getSupportedChainIds, getSupportedChains, isSupportedChainId, isLocalHost, resolveDeployment } from './deployments';
 import { bytesToHex, getCreate2Address, keccak256, padHex, toHex } from 'viem';
-export { deployedAddresses };
+export { deployedAddresses, getChainExplorerBaseUrl, getConfiguredChain, getDefaultChainId, getDeployment, getHostUrl, getSupportedChainIds, getSupportedChains, isSupportedChainId, isLocalHost, resolveDeployment };
 export const handleJsonBigInt = (key, value) => {
     if (typeof value === 'bigint') {
         return value.toString() + 'n';
@@ -20,13 +20,13 @@ export const predictContractAddress = ({ type, chainId, salt }) => {
         ? salt
         : padHex(toHex(salt), { size: 32 });
     return getCreate2Address({
-        from: deployedAddresses[chainId]?.OrganigramClient,
+        from: getDeployment(chainId, 'OrganigramClient'),
         salt: normalizedSalt,
         bytecodeHash: cloneInitCodeHash(type === 'Organ'
-            ? deployedAddresses[chainId]?.CloneableOrgan
+            ? getDeployment(chainId, 'CloneableOrgan')
             : type === 'Asset'
-                ? deployedAddresses[chainId]?.CloneableAsset
-                : deployedAddresses[chainId]?.[type.replace('Erc', 'ERC')])
+                ? getDeployment(chainId, 'CloneableAsset')
+                : getDeployment(chainId, type.replace('Erc', 'ERC')))
     });
 };
 export const createRandom32BytesHexId = () => bytesToHex(crypto.getRandomValues(new Uint8Array(32)));

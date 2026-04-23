@@ -1,4 +1,5 @@
-import { createRandom32BytesHexId, deployedAddresses, formatSalt } from '../utils';
+import { createRandom32BytesHexId, formatSalt } from '../utils';
+import { getDefaultChainId, getDeployment } from '../deployments';
 import { encodeFunctionData, isAddress, padHex, toHex, zeroAddress } from 'viem';
 export var ProcedureTypeNameEnum;
 (function (ProcedureTypeNameEnum) {
@@ -7,15 +8,6 @@ export var ProcedureTypeNameEnum;
     ProcedureTypeNameEnum["vote"] = "vote";
 })(ProcedureTypeNameEnum || (ProcedureTypeNameEnum = {}));
 const encodeDynamicFunctionData = encodeFunctionData;
-export const nomination = {
-    key: 'nomination',
-    address: deployedAddresses[11155111].NominationProcedure,
-    metadata: {
-        label: 'Nomination',
-        description: 'A nomination allows any member in the source organ to directly edit entries, assets or permissions in the target organ.'
-    },
-    fields: {}
-};
 export const electionFields = {
     quorumSize: {
         name: 'quorumSize',
@@ -39,45 +31,64 @@ export const electionFields = {
         type: 'number'
     }
 };
-export const vote = {
-    key: 'vote',
-    address: deployedAddresses[11155111].VoteProcedure,
-    metadata: {
-        label: 'Simple Majority Vote',
-        description: 'A vote allows any user in the source organ to vote on proposals to add, edit or replace one or many entries, assets or permissions in the target organ.'
-    },
-    fields: electionFields
-};
 export const procedureMetadata = {
     _type: 'procedureType',
     _generator: 'https://organigram.ai',
     _generatedAt: 0
 };
-export const erc20Vote = {
-    address: deployedAddresses[11155111].ERC20VoteProcedure,
-    key: 'erc20Vote',
-    fields: {
-        ...electionFields,
-        erc20: {
-            name: 'erc20',
-            label: 'ERC20 Token',
-            description: 'Address of the ERC20 Token used for weighting the voting power.',
-            defaultValue: '',
-            type: 'string'
+export const procedureTypeMetadata = {
+    erc20Vote: {
+        key: 'erc20Vote',
+        fields: {
+            ...electionFields,
+            erc20: {
+                name: 'erc20',
+                label: 'ERC20 Token',
+                description: 'Address of the ERC20 Token used for weighting the voting power.',
+                defaultValue: '',
+                type: 'string'
+            }
+        },
+        metadata: {
+            ...procedureMetadata,
+            label: 'Token-weighted Vote',
+            description: 'A token vote allows any member in the source organ to vote on proposals, where their voting power is based on the amount of tokens they hold.',
+            type: 'erc20Vote'
         }
     },
-    metadata: {
-        ...procedureMetadata,
-        label: 'Token-weighted Vote',
-        description: 'A token vote allows any member in the source organ to vote on proposals, where their voting power is based on the amount of tokens they hold.',
-        type: 'erc20Vote'
+    nomination: {
+        key: 'nomination',
+        fields: {},
+        metadata: {
+            label: 'Nomination',
+            description: 'A nomination allows any member in the source organ to directly edit entries, assets or permissions in the target organ.'
+        }
+    },
+    vote: {
+        key: 'vote',
+        fields: electionFields,
+        metadata: {
+            label: 'Simple Majority Vote',
+            description: 'A vote allows any user in the source organ to vote on proposals to add, edit or replace one or many entries, assets or permissions in the target organ.'
+        }
     }
 };
-export const procedureTypes = {
-    erc20Vote,
-    nomination,
-    vote
+const procedureTypeDeploymentNames = {
+    erc20Vote: 'ERC20VoteProcedure',
+    nomination: 'NominationProcedure',
+    vote: 'VoteProcedure'
 };
+const buildProcedureType = (chainId, typeName) => ({
+    ...procedureTypeMetadata[typeName],
+    address: getDeployment(chainId, procedureTypeDeploymentNames[typeName])
+});
+export const getProcedureTypes = (chainId = getDefaultChainId()) => ({
+    erc20Vote: buildProcedureType(chainId, 'erc20Vote'),
+    nomination: buildProcedureType(chainId, 'nomination'),
+    vote: buildProcedureType(chainId, 'vote')
+});
+export const getProcedureType = (chainId, typeName) => getProcedureTypes(chainId)[typeName];
+export const procedureTypes = getProcedureTypes();
 export const prepareDeployOrgansInput = (deployOrgansInput) => deployOrgansInput.map(organ => {
     const permissionAddresses = [];
     const permissionValues = [];
@@ -116,7 +127,7 @@ export const prepareDeployProceduresInput = async (deployProceduresInput, client
         proposers: procedure.proposers ?? procedure.deciders,
         withModeration: procedure.withModeration ?? false,
         forwarder: procedure.forwarder ??
-            deployedAddresses[procedure.chainId]?.MetaGasStation,
+            getDeployment(procedure.chainId ?? getDefaultChainId(), 'MetaGasStation'),
         args: rawArgs.map(arg => typeof arg === 'string'
             ? isAddress(arg) || arg.startsWith('0x')
                 ? arg
@@ -126,8 +137,7 @@ export const prepareDeployProceduresInput = async (deployProceduresInput, client
             : arg)
     }, clients);
     return {
-        procedureType: procedureTypes[procedure.typeName]
-            .address,
+        procedureType: getProcedureType(procedure.chainId ?? getDefaultChainId(), procedure.typeName).address,
         data: initialize.data,
         salt: formatSalt(procedure.salt),
         options: procedure.options

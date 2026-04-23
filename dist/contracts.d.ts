@@ -52,8 +52,8 @@ export declare const getContractInstance: <TAbi extends Abi | readonly unknown[]
     };
     getEvents: {
         [x: string]: (...parameters: [options?: {
-            strict?: boolean | undefined;
             blockHash?: `0x${string}` | undefined;
+            strict?: boolean | undefined;
             fromBlock?: bigint | import("viem").BlockTag | undefined;
             toBlock?: bigint | import("viem").BlockTag | undefined;
         } | undefined] | [args?: readonly unknown[] | {
@@ -70,8 +70,8 @@ export declare const getContractInstance: <TAbi extends Abi | readonly unknown[]
             batch?: undefined;
             pollingInterval?: undefined;
         } | undefined, options?: {
-            strict?: boolean | undefined;
             blockHash?: `0x${string}` | undefined;
+            strict?: boolean | undefined;
             fromBlock?: bigint | import("viem").BlockTag | undefined;
             toBlock?: bigint | import("viem").BlockTag | undefined;
         } | undefined]) => Promise<import("viem").GetContractEventsReturnType<Abi, string>>;
@@ -149,8 +149,8 @@ export declare const getContractInstance: <TAbi extends Abi | readonly unknown[]
     };
     getEvents: {
         [x: string]: (...parameters: [options?: {
-            strict?: boolean | undefined;
             blockHash?: `0x${string}` | undefined;
+            strict?: boolean | undefined;
             fromBlock?: bigint | import("viem").BlockTag | undefined;
             toBlock?: bigint | import("viem").BlockTag | undefined;
         } | undefined] | [args?: readonly unknown[] | {
@@ -167,8 +167,8 @@ export declare const getContractInstance: <TAbi extends Abi | readonly unknown[]
             batch?: undefined;
             pollingInterval?: undefined;
         } | undefined, options?: {
-            strict?: boolean | undefined;
             blockHash?: `0x${string}` | undefined;
+            strict?: boolean | undefined;
             fromBlock?: bigint | import("viem").BlockTag | undefined;
             toBlock?: bigint | import("viem").BlockTag | undefined;
         } | undefined]) => Promise<import("viem").GetContractEventsReturnType<Abi, string>>;

@@ -1,8 +1,9 @@
 import VoteProcedureContractABI from '@organigram/protocol/abi/Vote.sol/VoteProcedure.json' with { type: 'json' };
 import { Procedure } from '../procedure';
-import { deployedAddresses, handleJsonBigInt } from '../utils';
+import { handleJsonBigInt } from '../utils';
+import { getDeployment } from '../deployments';
 import { tryMulticall } from '../multicall';
-import { vote } from './utils';
+import { getProcedureTypes } from './utils';
 import { decodeFunctionResult, encodeFunctionData, zeroAddress } from 'viem';
 import { createContractWriteTransaction, getContractInstance, getWalletAccount } from '../contracts';
 const normalizeElection = (election, proposalKey) => ({
@@ -19,17 +20,16 @@ export class VoteProcedure extends Procedure {
     majoritySize;
     elections;
     typeName = 'vote';
-    type = vote;
     constructor({ quorumSize, voteDuration, majoritySize, elections, ...procedureInput }) {
         super({
             ...procedureInput,
-            typeName: 'vote',
-            type: vote
+            typeName: 'vote'
         });
         this.quorumSize = quorumSize;
         this.voteDuration = voteDuration;
         this.majoritySize = majoritySize;
         this.elections = elections;
+        this.type = getProcedureTypes(this.chainId).vote;
         this.contract =
             this.publicClient != null
                 ? getContractInstance({
@@ -60,9 +60,7 @@ export class VoteProcedure extends Procedure {
                     input.moderators ?? zeroAddress,
                     input.deciders,
                     input.withModeration ?? false,
-                    input.forwarder ??
-                        deployedAddresses[(chainId.toString() ?? '11155111')]
-                            .MetaGasStation,
+                    input.forwarder ?? getDeployment(chainId, 'MetaGasStation'),
                     parseInt(quorumSize, 16),
                     parseInt(voteDuration, 16),
                     parseInt(majoritySize, 16)
@@ -209,7 +207,6 @@ export class VoteProcedure extends Procedure {
             majoritySize: majoritySize.toString(),
             elections,
             typeName: 'vote',
-            type: vote,
             isDeployed: true,
             data: initialProcedure?.data ??
                 JSON.stringify({

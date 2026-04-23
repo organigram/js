@@ -1,4 +1,15 @@
+import type { Chain } from 'viem';
 export type ProtocolDeploymentName = 'Asset' | 'Organ' | 'ERC20VoteProcedure' | 'NominationProcedure' | 'VoteProcedure' | 'MetaGasStation' | 'OrganigramClient' | 'CloneableOrgan' | 'CloneableAsset';
 export type ProtocolDeployments = Record<string, Record<ProtocolDeploymentName, string>>;
 declare const deployedAddresses: ProtocolDeployments;
+export declare const getHostUrl: (hostUrl?: string | undefined) => URL | null;
+export declare const isLocalHost: (hostUrl?: string) => boolean;
+export declare const getSupportedChainIds: () => string[];
+export declare const isSupportedChainId: (chainId: string | number | bigint | null | undefined) => boolean;
+export declare const resolveDeployment: (chainId: string | number | bigint | null | undefined, deploymentName: ProtocolDeploymentName) => string | undefined;
+export declare const getDeployment: (chainId: string | number | bigint | null | undefined, deploymentName: ProtocolDeploymentName) => string;
+export declare const getConfiguredChain: (chainId: string, hostUrl?: string, preferLocalHost?: boolean) => Chain | undefined;
+export declare const getSupportedChains: (hostUrl?: string, preferLocalHost?: boolean) => Chain[];
+export declare const getChainExplorerBaseUrl: (chainId: string) => string | undefined;
+export declare const getDefaultChainId: () => string;
 export default deployedAddresses;

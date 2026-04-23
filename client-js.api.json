@@ -3511,6 +3511,125 @@
         },
         {
           "kind": "Function",
+          "canonicalReference": "@organigram/js!getChainExplorerBaseUrl:function(1)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "getChainExplorerBaseUrl: (chainId: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "string | undefined"
+            }
+          ],
+          "fileUrlPath": "dist/deployments.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "chainId",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "getChainExplorerBaseUrl"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@organigram/js!getConfiguredChain:function(1)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "getConfiguredChain: (chainId: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ", hostUrl?: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ", preferLocalHost?: "
+            },
+            {
+              "kind": "Content",
+              "text": "boolean"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "Chain",
+              "canonicalReference": "viem!Chain:type"
+            },
+            {
+              "kind": "Content",
+              "text": " | undefined"
+            }
+          ],
+          "fileUrlPath": "dist/deployments.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 7,
+            "endIndex": 9
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "chainId",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "hostUrl",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": true
+            },
+            {
+              "parameterName": "preferLocalHost",
+              "parameterTypeTokenRange": {
+                "startIndex": 5,
+                "endIndex": 6
+              },
+              "isOptional": true
+            }
+          ],
+          "name": "getConfiguredChain"
+        },
+        {
+          "kind": "Function",
           "canonicalReference": "@organigram/js!getContractInstance:function(1)",
           "docComment": "",
           "excerptTokens": [
@@ -4023,7 +4142,7 @@
             },
             {
               "kind": "Content",
-              "text": ">;\n    };\n    getEvents: {\n        [x: string]: (...parameters: [options?: {\n            strict?: boolean | undefined;\n            blockHash?: `0x${string}` | undefined;\n            fromBlock?: bigint | import(\"viem\")."
+              "text": ">;\n    };\n    getEvents: {\n        [x: string]: (...parameters: [options?: {\n            blockHash?: `0x${string}` | undefined;\n            strict?: boolean | undefined;\n            fromBlock?: bigint | import(\"viem\")."
             },
             {
               "kind": "Reference",
@@ -4041,7 +4160,7 @@
             },
             {
               "kind": "Content",
-              "text": " | undefined;\n        } | undefined] | [args?: readonly unknown[] | {\n            [x: string]: unknown;\n            address?: undefined;\n            abi?: undefined;\n            args?: undefined;\n            eventName?: undefined;\n            fromBlock?: undefined;\n            onError?: undefined;\n            onLogs?: undefined;\n            strict?: undefined;\n            poll?: undefined;\n            batch?: undefined;\n            pollingInterval?: undefined;\n        } | undefined, options?: {\n            strict?: boolean | undefined;\n            blockHash?: `0x${string}` | undefined;\n            fromBlock?: bigint | import(\"viem\")."
+              "text": " | undefined;\n        } | undefined] | [args?: readonly unknown[] | {\n            [x: string]: unknown;\n            address?: undefined;\n            abi?: undefined;\n            args?: undefined;\n            eventName?: undefined;\n            fromBlock?: undefined;\n            onError?: undefined;\n            onLogs?: undefined;\n            strict?: undefined;\n            poll?: undefined;\n            batch?: undefined;\n            pollingInterval?: undefined;\n        } | undefined, options?: {\n            blockHash?: `0x${string}` | undefined;\n            strict?: boolean | undefined;\n            fromBlock?: bigint | import(\"viem\")."
             },
             {
               "kind": "Reference",
@@ -4698,7 +4817,7 @@
             },
             {
               "kind": "Content",
-              "text": ">;\n    };\n    getEvents: {\n        [x: string]: (...parameters: [options?: {\n            strict?: boolean | undefined;\n            blockHash?: `0x${string}` | undefined;\n            fromBlock?: bigint | import(\"viem\")."
+              "text": ">;\n    };\n    getEvents: {\n        [x: string]: (...parameters: [options?: {\n            blockHash?: `0x${string}` | undefined;\n            strict?: boolean | undefined;\n            fromBlock?: bigint | import(\"viem\")."
             },
             {
               "kind": "Reference",
@@ -4716,7 +4835,7 @@
             },
             {
               "kind": "Content",
-              "text": " | undefined;\n        } | undefined] | [args?: readonly unknown[] | {\n            [x: string]: unknown;\n            address?: undefined;\n            abi?: undefined;\n            args?: undefined;\n            eventName?: undefined;\n            fromBlock?: undefined;\n            onError?: undefined;\n            onLogs?: undefined;\n            strict?: undefined;\n            poll?: undefined;\n            batch?: undefined;\n            pollingInterval?: undefined;\n        } | undefined, options?: {\n            strict?: boolean | undefined;\n            blockHash?: `0x${string}` | undefined;\n            fromBlock?: bigint | import(\"viem\")."
+              "text": " | undefined;\n        } | undefined] | [args?: readonly unknown[] | {\n            [x: string]: unknown;\n            address?: undefined;\n            abi?: undefined;\n            args?: undefined;\n            eventName?: undefined;\n            fromBlock?: undefined;\n            onError?: undefined;\n            onLogs?: undefined;\n            strict?: undefined;\n            poll?: undefined;\n            batch?: undefined;\n            pollingInterval?: undefined;\n        } | undefined, options?: {\n            blockHash?: `0x${string}` | undefined;\n            strict?: boolean | undefined;\n            fromBlock?: bigint | import(\"viem\")."
             },
             {
               "kind": "Reference",
@@ -5032,6 +5151,52 @@
         },
         {
           "kind": "Function",
+          "canonicalReference": "@organigram/js!getHostUrl:function(1)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "getHostUrl: (hostUrl?: "
+            },
+            {
+              "kind": "Content",
+              "text": "string | undefined"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "URL",
+              "canonicalReference": "!URL:interface"
+            },
+            {
+              "kind": "Content",
+              "text": " | null"
+            }
+          ],
+          "fileUrlPath": "dist/deployments.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 5
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "hostUrl",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": true
+            }
+          ],
+          "name": "getHostUrl"
+        },
+        {
+          "kind": "Function",
           "canonicalReference": "@organigram/js!getPermissionsSet:function(1)",
           "docComment": "",
           "excerptTokens": [
@@ -5294,6 +5459,68 @@
           "overloadIndex": 1,
           "parameters": [],
           "name": "getSupportedChainIds"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@organigram/js!getSupportedChains:function(1)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "getSupportedChains: (hostUrl?: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ", preferLocalHost?: "
+            },
+            {
+              "kind": "Content",
+              "text": "boolean"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Reference",
+              "text": "Chain",
+              "canonicalReference": "viem!Chain:type"
+            },
+            {
+              "kind": "Content",
+              "text": "[]"
+            }
+          ],
+          "fileUrlPath": "dist/deployments.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 5,
+            "endIndex": 7
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "hostUrl",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": true
+            },
+            {
+              "parameterName": "preferLocalHost",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": true
+            }
+          ],
+          "name": "getSupportedChains"
         },
         {
           "kind": "Function",
@@ -5692,6 +5919,47 @@
             }
           ],
           "extendsTokenRanges": []
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@organigram/js!isLocalHost:function(1)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "isLocalHost: (hostUrl?: "
+            },
+            {
+              "kind": "Content",
+              "text": "string"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "boolean"
+            }
+          ],
+          "fileUrlPath": "dist/deployments.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 3,
+            "endIndex": 4
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "hostUrl",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": true
+            }
+          ],
+          "name": "isLocalHost"
         },
         {
           "kind": "Function",

@@ -1,6 +1,6 @@
 import ERC20VoteProcedureContractABI from '@organigram/protocol/abi/ERC20Vote.sol/ERC20VoteProcedure.json' with { type: 'json' };
 import { Procedure } from '.';
-import { erc20Vote } from './utils';
+import { getProcedureTypes } from './utils';
 import { VoteProcedure } from './vote';
 import { handleJsonBigInt } from '../utils';
 import { encodeFunctionData, zeroAddress } from 'viem';
@@ -9,15 +9,14 @@ export class ERC20VoteProcedure extends VoteProcedure {
     static INTERFACE = '0xc9d27afe';
     erc20;
     contract;
-    type = erc20Vote;
     typeName = 'erc20Vote';
     constructor({ erc20, ...voteProcedureArguments }) {
         super({
             ...voteProcedureArguments,
-            typeName: 'erc20Vote',
-            type: erc20Vote
+            typeName: 'erc20Vote'
         });
         this.erc20 = erc20;
+        this.type = getProcedureTypes(this.chainId).erc20Vote;
         this.contract =
             this.publicClient != null
                 ? getContractInstance({

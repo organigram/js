@@ -5,15 +5,6 @@ import { type ContractClients } from '../contracts';
 export declare class NominationProcedure extends Procedure {
     static INTERFACE: string;
     contract?: any;
-    type: {
-        key: string;
-        address: string;
-        metadata: {
-            label: string;
-            description: string;
-        };
-        fields: {};
-    };
     typeName: ProcedureTypeName;
     constructor(procedureInput: ProcedureInput);
     static _populateInitialize(input: PopulateInitializeInput, _clients: ContractClients): Promise<PopulatedTransactionData>;

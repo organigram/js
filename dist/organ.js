@@ -1,6 +1,7 @@
 import OrganContractABI from '@organigram/protocol/abi/Organ.sol/Organ.json' with { type: 'json' };
 import { decodeFunctionResult, encodeFunctionData, padHex, toHex, zeroAddress } from 'viem';
-import { createRandom32BytesHexId, deployedAddresses, predictContractAddress } from './utils';
+import { createRandom32BytesHexId, predictContractAddress } from './utils';
+import { getDefaultChainId, getDeployment } from './deployments';
 import { tryMulticall } from './multicall';
 import { createContractWriteTransaction, getContractInstance, getWalletAddress } from './contracts';
 /**
@@ -159,7 +160,7 @@ export class Organ {
         this.isDeployed = isDeployed ?? false;
         this.salt =
             salt || (this.isDeployed ? undefined : createRandom32BytesHexId());
-        this.chainId = chainId ?? '11155111';
+        this.chainId = chainId ?? getDefaultChainId();
         this.address =
             address ??
                 predictContractAddress({
@@ -168,8 +169,7 @@ export class Organ {
                     salt: this.salt
                 });
         this.organigramId = organigramId ?? 'default-organigram-id';
-        this.forwarder =
-            forwarder ?? deployedAddresses[this.chainId]?.MetaGasStation;
+        this.forwarder = forwarder ?? getDeployment(this.chainId, 'MetaGasStation');
         this.balance = balance ?? '0';
         this.permissions = permissions ?? [];
         this.cid = cid ?? '';

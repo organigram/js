@@ -241,6 +241,46 @@ functions:
       return:
         type: string
         description: ''
+  - name: getChainExplorerBaseUrl(chainId)
+    uid: '@organigram/js!getChainExplorerBaseUrl:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'getChainExplorerBaseUrl: (chainId: string) => string | undefined'
+      parameters:
+        - id: chainId
+          description: ''
+          type: string
+      return:
+        type: string | undefined
+        description: ''
+  - name: getConfiguredChain(chainId, hostUrl, preferLocalHost)
+    uid: '@organigram/js!getConfiguredChain:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'getConfiguredChain: (chainId: string, hostUrl?: string, preferLocalHost?: boolean) => Chain | undefined'
+      parameters:
+        - id: chainId
+          description: ''
+          type: string
+        - id: hostUrl
+          description: ''
+          type: string
+        - id: preferLocalHost
+          description: ''
+          type: boolean
+      return:
+        type: <xref uid="viem!Chain:type" /> | undefined
+        description: ''
   - name: getContractInstance({ address, abi, publicClient, walletClient }, input)
     uid: '@organigram/js!getContractInstance:function(1)'
     package: '@organigram/js!'
@@ -290,8 +330,8 @@ functions:
             };
             getEvents: {
                 [x: string]: (...parameters: [options?: {
-                    strict?: boolean | undefined;
                     blockHash?: `0x${string}` | undefined;
+                    strict?: boolean | undefined;
                     fromBlock?: bigint | import("viem").BlockTag | undefined;
                     toBlock?: bigint | import("viem").BlockTag | undefined;
                 } | undefined] | [args?: readonly unknown[] | {
@@ -308,8 +348,8 @@ functions:
                     batch?: undefined;
                     pollingInterval?: undefined;
                 } | undefined, options?: {
-                    strict?: boolean | undefined;
                     blockHash?: `0x${string}` | undefined;
+                    strict?: boolean | undefined;
                     fromBlock?: bigint | import("viem").BlockTag | undefined;
                     toBlock?: bigint | import("viem").BlockTag | undefined;
                 } | undefined]) => Promise<import("viem").GetContractEventsReturnType<Abi, string>>;
@@ -387,8 +427,8 @@ functions:
             };
             getEvents: {
                 [x: string]: (...parameters: [options?: {
-                    strict?: boolean | undefined;
                     blockHash?: `0x${string}` | undefined;
+                    strict?: boolean | undefined;
                     fromBlock?: bigint | import("viem").BlockTag | undefined;
                     toBlock?: bigint | import("viem").BlockTag | undefined;
                 } | undefined] | [args?: readonly unknown[] | {
@@ -405,8 +445,8 @@ functions:
                     batch?: undefined;
                     pollingInterval?: undefined;
                 } | undefined, options?: {
-                    strict?: boolean | undefined;
                     blockHash?: `0x${string}` | undefined;
+                    strict?: boolean | undefined;
                     fromBlock?: bigint | import("viem").BlockTag | undefined;
                     toBlock?: bigint | import("viem").BlockTag | undefined;
                 } | undefined]) => Promise<import("viem").GetContractEventsReturnType<Abi, string>>;
@@ -498,8 +538,8 @@ functions:
               };
               getEvents: {
                   [x: string]: (...parameters: [options?: {
-                      strict?: boolean | undefined;
                       blockHash?: `0x${string}` | undefined;
+                      strict?: boolean | undefined;
                       fromBlock?: bigint | import("viem")<xref uid=".viem!BlockTag:type" /> | undefined;
                       toBlock?: bigint | import("viem")<xref uid=".viem!BlockTag:type" /> | undefined;
                   } | undefined] | [args?: readonly unknown[] | {
@@ -516,8 +556,8 @@ functions:
                       batch?: undefined;
                       pollingInterval?: undefined;
                   } | undefined, options?: {
-                      strict?: boolean | undefined;
                       blockHash?: `0x${string}` | undefined;
+                      strict?: boolean | undefined;
                       fromBlock?: bigint | import("viem")<xref uid=".viem!BlockTag:type" /> | undefined;
                       toBlock?: bigint | import("viem")<xref uid=".viem!BlockTag:type" /> | undefined;
                   } | undefined]) =&gt; Promise&lt;import("viem")<xref uid=".viem!GetContractEventsReturnType:type" />&lt;<xref uid="abitype!Abi:type" />, string&gt;&gt;;
@@ -595,8 +635,8 @@ functions:
               };
               getEvents: {
                   [x: string]: (...parameters: [options?: {
-                      strict?: boolean | undefined;
                       blockHash?: `0x${string}` | undefined;
+                      strict?: boolean | undefined;
                       fromBlock?: bigint | import("viem")<xref uid=".viem!BlockTag:type" /> | undefined;
                       toBlock?: bigint | import("viem")<xref uid=".viem!BlockTag:type" /> | undefined;
                   } | undefined] | [args?: readonly unknown[] | {
@@ -613,8 +653,8 @@ functions:
                       batch?: undefined;
                       pollingInterval?: undefined;
                   } | undefined, options?: {
-                      strict?: boolean | undefined;
                       blockHash?: `0x${string}` | undefined;
+                      strict?: boolean | undefined;
                       fromBlock?: bigint | import("viem")<xref uid=".viem!BlockTag:type" /> | undefined;
                       toBlock?: bigint | import("viem")<xref uid=".viem!BlockTag:type" /> | undefined;
                   } | undefined]) =&gt; Promise&lt;import("viem")<xref uid=".viem!GetContractEventsReturnType:type" />&lt;<xref uid="abitype!Abi:type" />, string&gt;&gt;;
@@ -692,6 +732,23 @@ functions:
           type: <xref uid="@organigram/js!~ProtocolDeploymentName:type" />
       return:
         type: string
+        description: ''
+  - name: getHostUrl(hostUrl)
+    uid: '@organigram/js!getHostUrl:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'getHostUrl: (hostUrl?: string | undefined) => URL | null'
+      parameters:
+        - id: hostUrl
+          description: ''
+          type: string | undefined
+      return:
+        type: URL | null
         description: ''
   - name: getPermissionsSet(permissions)
     uid: '@organigram/js!getPermissionsSet:function(1)'
@@ -791,6 +848,26 @@ functions:
       content: 'getSupportedChainIds: () => string[]'
       return:
         type: string[]
+        description: ''
+  - name: getSupportedChains(hostUrl, preferLocalHost)
+    uid: '@organigram/js!getSupportedChains:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'getSupportedChains: (hostUrl?: string, preferLocalHost?: boolean) => Chain[]'
+      parameters:
+        - id: hostUrl
+          description: ''
+          type: string
+        - id: preferLocalHost
+          description: ''
+          type: boolean
+      return:
+        type: <xref uid="viem!Chain:type" />[]
         description: ''
   - name: getTemplate(templateName, chainId)
     uid: '@organigram/js!getTemplate:function(1)'
@@ -1005,6 +1082,23 @@ functions:
           type: any
       return:
         type: any
+        description: ''
+  - name: isLocalHost(hostUrl)
+    uid: '@organigram/js!isLocalHost:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'isLocalHost: (hostUrl?: string) => boolean'
+      parameters:
+        - id: hostUrl
+          description: ''
+          type: string
+      return:
+        type: boolean
         description: ''
   - name: isSupportedChainId(chainId)
     uid: '@organigram/js!isSupportedChainId:function(1)'

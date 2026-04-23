@@ -1,8 +1,9 @@
 import ProcedureContractABI from '@organigram/protocol/abi/Procedure.sol/Procedure.json' with { type: 'json' };
 import { decodeAbiParameters, decodeFunctionResult, encodeAbiParameters, encodeFunctionData, encodePacked, keccak256, parseAbiParameters, toFunctionSelector, toHex, zeroAddress } from 'viem';
-import { capitalize, createRandom32BytesHexId, deployedAddresses, handleJsonBigInt, predictContractAddress } from '../utils';
+import { capitalize, createRandom32BytesHexId, handleJsonBigInt, predictContractAddress } from '../utils';
+import { getDefaultChainId, getDeployment } from '../deployments';
 import { tryMulticall } from '../multicall';
-import { ProcedureTypeNameEnum, procedureTypes } from './utils';
+import { ProcedureTypeNameEnum, getProcedureTypes } from './utils';
 import { createContractWriteTransaction, getContractInstance, getWalletAccount } from '../contracts';
 const normalizeProcedureData = (data) => ({
     cid: data.cid ?? data[0],
@@ -168,7 +169,7 @@ export class Procedure {
             address ??
                 predictContractAddress({
                     type: (capitalize(typeName) + 'Procedure'),
-                    chainId: chainId ?? '11155111',
+                    chainId: chainId ?? getDefaultChainId(),
                     salt: this.salt
                 });
         this.deciders = deciders;
@@ -177,14 +178,13 @@ export class Procedure {
         this.cid = cid ?? this.typeName;
         this.name = name ?? 'Unnamed procedure';
         this.description = description ?? '';
-        this.chainId = chainId ?? '11155111';
+        this.chainId = chainId ?? getDefaultChainId();
         this.organigramId = organigramId ?? 'default-organigram-id';
         this.metadata = metadata ?? '{}';
         this.proposers = proposers ?? deciders;
         this.moderators = moderators ?? zeroAddress;
         this.withModeration = withModeration ?? false;
-        this.forwarder =
-            forwarder ?? deployedAddresses[this.chainId]?.MetaGasStation;
+        this.forwarder = forwarder ?? getDeployment(this.chainId, 'MetaGasStation');
         this.proposals = proposals ?? [];
         this.walletClient = walletClient ?? undefined;
         this.publicClient = publicClient ?? undefined;
@@ -197,8 +197,7 @@ export class Procedure {
                     walletClient: this.walletClient
                 })
                 : undefined;
-        this.type =
-            type ?? procedureTypes[this.typeName];
+        this.type = type ?? getProcedureTypes(this.chainId)[this.typeName];
         this.data = data ?? '';
     }
     getClients() {
@@ -288,7 +287,7 @@ export class Procedure {
             deciders: data.deciders,
             withModeration: data.withModeration,
             forwarder: initialProcedure?.forwarder ??
-                deployedAddresses[chainId]?.MetaGasStation,
+                getDeployment(chainId, 'MetaGasStation'),
             proposals,
             isDeployed: true
         });

@@ -48,9 +48,9 @@ export type OrganigramInput = {
     workspaceId?: string | null;
 };
 /**
- * Default Sepolia chain id used by the SDK templates.
+ * Default chain id used by the SDK templates.
  */
-export declare const defaultChainId = "11155111";
+export declare const defaultChainId: string;
 /**
  * In-memory representation of an Organigram project.
  *
