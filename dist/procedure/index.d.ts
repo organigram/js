@@ -146,7 +146,7 @@ export interface ProcedureProposal {
     operations: ProcedureProposalOperation[];
     metadata?: ProposalMetadata;
 }
-export type ProposalKey = 'addEntries' | 'removeEntries' | 'replaceEntry' | 'addPermission' | 'removePermission' | 'replacePermission' | 'updateMetadata' | 'transfer' | 'externalCall' | string;
+export type ProposalKey = 'addEntries' | 'removeEntries' | 'replaceEntry' | 'addPermission' | 'removePermission' | 'replacePermission' | 'updateMetadata' | 'withdrawEther' | 'withdrawERC20' | 'withdrawERC721' | 'externalCall' | string;
 /**
  * Rich content attached to a proposal, usually stored off-chain.
  */

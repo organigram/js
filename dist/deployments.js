@@ -19,7 +19,8 @@ const createUrl = (hostUrl) => {
         }
     }
 };
-export const getHostUrl = (hostUrl = process.env.NEXT_PUBLIC_HOST_URL) => createUrl(hostUrl) ??
+const getProcessEnv = (key) => typeof process === 'undefined' ? undefined : process.env?.[key];
+export const getHostUrl = (hostUrl = getProcessEnv('NEXT_PUBLIC_HOST_URL')) => createUrl(hostUrl) ??
     (typeof window !== 'undefined' ? createUrl(window.location.origin) : null);
 export const isLocalHost = (hostUrl) => localHostnames.has(getHostUrl(hostUrl)?.hostname ?? '');
 const normalizeChainId = (chainId) => (chainId == null ? '' : chainId.toString());
@@ -84,10 +85,16 @@ export const getSupportedChains = (hostUrl, preferLocalHost = true) => sortSuppo
     .map(chainId => getConfiguredChain(chainId, hostUrl, preferLocalHost))
     .filter((chain) => chain != null);
 export const getChainExplorerBaseUrl = (chainId) => getConfiguredChain(chainId)?.blockExplorers?.default.url;
+const isProductionRuntime = () => {
+    const nodeEnv = getProcessEnv('NODE_ENV');
+    if (nodeEnv != null)
+        return nodeEnv === 'production';
+    return typeof window !== 'undefined' && !isLocalHost();
+};
 export const getDefaultChainId = () => {
     // Prefer Mainnet in production, but fall back to the first deployed chain
     // until the mainnet deployment is actually present in deployments.json.
-    return isLocalHost() || process.env.NODE_ENV !== 'production'
+    return isLocalHost() || !isProductionRuntime()
         ? '11155111'
         : isSupportedChainId('1')
             ? '1'

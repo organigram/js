@@ -43,8 +43,8 @@ export const procedureTypeMetadata = {
             ...electionFields,
             erc20: {
                 name: 'erc20',
-                label: 'ERC20 Token',
-                description: 'Address of the ERC20 Token used for weighting the voting power.',
+                label: 'ERC20Votes Token',
+                description: 'Address of the ERC20Votes-compatible token used for weighting the voting power.',
                 defaultValue: '',
                 type: 'string'
             }
@@ -52,7 +52,7 @@ export const procedureTypeMetadata = {
         metadata: {
             ...procedureMetadata,
             label: 'Token-weighted Vote',
-            description: 'A token vote allows any member in the source organ to vote on proposals, where their voting power is based on the amount of tokens they hold.',
+            description: 'A token vote allows any member in the source organ to vote on proposals, where their voting power is based on their delegated token votes at the proposal snapshot.',
             type: 'erc20Vote'
         }
     },

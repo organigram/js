@@ -785,7 +785,7 @@ export class Organ {
     // (undocumented)
     removePermission: (permission: string, options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;
     // (undocumented)
-    replaceEntry: (index: number, entry: OrganEntry, options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;
+    replaceEntry: (index: number, entry: IOrganEntry, options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;
     // (undocumented)
     replacePermission: (oldPermissionAddress: string, newOrganPermission: OrganPermission, options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;
     // (undocumented)
@@ -1462,8 +1462,8 @@ export const procedureTypeMetadata: {
         readonly fields: {
             readonly erc20: {
                 readonly name: "erc20";
-                readonly label: "ERC20 Token";
-                readonly description: "Address of the ERC20 Token used for weighting the voting power.";
+                readonly label: "ERC20Votes Token";
+                readonly description: "Address of the ERC20Votes-compatible token used for weighting the voting power.";
                 readonly defaultValue: "";
                 readonly type: "string";
             };
@@ -1491,7 +1491,7 @@ export const procedureTypeMetadata: {
         };
         readonly metadata: {
             readonly label: "Token-weighted Vote";
-            readonly description: "A token vote allows any member in the source organ to vote on proposals, where their voting power is based on the amount of tokens they hold.";
+            readonly description: "A token vote allows any member in the source organ to vote on proposals, where their voting power is based on their delegated token votes at the proposal snapshot.";
             readonly type: "erc20Vote";
             readonly _type: string;
             readonly _generator: string;
@@ -1559,7 +1559,7 @@ export const procedureTypes: {
 };
 
 // @public (undocumented)
-export type ProposalKey = 'addEntries' | 'removeEntries' | 'replaceEntry' | 'addPermission' | 'removePermission' | 'replacePermission' | 'updateMetadata' | 'transfer' | 'externalCall' | string;
+export type ProposalKey = 'addEntries' | 'removeEntries' | 'replaceEntry' | 'addPermission' | 'removePermission' | 'replacePermission' | 'updateMetadata' | 'withdrawEther' | 'withdrawERC20' | 'withdrawERC721' | 'externalCall' | string;
 
 // @public
 export interface ProposalMetadata {

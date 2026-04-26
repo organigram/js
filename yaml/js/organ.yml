@@ -292,11 +292,11 @@ properties:
     isDeprecated: false
     syntax:
       content: >-
-        replaceEntry: (index: number, entry: OrganEntry, options?: TransactionOptions) =>
+        replaceEntry: (index: number, entry: IOrganEntry, options?: TransactionOptions) =>
         Promise<OrganigramTransactionReceipt>;
       return:
         type: >-
-          (index: number, entry: <xref uid="@organigram/js!OrganEntry:interface" />, options?: <xref
+          (index: number, entry: <xref uid="@organigram/js!IOrganEntry:interface" />, options?: <xref
           uid="@organigram/js!TransactionOptions:interface" />) =&gt; Promise&lt;<xref
           uid="@organigram/js!OrganigramTransactionReceipt:type" />&gt;
   - name: replacePermission

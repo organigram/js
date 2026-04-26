@@ -631,7 +631,7 @@ export declare class Organ {
     updateCid: (cid: string, options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;
     addEntries: (entries: IOrganEntry[], options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;
     removeEntries: (indexes: string[], options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;
-    replaceEntry: (index: number, entry: OrganEntry, options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;
+    replaceEntry: (index: number, entry: IOrganEntry, options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;
     addPermission: (permission: OrganPermission, options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;
     removePermission: (permission: string, options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;
     replacePermission: (oldPermissionAddress: string, newOrganPermission: OrganPermission, options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;
@@ -1298,8 +1298,8 @@ export declare const procedureTypeMetadata: {
         readonly fields: {
             readonly erc20: {
                 readonly name: "erc20";
-                readonly label: "ERC20 Token";
-                readonly description: "Address of the ERC20 Token used for weighting the voting power.";
+                readonly label: "ERC20Votes Token";
+                readonly description: "Address of the ERC20Votes-compatible token used for weighting the voting power.";
                 readonly defaultValue: "";
                 readonly type: "string";
             };
@@ -1327,7 +1327,7 @@ export declare const procedureTypeMetadata: {
         };
         readonly metadata: {
             readonly label: "Token-weighted Vote";
-            readonly description: "A token vote allows any member in the source organ to vote on proposals, where their voting power is based on the amount of tokens they hold.";
+            readonly description: "A token vote allows any member in the source organ to vote on proposals, where their voting power is based on their delegated token votes at the proposal snapshot.";
             readonly type: "erc20Vote";
             readonly _type: string;
             readonly _generator: string;
@@ -1388,7 +1388,7 @@ export declare const procedureTypes: {
     vote: ProcedureType;
 };
 
-export declare type ProposalKey = 'addEntries' | 'removeEntries' | 'replaceEntry' | 'addPermission' | 'removePermission' | 'replacePermission' | 'updateMetadata' | 'transfer' | 'externalCall' | string;
+export declare type ProposalKey = 'addEntries' | 'removeEntries' | 'replaceEntry' | 'addPermission' | 'removePermission' | 'replacePermission' | 'updateMetadata' | 'withdrawEther' | 'withdrawERC20' | 'withdrawERC721' | 'externalCall' | string;
 
 /**
  * Rich content attached to a proposal, usually stored off-chain.

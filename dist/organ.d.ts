@@ -102,7 +102,7 @@ export declare class Organ {
     updateCid: (cid: string, options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;
     addEntries: (entries: IOrganEntry[], options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;
     removeEntries: (indexes: string[], options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;
-    replaceEntry: (index: number, entry: OrganEntry, options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;
+    replaceEntry: (index: number, entry: IOrganEntry, options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;
     addPermission: (permission: OrganPermission, options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;
     removePermission: (permission: string, options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;
     replacePermission: (oldPermissionAddress: string, newOrganPermission: OrganPermission, options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;

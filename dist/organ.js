@@ -26,6 +26,8 @@ const normalizeEntry = (entry) => ({
     addr: entry.address ?? zeroAddress,
     cid: entry.cid ?? ''
 });
+const isNonEmptyEntry = (entry) => (entry.address != null && entry.address !== '') ||
+    (entry.cid != null && entry.cid !== '');
 const normalizeLoadedOrganData = (data) => ({
     cid: data.cid ?? data[0],
     permissionsLength: BigInt(data.permissionsLength ?? data[1] ?? 0),
@@ -57,9 +59,12 @@ const normalizeOrganFunctionCall = async ({ functionName, args, walletClient }) 
             };
         case OrganFunctionName.replaceEntry: {
             const [index, entry] = args;
+            if (!isNonEmptyEntry(entry)) {
+                throw new Error('Entry must include an address or a CID.');
+            }
             return {
                 functionName: 'replaceEntry',
-                args: [BigInt(index), entry.address ?? '', entry.cid ?? '']
+                args: [BigInt(index), normalizeEntry(entry)]
             };
         }
         case OrganFunctionName.addPermission: {
@@ -88,7 +93,7 @@ const normalizeOrganFunctionCall = async ({ functionName, args, walletClient }) 
         case OrganFunctionName.withdrawEther: {
             const [to, value] = args;
             return {
-                functionName: 'transfer',
+                functionName: 'transferEther',
                 args: [to, BigInt(value)]
             };
         }
@@ -221,13 +226,15 @@ export class Organ {
     addEntries = async (entries, options) => {
         const normalizedEntries = entries
             .map(entry => {
-            if ((entry.address == null || entry.address === '') &&
-                (entry.cid == null || entry.cid === '')) {
+            if (!isNonEmptyEntry(entry)) {
                 return undefined;
             }
             return normalizeEntry(entry);
         })
             .filter(entry => entry != null);
+        if (normalizedEntries.length === 0) {
+            throw new Error('At least one entry with an address or a CID is required.');
+        }
         const tx = await createContractWriteTransaction({
             address: this.address,
             abi: OrganContractABI.abi,
@@ -252,11 +259,14 @@ export class Organ {
         return await tx.wait();
     };
     replaceEntry = async (index, entry, options) => {
+        if (!isNonEmptyEntry(entry)) {
+            throw new Error('Entry must include an address or a CID.');
+        }
         const tx = await createContractWriteTransaction({
             address: this.address,
             abi: OrganContractABI.abi,
             functionName: 'replaceEntry',
-            args: [BigInt(index), entry.address ?? '', entry.cid ?? ''],
+            args: [BigInt(index), normalizeEntry(entry)],
             clients: this.getClients(),
             nonce: options?.nonce
         });
@@ -310,7 +320,7 @@ export class Organ {
         const tx = await createContractWriteTransaction({
             address: this.address,
             abi: OrganContractABI.abi,
-            functionName: 'transfer',
+            functionName: 'transferEther',
             args: [to, BigInt(value)],
             clients: this.getClients(),
             nonce: options?.nonce
