@@ -38,8 +38,11 @@ const createUrl = (hostUrl?: string): URL | null => {
   }
 }
 
+const getProcessEnv = (key: string): string | undefined =>
+  typeof process === 'undefined' ? undefined : process.env?.[key]
+
 export const getHostUrl = (
-  hostUrl = process.env.NEXT_PUBLIC_HOST_URL
+  hostUrl = getProcessEnv('NEXT_PUBLIC_HOST_URL')
 ): URL | null =>
   createUrl(hostUrl) ??
   (typeof window !== 'undefined' ? createUrl(window.location.origin) : null)
@@ -144,10 +147,16 @@ export const getChainExplorerBaseUrl = (
   chainId: string
 ): string | undefined => getConfiguredChain(chainId)?.blockExplorers?.default.url
 
+const isProductionRuntime = (): boolean => {
+  const nodeEnv = getProcessEnv('NODE_ENV')
+  if (nodeEnv != null) return nodeEnv === 'production'
+  return typeof window !== 'undefined' && !isLocalHost()
+}
+
 export const getDefaultChainId = (): string => {
   // Prefer Mainnet in production, but fall back to the first deployed chain
   // until the mainnet deployment is actually present in deployments.json.
-  return isLocalHost() || process.env.NODE_ENV !== 'production'
+  return isLocalHost() || !isProductionRuntime()
     ? '11155111'
     : isSupportedChainId('1')
       ? '1'

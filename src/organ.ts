@@ -120,6 +120,10 @@ const normalizeEntry = (entry: IOrganEntry) => ({
   cid: entry.cid ?? ''
 })
 
+const isNonEmptyEntry = (entry: IOrganEntry) =>
+  (entry.address != null && entry.address !== '') ||
+  (entry.cid != null && entry.cid !== '')
+
 const normalizeLoadedOrganData = (data: any): OrganContractData => ({
   cid: data.cid ?? data[0],
   permissionsLength: BigInt(data.permissionsLength ?? data[1] ?? 0),
@@ -162,10 +166,13 @@ const normalizeOrganFunctionCall = async ({
         args: [(args[0] as string[]).map(index => BigInt(index))]
       }
     case OrganFunctionName.replaceEntry: {
-      const [index, entry] = args as [number | string | bigint, OrganEntry]
+      const [index, entry] = args as [number | string | bigint, IOrganEntry]
+      if (!isNonEmptyEntry(entry)) {
+        throw new Error('Entry must include an address or a CID.')
+      }
       return {
         functionName: 'replaceEntry',
-        args: [BigInt(index), entry.address ?? '', entry.cid ?? '']
+        args: [BigInt(index), normalizeEntry(entry)]
       }
     }
     case OrganFunctionName.addPermission: {
@@ -195,7 +202,7 @@ const normalizeOrganFunctionCall = async ({
     case OrganFunctionName.withdrawEther: {
       const [to, value] = args as [string, string | number | bigint]
       return {
-        functionName: 'transfer',
+        functionName: 'transferEther',
         args: [to, BigInt(value)]
       }
     }
@@ -360,15 +367,15 @@ export class Organ {
   ): Promise<OrganigramTransactionReceipt> => {
     const normalizedEntries = entries
       .map(entry => {
-        if (
-          (entry.address == null || entry.address === '') &&
-          (entry.cid == null || entry.cid === '')
-        ) {
+        if (!isNonEmptyEntry(entry)) {
           return undefined
         }
         return normalizeEntry(entry)
       })
       .filter(entry => entry != null)
+    if (normalizedEntries.length === 0) {
+      throw new Error('At least one entry with an address or a CID is required.')
+    }
     const tx = await createContractWriteTransaction({
       address: this.address,
       abi: OrganContractABI.abi,
@@ -405,14 +412,17 @@ export class Organ {
 
   public replaceEntry = async (
     index: number,
-    entry: OrganEntry,
+    entry: IOrganEntry,
     options?: TransactionOptions
   ): Promise<OrganigramTransactionReceipt> => {
+    if (!isNonEmptyEntry(entry)) {
+      throw new Error('Entry must include an address or a CID.')
+    }
     const tx = await createContractWriteTransaction({
       address: this.address,
       abi: OrganContractABI.abi,
       functionName: 'replaceEntry',
-      args: [BigInt(index), entry.address ?? '', entry.cid ?? ''],
+      args: [BigInt(index), normalizeEntry(entry)],
       clients: this.getClients(),
       nonce: options?.nonce
     })
@@ -493,7 +503,7 @@ export class Organ {
     const tx = await createContractWriteTransaction({
       address: this.address,
       abi: OrganContractABI.abi,
-      functionName: 'transfer',
+      functionName: 'transferEther',
       args: [to, BigInt(value)],
       clients: this.getClients(),
       nonce: options?.nonce

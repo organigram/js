@@ -248,7 +248,9 @@ export type ProposalKey =
   | 'removePermission'
   | 'replacePermission'
   | 'updateMetadata'
-  | 'transfer'
+  | 'withdrawEther'
+  | 'withdrawERC20'
+  | 'withdrawERC721'
   | 'externalCall'
   | string
 
@@ -384,9 +386,9 @@ export const procedureFunctions: ProcedureProposalOperationFunction[] = [
     target: 'organ'
   },
   {
-    funcSig: '0xa9059cbb',
+    funcSig: toFunctionSelector('transferEther(address,uint256)'),
     key: 'withdrawEther',
-    signature: 'transfer(address,uint256)',
+    signature: 'transferEther(address,uint256)',
     label: 'Withdraw ether',
     tags: ['transfer', 'withdraw', 'ether'],
     params: ['address', 'amount'],
