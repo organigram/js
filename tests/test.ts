@@ -28,7 +28,6 @@ import { NominationProcedure } from '../src/procedure/nomination'
 import { VoteProcedure } from '../src/procedure/vote'
 import { ERC20VoteProcedure } from '../src/procedure/erc20Vote'
 
-const ERC20_EXAMPLE = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238' // Sepolia USDC
 const SEPOLIA_CHAIN_ID = sepolia.id.toString()
 
 const txOptions: TransactionOptions = {
@@ -60,7 +59,7 @@ describe('Organigram JS Client', () => {
       walletClient
     }
     await Promise.resolve()
-  })
+  }, 60_000)
 
   describe('Web3', () => {
     it('should connect Web3 to a provider', async () => {
@@ -87,7 +86,7 @@ describe('Organigram JS Client', () => {
         publicClient,
         walletClient
       })
-    })
+    }, 60_000)
 
     it('should connect to the deployed client', async () => {
       expect(organigramClient?.address).not.toBeNull()
@@ -322,7 +321,7 @@ describe('Organigram JS Client', () => {
             withModeration: false,
             forwarder: getDeployment(SEPOLIA_CHAIN_ID, 'MetaGasStation'),
             salt: salt4,
-            args: [ERC20_EXAMPLE, '1', '8', '1']
+            args: [predictedAddress6, '1', '8', '1']
           },
           {
             typeName: 'vote' as const,
@@ -440,6 +439,14 @@ describe('Organigram JS Client', () => {
       })
 
       it('should block a proposal', async () => {
+        const address = signerAddress
+        const moderatedProcedure = (await organigramClient.deployProcedure({
+          typeName: 'nomination',
+          proposers: address,
+          moderators: address,
+          deciders: address,
+          withModeration: true
+        })) as NominationProcedure
         // Creating a new proposal
         const randomWallet = privateKeyToAccount(generatePrivateKey())
         const data = await Organ.populateTransaction(
@@ -456,16 +463,16 @@ describe('Organigram JS Client', () => {
           processed: false,
           functionSelector: data.data?.substring(0, 10) as string
         }
-        const proposal = await procedure.propose({
+        const proposal = await moderatedProcedure.propose({
           cid: '',
           operations: [operation]
         })
 
         // Blocking the proposal
-        const receipt = await procedure.blockProposal(proposal.key, '')
+        const receipt = await moderatedProcedure.blockProposal(proposal.key, '')
         // Checking with updated procedure.
         const payload = await NominationProcedure.loadProposal(
-          procedure.address,
+          moderatedProcedure.address,
           proposal.key,
           clients
         )
@@ -529,11 +536,43 @@ describe('Organigram JS Client', () => {
       })
 
       it('should block a proposal', async () => {
-        const receipt = await procedure.blockProposal(proposalKey, '')
+        const address = signerAddress
+        const moderatedProcedure = (await organigramClient.deployProcedure({
+          typeName: 'vote',
+          options: {},
+          cid: '',
+          proposers: address,
+          moderators: address,
+          deciders: address,
+          withModeration: true,
+          forwarder: getDeployment(SEPOLIA_CHAIN_ID, 'MetaGasStation'),
+          salt: createRandom32BytesHexId(),
+          args: ['1', '1', '8']
+        })) as unknown as VoteProcedure
+        const randomWallet = privateKeyToAccount(generatePrivateKey())
+        const data = await Organ.populateTransaction(
+          organ.address,
+          walletClient as any,
+          'addEntries',
+          [{ address: randomWallet.address, cid: '' }]
+        )
+        const operation: ProcedureProposalOperation = {
+          index: '0',
+          target: data.to,
+          data: data.data as string,
+          value: '0',
+          processed: false,
+          functionSelector: data.data?.substring(0, 10) as string
+        }
+        const proposal = await moderatedProcedure.propose({
+          cid: '',
+          operations: [operation]
+        })
+        const receipt = await moderatedProcedure.blockProposal(proposal.key, '')
         // Checking with updated procedure.
         const payload = await VoteProcedure.loadProposal(
-          procedure.address,
-          proposalKey,
+          moderatedProcedure.address,
+          proposal.key,
           clients
         )
         expect(receipt.status).toBe('success')
@@ -547,6 +586,15 @@ describe('Organigram JS Client', () => {
 
       it('should create an erc20Vote procedure', async () => {
         const address = signerAddress
+        const erc20VotesAsset =
+          asset ??
+          (await organigramClient.deployAsset(
+            'ERC20Votes',
+            'VOTE',
+            ERC20_INITIAL_SUPPLY,
+            undefined,
+            txOptions
+          ))
         procedure = (await organigramClient.deployProcedure({
           typeName: 'erc20Vote',
           options: {},
@@ -557,7 +605,7 @@ describe('Organigram JS Client', () => {
           withModeration: false,
           forwarder: getDeployment(SEPOLIA_CHAIN_ID, 'MetaGasStation'),
           salt: createRandom32BytesHexId(),
-          args: [ERC20_EXAMPLE, '1', '1', '8']
+          args: [erc20VotesAsset, '1', '1', '8']
         })) as ERC20VoteProcedure
 
         expect(procedure?.address).not.toBeNull()
@@ -605,11 +653,52 @@ describe('Organigram JS Client', () => {
       })
 
       it('should block a proposal', async () => {
-        const receipt = await procedure.blockProposal(proposalKey, '')
+        const address = signerAddress
+        const erc20VotesAsset =
+          asset ??
+          (await organigramClient.deployAsset(
+            'ERC20Votes',
+            'VOTE',
+            ERC20_INITIAL_SUPPLY,
+            undefined,
+            txOptions
+          ))
+        const moderatedProcedure = (await organigramClient.deployProcedure({
+          typeName: 'erc20Vote',
+          options: {},
+          cid: '',
+          proposers: address,
+          moderators: address,
+          deciders: address,
+          withModeration: true,
+          forwarder: getDeployment(SEPOLIA_CHAIN_ID, 'MetaGasStation'),
+          salt: createRandom32BytesHexId(),
+          args: [erc20VotesAsset, '1', '1', '8']
+        })) as ERC20VoteProcedure
+        const randomWallet = privateKeyToAccount(generatePrivateKey())
+        const data = await Organ.populateTransaction(
+          organ.address,
+          walletClient as any,
+          'addEntries',
+          [{ address: randomWallet.address, cid: '' }]
+        )
+        const operation: ProcedureProposalOperation = {
+          index: '0',
+          target: data.to,
+          data: data.data as string,
+          value: '0',
+          processed: false,
+          functionSelector: data.data?.substring(0, 10) as string
+        }
+        const proposal = await moderatedProcedure.propose({
+          cid: '',
+          operations: [operation]
+        })
+        const receipt = await moderatedProcedure.blockProposal(proposal.key, '')
         // Checking with updated procedure.
         const payload = await ERC20VoteProcedure.loadProposal(
-          procedure.address,
-          proposalKey,
+          moderatedProcedure.address,
+          proposal.key,
           clients
         )
         expect(receipt.status).toBe('success')
