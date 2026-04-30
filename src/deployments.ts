@@ -22,6 +22,8 @@ export type ProtocolDeployments = Record<
 const deployedAddresses: ProtocolDeployments = rawDeployedAddresses
 
 const localHostnames = new Set(['localhost', '127.0.0.1'])
+const anvilChainId = '31337'
+const sepoliaChainId = sepolia.id.toString()
 const localChainProviderUrl = 'http://127.0.0.1:8545'
 
 const createUrl = (hostUrl?: string): URL | null => {
@@ -127,10 +129,13 @@ export const getConfiguredChain = (
   hostUrl?: string,
   preferLocalHost = true
 ): Chain | undefined => {
-  const chain = chainId === sepolia.id.toString() ? sepolia : getChainById(chainId)
+  const chain = chainId === sepoliaChainId ? sepolia : getChainById(chainId)
   if (chain == null) return undefined
 
-  return isLocalHost(hostUrl) && preferLocalHost && chainId === sepolia.id.toString()
+  return isLocalHost(hostUrl) &&
+    preferLocalHost &&
+    chainId === sepoliaChainId &&
+    !isSupportedChainId(anvilChainId)
     ? createLocalChainFork(chain)
     : chain
 }
@@ -157,10 +162,12 @@ export const getDefaultChainId = (): string => {
   // Prefer Mainnet in production, but fall back to the first deployed chain
   // until the mainnet deployment is actually present in deployments.json.
   return isLocalHost() || !isProductionRuntime()
-    ? '11155111'
+    ? isSupportedChainId(anvilChainId)
+      ? anvilChainId
+      : sepoliaChainId
     : isSupportedChainId('1')
       ? '1'
-      : getSupportedChainIds()[0] ?? '11155111'
+      : getSupportedChainIds()[0] ?? sepoliaChainId
 }
 
 export default deployedAddresses

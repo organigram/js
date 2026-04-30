@@ -3,6 +3,8 @@ import { sepolia } from 'viem/chains';
 import rawDeployedAddresses from '@organigram/protocol/deployments.json' with { type: 'json' };
 const deployedAddresses = rawDeployedAddresses;
 const localHostnames = new Set(['localhost', '127.0.0.1']);
+const anvilChainId = '31337';
+const sepoliaChainId = sepolia.id.toString();
 const localChainProviderUrl = 'http://127.0.0.1:8545';
 const createUrl = (hostUrl) => {
     if (hostUrl == null || hostUrl === '')
@@ -74,10 +76,13 @@ const sortSupportedChainIds = (chainIds) => [...chainIds].sort((a, b) => {
     return Number(a) - Number(b);
 });
 export const getConfiguredChain = (chainId, hostUrl, preferLocalHost = true) => {
-    const chain = chainId === sepolia.id.toString() ? sepolia : getChainById(chainId);
+    const chain = chainId === sepoliaChainId ? sepolia : getChainById(chainId);
     if (chain == null)
         return undefined;
-    return isLocalHost(hostUrl) && preferLocalHost && chainId === sepolia.id.toString()
+    return isLocalHost(hostUrl) &&
+        preferLocalHost &&
+        chainId === sepoliaChainId &&
+        !isSupportedChainId(anvilChainId)
         ? createLocalChainFork(chain)
         : chain;
 };
@@ -95,9 +100,11 @@ export const getDefaultChainId = () => {
     // Prefer Mainnet in production, but fall back to the first deployed chain
     // until the mainnet deployment is actually present in deployments.json.
     return isLocalHost() || !isProductionRuntime()
-        ? '11155111'
+        ? isSupportedChainId(anvilChainId)
+            ? anvilChainId
+            : sepoliaChainId
         : isSupportedChainId('1')
             ? '1'
-            : getSupportedChainIds()[0] ?? '11155111';
+            : getSupportedChainIds()[0] ?? sepoliaChainId;
 };
 export default deployedAddresses;
