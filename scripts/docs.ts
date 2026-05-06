@@ -82,7 +82,7 @@ const yaml = yamlModule.default
 
 const docsOutputPath = path.resolve(
   __dirname,
-  '../../../stack/assets/docs/reference/js.mdx'
+  '../../docs/mdx/reference/js.mdx'
 )
 const companyUrl = process.env.NEXT_PUBLIC_COMPANY_URL ?? 'Organigram.ai'
 
