@@ -1,4 +1,17 @@
 import type { Config } from 'jest'
+import { existsSync, readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+
+const localProtocolDeploymentsPath = resolve(
+  '../protocol/deployments.local.json'
+)
+
+if (existsSync(localProtocolDeploymentsPath)) {
+  process.env.NEXT_PUBLIC_LOCAL_PROTOCOL_DEPLOYMENTS = readFileSync(
+    localProtocolDeploymentsPath,
+    'utf8'
+  )
+}
 
 const config: Config = {
   preset: 'ts-jest/presets/default-esm',
@@ -12,7 +25,15 @@ const config: Config = {
     '^.+\\.tsx?$': [
       'ts-jest',
       {
-        tsconfig: '<rootDir>/tests/tsconfig.json',
+        tsconfig: {
+          module: 'ESNext',
+          moduleResolution: 'bundler',
+          target: 'ESNext',
+          resolveJsonModule: true,
+          esModuleInterop: true,
+          types: ['jest', 'node']
+        },
+        diagnostics: false,
         useESM: true
       }
     ]

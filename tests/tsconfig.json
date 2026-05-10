@@ -4,6 +4,8 @@
     "rootDir": "..",
     "noEmit": true,
     "declaration": false,
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "types": ["jest", "node"]
   },
   "include": ["./**/*.ts"],

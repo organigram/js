@@ -1,4 +1,4 @@
-import AssetContractABI from '@organigram/protocol/abi/Asset.sol/Asset.json' with { type: 'json' }
+import AssetContractABI from '@organigram/protocol/abi/Asset.sol/Asset.json'
 import {
   createPublicClient,
   createWalletClient,
@@ -11,7 +11,7 @@ import {
   type WalletClient
 } from 'viem'
 import { generatePrivateKey, privateKeyToAccount } from 'viem/accounts'
-import { sepolia } from 'viem/chains'
+import { anvil } from 'viem/chains'
 
 import {
   type ContractClients,
@@ -28,7 +28,7 @@ import { NominationProcedure } from '../src/procedure/nomination'
 import { VoteProcedure } from '../src/procedure/vote'
 import { ERC20VoteProcedure } from '../src/procedure/erc20Vote'
 
-const SEPOLIA_CHAIN_ID = sepolia.id.toString()
+const TEST_CHAIN_ID = anvil.id.toString()
 
 const txOptions: TransactionOptions = {
   onTransaction: (tx, description) => {}
@@ -46,11 +46,11 @@ describe('Organigram JS Client', () => {
   beforeEach(async () => {
     // ipfs = await loadIpfs()
     publicClient = createPublicClient({
-      chain: sepolia,
+      chain: anvil,
       transport: http('http://127.0.0.1:8545/')
     })
     walletClient = createWalletClient({
-      chain: sepolia,
+      chain: anvil,
       transport: http('http://127.0.0.1:8545/')
     })
     signerAddress = (await walletClient.getAddresses())[0] as Address
@@ -65,14 +65,14 @@ describe('Organigram JS Client', () => {
     it('should connect Web3 to a provider', async () => {
       const chainId = await publicClient.getChainId()
 
-      expect(chainId).toBe(sepolia.id)
+      expect(chainId).toBe(anvil.id)
     })
 
     it('should provide signer with funds', async () => {
       const chainId = await publicClient.getChainId()
       const balance = await publicClient.getBalance({ address: signerAddress })
 
-      expect(chainId).toBe(sepolia.id)
+      expect(chainId).toBe(anvil.id)
       expect(signerAddress).not.toBeNull()
       expect(balance).toBeGreaterThan(0n)
     })
@@ -137,7 +137,7 @@ describe('Organigram JS Client', () => {
         account: signerAddress,
         to: organ.address as Address,
         value: amount,
-        chain: sepolia
+        chain: anvil
       })
 
       await publicClient.waitForTransactionReceipt({ hash })
@@ -262,32 +262,32 @@ describe('Organigram JS Client', () => {
 
       const predictedAddress = predictContractAddress({
         type: 'Organ',
-        chainId: SEPOLIA_CHAIN_ID,
+        chainId: TEST_CHAIN_ID,
         salt
       })
       const predictedAddress2 = predictContractAddress({
         type: 'Organ',
-        chainId: SEPOLIA_CHAIN_ID,
+        chainId: TEST_CHAIN_ID,
         salt: salt2
       })
       const predictedAddress3 = predictContractAddress({
         type: 'NominationProcedure',
-        chainId: SEPOLIA_CHAIN_ID,
+        chainId: TEST_CHAIN_ID,
         salt: salt3
       })
       const predictedAddress4 = predictContractAddress({
         type: 'ERC20VoteProcedure',
-        chainId: SEPOLIA_CHAIN_ID,
+        chainId: TEST_CHAIN_ID,
         salt: salt4
       })
       const predictedAddress5 = predictContractAddress({
         type: 'VoteProcedure',
-        chainId: SEPOLIA_CHAIN_ID,
+        chainId: TEST_CHAIN_ID,
         salt: salt5
       })
       const predictedAddress6 = predictContractAddress({
         type: 'Asset',
-        chainId: SEPOLIA_CHAIN_ID,
+        chainId: TEST_CHAIN_ID,
         salt: salt6
       })
       const organigram = {
@@ -310,7 +310,7 @@ describe('Organigram JS Client', () => {
             moderators: predictedAddress,
             deciders: predictedAddress,
             withModeration: false,
-            forwarder: getDeployment(SEPOLIA_CHAIN_ID, 'MetaGasStation'),
+            forwarder: getDeployment(TEST_CHAIN_ID, 'MetaGasStation'),
             salt: salt3
           },
           {
@@ -319,7 +319,7 @@ describe('Organigram JS Client', () => {
             moderators: predictedAddress,
             deciders: predictedAddress,
             withModeration: false,
-            forwarder: getDeployment(SEPOLIA_CHAIN_ID, 'MetaGasStation'),
+            forwarder: getDeployment(TEST_CHAIN_ID, 'MetaGasStation'),
             salt: salt4,
             args: [predictedAddress6, '1', '8', '1']
           },
@@ -329,7 +329,7 @@ describe('Organigram JS Client', () => {
             moderators: predictedAddress,
             deciders: predictedAddress,
             withModeration: false,
-            forwarder: getDeployment(SEPOLIA_CHAIN_ID, 'MetaGasStation'),
+            forwarder: getDeployment(TEST_CHAIN_ID, 'MetaGasStation'),
             salt: salt5,
             args: ['1', '8', '1']
           }
@@ -495,7 +495,7 @@ describe('Organigram JS Client', () => {
           moderators: address,
           deciders: address,
           withModeration: false,
-          forwarder: getDeployment(SEPOLIA_CHAIN_ID, 'MetaGasStation'),
+          forwarder: getDeployment(TEST_CHAIN_ID, 'MetaGasStation'),
           salt: createRandom32BytesHexId(),
           args: ['1', '1', '8']
         })) as unknown as VoteProcedure
@@ -545,7 +545,7 @@ describe('Organigram JS Client', () => {
           moderators: address,
           deciders: address,
           withModeration: true,
-          forwarder: getDeployment(SEPOLIA_CHAIN_ID, 'MetaGasStation'),
+          forwarder: getDeployment(TEST_CHAIN_ID, 'MetaGasStation'),
           salt: createRandom32BytesHexId(),
           args: ['1', '1', '8']
         })) as unknown as VoteProcedure
@@ -603,7 +603,7 @@ describe('Organigram JS Client', () => {
           moderators: address,
           deciders: address,
           withModeration: false,
-          forwarder: getDeployment(SEPOLIA_CHAIN_ID, 'MetaGasStation'),
+          forwarder: getDeployment(TEST_CHAIN_ID, 'MetaGasStation'),
           salt: createRandom32BytesHexId(),
           args: [erc20VotesAsset, '1', '1', '8']
         })) as ERC20VoteProcedure
@@ -671,7 +671,7 @@ describe('Organigram JS Client', () => {
           moderators: address,
           deciders: address,
           withModeration: true,
-          forwarder: getDeployment(SEPOLIA_CHAIN_ID, 'MetaGasStation'),
+          forwarder: getDeployment(TEST_CHAIN_ID, 'MetaGasStation'),
           salt: createRandom32BytesHexId(),
           args: [erc20VotesAsset, '1', '1', '8']
         })) as ERC20VoteProcedure
