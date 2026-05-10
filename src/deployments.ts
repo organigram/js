@@ -24,7 +24,6 @@ const deployedAddresses: ProtocolDeployments = rawDeployedAddresses
 const localHostnames = new Set(['localhost', '127.0.0.1'])
 const anvilChainId = '31337'
 const sepoliaChainId = sepolia.id.toString()
-const localChainProviderUrl = 'http://127.0.0.1:8545'
 
 const createUrl = (hostUrl?: string): URL | null => {
   if (hostUrl == null || hostUrl === '') return null
@@ -43,6 +42,20 @@ const createUrl = (hostUrl?: string): URL | null => {
 const getProcessEnv = (key: string): string | undefined =>
   typeof process === 'undefined' ? undefined : process.env?.[key]
 
+const parseLocalDeployments = (): ProtocolDeployments => {
+  try {
+    const rawDeployments =
+      typeof process === 'undefined'
+        ? undefined
+        : process.env.NEXT_PUBLIC_LOCAL_PROTOCOL_DEPLOYMENTS
+    return JSON.parse(rawDeployments ?? '{}') as ProtocolDeployments
+  } catch {
+    return {}
+  }
+}
+
+Object.assign(deployedAddresses, parseLocalDeployments())
+
 export const getHostUrl = (
   hostUrl = getProcessEnv('NEXT_PUBLIC_HOST_URL')
 ): URL | null =>
@@ -56,13 +69,16 @@ const normalizeChainId = (
   chainId: string | number | bigint | null | undefined
 ): string => (chainId == null ? '' : chainId.toString())
 
-export const getSupportedChainIds = (): string[] => Object.keys(deployedAddresses)
+export const getSupportedChainIds = (): string[] =>
+  Object.keys(deployedAddresses)
 
 export const isSupportedChainId = (
   chainId: string | number | bigint | null | undefined
 ): boolean => {
   const normalizedChainId = normalizeChainId(chainId)
-  return normalizedChainId !== '' && deployedAddresses[normalizedChainId] != null
+  return (
+    normalizedChainId !== '' && deployedAddresses[normalizedChainId] != null
+  )
 }
 
 export const resolveDeployment = (
@@ -96,27 +112,6 @@ const getChainById = (chainId: string): Chain | undefined =>
     )
   }) as Chain | undefined
 
-const createLocalChainFork = (chain: Chain): Chain => ({
-  ...chain,
-  name: `Local ${chain.name} Fork`,
-  rpcUrls: {
-    ...chain.rpcUrls,
-    default: {
-      ...chain.rpcUrls.default,
-      http: [localChainProviderUrl]
-    },
-    public:
-      chain.rpcUrls.public == null
-        ? chain.rpcUrls.public
-        : {
-            ...chain.rpcUrls.public,
-            http: [localChainProviderUrl]
-          }
-  },
-  // Keep receipt/block polling aggressive on localhost-backed forks.
-  blockTime: 1_000
-})
-
 const sortSupportedChainIds = (chainIds: string[]): string[] =>
   [...chainIds].sort((a, b) => {
     if (a === sepolia.id.toString()) return 1
@@ -124,33 +119,21 @@ const sortSupportedChainIds = (chainIds: string[]): string[] =>
     return Number(a) - Number(b)
   })
 
-export const getConfiguredChain = (
-  chainId: string,
-  hostUrl?: string,
-  preferLocalHost = true
-): Chain | undefined => {
+export const getConfiguredChain = (chainId: string): Chain | undefined => {
   const chain = chainId === sepoliaChainId ? sepolia : getChainById(chainId)
   if (chain == null) return undefined
 
-  return isLocalHost(hostUrl) &&
-    preferLocalHost &&
-    chainId === sepoliaChainId &&
-    !isSupportedChainId(anvilChainId)
-    ? createLocalChainFork(chain)
-    : chain
+  return chain
 }
 
-export const getSupportedChains = (
-  hostUrl?: string,
-  preferLocalHost = true
-): Chain[] =>
-  sortSupportedChainIds(getSupportedChainIds())
-    .map(chainId => getConfiguredChain(chainId, hostUrl, preferLocalHost))
+export const getSupportedChains = (): Chain[] => {
+  return sortSupportedChainIds(getSupportedChainIds())
+    .map(chainId => getConfiguredChain(chainId))
     .filter((chain): chain is Chain => chain != null)
+}
 
-export const getChainExplorerBaseUrl = (
-  chainId: string
-): string | undefined => getConfiguredChain(chainId)?.blockExplorers?.default.url
+export const getChainExplorerBaseUrl = (chainId: string): string | undefined =>
+  getConfiguredChain(chainId)?.blockExplorers?.default.url
 
 const isProductionRuntime = (): boolean => {
   const nodeEnv = getProcessEnv('NODE_ENV')
@@ -167,7 +150,7 @@ export const getDefaultChainId = (): string => {
       : sepoliaChainId
     : isSupportedChainId('1')
       ? '1'
-      : getSupportedChainIds()[0] ?? sepoliaChainId
+      : (getSupportedChainIds()[0] ?? sepoliaChainId)
 }
 
 export default deployedAddresses

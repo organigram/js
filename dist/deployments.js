@@ -5,7 +5,6 @@ const deployedAddresses = rawDeployedAddresses;
 const localHostnames = new Set(['localhost', '127.0.0.1']);
 const anvilChainId = '31337';
 const sepoliaChainId = sepolia.id.toString();
-const localChainProviderUrl = 'http://127.0.0.1:8545';
 const createUrl = (hostUrl) => {
     if (hostUrl == null || hostUrl === '')
         return null;
@@ -22,6 +21,18 @@ const createUrl = (hostUrl) => {
     }
 };
 const getProcessEnv = (key) => typeof process === 'undefined' ? undefined : process.env?.[key];
+const parseLocalDeployments = () => {
+    try {
+        const rawDeployments = typeof process === 'undefined'
+            ? undefined
+            : process.env.NEXT_PUBLIC_LOCAL_PROTOCOL_DEPLOYMENTS;
+        return JSON.parse(rawDeployments ?? '{}');
+    }
+    catch {
+        return {};
+    }
+};
+Object.assign(deployedAddresses, parseLocalDeployments());
 export const getHostUrl = (hostUrl = getProcessEnv('NEXT_PUBLIC_HOST_URL')) => createUrl(hostUrl) ??
     (typeof window !== 'undefined' ? createUrl(window.location.origin) : null);
 export const isLocalHost = (hostUrl) => localHostnames.has(getHostUrl(hostUrl)?.hostname ?? '');
@@ -29,7 +40,7 @@ const normalizeChainId = (chainId) => (chainId == null ? '' : chainId.toString()
 export const getSupportedChainIds = () => Object.keys(deployedAddresses);
 export const isSupportedChainId = (chainId) => {
     const normalizedChainId = normalizeChainId(chainId);
-    return normalizedChainId !== '' && deployedAddresses[normalizedChainId] != null;
+    return (normalizedChainId !== '' && deployedAddresses[normalizedChainId] != null);
 };
 export const resolveDeployment = (chainId, deploymentName) => {
     const normalizedChainId = normalizeChainId(chainId);
@@ -49,25 +60,6 @@ const getChainById = (chainId) => Object.values(chains).find(chain => {
     const candidate = chain;
     return (typeof candidate.id === 'number' && candidate.id.toString() === chainId);
 });
-const createLocalChainFork = (chain) => ({
-    ...chain,
-    name: `Local ${chain.name} Fork`,
-    rpcUrls: {
-        ...chain.rpcUrls,
-        default: {
-            ...chain.rpcUrls.default,
-            http: [localChainProviderUrl]
-        },
-        public: chain.rpcUrls.public == null
-            ? chain.rpcUrls.public
-            : {
-                ...chain.rpcUrls.public,
-                http: [localChainProviderUrl]
-            }
-    },
-    // Keep receipt/block polling aggressive on localhost-backed forks.
-    blockTime: 1_000
-});
 const sortSupportedChainIds = (chainIds) => [...chainIds].sort((a, b) => {
     if (a === sepolia.id.toString())
         return 1;
@@ -75,20 +67,17 @@ const sortSupportedChainIds = (chainIds) => [...chainIds].sort((a, b) => {
         return -1;
     return Number(a) - Number(b);
 });
-export const getConfiguredChain = (chainId, hostUrl, preferLocalHost = true) => {
+export const getConfiguredChain = (chainId) => {
     const chain = chainId === sepoliaChainId ? sepolia : getChainById(chainId);
     if (chain == null)
         return undefined;
-    return isLocalHost(hostUrl) &&
-        preferLocalHost &&
-        chainId === sepoliaChainId &&
-        !isSupportedChainId(anvilChainId)
-        ? createLocalChainFork(chain)
-        : chain;
+    return chain;
 };
-export const getSupportedChains = (hostUrl, preferLocalHost = true) => sortSupportedChainIds(getSupportedChainIds())
-    .map(chainId => getConfiguredChain(chainId, hostUrl, preferLocalHost))
-    .filter((chain) => chain != null);
+export const getSupportedChains = () => {
+    return sortSupportedChainIds(getSupportedChainIds())
+        .map(chainId => getConfiguredChain(chainId))
+        .filter((chain) => chain != null);
+};
 export const getChainExplorerBaseUrl = (chainId) => getConfiguredChain(chainId)?.blockExplorers?.default.url;
 const isProductionRuntime = () => {
     const nodeEnv = getProcessEnv('NODE_ENV');
@@ -105,6 +94,6 @@ export const getDefaultChainId = () => {
             : sepoliaChainId
         : isSupportedChainId('1')
             ? '1'
-            : getSupportedChainIds()[0] ?? sepoliaChainId;
+            : (getSupportedChainIds()[0] ?? sepoliaChainId);
 };
 export default deployedAddresses;
