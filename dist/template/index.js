@@ -11,62 +11,88 @@ export const templates = {
     openSource,
     participatoryBudget
 };
-const renewSalts = (pv, cv) => Object.assign(pv, { [cv.salt]: createRandom32BytesHexId() });
-const renewAddresses = (salts, type, chainId) => (pv, cv) => Object.assign(pv, {
-    [cv.address]: predictContractAddress({
-        type: type === 'Procedure'
-            ? (capitalize(cv.typeName) + type)
-            : type,
-        chainId: cv.chainId ?? chainId,
-        salt: salts[cv.salt]
-    })
-});
+const setFirstValue = (target, key, value) => {
+    if (key != null && key !== '' && target[key] == null) {
+        target[key] = value;
+    }
+};
+const createRenewedContractValues = (items, type, chainId) => {
+    const values = items?.map(item => {
+        const salt = createRandom32BytesHexId();
+        const address = predictContractAddress({
+            type: type === 'Procedure'
+                ? (capitalize(item.typeName) + type)
+                : type,
+            chainId: item.chainId ?? chainId,
+            salt
+        });
+        return {
+            item,
+            salt,
+            address
+        };
+    }) ?? [];
+    const salts = {};
+    const addresses = {};
+    const addressBySalt = {};
+    for (const value of values) {
+        setFirstValue(salts, value.item.salt, value.salt);
+        setFirstValue(addresses, value.item.address, value.address);
+        setFirstValue(addressBySalt, value.item.salt, value.address);
+    }
+    return {
+        values,
+        salts,
+        addresses,
+        addressBySalt
+    };
+};
+const resolveRenewedAddress = (reference, renewal) => reference == null
+    ? ''
+    : (renewal.addresses[reference] ?? renewal.addressBySalt[reference] ?? '');
 export const renewSaltsAndAddresses = (organigram, chainId) => {
-    const newOrganSalts = organigram.organs?.reduce((renewSalts), {}) ?? {};
-    const newAssetSalts = organigram.assets?.reduce((renewSalts), {}) ?? {};
-    const newProcedureSalts = organigram.procedures?.reduce((renewSalts), {}) ?? {};
-    const newOrganAddresses = organigram.organs?.reduce(renewAddresses(newOrganSalts, 'Organ', chainId), {}) ?? {};
-    const newAssetAddresses = organigram.assets?.reduce(renewAddresses(newAssetSalts, 'Asset', chainId), {}) ?? {};
-    const newProcedureAddresses = organigram.procedures?.reduce(renewAddresses(newProcedureSalts, 'Procedure', chainId), {}) ?? {};
-    const organs = organigram.organs?.map(organ => ({
+    const organRenewal = createRenewedContractValues(organigram.organs, 'Organ', chainId);
+    const assetRenewal = createRenewedContractValues(organigram.assets, 'Asset', chainId);
+    const procedureRenewal = createRenewedContractValues(organigram.procedures, 'Procedure', chainId);
+    const organs = organRenewal.values.map(({ item: organ, salt, address }) => ({
         ...organ,
-        salt: newOrganSalts[organ.salt],
-        address: newOrganAddresses[organ.address],
+        salt,
+        address,
         chainId,
         isDeployed: false,
         permissions: organ.permissions
             ?.map(permission => ({
             ...permission,
-            permissionAddress: newProcedureAddresses[permission.permissionAddress]
+            permissionAddress: resolveRenewedAddress(permission.permissionAddress, procedureRenewal)
         }))
-            .filter(permission => permission.permissionAddress !== undefined)
+            .filter((permission) => permission.permissionAddress !== '')
     }));
-    const procedures = organigram.procedures?.map(procedure => ({
+    const procedures = procedureRenewal.values.map(({ item: procedure, salt, address }) => ({
         ...procedure,
-        salt: newProcedureSalts[procedure.salt],
+        salt,
         chainId,
         data: JSON.parse(procedure.data ?? '{}').erc20
             ? JSON.stringify({
-                erc20: newAssetAddresses[JSON.parse(procedure.data).erc20],
+                erc20: resolveRenewedAddress(JSON.parse(procedure.data).erc20, assetRenewal),
                 quorumSize: JSON.parse(procedure.data).quorumSize,
                 voteDuration: JSON.parse(procedure.data).voteDuration,
                 majoritySize: JSON.parse(procedure.data).majoritySize
             })
             : (procedure.data ?? '{}'),
         isDeployed: false,
-        address: newProcedureAddresses[procedure.address],
-        deciders: newOrganAddresses[procedure.deciders],
-        proposers: newOrganAddresses[procedure.proposers],
+        address,
+        deciders: resolveRenewedAddress(procedure.deciders, organRenewal),
+        proposers: resolveRenewedAddress(procedure.proposers, organRenewal),
         moderators: procedure.moderators
-            ? newOrganAddresses[procedure.moderators]
+            ? resolveRenewedAddress(procedure.moderators, organRenewal)
             : undefined
     }));
-    const assets = organigram.assets?.map(asset => ({
+    const assets = assetRenewal.values.map(({ item: asset, salt, address }) => ({
         ...asset,
         chainId,
         isDeployed: false,
-        salt: newAssetSalts[asset.salt],
-        address: newAssetAddresses[asset.address]
+        salt,
+        address
     }));
     return {
         ...organigram,
