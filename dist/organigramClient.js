@@ -91,7 +91,12 @@ export class OrganigramClient {
     contract;
     walletClient;
     constructor(input) {
-        const resolvedChainId = input.chainId ?? getDefaultChainId();
+        const publicClientChainId = input.publicClient.chain?.id?.toString();
+        const walletClientChainId = input.walletClient?.chain?.id?.toString();
+        const resolvedChainId = input.chainId ??
+            publicClientChainId ??
+            walletClientChainId ??
+            getDefaultChainId();
         const resolvedAddress = input.address ??
             input.contract?.address ??
             getDeployment(resolvedChainId, 'OrganigramClient');
