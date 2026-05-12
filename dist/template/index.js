@@ -23,7 +23,7 @@ const createRenewedContractValues = (items, type, chainId) => {
             type: type === 'Procedure'
                 ? (capitalize(item.typeName) + type)
                 : type,
-            chainId: item.chainId ?? chainId,
+            chainId,
             salt
         });
         return {

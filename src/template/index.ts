@@ -53,7 +53,7 @@ const createRenewedContractValues = <T extends RenewableContractInput>(
           type === 'Procedure'
             ? ((capitalize(item.typeName!) + type) as 'NominationProcedure')
             : (type as 'Organ'),
-        chainId: item.chainId ?? chainId,
+        chainId,
         salt
       })
 
