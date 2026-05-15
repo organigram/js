@@ -41,7 +41,8 @@
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest --coverage",
     "test:watch": "NODE_OPTIONS=--experimental-vm-modules jest --watch",
-    "typecheck": "tsc --noEmit --incremental false"
+    "typecheck": "tsc --noEmit --incremental false",
+    "lint": "eslint ."
   },
   "gitHead": "5aeceb89fcac23a06b21969c01c8bfdd36cea896"
 }
