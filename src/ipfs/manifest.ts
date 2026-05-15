@@ -1,4 +1,5 @@
 import { ENCRYPTED_CID_KIND, ENCRYPTION_ALGORITHM } from './constants'
+
 import type {
   EncryptedCidAccessGroup,
   EncryptedCidContentType,
@@ -45,4 +46,3 @@ export const isEncryptedCidManifest = (
     candidate.wrappedContentKey?.ciphertext != null
   )
 }
-

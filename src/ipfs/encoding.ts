@@ -52,4 +52,3 @@ export const base64UrlToBytes = (value: string): Uint8Array => {
     .padEnd(Math.ceil(value.length / 4) * 4, '=')
   return base64ToBytes(base64)
 }
-
