@@ -1,5 +1,6 @@
 export * from './asset'
 export * from './contracts'
+export * from './ipfs/enveloppe'
 export * from './organ'
 export * from './organigram'
 export * from './organigramClient'
