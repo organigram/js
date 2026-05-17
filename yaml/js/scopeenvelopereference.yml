@@ -1,0 +1,38 @@
+### YamlMime:TSType
+name: ScopeEnvelopeReference
+uid: '@organigram/js!ScopeEnvelopeReference:interface'
+package: '@organigram/js!'
+fullName: ScopeEnvelopeReference
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: scopeId
+    uid: '@organigram/js!ScopeEnvelopeReference#scopeId:member'
+    package: '@organigram/js!'
+    fullName: scopeId
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'scopeId: string;'
+      return:
+        type: string
+  - name: scopeType
+    uid: '@organigram/js!ScopeEnvelopeReference#scopeType:member'
+    package: '@organigram/js!'
+    fullName: scopeType
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'scopeType: ScopeEnvelopeScopeType;'
+      return:
+        type: <xref uid="@organigram/js!ScopeEnvelopeScopeType:type" />

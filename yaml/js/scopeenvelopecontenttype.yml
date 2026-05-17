@@ -1,0 +1,11 @@
+### YamlMime:TSTypeAlias
+name: ScopeEnvelopeContentType
+uid: '@organigram/js!ScopeEnvelopeContentType:type'
+package: '@organigram/js!'
+fullName: ScopeEnvelopeContentType
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+syntax: export type ScopeEnvelopeContentType = EncryptedCidContentType;

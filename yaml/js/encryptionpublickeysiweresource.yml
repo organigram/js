@@ -1,0 +1,64 @@
+### YamlMime:TSType
+name: EncryptionPublicKeySiweResource
+uid: '@organigram/js!EncryptionPublicKeySiweResource:interface'
+package: '@organigram/js!'
+fullName: EncryptionPublicKeySiweResource
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: address
+    uid: '@organigram/js!EncryptionPublicKeySiweResource#address:member'
+    package: '@organigram/js!'
+    fullName: address
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'address: string;'
+      return:
+        type: string
+  - name: keyVersion
+    uid: '@organigram/js!EncryptionPublicKeySiweResource#keyVersion:member'
+    package: '@organigram/js!'
+    fullName: keyVersion
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'keyVersion: number;'
+      return:
+        type: number
+  - name: kind
+    uid: '@organigram/js!EncryptionPublicKeySiweResource#kind:member'
+    package: '@organigram/js!'
+    fullName: kind
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'kind: typeof ENCRYPTION_PUBLIC_KEY_SIWE_RESOURCE_KIND;'
+      return:
+        type: typeof <xref uid="@organigram/js!ENCRYPTION_PUBLIC_KEY_SIWE_RESOURCE_KIND:var" />
+  - name: publicKey
+    uid: '@organigram/js!EncryptionPublicKeySiweResource#publicKey:member'
+    package: '@organigram/js!'
+    fullName: publicKey
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'publicKey: JsonWebKey;'
+      return:
+        type: JsonWebKey

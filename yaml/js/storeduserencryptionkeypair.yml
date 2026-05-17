@@ -1,0 +1,51 @@
+### YamlMime:TSType
+name: StoredUserEncryptionKeyPair
+uid: '@organigram/js!StoredUserEncryptionKeyPair:interface'
+package: '@organigram/js!'
+fullName: StoredUserEncryptionKeyPair
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: keyPair
+    uid: '@organigram/js!StoredUserEncryptionKeyPair#keyPair:member'
+    package: '@organigram/js!'
+    fullName: keyPair
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'keyPair: CryptoKeyPair;'
+      return:
+        type: CryptoKeyPair
+  - name: keyVersion
+    uid: '@organigram/js!StoredUserEncryptionKeyPair#keyVersion:member'
+    package: '@organigram/js!'
+    fullName: keyVersion
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'keyVersion: number;'
+      return:
+        type: number
+  - name: publicKey
+    uid: '@organigram/js!StoredUserEncryptionKeyPair#publicKey:member'
+    package: '@organigram/js!'
+    fullName: publicKey
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'publicKey: JsonWebKey;'
+      return:
+        type: JsonWebKey

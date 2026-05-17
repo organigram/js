@@ -1,0 +1,90 @@
+### YamlMime:TSType
+name: WrappedGroupKey
+uid: '@organigram/js!WrappedGroupKey:interface'
+package: '@organigram/js!'
+fullName: WrappedGroupKey
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: algorithm
+    uid: '@organigram/js!WrappedGroupKey#algorithm:member'
+    package: '@organigram/js!'
+    fullName: algorithm
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'algorithm: typeof GROUP_KEY_ALGORITHM;'
+      return:
+        type: typeof <xref uid="@organigram/js!GROUP_KEY_ALGORITHM:var" />
+  - name: ciphertext
+    uid: '@organigram/js!WrappedGroupKey#ciphertext:member'
+    package: '@organigram/js!'
+    fullName: ciphertext
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'ciphertext: string;'
+      return:
+        type: string
+  - name: ephemeralPublicKey
+    uid: '@organigram/js!WrappedGroupKey#ephemeralPublicKey:member'
+    package: '@organigram/js!'
+    fullName: ephemeralPublicKey
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'ephemeralPublicKey: JsonWebKey;'
+      return:
+        type: JsonWebKey
+  - name: iv
+    uid: '@organigram/js!WrappedGroupKey#iv:member'
+    package: '@organigram/js!'
+    fullName: iv
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'iv: string;'
+      return:
+        type: string
+  - name: recipientAddress
+    uid: '@organigram/js!WrappedGroupKey#recipientAddress:member'
+    package: '@organigram/js!'
+    fullName: recipientAddress
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'recipientAddress: string;'
+      return:
+        type: string
+  - name: recipientKeyVersion
+    uid: '@organigram/js!WrappedGroupKey#recipientKeyVersion:member'
+    package: '@organigram/js!'
+    fullName: recipientKeyVersion
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'recipientKeyVersion: number;'
+      return:
+        type: number

@@ -5,6 +5,8 @@ items:
       - name: js
         uid: '@organigram/js!'
         items:
+          - name: AccessGroupScopeType
+            uid: '@organigram/js!AccessGroupScopeType:type'
           - name: AccountInOrgans
             uid: '@organigram/js!AccountInOrgans:type'
           - name: Asset
@@ -27,6 +29,14 @@ items:
             uid: '@organigram/js!DeployProceduresInput:interface'
           - name: Election
             uid: '@organigram/js!Election:type'
+          - name: EncryptedCidAccessGroup
+            uid: '@organigram/js!EncryptedCidAccessGroup:interface'
+          - name: EncryptedCidContentType
+            uid: '@organigram/js!EncryptedCidContentType:type'
+          - name: EncryptedCidManifest
+            uid: '@organigram/js!EncryptedCidManifest:interface'
+          - name: EncryptionPublicKeySiweResource
+            uid: '@organigram/js!EncryptionPublicKeySiweResource:interface'
           - name: ERC20VoteProcedure
             uid: '@organigram/js!ERC20VoteProcedure:class'
           - name: ERC20VoteProcedureInput
@@ -35,6 +45,8 @@ items:
             uid: '@organigram/js!ExternalCallOperationInput:interface'
           - name: File_2
             uid: '@organigram/js!File_2:interface'
+          - name: FileVersionManifest
+            uid: '@organigram/js!FileVersionManifest:type'
           - name: IOrganEntry
             uid: '@organigram/js!IOrganEntry:interface'
           - name: NominationProcedure
@@ -71,6 +83,8 @@ items:
             uid: '@organigram/js!OrganJson:interface'
           - name: OrganPermission
             uid: '@organigram/js!OrganPermission:interface'
+          - name: ParsedCidRef
+            uid: '@organigram/js!ParsedCidRef:interface'
           - name: PopulatedTransactionData
             uid: '@organigram/js!PopulatedTransactionData:type'
           - name: PopulateInitializeInput
@@ -101,17 +115,43 @@ items:
             uid: '@organigram/js!ProposalKey:type'
           - name: ProposalMetadata
             uid: '@organigram/js!ProposalMetadata:interface'
+          - name: PublicFileVersionManifest
+            uid: '@organigram/js!PublicFileVersionManifest:interface'
+          - name: RecipientEncryptionKey
+            uid: '@organigram/js!RecipientEncryptionKey:interface'
+          - name: ScopeEnvelopeCheckpoint
+            uid: '@organigram/js!ScopeEnvelopeCheckpoint:interface'
+          - name: ScopeEnvelopeContentType
+            uid: '@organigram/js!ScopeEnvelopeContentType:type'
+          - name: ScopeEnvelopeItem
+            uid: '@organigram/js!ScopeEnvelopeItem:interface'
+          - name: ScopeEnvelopeManifest
+            uid: '@organigram/js!ScopeEnvelopeManifest:interface'
+          - name: ScopeEnvelopeReference
+            uid: '@organigram/js!ScopeEnvelopeReference:interface'
+          - name: ScopeEnvelopeRetentionState
+            uid: '@organigram/js!ScopeEnvelopeRetentionState:type'
+          - name: ScopeEnvelopeScopeType
+            uid: '@organigram/js!ScopeEnvelopeScopeType:type'
           - name: SignedBlockProposalInput
             uid: '@organigram/js!SignedBlockProposalInput:interface'
           - name: SignedProposalActionInput
             uid: '@organigram/js!SignedProposalActionInput:interface'
           - name: SignedProposalInput
             uid: '@organigram/js!SignedProposalInput:interface'
+          - name: StoredUserEncryptionKeyPair
+            uid: '@organigram/js!StoredUserEncryptionKeyPair:interface'
           - name: TemplateName
             uid: '@organigram/js!TemplateName:type'
           - name: TransactionOptions
             uid: '@organigram/js!TransactionOptions:interface'
+          - name: UserEncryptionKeyBackup
+            uid: '@organigram/js!UserEncryptionKeyBackup:interface'
           - name: VoteProcedure
             uid: '@organigram/js!VoteProcedure:class'
           - name: VoteProcedureInput
             uid: '@organigram/js!VoteProcedureInput:type'
+          - name: WrappedContentKey
+            uid: '@organigram/js!WrappedContentKey:interface'
+          - name: WrappedGroupKey
+            uid: '@organigram/js!WrappedGroupKey:interface'

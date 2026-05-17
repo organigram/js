@@ -1,4 +1,7 @@
 export const ENCRYPTED_CID_KIND = 'organigram.encrypted-cid.v1';
+export const FILE_VERSION_MANIFEST_KIND = 'organigram.file-version-manifest.v1';
+export const SCOPE_ENVELOPE_KIND = 'organigram.scope-envelope.v1';
+export const CID_REF_PREFIX = 'og://workspace/';
 export const ENCRYPTION_ALGORITHM = 'A256GCM';
 export const GROUP_KEY_ALGORITHM = 'ECDH-P256+A256GCM';
 export const ENCRYPTION_PUBLIC_KEY_SIWE_RESOURCE_KIND = 'organigram.encryption-public-key.v1';

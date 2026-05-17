@@ -1,12 +1,21 @@
-import type { EncryptedCidAccessGroup, EncryptedCidContentType, EncryptedCidManifest, WrappedContentKey } from './types';
+import type { EncryptedCidAccessGroup, EncryptedCidContentType, EncryptedCidManifest, FileVersionManifest, PublicFileVersionManifest, WrappedContentKey } from './types';
 export declare const createEncryptedCidManifest: (input: {
     contentType: EncryptedCidContentType;
-    accessGroup: EncryptedCidAccessGroup;
+    accessGroup?: EncryptedCidAccessGroup;
+    scopeRef?: FileVersionManifest["scopeRef"];
+    logicalKey?: string;
+    retentionState?: FileVersionManifest["retentionState"];
+    previousManifestCid?: string;
     encryptedCid: string;
     encryptedContentIv: string;
     encryptedContentSize: number;
     wrappedContentKey: WrappedContentKey;
     mime?: string;
     name?: string;
+    scopeEnvelope?: FileVersionManifest["scopeEnvelope"];
+    signature?: string;
+    signedByAddress?: string;
 }) => EncryptedCidManifest;
 export declare const isEncryptedCidManifest: (value: unknown) => value is EncryptedCidManifest;
+export declare const isPublicFileVersionManifest: (value: unknown) => value is PublicFileVersionManifest;
+export declare const isFileVersionManifest: (value: unknown) => value is FileVersionManifest;

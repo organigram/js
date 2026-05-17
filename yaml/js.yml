@@ -4,11 +4,14 @@ name: '@organigram/js'
 type: package
 summary: ''
 typeAliases:
+  - '@organigram/js!AccessGroupScopeType:type'
   - '@organigram/js!AccountInOrgans:type'
   - '@organigram/js!ContractClients:type'
   - '@organigram/js!ContractName:type'
   - '@organigram/js!Election:type'
+  - '@organigram/js!EncryptedCidContentType:type'
   - '@organigram/js!ERC20VoteProcedureInput:type'
+  - '@organigram/js!FileVersionManifest:type'
   - '@organigram/js!OperationParamAction:type'
   - '@organigram/js!OperationParamType:type'
   - '@organigram/js!OperationTag:type'
@@ -21,6 +24,9 @@ typeAliases:
   - '@organigram/js!ProcedureRoleTypeName:type'
   - '@organigram/js!ProcedureTypeName:type'
   - '@organigram/js!ProposalKey:type'
+  - '@organigram/js!ScopeEnvelopeContentType:type'
+  - '@organigram/js!ScopeEnvelopeRetentionState:type'
+  - '@organigram/js!ScopeEnvelopeScopeType:type'
   - '@organigram/js!TemplateName:type'
   - '@organigram/js!VoteProcedureInput:type'
 classes:
@@ -39,6 +45,9 @@ interfaces:
   - '@organigram/js!DeployOrganigramInput:interface'
   - '@organigram/js!DeployOrganInput:interface'
   - '@organigram/js!DeployProceduresInput:interface'
+  - '@organigram/js!EncryptedCidAccessGroup:interface'
+  - '@organigram/js!EncryptedCidManifest:interface'
+  - '@organigram/js!EncryptionPublicKeySiweResource:interface'
   - '@organigram/js!ExternalCallOperationInput:interface'
   - '@organigram/js!File_2:interface'
   - '@organigram/js!IOrganEntry:interface'
@@ -47,6 +56,7 @@ interfaces:
   - '@organigram/js!OrganInput:interface'
   - '@organigram/js!OrganJson:interface'
   - '@organigram/js!OrganPermission:interface'
+  - '@organigram/js!ParsedCidRef:interface'
   - '@organigram/js!PopulateInitializeInput:interface'
   - '@organigram/js!ProcedureInput:interface'
   - '@organigram/js!ProcedureProposal:interface'
@@ -55,14 +65,58 @@ interfaces:
   - '@organigram/js!ProcedureType:interface'
   - '@organigram/js!ProcedureTypeField:interface'
   - '@organigram/js!ProposalMetadata:interface'
+  - '@organigram/js!PublicFileVersionManifest:interface'
+  - '@organigram/js!RecipientEncryptionKey:interface'
+  - '@organigram/js!ScopeEnvelopeCheckpoint:interface'
+  - '@organigram/js!ScopeEnvelopeItem:interface'
+  - '@organigram/js!ScopeEnvelopeManifest:interface'
+  - '@organigram/js!ScopeEnvelopeReference:interface'
   - '@organigram/js!SignedBlockProposalInput:interface'
   - '@organigram/js!SignedProposalActionInput:interface'
   - '@organigram/js!SignedProposalInput:interface'
+  - '@organigram/js!StoredUserEncryptionKeyPair:interface'
   - '@organigram/js!TransactionOptions:interface'
+  - '@organigram/js!UserEncryptionKeyBackup:interface'
+  - '@organigram/js!WrappedContentKey:interface'
+  - '@organigram/js!WrappedGroupKey:interface'
 enums:
   - '@organigram/js!OrganFunctionName:enum'
   - '@organigram/js!ProcedureTypeNameEnum:enum'
 functions:
+  - name: base64ToBytes(value)
+    uid: '@organigram/js!base64ToBytes:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'base64ToBytes: (value: string) => Uint8Array'
+      parameters:
+        - id: value
+          description: ''
+          type: string
+      return:
+        type: Uint8Array
+        description: ''
+  - name: base64UrlToBytes(value)
+    uid: '@organigram/js!base64UrlToBytes:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'base64UrlToBytes: (value: string) => Uint8Array'
+      parameters:
+        - id: value
+          description: ''
+          type: string
+      return:
+        type: Uint8Array
+        description: ''
   - name: bufferEstimatedGas(estimatedGas)
     uid: '@organigram/js!bufferEstimatedGas:function(1)'
     package: '@organigram/js!'
@@ -79,6 +133,74 @@ functions:
           type: bigint
       return:
         type: bigint
+        description: ''
+  - name: bytesToArrayBuffer(value)
+    uid: '@organigram/js!bytesToArrayBuffer:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'bytesToArrayBuffer: (value: ArrayBuffer | Uint8Array) => ArrayBuffer'
+      parameters:
+        - id: value
+          description: ''
+          type: ArrayBuffer | Uint8Array
+      return:
+        type: ArrayBuffer
+        description: ''
+  - name: bytesToBase64(bytes)
+    uid: '@organigram/js!bytesToBase64:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'bytesToBase64: (bytes: ArrayBuffer | Uint8Array) => string'
+      parameters:
+        - id: bytes
+          description: ''
+          type: ArrayBuffer | Uint8Array
+      return:
+        type: string
+        description: ''
+  - name: bytesToBase64Url(bytes)
+    uid: '@organigram/js!bytesToBase64Url:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'bytesToBase64Url: (bytes: ArrayBuffer | Uint8Array) => string'
+      parameters:
+        - id: bytes
+          description: ''
+          type: ArrayBuffer | Uint8Array
+      return:
+        type: string
+        description: ''
+  - name: bytesToText(value)
+    uid: '@organigram/js!bytesToText:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'bytesToText: (value: ArrayBuffer | Uint8Array) => string'
+      parameters:
+        - id: value
+          description: ''
+          type: ArrayBuffer | Uint8Array
+      return:
+        type: string
         description: ''
   - name: capitalize(s)
     uid: '@organigram/js!capitalize:function(1)'
@@ -113,6 +235,23 @@ functions:
           type: string
       return:
         type: string
+        description: ''
+  - name: computeScopeEnvelopeRoot(items)
+    uid: '@organigram/js!computeScopeEnvelopeRoot:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'computeScopeEnvelopeRoot: (items: Record<string, ScopeEnvelopeItem>) => Promise<string>'
+      parameters:
+        - id: items
+          description: ''
+          type: Record&lt;string, <xref uid="@organigram/js!ScopeEnvelopeItem:interface" />&gt;
+      return:
+        type: Promise&lt;string&gt;
         description: ''
   - name: createContractWriteTransaction({ address, abi, functionName, args, clients, nonce, value }, input)
     uid: '@organigram/js!createContractWriteTransaction:function(1)'
@@ -188,6 +327,218 @@ functions:
       return:
         type: Promise&lt;<xref uid="@organigram/js!OrganigramTransaction:type" />&gt;
         description: ''
+  - name: createEncryptedCidManifest(input)
+    uid: '@organigram/js!createEncryptedCidManifest:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        createEncryptedCidManifest: (input: {
+            contentType: EncryptedCidContentType;
+            accessGroup?: EncryptedCidAccessGroup;
+            scopeRef?: FileVersionManifest["scopeRef"];
+            logicalKey?: string;
+            retentionState?: FileVersionManifest["retentionState"];
+            previousManifestCid?: string;
+            encryptedCid: string;
+            encryptedContentIv: string;
+            encryptedContentSize: number;
+            wrappedContentKey: WrappedContentKey;
+            mime?: string;
+            name?: string;
+            scopeEnvelope?: FileVersionManifest["scopeEnvelope"];
+            signature?: string;
+            signedByAddress?: string;
+        }) => EncryptedCidManifest
+      parameters:
+        - id: input
+          description: ''
+          type: |-
+            {
+                contentType: <xref uid="@organigram/js!EncryptedCidContentType:type" />;
+                accessGroup?: <xref uid="@organigram/js!EncryptedCidAccessGroup:interface" />;
+                scopeRef?: <xref uid="@organigram/js!FileVersionManifest:type" />["scopeRef"];
+                logicalKey?: string;
+                retentionState?: <xref uid="@organigram/js!FileVersionManifest:type" />["retentionState"];
+                previousManifestCid?: string;
+                encryptedCid: string;
+                encryptedContentIv: string;
+                encryptedContentSize: number;
+                wrappedContentKey: <xref uid="@organigram/js!WrappedContentKey:interface" />;
+                mime?: string;
+                name?: string;
+                scopeEnvelope?: <xref uid="@organigram/js!FileVersionManifest:type" />["scopeEnvelope"];
+                signature?: string;
+                signedByAddress?: string;
+            }
+      return:
+        type: <xref uid="@organigram/js!EncryptedCidManifest:interface" />
+        description: ''
+  - name: createEncryptionKeyVersion(timestamp)
+    uid: '@organigram/js!createEncryptionKeyVersion:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'createEncryptionKeyVersion: (timestamp?: number) => number'
+      parameters:
+        - id: timestamp
+          description: ''
+          type: number
+      return:
+        type: number
+        description: ''
+  - name: createEncryptionPublicKeyMessage(address, publicKey, keyVersion)
+    uid: '@organigram/js!createEncryptionPublicKeyMessage:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'createEncryptionPublicKeyMessage: (address: string, publicKey: JsonWebKey, keyVersion: number) => string'
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: publicKey
+          description: ''
+          type: JsonWebKey
+        - id: keyVersion
+          description: ''
+          type: number
+      return:
+        type: string
+        description: ''
+  - name: createEncryptionPublicKeySiweResource(address, publicKey, keyVersion)
+    uid: '@organigram/js!createEncryptionPublicKeySiweResource:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'createEncryptionPublicKeySiweResource: (address: string, publicKey: JsonWebKey, keyVersion: number) => string'
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: publicKey
+          description: ''
+          type: JsonWebKey
+        - id: keyVersion
+          description: ''
+          type: number
+      return:
+        type: string
+        description: ''
+  - name: createFileVersionManifest(input)
+    uid: '@organigram/js!createFileVersionManifest:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        createFileVersionManifest: (input: {
+            contentType: ScopeEnvelopeContentType;
+            scopeRef: ScopeEnvelopeReference;
+            logicalKey: string;
+            encryptedCid: string;
+            encryptedContentIv: string;
+            encryptedContentSize: number;
+            wrappedContentKey: WrappedContentKey;
+            previousManifestCid?: string | null;
+            retentionState?: ScopeEnvelopeRetentionState;
+            scopeEnvelope?: ScopeEnvelopeCheckpoint;
+            mime?: string;
+            name?: string;
+            signature?: string | null;
+            signedByAddress?: string | null;
+            createdAt?: Date | string;
+        }) => FileVersionManifest
+      parameters:
+        - id: input
+          description: ''
+          type: |-
+            {
+                contentType: <xref uid="@organigram/js!ScopeEnvelopeContentType:type" />;
+                scopeRef: <xref uid="@organigram/js!ScopeEnvelopeReference:interface" />;
+                logicalKey: string;
+                encryptedCid: string;
+                encryptedContentIv: string;
+                encryptedContentSize: number;
+                wrappedContentKey: <xref uid="@organigram/js!WrappedContentKey:interface" />;
+                previousManifestCid?: string | null;
+                retentionState?: <xref uid="@organigram/js!ScopeEnvelopeRetentionState:type" />;
+                scopeEnvelope?: <xref uid="@organigram/js!ScopeEnvelopeCheckpoint:interface" />;
+                mime?: string;
+                name?: string;
+                signature?: string | null;
+                signedByAddress?: string | null;
+                createdAt?: Date | string;
+            }
+      return:
+        type: <xref uid="@organigram/js!FileVersionManifest:type" />
+        description: ''
+  - name: createPublicFileVersionManifest(input)
+    uid: '@organigram/js!createPublicFileVersionManifest:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        createPublicFileVersionManifest: (input: {
+            contentType: ScopeEnvelopeContentType;
+            scopeRef: ScopeEnvelopeReference;
+            logicalKey: string;
+            publicCid: string;
+            publicContentSize: number;
+            previousManifestCid?: string | null;
+            retentionState?: ScopeEnvelopeRetentionState;
+            scopeEnvelope?: ScopeEnvelopeCheckpoint;
+            mime?: string;
+            name?: string;
+            signature?: string | null;
+            signedByAddress?: string | null;
+            createdAt?: Date | string;
+        }) => PublicFileVersionManifest
+      parameters:
+        - id: input
+          description: ''
+          type: |-
+            {
+                contentType: <xref uid="@organigram/js!ScopeEnvelopeContentType:type" />;
+                scopeRef: <xref uid="@organigram/js!ScopeEnvelopeReference:interface" />;
+                logicalKey: string;
+                publicCid: string;
+                publicContentSize: number;
+                previousManifestCid?: string | null;
+                retentionState?: <xref uid="@organigram/js!ScopeEnvelopeRetentionState:type" />;
+                scopeEnvelope?: <xref uid="@organigram/js!ScopeEnvelopeCheckpoint:interface" />;
+                mime?: string;
+                name?: string;
+                signature?: string | null;
+                signedByAddress?: string | null;
+                createdAt?: Date | string;
+            }
+      return:
+        type: <xref uid="@organigram/js!PublicFileVersionManifest:interface" />
+        description: ''
   - name: createRandom32BytesHexId()
     uid: '@organigram/js!createRandom32BytesHexId:function(1)'
     package: '@organigram/js!'
@@ -200,6 +551,157 @@ functions:
       content: 'createRandom32BytesHexId: () => `0x${string}`'
       return:
         type: '`0x${string}`'
+        description: ''
+  - name: createScopeEnvelopeCheckpoint(input)
+    uid: '@organigram/js!createScopeEnvelopeCheckpoint:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        createScopeEnvelopeCheckpoint: (input: {
+            epoch: number;
+            membershipHash: string;
+            rootHash: string;
+        }) => ScopeEnvelopeCheckpoint
+      parameters:
+        - id: input
+          description: ''
+          type: |-
+            {
+                epoch: number;
+                membershipHash: string;
+                rootHash: string;
+            }
+      return:
+        type: <xref uid="@organigram/js!ScopeEnvelopeCheckpoint:interface" />
+        description: ''
+  - name: createScopeEnvelopeItem(input)
+    uid: '@organigram/js!createScopeEnvelopeItem:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        createScopeEnvelopeItem: (input: {
+            logicalKey: string;
+            currentManifestCid: string;
+            contentType: ScopeEnvelopeContentType;
+            version?: number;
+            retentionState?: ScopeEnvelopeRetentionState;
+            previousManifestCid?: string;
+            updatedAt?: Date | string;
+        }) => ScopeEnvelopeItem
+      parameters:
+        - id: input
+          description: ''
+          type: |-
+            {
+                logicalKey: string;
+                currentManifestCid: string;
+                contentType: <xref uid="@organigram/js!ScopeEnvelopeContentType:type" />;
+                version?: number;
+                retentionState?: <xref uid="@organigram/js!ScopeEnvelopeRetentionState:type" />;
+                previousManifestCid?: string;
+                updatedAt?: Date | string;
+            }
+      return:
+        type: <xref uid="@organigram/js!ScopeEnvelopeItem:interface" />
+        description: ''
+  - name: createScopeEnvelopeManifest(input)
+    uid: '@organigram/js!createScopeEnvelopeManifest:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        createScopeEnvelopeManifest: (input: {
+            scopeRef: ScopeEnvelopeReference;
+            checkpoint: ScopeEnvelopeCheckpoint;
+            items: Record<string, ScopeEnvelopeItem>;
+            wrappedEnvelopeKey: WrappedContentKey;
+            previousEnvelopeCid?: string | null;
+            signature?: string | null;
+            signedByAddress?: string | null;
+            createdAt?: Date | string;
+        }) => ScopeEnvelopeManifest
+      parameters:
+        - id: input
+          description: ''
+          type: |-
+            {
+                scopeRef: <xref uid="@organigram/js!ScopeEnvelopeReference:interface" />;
+                checkpoint: <xref uid="@organigram/js!ScopeEnvelopeCheckpoint:interface" />;
+                items: Record&lt;string, <xref uid="@organigram/js!ScopeEnvelopeItem:interface" />&gt;;
+                wrappedEnvelopeKey: <xref uid="@organigram/js!WrappedContentKey:interface" />;
+                previousEnvelopeCid?: string | null;
+                signature?: string | null;
+                signedByAddress?: string | null;
+                createdAt?: Date | string;
+            }
+      return:
+        type: <xref uid="@organigram/js!ScopeEnvelopeManifest:interface" />
+        description: ''
+  - name: createScopeEnvelopeSignatureMessage(input)
+    uid: '@organigram/js!createScopeEnvelopeSignatureMessage:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        createScopeEnvelopeSignatureMessage: (input: {
+            scopeRef: ScopeEnvelopeReference;
+            checkpoint: ScopeEnvelopeCheckpoint;
+            items: Record<string, ScopeEnvelopeItem>;
+            previousEnvelopeCid?: string | null;
+        }) => string
+      parameters:
+        - id: input
+          description: ''
+          type: |-
+            {
+                scopeRef: <xref uid="@organigram/js!ScopeEnvelopeReference:interface" />;
+                checkpoint: <xref uid="@organigram/js!ScopeEnvelopeCheckpoint:interface" />;
+                items: Record&lt;string, <xref uid="@organigram/js!ScopeEnvelopeItem:interface" />&gt;;
+                previousEnvelopeCid?: string | null;
+            }
+      return:
+        type: string
+        description: ''
+  - name: decryptBytes(encryptedBytes, key, iv)
+    uid: '@organigram/js!decryptBytes:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'decryptBytes: (encryptedBytes: ArrayBuffer | Uint8Array, key: CryptoKey, iv: string) => Promise<Uint8Array>'
+      parameters:
+        - id: encryptedBytes
+          description: ''
+          type: ArrayBuffer | Uint8Array
+        - id: key
+          description: ''
+          type: CryptoKey
+        - id: iv
+          description: ''
+          type: string
+      return:
+        type: Promise&lt;Uint8Array&gt;
         description: ''
   - name: encodeProcedureInitialization(abi, functionName, args)
     uid: '@organigram/js!encodeProcedureInitialization:function(1)'
@@ -224,6 +726,142 @@ functions:
       return:
         type: <xref uid="@organigram/js!PopulatedTransactionData:type" />
         description: ''
+  - name: encryptBytes(bytes, key)
+    uid: '@organigram/js!encryptBytes:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        encryptBytes: (bytes: ArrayBuffer | Uint8Array, key: CryptoKey) => Promise<{
+            encryptedBytes: Uint8Array;
+            iv: string;
+        }>
+      parameters:
+        - id: bytes
+          description: ''
+          type: ArrayBuffer | Uint8Array
+        - id: key
+          description: ''
+          type: CryptoKey
+      return:
+        type: |-
+          Promise&lt;{
+              encryptedBytes: Uint8Array;
+              iv: string;
+          }&gt;
+        description: ''
+  - name: ensureUserEncryptionKeyPair(address)
+    uid: '@organigram/js!ensureUserEncryptionKeyPair:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'ensureUserEncryptionKeyPair: (address: string) => Promise<StoredUserEncryptionKeyPair>'
+      parameters:
+        - id: address
+          description: ''
+          type: string
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!StoredUserEncryptionKeyPair:interface" />&gt;
+        description: ''
+  - name: exportSymmetricKey(key)
+    uid: '@organigram/js!exportSymmetricKey:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'exportSymmetricKey: (key: CryptoKey) => Promise<Uint8Array>'
+      parameters:
+        - id: key
+          description: ''
+          type: CryptoKey
+      return:
+        type: Promise&lt;Uint8Array&gt;
+        description: ''
+  - name: exportUserEncryptionKeyBackup(address, passphrase)
+    uid: '@organigram/js!exportUserEncryptionKeyBackup:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'exportUserEncryptionKeyBackup: (address: string, passphrase: string) => Promise<UserEncryptionKeyBackup>'
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: passphrase
+          description: ''
+          type: string
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!UserEncryptionKeyBackup:interface" />&gt;
+        description: ''
+  - name: exportUserPrivateKey(keyPair)
+    uid: '@organigram/js!exportUserPrivateKey:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'exportUserPrivateKey: (keyPair: CryptoKeyPair) => Promise<JsonWebKey>'
+      parameters:
+        - id: keyPair
+          description: ''
+          type: CryptoKeyPair
+      return:
+        type: Promise&lt;JsonWebKey&gt;
+        description: ''
+  - name: exportUserPublicKey(keyPair)
+    uid: '@organigram/js!exportUserPublicKey:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'exportUserPublicKey: (keyPair: CryptoKeyPair) => Promise<JsonWebKey>'
+      parameters:
+        - id: keyPair
+          description: ''
+          type: CryptoKeyPair
+      return:
+        type: Promise&lt;JsonWebKey&gt;
+        description: ''
+  - name: formatCidRef(scopeRef, logicalKey)
+    uid: '@organigram/js!formatCidRef:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'formatCidRef: (scopeRef: ScopeEnvelopeReference, logicalKey: string) => string'
+      parameters:
+        - id: scopeRef
+          description: ''
+          type: <xref uid="@organigram/js!ScopeEnvelopeReference:interface" />
+        - id: logicalKey
+          description: ''
+          type: string
+      return:
+        type: string
+        description: ''
   - name: formatSalt(salt)
     uid: '@organigram/js!formatSalt:function(1)'
     package: '@organigram/js!'
@@ -240,6 +878,45 @@ functions:
           type: string | null
       return:
         type: string
+        description: ''
+  - name: generateContentKey()
+    uid: '@organigram/js!generateContentKey:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'generateContentKey: () => Promise<CryptoKey>'
+      return:
+        type: Promise&lt;CryptoKey&gt;
+        description: ''
+  - name: generateGroupKey()
+    uid: '@organigram/js!generateGroupKey:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'generateGroupKey: () => Promise<CryptoKey>'
+      return:
+        type: Promise&lt;CryptoKey&gt;
+        description: ''
+  - name: generateUserEncryptionKeyPair()
+    uid: '@organigram/js!generateUserEncryptionKeyPair:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'generateUserEncryptionKeyPair: () => Promise<CryptoKeyPair>'
+      return:
+        type: Promise&lt;CryptoKeyPair&gt;
         description: ''
   - name: getChainExplorerBaseUrl(chainId)
     uid: '@organigram/js!getChainExplorerBaseUrl:function(1)'
@@ -258,7 +935,7 @@ functions:
       return:
         type: string | undefined
         description: ''
-  - name: getConfiguredChain(chainId, hostUrl, preferLocalHost)
+  - name: getConfiguredChain(chainId)
     uid: '@organigram/js!getConfiguredChain:function(1)'
     package: '@organigram/js!'
     summary: ''
@@ -267,17 +944,11 @@ functions:
     isPreview: false
     isDeprecated: false
     syntax:
-      content: 'getConfiguredChain: (chainId: string, hostUrl?: string, preferLocalHost?: boolean) => Chain | undefined'
+      content: 'getConfiguredChain: (chainId: string) => Chain | undefined'
       parameters:
         - id: chainId
           description: ''
           type: string
-        - id: hostUrl
-          description: ''
-          type: string
-        - id: preferLocalHost
-          description: ''
-          type: boolean
       return:
         type: <xref uid="viem!Chain:type" /> | undefined
         description: ''
@@ -698,6 +1369,19 @@ functions:
               abi: <xref uid="abitype!Abi:type" />;
           }
         description: ''
+  - name: getCrypto()
+    uid: '@organigram/js!getCrypto:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'getCrypto: () => Crypto'
+      return:
+        type: Crypto
+        description: ''
   - name: getDefaultChainId()
     uid: '@organigram/js!getDefaultChainId:function(1)'
     package: '@organigram/js!'
@@ -836,6 +1520,19 @@ functions:
               vote: <xref uid="@organigram/js!ProcedureType:interface" />;
           }
         description: ''
+  - name: getRandomIv()
+    uid: '@organigram/js!getRandomIv:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'getRandomIv: () => Uint8Array'
+      return:
+        type: Uint8Array
+        description: ''
   - name: getSupportedChainIds()
     uid: '@organigram/js!getSupportedChainIds:function(1)'
     package: '@organigram/js!'
@@ -849,7 +1546,7 @@ functions:
       return:
         type: string[]
         description: ''
-  - name: getSupportedChains(hostUrl, preferLocalHost)
+  - name: getSupportedChains()
     uid: '@organigram/js!getSupportedChains:function(1)'
     package: '@organigram/js!'
     summary: ''
@@ -858,14 +1555,7 @@ functions:
     isPreview: false
     isDeprecated: false
     syntax:
-      content: 'getSupportedChains: (hostUrl?: string, preferLocalHost?: boolean) => Chain[]'
-      parameters:
-        - id: hostUrl
-          description: ''
-          type: string
-        - id: preferLocalHost
-          description: ''
-          type: boolean
+      content: 'getSupportedChains: () => Chain[]'
       return:
         type: <xref uid="viem!Chain:type" />[]
         description: ''
@@ -878,77 +1568,7 @@ functions:
     isPreview: false
     isDeprecated: false
     syntax:
-      content: |-
-        getTemplate: (templateName: TemplateName, chainId: string) => {
-            chainId: string;
-            organs: {
-                salt: string;
-                address: string;
-                chainId: string;
-                isDeployed: boolean;
-                permissions: {
-                    permissionAddress: string;
-                    permissionValue: number;
-                }[] | undefined;
-                publicClient?: import("viem").PublicClient | null;
-                walletClient?: import("viem").WalletClient | null;
-                balance?: string | null;
-                cid?: string | null;
-                entries?: Array<{
-                    index: string;
-                    address: string;
-                    cid: string;
-                }> | null;
-                name?: string | null;
-                description?: string | null;
-                organigramId?: string | null;
-                forwarder?: string | null;
-            }[];
-            procedures: {
-                salt: string;
-                chainId: string;
-                data: string;
-                isDeployed: boolean;
-                address: string;
-                deciders: string;
-                proposers: string;
-                moderators: string | undefined;
-                typeName: string;
-                type?: import("..").ProcedureType;
-                name?: string | null;
-                description?: string | null;
-                cid?: string | null;
-                publicClient?: import("viem").PublicClient | null;
-                walletClient?: import("viem").WalletClient | null;
-                metadata?: string | null;
-                withModeration?: boolean | null;
-                forwarder?: string | null;
-                proposals?: import("..").ProcedureProposal[] | null;
-                organigramId?: string | null;
-            }[];
-            assets: {
-                chainId: string;
-                isDeployed: boolean;
-                salt: string;
-                address: string;
-                name?: string | null;
-                description?: string | null;
-                symbol?: string | null;
-                initialSupply?: number | null;
-                image?: string | null;
-                userBalance?: string | null;
-                organigramId?: string | null;
-            }[];
-            id?: string | null;
-            slug?: string | null;
-            name?: string | null;
-            description?: string | null;
-            organigramClient?: import("..").OrganigramClient | null;
-            walletClient?: import("viem").WalletClient | null;
-            publicClient?: import("viem").PublicClient | null;
-            contractAddresses?: string[] | null;
-            workspaceId?: string | null;
-        }
+      content: 'getTemplate: (templateName: TemplateName, chainId: string) => OrganigramInput'
       parameters:
         - id: templateName
           description: ''
@@ -957,77 +1577,7 @@ functions:
           description: ''
           type: string
       return:
-        type: |-
-          {
-              chainId: string;
-              organs: {
-                  salt: string;
-                  address: string;
-                  chainId: string;
-                  isDeployed: boolean;
-                  permissions: {
-                      permissionAddress: string;
-                      permissionValue: number;
-                  }[] | undefined;
-                  publicClient?: import("viem")<xref uid=".viem!PublicClient:type" /> | null;
-                  walletClient?: import("viem")<xref uid=".viem!WalletClient:type" /> | null;
-                  balance?: string | null;
-                  cid?: string | null;
-                  entries?: Array&lt;{
-                      index: string;
-                      address: string;
-                      cid: string;
-                  }&gt; | null;
-                  name?: string | null;
-                  description?: string | null;
-                  organigramId?: string | null;
-                  forwarder?: string | null;
-              }[];
-              procedures: {
-                  salt: string;
-                  chainId: string;
-                  data: string;
-                  isDeployed: boolean;
-                  address: string;
-                  deciders: string;
-                  proposers: string;
-                  moderators: string | undefined;
-                  typeName: string;
-                  type?: import("..").<xref uid="@organigram/js!ProcedureType:interface" />;
-                  name?: string | null;
-                  description?: string | null;
-                  cid?: string | null;
-                  publicClient?: import("viem")<xref uid=".viem!PublicClient:type" /> | null;
-                  walletClient?: import("viem")<xref uid=".viem!WalletClient:type" /> | null;
-                  metadata?: string | null;
-                  withModeration?: boolean | null;
-                  forwarder?: string | null;
-                  proposals?: import("..").<xref uid="@organigram/js!ProcedureProposal:interface" />[] | null;
-                  organigramId?: string | null;
-              }[];
-              assets: {
-                  chainId: string;
-                  isDeployed: boolean;
-                  salt: string;
-                  address: string;
-                  name?: string | null;
-                  description?: string | null;
-                  symbol?: string | null;
-                  initialSupply?: number | null;
-                  image?: string | null;
-                  userBalance?: string | null;
-                  organigramId?: string | null;
-              }[];
-              id?: string | null;
-              slug?: string | null;
-              name?: string | null;
-              description?: string | null;
-              organigramClient?: import("..").<xref uid="@organigram/js!OrganigramClient:class" /> | null;
-              walletClient?: import("viem")<xref uid=".viem!WalletClient:type" /> | null;
-              publicClient?: import("viem")<xref uid=".viem!PublicClient:type" /> | null;
-              contractAddresses?: string[] | null;
-              workspaceId?: string | null;
-          }
+        type: <xref uid="@organigram/js!OrganigramInput:type" />
         description: ''
   - name: getWalletAccount(walletClient)
     uid: '@organigram/js!getWalletAccount:function(1)'
@@ -1083,6 +1633,147 @@ functions:
       return:
         type: any
         description: ''
+  - name: importExtractableUserPublicKey(publicKey)
+    uid: '@organigram/js!importExtractableUserPublicKey:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'importExtractableUserPublicKey: (publicKey: JsonWebKey) => Promise<CryptoKey>'
+      parameters:
+        - id: publicKey
+          description: ''
+          type: JsonWebKey
+      return:
+        type: Promise&lt;CryptoKey&gt;
+        description: ''
+  - name: importSymmetricKey(rawKey)
+    uid: '@organigram/js!importSymmetricKey:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'importSymmetricKey: (rawKey: ArrayBuffer | Uint8Array) => Promise<CryptoKey>'
+      parameters:
+        - id: rawKey
+          description: ''
+          type: ArrayBuffer | Uint8Array
+      return:
+        type: Promise&lt;CryptoKey&gt;
+        description: ''
+  - name: importUserEncryptionKeyBackup(backup, passphrase)
+    uid: '@organigram/js!importUserEncryptionKeyBackup:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        importUserEncryptionKeyBackup: (backup: UserEncryptionKeyBackup, passphrase: string) =>
+        Promise<StoredUserEncryptionKeyPair>
+      parameters:
+        - id: backup
+          description: ''
+          type: <xref uid="@organigram/js!UserEncryptionKeyBackup:interface" />
+        - id: passphrase
+          description: ''
+          type: string
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!StoredUserEncryptionKeyPair:interface" />&gt;
+        description: ''
+  - name: importUserPrivateKey(privateKey)
+    uid: '@organigram/js!importUserPrivateKey:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'importUserPrivateKey: (privateKey: JsonWebKey) => Promise<CryptoKey>'
+      parameters:
+        - id: privateKey
+          description: ''
+          type: JsonWebKey
+      return:
+        type: Promise&lt;CryptoKey&gt;
+        description: ''
+  - name: importUserPublicKey(publicKey)
+    uid: '@organigram/js!importUserPublicKey:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'importUserPublicKey: (publicKey: JsonWebKey) => Promise<CryptoKey>'
+      parameters:
+        - id: publicKey
+          description: ''
+          type: JsonWebKey
+      return:
+        type: Promise&lt;CryptoKey&gt;
+        description: ''
+  - name: isCidRef(value)
+    uid: '@organigram/js!isCidRef:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'isCidRef: (value?: string | null) => boolean'
+      parameters:
+        - id: value
+          description: ''
+          type: string | null
+      return:
+        type: boolean
+        description: ''
+  - name: isEncryptedCidManifest(value)
+    uid: '@organigram/js!isEncryptedCidManifest:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'isEncryptedCidManifest: (value: unknown) => value is EncryptedCidManifest'
+      parameters:
+        - id: value
+          description: ''
+          type: unknown
+      return:
+        type: '@organigram/js!~value is <xref uid="@organigram/js!EncryptedCidManifest:interface" />'
+        description: ''
+  - name: isFileVersionManifest(value)
+    uid: '@organigram/js!isFileVersionManifest:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'isFileVersionManifest: (value: unknown) => value is FileVersionManifest'
+      parameters:
+        - id: value
+          description: ''
+          type: unknown
+      return:
+        type: '@organigram/js!~value is <xref uid="@organigram/js!FileVersionManifest:type" />'
+        description: ''
   - name: isLocalHost(hostUrl)
     uid: '@organigram/js!isLocalHost:function(1)'
     package: '@organigram/js!'
@@ -1100,6 +1791,40 @@ functions:
       return:
         type: boolean
         description: ''
+  - name: isPublicFileVersionManifest(value)
+    uid: '@organigram/js!isPublicFileVersionManifest:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'isPublicFileVersionManifest: (value: unknown) => value is PublicFileVersionManifest'
+      parameters:
+        - id: value
+          description: ''
+          type: unknown
+      return:
+        type: '@organigram/js!~value is <xref uid="@organigram/js!PublicFileVersionManifest:interface" />'
+        description: ''
+  - name: isScopeEnvelopeManifest(value)
+    uid: '@organigram/js!isScopeEnvelopeManifest:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'isScopeEnvelopeManifest: (value: unknown) => value is ScopeEnvelopeManifest'
+      parameters:
+        - id: value
+          description: ''
+          type: unknown
+      return:
+        type: '@organigram/js!~value is <xref uid="@organigram/js!ScopeEnvelopeManifest:interface" />'
+        description: ''
   - name: isSupportedChainId(chainId)
     uid: '@organigram/js!isSupportedChainId:function(1)'
     package: '@organigram/js!'
@@ -1116,6 +1841,96 @@ functions:
           type: string | number | bigint | null | undefined
       return:
         type: boolean
+        description: ''
+  - name: isValidEncryptionKeyVersion(keyVersion)
+    uid: '@organigram/js!isValidEncryptionKeyVersion:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'isValidEncryptionKeyVersion: (keyVersion: number) => boolean'
+      parameters:
+        - id: keyVersion
+          description: ''
+          type: number
+      return:
+        type: boolean
+        description: ''
+  - name: loadUserEncryptionKeyPair(address)
+    uid: '@organigram/js!loadUserEncryptionKeyPair:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'loadUserEncryptionKeyPair: (address: string) => Promise<StoredUserEncryptionKeyPair | null>'
+      parameters:
+        - id: address
+          description: ''
+          type: string
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!StoredUserEncryptionKeyPair:interface" /> | null&gt;
+        description: ''
+  - name: normalizeEncryptionKeyVersion(keyVersion)
+    uid: '@organigram/js!normalizeEncryptionKeyVersion:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'normalizeEncryptionKeyVersion: (keyVersion: number) => number | null'
+      parameters:
+        - id: keyVersion
+          description: ''
+          type: number
+      return:
+        type: number | null
+        description: ''
+  - name: parseCidRef(value)
+    uid: '@organigram/js!parseCidRef:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'parseCidRef: (value?: string | null) => ParsedCidRef | null'
+      parameters:
+        - id: value
+          description: ''
+          type: string | null
+      return:
+        type: <xref uid="@organigram/js!ParsedCidRef:interface" /> | null
+        description: ''
+  - name: parseEncryptionPublicKeySiweResource(resources, address)
+    uid: '@organigram/js!parseEncryptionPublicKeySiweResource:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: >-
+        parseEncryptionPublicKeySiweResource: (resources: string[] | undefined, address: string) =>
+        EncryptionPublicKeySiweResource | null
+      parameters:
+        - id: resources
+          description: ''
+          type: string[] | undefined
+        - id: address
+          description: ''
+          type: string
+      return:
+        type: <xref uid="@organigram/js!EncryptionPublicKeySiweResource:interface" /> | null
         description: ''
   - name: populateInitializeProcedure(input, clients)
     uid: '@organigram/js!populateInitializeProcedure:function(1)'
@@ -1248,77 +2063,7 @@ functions:
     isPreview: false
     isDeprecated: false
     syntax:
-      content: |-
-        renewSaltsAndAddresses: (organigram: OrganigramInput, chainId: string) => {
-            chainId: string;
-            organs: {
-                salt: string;
-                address: string;
-                chainId: string;
-                isDeployed: boolean;
-                permissions: {
-                    permissionAddress: string;
-                    permissionValue: number;
-                }[] | undefined;
-                publicClient?: import("viem").PublicClient | null;
-                walletClient?: import("viem").WalletClient | null;
-                balance?: string | null;
-                cid?: string | null;
-                entries?: Array<{
-                    index: string;
-                    address: string;
-                    cid: string;
-                }> | null;
-                name?: string | null;
-                description?: string | null;
-                organigramId?: string | null;
-                forwarder?: string | null;
-            }[];
-            procedures: {
-                salt: string;
-                chainId: string;
-                data: string;
-                isDeployed: boolean;
-                address: string;
-                deciders: string;
-                proposers: string;
-                moderators: string | undefined;
-                typeName: string;
-                type?: import("..").ProcedureType;
-                name?: string | null;
-                description?: string | null;
-                cid?: string | null;
-                publicClient?: import("viem").PublicClient | null;
-                walletClient?: import("viem").WalletClient | null;
-                metadata?: string | null;
-                withModeration?: boolean | null;
-                forwarder?: string | null;
-                proposals?: import("..").ProcedureProposal[] | null;
-                organigramId?: string | null;
-            }[];
-            assets: {
-                chainId: string;
-                isDeployed: boolean;
-                salt: string;
-                address: string;
-                name?: string | null;
-                description?: string | null;
-                symbol?: string | null;
-                initialSupply?: number | null;
-                image?: string | null;
-                userBalance?: string | null;
-                organigramId?: string | null;
-            }[];
-            id?: string | null;
-            slug?: string | null;
-            name?: string | null;
-            description?: string | null;
-            organigramClient?: import("..").OrganigramClient | null;
-            walletClient?: import("viem").WalletClient | null;
-            publicClient?: import("viem").PublicClient | null;
-            contractAddresses?: string[] | null;
-            workspaceId?: string | null;
-        }
+      content: 'renewSaltsAndAddresses: (organigram: OrganigramInput, chainId: string) => OrganigramInput'
       parameters:
         - id: organigram
           description: ''
@@ -1327,77 +2072,7 @@ functions:
           description: ''
           type: string
       return:
-        type: |-
-          {
-              chainId: string;
-              organs: {
-                  salt: string;
-                  address: string;
-                  chainId: string;
-                  isDeployed: boolean;
-                  permissions: {
-                      permissionAddress: string;
-                      permissionValue: number;
-                  }[] | undefined;
-                  publicClient?: import("viem")<xref uid=".viem!PublicClient:type" /> | null;
-                  walletClient?: import("viem")<xref uid=".viem!WalletClient:type" /> | null;
-                  balance?: string | null;
-                  cid?: string | null;
-                  entries?: Array&lt;{
-                      index: string;
-                      address: string;
-                      cid: string;
-                  }&gt; | null;
-                  name?: string | null;
-                  description?: string | null;
-                  organigramId?: string | null;
-                  forwarder?: string | null;
-              }[];
-              procedures: {
-                  salt: string;
-                  chainId: string;
-                  data: string;
-                  isDeployed: boolean;
-                  address: string;
-                  deciders: string;
-                  proposers: string;
-                  moderators: string | undefined;
-                  typeName: string;
-                  type?: import("..").<xref uid="@organigram/js!ProcedureType:interface" />;
-                  name?: string | null;
-                  description?: string | null;
-                  cid?: string | null;
-                  publicClient?: import("viem")<xref uid=".viem!PublicClient:type" /> | null;
-                  walletClient?: import("viem")<xref uid=".viem!WalletClient:type" /> | null;
-                  metadata?: string | null;
-                  withModeration?: boolean | null;
-                  forwarder?: string | null;
-                  proposals?: import("..").<xref uid="@organigram/js!ProcedureProposal:interface" />[] | null;
-                  organigramId?: string | null;
-              }[];
-              assets: {
-                  chainId: string;
-                  isDeployed: boolean;
-                  salt: string;
-                  address: string;
-                  name?: string | null;
-                  description?: string | null;
-                  symbol?: string | null;
-                  initialSupply?: number | null;
-                  image?: string | null;
-                  userBalance?: string | null;
-                  organigramId?: string | null;
-              }[];
-              id?: string | null;
-              slug?: string | null;
-              name?: string | null;
-              description?: string | null;
-              organigramClient?: import("..").<xref uid="@organigram/js!OrganigramClient:class" /> | null;
-              walletClient?: import("viem")<xref uid=".viem!WalletClient:type" /> | null;
-              publicClient?: import("viem")<xref uid=".viem!PublicClient:type" /> | null;
-              contractAddresses?: string[] | null;
-              workspaceId?: string | null;
-          }
+        type: <xref uid="@organigram/js!OrganigramInput:type" />
         description: ''
   - name: resolveDeployment(chainId, deploymentName)
     uid: '@organigram/js!resolveDeployment:function(1)'
@@ -1420,4 +2095,155 @@ functions:
           type: <xref uid="@organigram/js!~ProtocolDeploymentName:type" />
       return:
         type: string | undefined
+        description: ''
+  - name: saveUserEncryptionKeyPair(address, value)
+    uid: '@organigram/js!saveUserEncryptionKeyPair:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'saveUserEncryptionKeyPair: (address: string, value: StoredUserEncryptionKeyPair) => Promise<void>'
+      parameters:
+        - id: address
+          description: ''
+          type: string
+        - id: value
+          description: ''
+          type: <xref uid="@organigram/js!StoredUserEncryptionKeyPair:interface" />
+      return:
+        type: Promise&lt;void&gt;
+        description: ''
+  - name: sha256Hex(value)
+    uid: '@organigram/js!sha256Hex:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'sha256Hex: (value: string) => Promise<string>'
+      parameters:
+        - id: value
+          description: ''
+          type: string
+      return:
+        type: Promise&lt;string&gt;
+        description: ''
+  - name: stableStringify(value)
+    uid: '@organigram/js!stableStringify:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'stableStringify: (value: unknown) => string'
+      parameters:
+        - id: value
+          description: ''
+          type: unknown
+      return:
+        type: string
+        description: ''
+  - name: textToBytes(value)
+    uid: '@organigram/js!textToBytes:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'textToBytes: (value: string) => Uint8Array'
+      parameters:
+        - id: value
+          description: ''
+          type: string
+      return:
+        type: Uint8Array
+        description: ''
+  - name: unwrapContentKey(wrappedContentKey, groupKey)
+    uid: '@organigram/js!unwrapContentKey:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'unwrapContentKey: (wrappedContentKey: WrappedContentKey, groupKey: CryptoKey) => Promise<CryptoKey>'
+      parameters:
+        - id: wrappedContentKey
+          description: ''
+          type: <xref uid="@organigram/js!WrappedContentKey:interface" />
+        - id: groupKey
+          description: ''
+          type: CryptoKey
+      return:
+        type: Promise&lt;CryptoKey&gt;
+        description: ''
+  - name: unwrapGroupKey(wrappedGroupKey, recipientPrivateKey)
+    uid: '@organigram/js!unwrapGroupKey:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'unwrapGroupKey: (wrappedGroupKey: WrappedGroupKey, recipientPrivateKey: CryptoKey) => Promise<CryptoKey>'
+      parameters:
+        - id: wrappedGroupKey
+          description: ''
+          type: <xref uid="@organigram/js!WrappedGroupKey:interface" />
+        - id: recipientPrivateKey
+          description: ''
+          type: CryptoKey
+      return:
+        type: Promise&lt;CryptoKey&gt;
+        description: ''
+  - name: wrapContentKey(contentKey, groupKey)
+    uid: '@organigram/js!wrapContentKey:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'wrapContentKey: (contentKey: CryptoKey, groupKey: CryptoKey) => Promise<WrappedContentKey>'
+      parameters:
+        - id: contentKey
+          description: ''
+          type: CryptoKey
+        - id: groupKey
+          description: ''
+          type: CryptoKey
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!WrappedContentKey:interface" />&gt;
+        description: ''
+  - name: wrapGroupKeyForRecipient(groupKey, recipient)
+    uid: '@organigram/js!wrapGroupKeyForRecipient:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'wrapGroupKeyForRecipient: (groupKey: CryptoKey, recipient: RecipientEncryptionKey) => Promise<WrappedGroupKey>'
+      parameters:
+        - id: groupKey
+          description: ''
+          type: CryptoKey
+        - id: recipient
+          description: ''
+          type: <xref uid="@organigram/js!RecipientEncryptionKey:interface" />
+      return:
+        type: Promise&lt;<xref uid="@organigram/js!WrappedGroupKey:interface" />&gt;
         description: ''

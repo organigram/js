@@ -1,0 +1,38 @@
+### YamlMime:TSType
+name: ParsedCidRef
+uid: '@organigram/js!ParsedCidRef:interface'
+package: '@organigram/js!'
+fullName: ParsedCidRef
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: logicalKey
+    uid: '@organigram/js!ParsedCidRef#logicalKey:member'
+    package: '@organigram/js!'
+    fullName: logicalKey
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'logicalKey: string;'
+      return:
+        type: string
+  - name: scopeRef
+    uid: '@organigram/js!ParsedCidRef#scopeRef:member'
+    package: '@organigram/js!'
+    fullName: scopeRef
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'scopeRef: ScopeEnvelopeReference;'
+      return:
+        type: <xref uid="@organigram/js!ScopeEnvelopeReference:interface" />

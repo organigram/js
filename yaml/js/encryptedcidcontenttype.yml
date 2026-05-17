@@ -1,0 +1,13 @@
+### YamlMime:TSTypeAlias
+name: EncryptedCidContentType
+uid: '@organigram/js!EncryptedCidContentType:type'
+package: '@organigram/js!'
+fullName: EncryptedCidContentType
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+syntax: >-
+  export type EncryptedCidContentType = 'entry' | 'proposal' | 'organMetadata' | 'procedureMetadata' | 'certifiedProof'
+  | 'file' | string;

@@ -1,0 +1,70 @@
+import type { FileVersionManifest, ParsedCidRef, PublicFileVersionManifest, ScopeEnvelopeCheckpoint, ScopeEnvelopeContentType, ScopeEnvelopeItem, ScopeEnvelopeManifest, ScopeEnvelopeReference, ScopeEnvelopeRetentionState, WrappedContentKey } from './types';
+export declare const stableStringify: (value: unknown) => string;
+export declare const sha256Hex: (value: string) => Promise<string>;
+export declare const createScopeEnvelopeCheckpoint: (input: {
+    epoch: number;
+    membershipHash: string;
+    rootHash: string;
+}) => ScopeEnvelopeCheckpoint;
+export declare const formatCidRef: (scopeRef: ScopeEnvelopeReference, logicalKey: string) => string;
+export declare const parseCidRef: (value?: string | null) => ParsedCidRef | null;
+export declare const isCidRef: (value?: string | null) => boolean;
+export declare const createScopeEnvelopeItem: (input: {
+    logicalKey: string;
+    currentManifestCid: string;
+    contentType: ScopeEnvelopeContentType;
+    version?: number;
+    retentionState?: ScopeEnvelopeRetentionState;
+    previousManifestCid?: string;
+    updatedAt?: Date | string;
+}) => ScopeEnvelopeItem;
+export declare const computeScopeEnvelopeRoot: (items: Record<string, ScopeEnvelopeItem>) => Promise<string>;
+export declare const createScopeEnvelopeSignatureMessage: (input: {
+    scopeRef: ScopeEnvelopeReference;
+    checkpoint: ScopeEnvelopeCheckpoint;
+    items: Record<string, ScopeEnvelopeItem>;
+    previousEnvelopeCid?: string | null;
+}) => string;
+export declare const createScopeEnvelopeManifest: (input: {
+    scopeRef: ScopeEnvelopeReference;
+    checkpoint: ScopeEnvelopeCheckpoint;
+    items: Record<string, ScopeEnvelopeItem>;
+    wrappedEnvelopeKey: WrappedContentKey;
+    previousEnvelopeCid?: string | null;
+    signature?: string | null;
+    signedByAddress?: string | null;
+    createdAt?: Date | string;
+}) => ScopeEnvelopeManifest;
+export declare const isScopeEnvelopeManifest: (value: unknown) => value is ScopeEnvelopeManifest;
+export declare const createFileVersionManifest: (input: {
+    contentType: ScopeEnvelopeContentType;
+    scopeRef: ScopeEnvelopeReference;
+    logicalKey: string;
+    encryptedCid: string;
+    encryptedContentIv: string;
+    encryptedContentSize: number;
+    wrappedContentKey: WrappedContentKey;
+    previousManifestCid?: string | null;
+    retentionState?: ScopeEnvelopeRetentionState;
+    scopeEnvelope?: ScopeEnvelopeCheckpoint;
+    mime?: string;
+    name?: string;
+    signature?: string | null;
+    signedByAddress?: string | null;
+    createdAt?: Date | string;
+}) => FileVersionManifest;
+export declare const createPublicFileVersionManifest: (input: {
+    contentType: ScopeEnvelopeContentType;
+    scopeRef: ScopeEnvelopeReference;
+    logicalKey: string;
+    publicCid: string;
+    publicContentSize: number;
+    previousManifestCid?: string | null;
+    retentionState?: ScopeEnvelopeRetentionState;
+    scopeEnvelope?: ScopeEnvelopeCheckpoint;
+    mime?: string;
+    name?: string;
+    signature?: string | null;
+    signedByAddress?: string | null;
+    createdAt?: Date | string;
+}) => PublicFileVersionManifest;

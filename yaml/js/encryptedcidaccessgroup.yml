@@ -1,0 +1,51 @@
+### YamlMime:TSType
+name: EncryptedCidAccessGroup
+uid: '@organigram/js!EncryptedCidAccessGroup:interface'
+package: '@organigram/js!'
+fullName: EncryptedCidAccessGroup
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: epoch
+    uid: '@organigram/js!EncryptedCidAccessGroup#epoch:member'
+    package: '@organigram/js!'
+    fullName: epoch
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'epoch: number;'
+      return:
+        type: number
+  - name: scopeId
+    uid: '@organigram/js!EncryptedCidAccessGroup#scopeId:member'
+    package: '@organigram/js!'
+    fullName: scopeId
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'scopeId: string;'
+      return:
+        type: string
+  - name: scopeType
+    uid: '@organigram/js!EncryptedCidAccessGroup#scopeType:member'
+    package: '@organigram/js!'
+    fullName: scopeType
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'scopeType: AccessGroupScopeType;'
+      return:
+        type: <xref uid="@organigram/js!AccessGroupScopeType:type" />

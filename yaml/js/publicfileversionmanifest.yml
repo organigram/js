@@ -1,0 +1,193 @@
+### YamlMime:TSType
+name: PublicFileVersionManifest
+uid: '@organigram/js!PublicFileVersionManifest:interface'
+package: '@organigram/js!'
+fullName: PublicFileVersionManifest
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: accessGroup
+    uid: '@organigram/js!PublicFileVersionManifest#accessGroup:member'
+    package: '@organigram/js!'
+    fullName: accessGroup
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'accessGroup?: EncryptedCidAccessGroup;'
+      return:
+        type: <xref uid="@organigram/js!EncryptedCidAccessGroup:interface" />
+  - name: contentType
+    uid: '@organigram/js!PublicFileVersionManifest#contentType:member'
+    package: '@organigram/js!'
+    fullName: contentType
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'contentType: ScopeEnvelopeContentType;'
+      return:
+        type: <xref uid="@organigram/js!ScopeEnvelopeContentType:type" />
+  - name: createdAt
+    uid: '@organigram/js!PublicFileVersionManifest#createdAt:member'
+    package: '@organigram/js!'
+    fullName: createdAt
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'createdAt: string;'
+      return:
+        type: string
+  - name: kind
+    uid: '@organigram/js!PublicFileVersionManifest#kind:member'
+    package: '@organigram/js!'
+    fullName: kind
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'kind: typeof FILE_VERSION_MANIFEST_KIND;'
+      return:
+        type: typeof <xref uid="@organigram/js!FILE_VERSION_MANIFEST_KIND:var" />
+  - name: logicalKey
+    uid: '@organigram/js!PublicFileVersionManifest#logicalKey:member'
+    package: '@organigram/js!'
+    fullName: logicalKey
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'logicalKey?: string;'
+      return:
+        type: string
+  - name: previousManifestCid
+    uid: '@organigram/js!PublicFileVersionManifest#previousManifestCid:member'
+    package: '@organigram/js!'
+    fullName: previousManifestCid
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'previousManifestCid?: string;'
+      return:
+        type: string
+  - name: publicContent
+    uid: '@organigram/js!PublicFileVersionManifest#publicContent:member'
+    package: '@organigram/js!'
+    fullName: publicContent
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        publicContent: {
+                cid: string;
+                size: number;
+                mime?: string;
+                name?: string;
+            };
+      return:
+        type: |-
+          {
+                  cid: string;
+                  size: number;
+                  mime?: string;
+                  name?: string;
+              }
+  - name: retentionState
+    uid: '@organigram/js!PublicFileVersionManifest#retentionState:member'
+    package: '@organigram/js!'
+    fullName: retentionState
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'retentionState?: ScopeEnvelopeRetentionState;'
+      return:
+        type: <xref uid="@organigram/js!ScopeEnvelopeRetentionState:type" />
+  - name: scopeEnvelope
+    uid: '@organigram/js!PublicFileVersionManifest#scopeEnvelope:member'
+    package: '@organigram/js!'
+    fullName: scopeEnvelope
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'scopeEnvelope?: ScopeEnvelopeCheckpoint;'
+      return:
+        type: <xref uid="@organigram/js!ScopeEnvelopeCheckpoint:interface" />
+  - name: scopeRef
+    uid: '@organigram/js!PublicFileVersionManifest#scopeRef:member'
+    package: '@organigram/js!'
+    fullName: scopeRef
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'scopeRef?: ScopeEnvelopeReference;'
+      return:
+        type: <xref uid="@organigram/js!ScopeEnvelopeReference:interface" />
+  - name: signature
+    uid: '@organigram/js!PublicFileVersionManifest#signature:member'
+    package: '@organigram/js!'
+    fullName: signature
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'signature?: string;'
+      return:
+        type: string
+  - name: signedByAddress
+    uid: '@organigram/js!PublicFileVersionManifest#signedByAddress:member'
+    package: '@organigram/js!'
+    fullName: signedByAddress
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'signedByAddress?: string;'
+      return:
+        type: string
+  - name: version
+    uid: '@organigram/js!PublicFileVersionManifest#version:member'
+    package: '@organigram/js!'
+    fullName: version
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'version: 1;'
+      return:
+        type: '1'

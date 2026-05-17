@@ -1,0 +1,104 @@
+### YamlMime:TSType
+name: UserEncryptionKeyBackup
+uid: '@organigram/js!UserEncryptionKeyBackup:interface'
+package: '@organigram/js!'
+fullName: UserEncryptionKeyBackup
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: address
+    uid: '@organigram/js!UserEncryptionKeyBackup#address:member'
+    package: '@organigram/js!'
+    fullName: address
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'address: string;'
+      return:
+        type: string
+  - name: createdAt
+    uid: '@organigram/js!UserEncryptionKeyBackup#createdAt:member'
+    package: '@organigram/js!'
+    fullName: createdAt
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'createdAt: string;'
+      return:
+        type: string
+  - name: keyVersion
+    uid: '@organigram/js!UserEncryptionKeyBackup#keyVersion:member'
+    package: '@organigram/js!'
+    fullName: keyVersion
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'keyVersion: number;'
+      return:
+        type: number
+  - name: kind
+    uid: '@organigram/js!UserEncryptionKeyBackup#kind:member'
+    package: '@organigram/js!'
+    fullName: kind
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'kind: typeof USER_ENCRYPTION_KEY_BACKUP_KIND;'
+      return:
+        type: typeof <xref uid="@organigram/js!USER_ENCRYPTION_KEY_BACKUP_KIND:var" />
+  - name: privateKey
+    uid: '@organigram/js!UserEncryptionKeyBackup#privateKey:member'
+    package: '@organigram/js!'
+    fullName: privateKey
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        privateKey: {
+                algorithm: 'PBKDF2-SHA256+A256GCM';
+                iterations: number;
+                salt: string;
+                iv: string;
+                ciphertext: string;
+            };
+      return:
+        type: |-
+          {
+                  algorithm: 'PBKDF2-SHA256+A256GCM';
+                  iterations: number;
+                  salt: string;
+                  iv: string;
+                  ciphertext: string;
+              }
+  - name: publicKey
+    uid: '@organigram/js!UserEncryptionKeyBackup#publicKey:member'
+    package: '@organigram/js!'
+    fullName: publicKey
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'publicKey: JsonWebKey;'
+      return:
+        type: JsonWebKey

@@ -1,0 +1,11 @@
+### YamlMime:TSTypeAlias
+name: FileVersionManifest
+uid: '@organigram/js!FileVersionManifest:type'
+package: '@organigram/js!'
+fullName: FileVersionManifest
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+syntax: export type FileVersionManifest = PublicFileVersionManifest | EncryptedCidManifest;

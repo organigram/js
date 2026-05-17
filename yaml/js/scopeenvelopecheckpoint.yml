@@ -1,0 +1,51 @@
+### YamlMime:TSType
+name: ScopeEnvelopeCheckpoint
+uid: '@organigram/js!ScopeEnvelopeCheckpoint:interface'
+package: '@organigram/js!'
+fullName: ScopeEnvelopeCheckpoint
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: epoch
+    uid: '@organigram/js!ScopeEnvelopeCheckpoint#epoch:member'
+    package: '@organigram/js!'
+    fullName: epoch
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'epoch: number;'
+      return:
+        type: number
+  - name: membershipHash
+    uid: '@organigram/js!ScopeEnvelopeCheckpoint#membershipHash:member'
+    package: '@organigram/js!'
+    fullName: membershipHash
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'membershipHash: string;'
+      return:
+        type: string
+  - name: rootHash
+    uid: '@organigram/js!ScopeEnvelopeCheckpoint#rootHash:member'
+    package: '@organigram/js!'
+    fullName: rootHash
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'rootHash: string;'
+      return:
+        type: string

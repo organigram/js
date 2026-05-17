@@ -1,0 +1,51 @@
+### YamlMime:TSType
+name: WrappedContentKey
+uid: '@organigram/js!WrappedContentKey:interface'
+package: '@organigram/js!'
+fullName: WrappedContentKey
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: algorithm
+    uid: '@organigram/js!WrappedContentKey#algorithm:member'
+    package: '@organigram/js!'
+    fullName: algorithm
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'algorithm: typeof ENCRYPTION_ALGORITHM;'
+      return:
+        type: typeof <xref uid="@organigram/js!ENCRYPTION_ALGORITHM:var" />
+  - name: ciphertext
+    uid: '@organigram/js!WrappedContentKey#ciphertext:member'
+    package: '@organigram/js!'
+    fullName: ciphertext
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'ciphertext: string;'
+      return:
+        type: string
+  - name: iv
+    uid: '@organigram/js!WrappedContentKey#iv:member'
+    package: '@organigram/js!'
+    fullName: iv
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'iv: string;'
+      return:
+        type: string

@@ -4,6 +4,7 @@ export * from './crypto';
 export * from './encoding';
 export * from './keyVersion';
 export * from './manifest';
+export * from './scopeEnvelope';
 export * from './siwe';
 export * from './storage';
 export * from './types';

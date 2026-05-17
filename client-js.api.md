@@ -29,10 +29,19 @@ import { WriteContractParameters } from 'viem';
 import { WriteContractReturnType } from 'viem';
 
 // @public (undocumented)
+export type AccessGroupScopeType = 'workspace' | 'organization' | 'organ' | 'procedure' | 'certifiedProof';
+
+// @public (undocumented)
 export type AccountInOrgans = {
     moderators?: boolean;
     proposers?: boolean;
     deciders?: boolean;
+};
+
+// @public (undocumented)
+export const aesKeyAlgorithm: {
+    readonly name: "AES-GCM";
+    readonly length: 256;
 };
 
 // @public
@@ -117,13 +126,37 @@ export interface AssetJson {
 }
 
 // @public (undocumented)
+export const base64ToBytes: (value: string) => Uint8Array;
+
+// @public (undocumented)
+export const base64UrlToBytes: (value: string) => Uint8Array;
+
+// @public (undocumented)
 export const bufferEstimatedGas: (estimatedGas: bigint) => bigint;
+
+// @public (undocumented)
+export const bytesToArrayBuffer: (value: ArrayBuffer | Uint8Array) => ArrayBuffer;
+
+// @public (undocumented)
+export const bytesToBase64: (bytes: ArrayBuffer | Uint8Array) => string;
+
+// @public (undocumented)
+export const bytesToBase64Url: (bytes: ArrayBuffer | Uint8Array) => string;
+
+// @public (undocumented)
+export const bytesToText: (value: ArrayBuffer | Uint8Array) => string;
 
 // @public (undocumented)
 export const capitalize: (s: string) => string;
 
 // @public (undocumented)
+export const CID_REF_PREFIX: "og://workspace/";
+
+// @public (undocumented)
 export function cloneInitCodeHash(implementation: string): string;
+
+// @public (undocumented)
+export const computeScopeEnvelopeRoot: (items: Record<string, ScopeEnvelopeItem>) => Promise<string>;
 
 // @public (undocumented)
 export type ContractClients = {
@@ -156,7 +189,112 @@ export const createDeployTransaction: <TAbi extends Abi | readonly unknown[]>(in
 }) => Promise<OrganigramTransaction>;
 
 // @public (undocumented)
+export const createEncryptedCidManifest: (input: {
+    contentType: EncryptedCidContentType;
+    accessGroup?: EncryptedCidAccessGroup;
+    scopeRef?: FileVersionManifest["scopeRef"];
+    logicalKey?: string;
+    retentionState?: FileVersionManifest["retentionState"];
+    previousManifestCid?: string;
+    encryptedCid: string;
+    encryptedContentIv: string;
+    encryptedContentSize: number;
+    wrappedContentKey: WrappedContentKey;
+    mime?: string;
+    name?: string;
+    scopeEnvelope?: FileVersionManifest["scopeEnvelope"];
+    signature?: string;
+    signedByAddress?: string;
+}) => EncryptedCidManifest;
+
+// @public (undocumented)
+export const createEncryptionKeyVersion: (timestamp?: number) => number;
+
+// @public (undocumented)
+export const createEncryptionPublicKeyMessage: (address: string, publicKey: JsonWebKey, keyVersion: number) => string;
+
+// @public (undocumented)
+export const createEncryptionPublicKeySiweResource: (address: string, publicKey: JsonWebKey, keyVersion: number) => string;
+
+// @public (undocumented)
+export const createFileVersionManifest: (input: {
+    contentType: ScopeEnvelopeContentType;
+    scopeRef: ScopeEnvelopeReference;
+    logicalKey: string;
+    encryptedCid: string;
+    encryptedContentIv: string;
+    encryptedContentSize: number;
+    wrappedContentKey: WrappedContentKey;
+    previousManifestCid?: string | null;
+    retentionState?: ScopeEnvelopeRetentionState;
+    scopeEnvelope?: ScopeEnvelopeCheckpoint;
+    mime?: string;
+    name?: string;
+    signature?: string | null;
+    signedByAddress?: string | null;
+    createdAt?: Date | string;
+}) => FileVersionManifest;
+
+// @public (undocumented)
+export const createPublicFileVersionManifest: (input: {
+    contentType: ScopeEnvelopeContentType;
+    scopeRef: ScopeEnvelopeReference;
+    logicalKey: string;
+    publicCid: string;
+    publicContentSize: number;
+    previousManifestCid?: string | null;
+    retentionState?: ScopeEnvelopeRetentionState;
+    scopeEnvelope?: ScopeEnvelopeCheckpoint;
+    mime?: string;
+    name?: string;
+    signature?: string | null;
+    signedByAddress?: string | null;
+    createdAt?: Date | string;
+}) => PublicFileVersionManifest;
+
+// @public (undocumented)
 export const createRandom32BytesHexId: () => `0x${string}`;
+
+// @public (undocumented)
+export const createScopeEnvelopeCheckpoint: (input: {
+    epoch: number;
+    membershipHash: string;
+    rootHash: string;
+}) => ScopeEnvelopeCheckpoint;
+
+// @public (undocumented)
+export const createScopeEnvelopeItem: (input: {
+    logicalKey: string;
+    currentManifestCid: string;
+    contentType: ScopeEnvelopeContentType;
+    version?: number;
+    retentionState?: ScopeEnvelopeRetentionState;
+    previousManifestCid?: string;
+    updatedAt?: Date | string;
+}) => ScopeEnvelopeItem;
+
+// @public (undocumented)
+export const createScopeEnvelopeManifest: (input: {
+    scopeRef: ScopeEnvelopeReference;
+    checkpoint: ScopeEnvelopeCheckpoint;
+    items: Record<string, ScopeEnvelopeItem>;
+    wrappedEnvelopeKey: WrappedContentKey;
+    previousEnvelopeCid?: string | null;
+    signature?: string | null;
+    signedByAddress?: string | null;
+    createdAt?: Date | string;
+}) => ScopeEnvelopeManifest;
+
+// @public (undocumented)
+export const createScopeEnvelopeSignatureMessage: (input: {
+    scopeRef: ScopeEnvelopeReference;
+    checkpoint: ScopeEnvelopeCheckpoint;
+    items: Record<string, ScopeEnvelopeItem>;
+    previousEnvelopeCid?: string | null;
+}) => string;
+
+// @public (undocumented)
+export const decryptBytes: (encryptedBytes: ArrayBuffer | Uint8Array, key: CryptoKey, iv: string) => Promise<Uint8Array>;
 
 // @public
 export const defaultChainId: string;
@@ -268,6 +406,91 @@ export const electionFields: {
 export const encodeProcedureInitialization: (abi: unknown, functionName: string, args: unknown[]) => PopulatedTransactionData;
 
 // @public (undocumented)
+export const encryptBytes: (bytes: ArrayBuffer | Uint8Array, key: CryptoKey) => Promise<{
+    encryptedBytes: Uint8Array;
+    iv: string;
+}>;
+
+// @public (undocumented)
+export const ENCRYPTED_CID_KIND: "organigram.encrypted-cid.v1";
+
+// @public (undocumented)
+export interface EncryptedCidAccessGroup {
+    // (undocumented)
+    epoch: number;
+    // (undocumented)
+    scopeId: string;
+    // (undocumented)
+    scopeType: AccessGroupScopeType;
+}
+
+// @public (undocumented)
+export type EncryptedCidContentType = 'entry' | 'proposal' | 'organMetadata' | 'procedureMetadata' | 'certifiedProof' | 'file' | string;
+
+// @public (undocumented)
+export interface EncryptedCidManifest {
+    // (undocumented)
+    accessGroup?: EncryptedCidAccessGroup;
+    // (undocumented)
+    contentType: ScopeEnvelopeContentType;
+    // (undocumented)
+    createdAt: string;
+    // (undocumented)
+    encryptedContent: {
+        cid: string;
+        algorithm: typeof ENCRYPTION_ALGORITHM;
+        iv: string;
+        size: number;
+        mime?: string;
+        name?: string;
+    };
+    // (undocumented)
+    kind: typeof ENCRYPTED_CID_KIND | typeof FILE_VERSION_MANIFEST_KIND;
+    // (undocumented)
+    logicalKey?: string;
+    // (undocumented)
+    previousManifestCid?: string;
+    // (undocumented)
+    retentionState?: ScopeEnvelopeRetentionState;
+    // (undocumented)
+    scopeEnvelope?: ScopeEnvelopeCheckpoint;
+    // (undocumented)
+    scopeRef?: ScopeEnvelopeReference;
+    // (undocumented)
+    signature?: string;
+    // (undocumented)
+    signedByAddress?: string;
+    // (undocumented)
+    version: 1;
+    // (undocumented)
+    wrappedContentKey: WrappedContentKey;
+}
+
+// @public (undocumented)
+export const ENCRYPTION_ALGORITHM: "A256GCM";
+
+// @public (undocumented)
+export const ENCRYPTION_PUBLIC_KEY_SIWE_RESOURCE_KIND: "organigram.encryption-public-key.v1";
+
+// @public (undocumented)
+export const ENCRYPTION_PUBLIC_KEY_SIWE_RESOURCE_PREFIX: "urn:organigram:encryption-public-key:";
+
+// @public (undocumented)
+export interface EncryptionPublicKeySiweResource {
+    // (undocumented)
+    address: string;
+    // (undocumented)
+    keyVersion: number;
+    // (undocumented)
+    kind: typeof ENCRYPTION_PUBLIC_KEY_SIWE_RESOURCE_KIND;
+    // (undocumented)
+    publicKey: JsonWebKey;
+}
+
+// @public (undocumented)
+export const ensureUserEncryptionKeyPair: (address: string) => Promise<StoredUserEncryptionKeyPair>;
+
+// @public (undocumented)
 export const ERC20_INITIAL_SUPPLY = 10000000;
 
 // @public (undocumented)
@@ -299,6 +522,18 @@ export type ERC20VoteProcedureInput = Omit<VoteProcedureInput, 'type' | 'typeNam
 };
 
 // @public (undocumented)
+export const exportSymmetricKey: (key: CryptoKey) => Promise<Uint8Array>;
+
+// @public (undocumented)
+export const exportUserEncryptionKeyBackup: (address: string, passphrase: string) => Promise<UserEncryptionKeyBackup>;
+
+// @public (undocumented)
+export const exportUserPrivateKey: (keyPair: CryptoKeyPair) => Promise<JsonWebKey>;
+
+// @public (undocumented)
+export const exportUserPublicKey: (keyPair: CryptoKeyPair) => Promise<JsonWebKey>;
+
+// @public (undocumented)
 export interface ExternalCallOperationInput {
     // (undocumented)
     data: string;
@@ -322,13 +557,31 @@ interface File_2 {
 export { File_2 as File }
 
 // @public (undocumented)
+export const FILE_VERSION_MANIFEST_KIND: "organigram.file-version-manifest.v1";
+
+// @public (undocumented)
+export type FileVersionManifest = PublicFileVersionManifest | EncryptedCidManifest;
+
+// @public (undocumented)
+export const formatCidRef: (scopeRef: ScopeEnvelopeReference, logicalKey: string) => string;
+
+// @public (undocumented)
 export const formatSalt: (salt?: string | null) => string;
+
+// @public (undocumented)
+export const generateContentKey: () => Promise<CryptoKey>;
+
+// @public (undocumented)
+export const generateGroupKey: () => Promise<CryptoKey>;
+
+// @public (undocumented)
+export const generateUserEncryptionKeyPair: () => Promise<CryptoKeyPair>;
 
 // @public (undocumented)
 export const getChainExplorerBaseUrl: (chainId: string) => string | undefined;
 
 // @public (undocumented)
-export const getConfiguredChain: (chainId: string, hostUrl?: string, preferLocalHost?: boolean) => Chain | undefined;
+export const getConfiguredChain: (chainId: string) => Chain | undefined;
 
 // @public (undocumented)
 export const getContractInstance: <TAbi extends Abi | readonly unknown[]>(input: {
@@ -531,6 +784,9 @@ export const getContractInstance: <TAbi extends Abi | readonly unknown[]>(input:
 };
 
 // @public (undocumented)
+export const getCrypto: () => Crypto;
+
+// @public (undocumented)
 export const getDefaultChainId: () => string;
 
 // Warning: (ae-forgotten-export) The symbol "ProtocolDeploymentName" needs to be exported by the entry point index.d.ts
@@ -558,82 +814,16 @@ export const getProcedureTypes: (chainId?: string) => {
 };
 
 // @public (undocumented)
+export const getRandomIv: () => Uint8Array;
+
+// @public (undocumented)
 export const getSupportedChainIds: () => string[];
 
 // @public (undocumented)
-export const getSupportedChains: (hostUrl?: string, preferLocalHost?: boolean) => Chain[];
+export const getSupportedChains: () => Chain[];
 
 // @public (undocumented)
-export const getTemplate: (templateName: TemplateName, chainId: string) => {
-    chainId: string;
-    organs: {
-        salt: string;
-        address: string;
-        chainId: string;
-        isDeployed: boolean;
-        permissions: {
-            permissionAddress: string;
-            permissionValue: number;
-        }[] | undefined;
-        publicClient?: PublicClient | null;
-        walletClient?: WalletClient | null;
-        balance?: string | null;
-        cid?: string | null;
-        entries?: Array<{
-            index: string;
-            address: string;
-            cid: string;
-        }> | null;
-        name?: string | null;
-        description?: string | null;
-        organigramId?: string | null;
-        forwarder?: string | null;
-    }[];
-    procedures: {
-        salt: string;
-        chainId: string;
-        data: string;
-        isDeployed: boolean;
-        address: string;
-        deciders: string;
-        proposers: string;
-        moderators: string | undefined;
-        typeName: string;
-        type?: ProcedureType;
-        name?: string | null;
-        description?: string | null;
-        cid?: string | null;
-        publicClient?: PublicClient | null;
-        walletClient?: WalletClient | null;
-        metadata?: string | null;
-        withModeration?: boolean | null;
-        forwarder?: string | null;
-        proposals?: ProcedureProposal[] | null;
-        organigramId?: string | null;
-    }[];
-    assets: {
-        chainId: string;
-        isDeployed: boolean;
-        salt: string;
-        address: string;
-        name?: string | null;
-        description?: string | null;
-        symbol?: string | null;
-        initialSupply?: number | null;
-        image?: string | null;
-        userBalance?: string | null;
-        organigramId?: string | null;
-    }[];
-    id?: string | null;
-    slug?: string | null;
-    name?: string | null;
-    description?: string | null;
-    organigramClient?: OrganigramClient | null;
-    walletClient?: WalletClient | null;
-    publicClient?: PublicClient | null;
-    contractAddresses?: string[] | null;
-    workspaceId?: string | null;
-};
+export const getTemplate: (templateName: TemplateName, chainId: string) => OrganigramInput;
 
 // @public (undocumented)
 export const getWalletAccount: (walletClient: WalletClient) => Promise<Account | Address>;
@@ -642,7 +832,25 @@ export const getWalletAccount: (walletClient: WalletClient) => Promise<Account |
 export const getWalletAddress: (walletClient: WalletClient) => Promise<Address>;
 
 // @public (undocumented)
+export const GROUP_KEY_ALGORITHM: "ECDH-P256+A256GCM";
+
+// @public (undocumented)
 export const handleJsonBigInt: (key: string, value: any) => any;
+
+// @public (undocumented)
+export const importExtractableUserPublicKey: (publicKey: JsonWebKey) => Promise<CryptoKey>;
+
+// @public (undocumented)
+export const importSymmetricKey: (rawKey: ArrayBuffer | Uint8Array) => Promise<CryptoKey>;
+
+// @public (undocumented)
+export const importUserEncryptionKeyBackup: (backup: UserEncryptionKeyBackup, passphrase: string) => Promise<StoredUserEncryptionKeyPair>;
+
+// @public (undocumented)
+export const importUserPrivateKey: (privateKey: JsonWebKey) => Promise<CryptoKey>;
+
+// @public (undocumented)
+export const importUserPublicKey: (publicKey: JsonWebKey) => Promise<CryptoKey>;
 
 // @public
 export interface IOrganEntry {
@@ -653,10 +861,34 @@ export interface IOrganEntry {
 }
 
 // @public (undocumented)
+export const isCidRef: (value?: string | null) => boolean;
+
+// @public (undocumented)
+export const isEncryptedCidManifest: (value: unknown) => value is EncryptedCidManifest;
+
+// @public (undocumented)
+export const isFileVersionManifest: (value: unknown) => value is FileVersionManifest;
+
+// @public (undocumented)
 export const isLocalHost: (hostUrl?: string) => boolean;
 
 // @public (undocumented)
+export const isPublicFileVersionManifest: (value: unknown) => value is PublicFileVersionManifest;
+
+// @public (undocumented)
+export const isScopeEnvelopeManifest: (value: unknown) => value is ScopeEnvelopeManifest;
+
+// @public (undocumented)
 export const isSupportedChainId: (chainId: string | number | bigint | null | undefined) => boolean;
+
+// @public (undocumented)
+export const isValidEncryptionKeyVersion: (keyVersion: number) => boolean;
+
+// @public (undocumented)
+export const loadUserEncryptionKeyPair: (address: string) => Promise<StoredUserEncryptionKeyPair | null>;
+
+// @public (undocumented)
+export const MAX_ENCRYPTION_KEY_VERSION = 2147483647;
 
 // @public (undocumented)
 export class NominationProcedure extends Procedure {
@@ -687,6 +919,9 @@ export class NominationProcedure extends Procedure {
     // (undocumented)
     typeName: ProcedureTypeName;
 }
+
+// @public (undocumented)
+export const normalizeEncryptionKeyVersion: (keyVersion: number) => number | null;
 
 // @public (undocumented)
 export interface OperationParam {
@@ -1056,6 +1291,20 @@ export interface OrganPermission {
     // (undocumented)
     permissionValue: number;
 }
+
+// @public (undocumented)
+export const parseCidRef: (value?: string | null) => ParsedCidRef | null;
+
+// @public (undocumented)
+export interface ParsedCidRef {
+    // (undocumented)
+    logicalKey: string;
+    // (undocumented)
+    scopeRef: ScopeEnvelopeReference;
+}
+
+// @public (undocumented)
+export const parseEncryptionPublicKeySiweResource: (resources: string[] | undefined, address: string) => EncryptionPublicKeySiweResource | null;
 
 // @public (undocumented)
 export const PERMISSIONS: {
@@ -1578,79 +1827,133 @@ export interface ProposalMetadata {
 }
 
 // @public (undocumented)
-export const renewSaltsAndAddresses: (organigram: OrganigramInput, chainId: string) => {
-    chainId: string;
-    organs: {
-        salt: string;
-        address: string;
-        chainId: string;
-        isDeployed: boolean;
-        permissions: {
-            permissionAddress: string;
-            permissionValue: number;
-        }[] | undefined;
-        publicClient?: PublicClient | null;
-        walletClient?: WalletClient | null;
-        balance?: string | null;
-        cid?: string | null;
-        entries?: Array<{
-            index: string;
-            address: string;
-            cid: string;
-        }> | null;
-        name?: string | null;
-        description?: string | null;
-        organigramId?: string | null;
-        forwarder?: string | null;
-    }[];
-    procedures: {
-        salt: string;
-        chainId: string;
-        data: string;
-        isDeployed: boolean;
-        address: string;
-        deciders: string;
-        proposers: string;
-        moderators: string | undefined;
-        typeName: string;
-        type?: ProcedureType;
-        name?: string | null;
-        description?: string | null;
-        cid?: string | null;
-        publicClient?: PublicClient | null;
-        walletClient?: WalletClient | null;
-        metadata?: string | null;
-        withModeration?: boolean | null;
-        forwarder?: string | null;
-        proposals?: ProcedureProposal[] | null;
-        organigramId?: string | null;
-    }[];
-    assets: {
-        chainId: string;
-        isDeployed: boolean;
-        salt: string;
-        address: string;
-        name?: string | null;
-        description?: string | null;
-        symbol?: string | null;
-        initialSupply?: number | null;
-        image?: string | null;
-        userBalance?: string | null;
-        organigramId?: string | null;
-    }[];
-    id?: string | null;
-    slug?: string | null;
-    name?: string | null;
-    description?: string | null;
-    organigramClient?: OrganigramClient | null;
-    walletClient?: WalletClient | null;
-    publicClient?: PublicClient | null;
-    contractAddresses?: string[] | null;
-    workspaceId?: string | null;
-};
+export interface PublicFileVersionManifest {
+    // (undocumented)
+    accessGroup?: EncryptedCidAccessGroup;
+    // (undocumented)
+    contentType: ScopeEnvelopeContentType;
+    // (undocumented)
+    createdAt: string;
+    // (undocumented)
+    kind: typeof FILE_VERSION_MANIFEST_KIND;
+    // (undocumented)
+    logicalKey?: string;
+    // (undocumented)
+    previousManifestCid?: string;
+    // (undocumented)
+    publicContent: {
+        cid: string;
+        size: number;
+        mime?: string;
+        name?: string;
+    };
+    // (undocumented)
+    retentionState?: ScopeEnvelopeRetentionState;
+    // (undocumented)
+    scopeEnvelope?: ScopeEnvelopeCheckpoint;
+    // (undocumented)
+    scopeRef?: ScopeEnvelopeReference;
+    // (undocumented)
+    signature?: string;
+    // (undocumented)
+    signedByAddress?: string;
+    // (undocumented)
+    version: 1;
+}
+
+// @public (undocumented)
+export interface RecipientEncryptionKey {
+    // (undocumented)
+    address: string;
+    // (undocumented)
+    keyVersion: number;
+    // (undocumented)
+    publicKey: JsonWebKey;
+}
+
+// @public (undocumented)
+export const renewSaltsAndAddresses: (organigram: OrganigramInput, chainId: string) => OrganigramInput;
 
 // @public (undocumented)
 export const resolveDeployment: (chainId: string | number | bigint | null | undefined, deploymentName: ProtocolDeploymentName) => string | undefined;
+
+// @public (undocumented)
+export const saveUserEncryptionKeyPair: (address: string, value: StoredUserEncryptionKeyPair) => Promise<void>;
+
+// @public (undocumented)
+export const SCOPE_ENVELOPE_KIND: "organigram.scope-envelope.v1";
+
+// @public (undocumented)
+export interface ScopeEnvelopeCheckpoint {
+    // (undocumented)
+    epoch: number;
+    // (undocumented)
+    membershipHash: string;
+    // (undocumented)
+    rootHash: string;
+}
+
+// @public (undocumented)
+export type ScopeEnvelopeContentType = EncryptedCidContentType;
+
+// @public (undocumented)
+export interface ScopeEnvelopeItem {
+    // (undocumented)
+    contentType: ScopeEnvelopeContentType;
+    // (undocumented)
+    currentManifestCid: string;
+    // (undocumented)
+    logicalKey: string;
+    // (undocumented)
+    previousManifestCid?: string;
+    // (undocumented)
+    retentionState: ScopeEnvelopeRetentionState;
+    // (undocumented)
+    updatedAt: string;
+    // (undocumented)
+    version: number;
+}
+
+// @public (undocumented)
+export interface ScopeEnvelopeManifest {
+    // (undocumented)
+    checkpoint: ScopeEnvelopeCheckpoint;
+    // (undocumented)
+    createdAt: string;
+    // (undocumented)
+    items: Record<string, ScopeEnvelopeItem>;
+    // (undocumented)
+    kind: typeof SCOPE_ENVELOPE_KIND;
+    // (undocumented)
+    previousEnvelopeCid?: string;
+    // (undocumented)
+    scopeRef: ScopeEnvelopeReference;
+    // (undocumented)
+    signature?: string;
+    // (undocumented)
+    signedByAddress?: string;
+    // (undocumented)
+    version: 1;
+    // (undocumented)
+    wrappedEnvelopeKey: WrappedContentKey;
+}
+
+// @public (undocumented)
+export interface ScopeEnvelopeReference {
+    // (undocumented)
+    scopeId: string;
+    // (undocumented)
+    scopeType: ScopeEnvelopeScopeType;
+}
+
+// @public (undocumented)
+export type ScopeEnvelopeRetentionState = 'current' | 'superseded' | 'revoked' | 'archived';
+
+// @public (undocumented)
+export type ScopeEnvelopeScopeType = 'workspace';
+
+// @public (undocumented)
+export const sha256Hex: (value: string) => Promise<string>;
 
 // @public (undocumented)
 export interface SignedBlockProposalInput extends SignedProposalActionInput {
@@ -1678,6 +1981,19 @@ export interface SignedProposalInput {
     nonce: bigint;
     // (undocumented)
     operations: ProcedureProposalOperation[];
+}
+
+// @public (undocumented)
+export const stableStringify: (value: unknown) => string;
+
+// @public (undocumented)
+export interface StoredUserEncryptionKeyPair {
+    // (undocumented)
+    keyPair: CryptoKeyPair;
+    // (undocumented)
+    keyVersion: number;
+    // (undocumented)
+    publicKey: JsonWebKey;
 }
 
 // @public (undocumented)
@@ -1819,6 +2135,9 @@ export const templates: {
     };
 };
 
+// @public (undocumented)
+export const textToBytes: (value: string) => Uint8Array;
+
 // @public
 export interface TransactionOptions {
     // (undocumented)
@@ -1829,6 +2148,37 @@ export interface TransactionOptions {
     nonce?: number;
     // (undocumented)
     onTransaction?: (tx: OrganigramTransaction, description: string) => void;
+}
+
+// @public (undocumented)
+export const unwrapContentKey: (wrappedContentKey: WrappedContentKey, groupKey: CryptoKey) => Promise<CryptoKey>;
+
+// @public (undocumented)
+export const unwrapGroupKey: (wrappedGroupKey: WrappedGroupKey, recipientPrivateKey: CryptoKey) => Promise<CryptoKey>;
+
+// @public (undocumented)
+export const USER_ENCRYPTION_KEY_BACKUP_KIND: "organigram.user-encryption-key-backup.v1";
+
+// @public (undocumented)
+export interface UserEncryptionKeyBackup {
+    // (undocumented)
+    address: string;
+    // (undocumented)
+    createdAt: string;
+    // (undocumented)
+    keyVersion: number;
+    // (undocumented)
+    kind: typeof USER_ENCRYPTION_KEY_BACKUP_KIND;
+    // (undocumented)
+    privateKey: {
+        algorithm: 'PBKDF2-SHA256+A256GCM';
+        iterations: number;
+        salt: string;
+        iv: string;
+        ciphertext: string;
+    };
+    // (undocumented)
+    publicKey: JsonWebKey;
 }
 
 // @public (undocumented)
@@ -1886,6 +2236,38 @@ export type VoteProcedureInput = ProcedureInput & {
     majoritySize: string;
     elections: Election[];
 };
+
+// @public (undocumented)
+export const wrapContentKey: (contentKey: CryptoKey, groupKey: CryptoKey) => Promise<WrappedContentKey>;
+
+// @public (undocumented)
+export const wrapGroupKeyForRecipient: (groupKey: CryptoKey, recipient: RecipientEncryptionKey) => Promise<WrappedGroupKey>;
+
+// @public (undocumented)
+export interface WrappedContentKey {
+    // (undocumented)
+    algorithm: typeof ENCRYPTION_ALGORITHM;
+    // (undocumented)
+    ciphertext: string;
+    // (undocumented)
+    iv: string;
+}
+
+// @public (undocumented)
+export interface WrappedGroupKey {
+    // (undocumented)
+    algorithm: typeof GROUP_KEY_ALGORITHM;
+    // (undocumented)
+    ciphertext: string;
+    // (undocumented)
+    ephemeralPublicKey: JsonWebKey;
+    // (undocumented)
+    iv: string;
+    // (undocumented)
+    recipientAddress: string;
+    // (undocumented)
+    recipientKeyVersion: number;
+}
 
 // (No @packageDocumentation comment for this package)
 

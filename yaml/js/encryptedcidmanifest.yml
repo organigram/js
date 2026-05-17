@@ -1,0 +1,212 @@
+### YamlMime:TSType
+name: EncryptedCidManifest
+uid: '@organigram/js!EncryptedCidManifest:interface'
+package: '@organigram/js!'
+fullName: EncryptedCidManifest
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: accessGroup
+    uid: '@organigram/js!EncryptedCidManifest#accessGroup:member'
+    package: '@organigram/js!'
+    fullName: accessGroup
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'accessGroup?: EncryptedCidAccessGroup;'
+      return:
+        type: <xref uid="@organigram/js!EncryptedCidAccessGroup:interface" />
+  - name: contentType
+    uid: '@organigram/js!EncryptedCidManifest#contentType:member'
+    package: '@organigram/js!'
+    fullName: contentType
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'contentType: ScopeEnvelopeContentType;'
+      return:
+        type: <xref uid="@organigram/js!ScopeEnvelopeContentType:type" />
+  - name: createdAt
+    uid: '@organigram/js!EncryptedCidManifest#createdAt:member'
+    package: '@organigram/js!'
+    fullName: createdAt
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'createdAt: string;'
+      return:
+        type: string
+  - name: encryptedContent
+    uid: '@organigram/js!EncryptedCidManifest#encryptedContent:member'
+    package: '@organigram/js!'
+    fullName: encryptedContent
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: |-
+        encryptedContent: {
+                cid: string;
+                algorithm: typeof ENCRYPTION_ALGORITHM;
+                iv: string;
+                size: number;
+                mime?: string;
+                name?: string;
+            };
+      return:
+        type: |-
+          {
+                  cid: string;
+                  algorithm: typeof <xref uid="@organigram/js!ENCRYPTION_ALGORITHM:var" />;
+                  iv: string;
+                  size: number;
+                  mime?: string;
+                  name?: string;
+              }
+  - name: kind
+    uid: '@organigram/js!EncryptedCidManifest#kind:member'
+    package: '@organigram/js!'
+    fullName: kind
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'kind: typeof ENCRYPTED_CID_KIND | typeof FILE_VERSION_MANIFEST_KIND;'
+      return:
+        type: >-
+          typeof <xref uid="@organigram/js!ENCRYPTED_CID_KIND:var" /> | typeof <xref
+          uid="@organigram/js!FILE_VERSION_MANIFEST_KIND:var" />
+  - name: logicalKey
+    uid: '@organigram/js!EncryptedCidManifest#logicalKey:member'
+    package: '@organigram/js!'
+    fullName: logicalKey
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'logicalKey?: string;'
+      return:
+        type: string
+  - name: previousManifestCid
+    uid: '@organigram/js!EncryptedCidManifest#previousManifestCid:member'
+    package: '@organigram/js!'
+    fullName: previousManifestCid
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'previousManifestCid?: string;'
+      return:
+        type: string
+  - name: retentionState
+    uid: '@organigram/js!EncryptedCidManifest#retentionState:member'
+    package: '@organigram/js!'
+    fullName: retentionState
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'retentionState?: ScopeEnvelopeRetentionState;'
+      return:
+        type: <xref uid="@organigram/js!ScopeEnvelopeRetentionState:type" />
+  - name: scopeEnvelope
+    uid: '@organigram/js!EncryptedCidManifest#scopeEnvelope:member'
+    package: '@organigram/js!'
+    fullName: scopeEnvelope
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'scopeEnvelope?: ScopeEnvelopeCheckpoint;'
+      return:
+        type: <xref uid="@organigram/js!ScopeEnvelopeCheckpoint:interface" />
+  - name: scopeRef
+    uid: '@organigram/js!EncryptedCidManifest#scopeRef:member'
+    package: '@organigram/js!'
+    fullName: scopeRef
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'scopeRef?: ScopeEnvelopeReference;'
+      return:
+        type: <xref uid="@organigram/js!ScopeEnvelopeReference:interface" />
+  - name: signature
+    uid: '@organigram/js!EncryptedCidManifest#signature:member'
+    package: '@organigram/js!'
+    fullName: signature
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'signature?: string;'
+      return:
+        type: string
+  - name: signedByAddress
+    uid: '@organigram/js!EncryptedCidManifest#signedByAddress:member'
+    package: '@organigram/js!'
+    fullName: signedByAddress
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'signedByAddress?: string;'
+      return:
+        type: string
+  - name: version
+    uid: '@organigram/js!EncryptedCidManifest#version:member'
+    package: '@organigram/js!'
+    fullName: version
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'version: 1;'
+      return:
+        type: '1'
+  - name: wrappedContentKey
+    uid: '@organigram/js!EncryptedCidManifest#wrappedContentKey:member'
+    package: '@organigram/js!'
+    fullName: wrappedContentKey
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'wrappedContentKey: WrappedContentKey;'
+      return:
+        type: <xref uid="@organigram/js!WrappedContentKey:interface" />

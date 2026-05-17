@@ -1,0 +1,103 @@
+### YamlMime:TSType
+name: ScopeEnvelopeItem
+uid: '@organigram/js!ScopeEnvelopeItem:interface'
+package: '@organigram/js!'
+fullName: ScopeEnvelopeItem
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+type: interface
+properties:
+  - name: contentType
+    uid: '@organigram/js!ScopeEnvelopeItem#contentType:member'
+    package: '@organigram/js!'
+    fullName: contentType
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'contentType: ScopeEnvelopeContentType;'
+      return:
+        type: <xref uid="@organigram/js!ScopeEnvelopeContentType:type" />
+  - name: currentManifestCid
+    uid: '@organigram/js!ScopeEnvelopeItem#currentManifestCid:member'
+    package: '@organigram/js!'
+    fullName: currentManifestCid
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'currentManifestCid: string;'
+      return:
+        type: string
+  - name: logicalKey
+    uid: '@organigram/js!ScopeEnvelopeItem#logicalKey:member'
+    package: '@organigram/js!'
+    fullName: logicalKey
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'logicalKey: string;'
+      return:
+        type: string
+  - name: previousManifestCid
+    uid: '@organigram/js!ScopeEnvelopeItem#previousManifestCid:member'
+    package: '@organigram/js!'
+    fullName: previousManifestCid
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'previousManifestCid?: string;'
+      return:
+        type: string
+  - name: retentionState
+    uid: '@organigram/js!ScopeEnvelopeItem#retentionState:member'
+    package: '@organigram/js!'
+    fullName: retentionState
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'retentionState: ScopeEnvelopeRetentionState;'
+      return:
+        type: <xref uid="@organigram/js!ScopeEnvelopeRetentionState:type" />
+  - name: updatedAt
+    uid: '@organigram/js!ScopeEnvelopeItem#updatedAt:member'
+    package: '@organigram/js!'
+    fullName: updatedAt
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'updatedAt: string;'
+      return:
+        type: string
+  - name: version
+    uid: '@organigram/js!ScopeEnvelopeItem#version:member'
+    package: '@organigram/js!'
+    fullName: version
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'version: number;'
+      return:
+        type: number
