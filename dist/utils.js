@@ -1,7 +1,7 @@
 import deployedAddresses, { getChainExplorerBaseUrl, getConfiguredChain, getDefaultChainId, getDeployment, getHostUrl, getSupportedChainIds, getSupportedChains, isSupportedChainId, isLocalHost, resolveDeployment } from './deployments';
 import { bytesToHex, getCreate2Address, keccak256, padHex, toHex } from 'viem';
 export { deployedAddresses, getChainExplorerBaseUrl, getConfiguredChain, getDefaultChainId, getDeployment, getHostUrl, getSupportedChainIds, getSupportedChains, isSupportedChainId, isLocalHost, resolveDeployment };
-export const handleJsonBigInt = (key, value) => {
+export const handleJsonBigInt = (_key, value) => {
     if (typeof value === 'bigint') {
         return value.toString() + 'n';
     }

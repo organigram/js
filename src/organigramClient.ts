@@ -1025,7 +1025,7 @@ export class OrganigramClient {
    */
   async loadOrganigram(
     organigram: Organigram,
-    cached = true
+    cached = false
   ): Promise<Organigram> {
     const loadConcurrency = 4
 
@@ -1043,7 +1043,7 @@ export class OrganigramClient {
           }
           try {
             return (
-              (await this.getDeployedOrgan(organ.address, false, organ)) ??
+              (await this.getDeployedOrgan(organ.address, cached, organ)) ??
               organ
             )
           } catch (error) {
@@ -1073,7 +1073,7 @@ export class OrganigramClient {
           return (
             (await this.getDeployedProcedure(
               procedure.address,
-              false,
+              cached,
               procedure
             )) ?? procedure
           )
@@ -1102,7 +1102,7 @@ export class OrganigramClient {
           }
           try {
             return (
-              (await this.getDeployedAsset(asset.address, false, asset)) ??
+              (await this.getDeployedAsset(asset.address, cached, asset)) ??
               asset
             )
           } catch (error) {

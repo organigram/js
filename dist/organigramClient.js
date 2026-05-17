@@ -696,7 +696,7 @@ export class OrganigramClient {
      * @param organigram Organigram definition to hydrate.
      * @param cached Whether previously cached instances may be reused.
      */
-    async loadOrganigram(organigram, cached = true) {
+    async loadOrganigram(organigram, cached = false) {
         const loadConcurrency = 4;
         const deployedOrgans = (await this.mapWithConcurrencyLimit(organigram.organs, loadConcurrency, async (organ) => {
             if (!organ.isDeployed ||
@@ -705,7 +705,7 @@ export class OrganigramClient {
                 return organ;
             }
             try {
-                return ((await this.getDeployedOrgan(organ.address, false, organ)) ??
+                return ((await this.getDeployedOrgan(organ.address, cached, organ)) ??
                     organ);
             }
             catch (error) {
@@ -720,7 +720,7 @@ export class OrganigramClient {
                 return procedure;
             }
             try {
-                return ((await this.getDeployedProcedure(procedure.address, false, procedure)) ?? procedure);
+                return ((await this.getDeployedProcedure(procedure.address, cached, procedure)) ?? procedure);
             }
             catch (error) {
                 console.warn('Unable to hydrate deployed procedure in organigram load.', procedure.address, error.message);
@@ -734,7 +734,7 @@ export class OrganigramClient {
                 return asset;
             }
             try {
-                return ((await this.getDeployedAsset(asset.address, false, asset)) ??
+                return ((await this.getDeployedAsset(asset.address, cached, asset)) ??
                     asset);
             }
             catch (error) {

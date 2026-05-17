@@ -34,7 +34,7 @@ export type ContractName =
   | 'NominationProcedure'
   | 'OrganigramClient'
 
-export const handleJsonBigInt = (key: string, value: any) => {
+export const handleJsonBigInt = (_key: string, value: any) => {
   if (typeof value === 'bigint') {
     return value.toString() + 'n'
   }

@@ -120,9 +120,17 @@ export class Organigram {
     if (description !== undefined) this.description = description
   }
 
-  setOrgans(organs: Organ[]) {}
-  setAssets(assets: Asset[]) {}
-  setProcedures(procedures: Procedure[]) {}
+  setOrgans(organs: Organ[]) {
+    this.organs = organs
+  }
+
+  setAssets(assets: Asset[]) {
+    this.assets = assets
+  }
+
+  setProcedures(procedures: Procedure[]) {
+    this.procedures = procedures
+  }
 
   /**
    * Hydrate every deployed object referenced by this organigram.

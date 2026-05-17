@@ -98,7 +98,6 @@ export declare class Organ {
     forwarder: string;
     constructor({ address, chainId, publicClient, walletClient, balance, permissions, cid, entries, salt, isDeployed, name, description, organigramId, forwarder }: OrganInput);
     private getClients;
-    private getContract;
     updateCid: (cid: string, options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;
     addEntries: (entries: IOrganEntry[], options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;
     removeEntries: (indexes: string[], options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;

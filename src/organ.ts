@@ -333,18 +333,6 @@ export class Organ {
     }
   }
 
-  private getContract() {
-    if (this.contract == null) {
-      const clients = this.getClients()
-      this.contract = getContractInstance({
-        address: this.address,
-        abi: OrganContractABI.abi,
-        ...clients
-      })
-    }
-    return this.contract
-  }
-
   public updateCid = async (
     cid: string,
     options?: TransactionOptions

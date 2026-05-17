@@ -68,9 +68,15 @@ export class Organigram {
         if (description !== undefined)
             this.description = description;
     }
-    setOrgans(organs) { }
-    setAssets(assets) { }
-    setProcedures(procedures) { }
+    setOrgans(organs) {
+        this.organs = organs;
+    }
+    setAssets(assets) {
+        this.assets = assets;
+    }
+    setProcedures(procedures) {
+        this.procedures = procedures;
+    }
     /**
      * Hydrate every deployed object referenced by this organigram.
      *
