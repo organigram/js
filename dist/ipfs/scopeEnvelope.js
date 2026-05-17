@@ -1,5 +1,6 @@
 import { CID_REF_PREFIX, ENCRYPTION_ALGORITHM, FILE_VERSION_MANIFEST_KIND, SCOPE_ENVELOPE_KIND } from './constants';
 import { textToBytes } from './encoding';
+import { bytesToHex } from 'viem';
 const canonicalize = (value) => {
     if (Array.isArray(value)) {
         return value.map(item => canonicalize(item));
@@ -15,11 +16,10 @@ const canonicalize = (value) => {
     return value;
 };
 export const stableStringify = (value) => JSON.stringify(canonicalize(value));
-const bytesToHex = (bytes) => [...bytes].map(byte => byte.toString(16).padStart(2, '0')).join('');
 export const sha256Hex = async (value) => {
     if (globalThis.crypto?.subtle != null) {
         const digest = await globalThis.crypto.subtle.digest('SHA-256', textToBytes(value).buffer);
-        return bytesToHex(new Uint8Array(digest));
+        return bytesToHex(new Uint8Array(digest)).slice(2);
     }
     const { createHash } = await import('node:crypto');
     return createHash('sha256').update(value).digest('hex');
