@@ -3,6 +3,8 @@ import type {
   ENCRYPTION_ALGORITHM,
   ENCRYPTION_PUBLIC_KEY_SIWE_RESOURCE_KIND,
   GROUP_KEY_ALGORITHM,
+  FILE_VERSION_MANIFEST_KIND,
+  SCOPE_ENVELOPE_KIND,
   USER_ENCRYPTION_KEY_BACKUP_KIND
 } from './constants'
 
@@ -21,6 +23,26 @@ export type EncryptedCidContentType =
   | 'certifiedProof'
   | 'file'
   | string
+
+export type ScopeEnvelopeScopeType = 'workspace'
+
+export type ScopeEnvelopeContentType = EncryptedCidContentType
+
+export type ScopeEnvelopeRetentionState =
+  | 'current'
+  | 'superseded'
+  | 'revoked'
+  | 'archived'
+
+export interface ScopeEnvelopeReference {
+  scopeType: ScopeEnvelopeScopeType
+  scopeId: string
+}
+
+export interface ParsedCidRef {
+  scopeRef: ScopeEnvelopeReference
+  logicalKey: string
+}
 
 export interface EncryptedCidAccessGroup {
   scopeType: AccessGroupScopeType
@@ -43,11 +65,65 @@ export interface WrappedContentKey {
   ciphertext: string
 }
 
-export interface EncryptedCidManifest {
-  kind: typeof ENCRYPTED_CID_KIND
+export interface ScopeEnvelopeCheckpoint {
+  epoch: number
+  membershipHash: string
+  rootHash: string
+}
+
+export interface ScopeEnvelopeItem {
+  logicalKey: string
+  currentManifestCid: string
+  contentType: ScopeEnvelopeContentType
+  version: number
+  retentionState: ScopeEnvelopeRetentionState
+  previousManifestCid?: string
+  updatedAt: string
+}
+
+export interface ScopeEnvelopeManifest {
+  kind: typeof SCOPE_ENVELOPE_KIND
   version: 1
-  contentType: EncryptedCidContentType
-  accessGroup: EncryptedCidAccessGroup
+  scopeRef: ScopeEnvelopeReference
+  checkpoint: ScopeEnvelopeCheckpoint
+  items: Record<string, ScopeEnvelopeItem>
+  wrappedEnvelopeKey: WrappedContentKey
+  previousEnvelopeCid?: string
+  signature?: string
+  signedByAddress?: string
+  createdAt: string
+}
+
+export interface PublicFileVersionManifest {
+  kind: typeof FILE_VERSION_MANIFEST_KIND
+  version: 1
+  contentType: ScopeEnvelopeContentType
+  accessGroup?: EncryptedCidAccessGroup
+  scopeRef?: ScopeEnvelopeReference
+  logicalKey?: string
+  retentionState?: ScopeEnvelopeRetentionState
+  previousManifestCid?: string
+  publicContent: {
+    cid: string
+    size: number
+    mime?: string
+    name?: string
+  }
+  scopeEnvelope?: ScopeEnvelopeCheckpoint
+  signature?: string
+  signedByAddress?: string
+  createdAt: string
+}
+
+export interface EncryptedCidManifest {
+  kind: typeof ENCRYPTED_CID_KIND | typeof FILE_VERSION_MANIFEST_KIND
+  version: 1
+  contentType: ScopeEnvelopeContentType
+  accessGroup?: EncryptedCidAccessGroup
+  scopeRef?: ScopeEnvelopeReference
+  logicalKey?: string
+  retentionState?: ScopeEnvelopeRetentionState
+  previousManifestCid?: string
   encryptedContent: {
     cid: string
     algorithm: typeof ENCRYPTION_ALGORITHM
@@ -57,8 +133,15 @@ export interface EncryptedCidManifest {
     name?: string
   }
   wrappedContentKey: WrappedContentKey
+  scopeEnvelope?: ScopeEnvelopeCheckpoint
+  signature?: string
+  signedByAddress?: string
   createdAt: string
 }
+
+export type FileVersionManifest =
+  | PublicFileVersionManifest
+  | EncryptedCidManifest
 
 export interface RecipientEncryptionKey {
   address: string
