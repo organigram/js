@@ -21,6 +21,57 @@ export const procedureRoleTypes = [
   { label: 'Filter proposals', name: 'moderators' }
 ]
 
+export const organigramEdgeTypes = [
+  'default',
+  'straight',
+  'step',
+  'smoothstep'
+  // 'simplebezier'
+] as const
+
+export type OrganigramEdgeType = (typeof organigramEdgeTypes)[number]
+
+export const defaultOrganigramEdgeType: OrganigramEdgeType = 'default'
+
+export type OrganigramNodePosition = {
+  x: number
+  y: number
+}
+
+export type OrganigramNodePositions = Record<string, OrganigramNodePosition>
+
+export const normalizeOrganigramEdgeType = (
+  edgeType?: string | null
+): OrganigramEdgeType =>
+  organigramEdgeTypes.includes(edgeType as OrganigramEdgeType)
+    ? (edgeType as OrganigramEdgeType)
+    : defaultOrganigramEdgeType
+
+export const normalizeOrganigramNodePositions = (
+  nodePositions?: unknown
+): OrganigramNodePositions => {
+  if (nodePositions == null || typeof nodePositions !== 'object') {
+    return {}
+  }
+
+  return Object.fromEntries(
+    Object.entries(nodePositions).flatMap(([key, value]) => {
+      if (
+        value != null &&
+        typeof value === 'object' &&
+        typeof value.x === 'number' &&
+        Number.isFinite(value.x) &&
+        typeof value.y === 'number' &&
+        Number.isFinite(value.y)
+      ) {
+        return [[key, { x: value.x, y: value.y }]]
+      }
+
+      return []
+    })
+  )
+}
+
 /**
  * JSON-safe serialized representation of an organigram.
  */
@@ -29,6 +80,8 @@ export type OrganigramJson = {
   slug: string
   name: string
   description: string
+  edgeType: OrganigramEdgeType
+  nodePositions: OrganigramNodePositions
   chainId: string
   organs: OrganJson[]
   procedures: ProcedureJson[]
@@ -44,6 +97,8 @@ export type OrganigramInput = {
   slug?: string | null
   name?: string | null
   description?: string | null
+  edgeType?: string | null
+  nodePositions?: unknown
   chainId?: string | null
   organs: OrganInput[]
   procedures: ProcedureInput[]
@@ -75,6 +130,8 @@ export class Organigram {
   slug: string
   name: string
   description: string
+  edgeType: OrganigramEdgeType
+  nodePositions: OrganigramNodePositions
   workspaceId?: string | null
   organigramClient?: OrganigramClient | null
   walletClient?: WalletClient | null
@@ -94,8 +151,11 @@ export class Organigram {
 
     const initial = resolvedOrganigram as Organigram
     this.name = initial?.name ?? 'Blank project'
-    this.description =
-      initial?.description ?? 'This is the default organigram.'
+    this.description = initial?.description ?? 'This is the default organigram.'
+    this.edgeType = normalizeOrganigramEdgeType(initial?.edgeType)
+    this.nodePositions = normalizeOrganigramNodePositions(
+      initial?.nodePositions
+    )
     this.id = initial?.id ?? crypto.randomUUID()
     this.slug = initial?.slug ?? this.id
     this.organs = initial?.organs ?? []
@@ -110,14 +170,20 @@ export class Organigram {
 
   editDetails({
     name,
-    description
+    description,
+    edgeType,
+    nodePositions
   }: {
     name?: string
     description?: string
+    edgeType?: OrganigramEdgeType
+    nodePositions?: OrganigramNodePositions
     contractAddresses?: string[]
   }) {
     if (name !== undefined) this.name = name
     if (description !== undefined) this.description = description
+    if (edgeType !== undefined) this.edgeType = edgeType
+    if (nodePositions !== undefined) this.nodePositions = nodePositions
   }
 
   setOrgans(organs: Organ[]) {
@@ -195,6 +261,8 @@ export class Organigram {
           chainId: this.chainId,
           name: this.name,
           description: this.description,
+          edgeType: this.edgeType,
+          nodePositions: this.nodePositions,
           organs: this.organs.map(organ => organ.toJson?.() ?? organ),
           assets: this.assets.map(asset => asset.toJson?.() ?? asset),
           procedures: this.procedures.map(

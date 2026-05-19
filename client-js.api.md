@@ -299,6 +299,9 @@ export const decryptBytes: (encryptedBytes: ArrayBuffer | Uint8Array, key: Crypt
 // @public
 export const defaultChainId: string;
 
+// @public (undocumented)
+export const defaultOrganigramEdgeType: OrganigramEdgeType;
+
 // @public
 export interface DeployAssetInput {
     // (undocumented)
@@ -835,7 +838,7 @@ export const getWalletAddress: (walletClient: WalletClient) => Promise<Address>;
 export const GROUP_KEY_ALGORITHM: "ECDH-P256+A256GCM";
 
 // @public (undocumented)
-export const handleJsonBigInt: (key: string, value: any) => any;
+export const handleJsonBigInt: (_key: string, value: any) => any;
 
 // @public (undocumented)
 export const importExtractableUserPublicKey: (publicKey: JsonWebKey) => Promise<CryptoKey>;
@@ -922,6 +925,12 @@ export class NominationProcedure extends Procedure {
 
 // @public (undocumented)
 export const normalizeEncryptionKeyVersion: (keyVersion: number) => number | null;
+
+// @public (undocumented)
+export const normalizeOrganigramEdgeType: (edgeType?: string | null) => OrganigramEdgeType;
+
+// @public (undocumented)
+export const normalizeOrganigramNodePositions: (nodePositions?: unknown) => OrganigramNodePositions;
 
 // @public (undocumented)
 export interface OperationParam {
@@ -1082,9 +1091,13 @@ export class Organigram {
     // (undocumented)
     description: string;
     // (undocumented)
+    edgeType: OrganigramEdgeType;
+    // (undocumented)
     editDetails(input: {
         name?: string;
         description?: string;
+        edgeType?: OrganigramEdgeType;
+        nodePositions?: OrganigramNodePositions;
         contractAddresses?: string[];
     }): void;
     // (undocumented)
@@ -1095,6 +1108,8 @@ export class Organigram {
     }) => Promise<Organigram>;
     // (undocumented)
     name: string;
+    // (undocumented)
+    nodePositions: OrganigramNodePositions;
     // (undocumented)
     organigramClient?: OrganigramClient | null;
     // (undocumented)
@@ -1181,12 +1196,20 @@ export class OrganigramClient {
     walletClient?: WalletClient;
 }
 
+// @public (undocumented)
+export type OrganigramEdgeType = (typeof organigramEdgeTypes)[number];
+
+// @public (undocumented)
+export const organigramEdgeTypes: readonly ["default", "straight", "step", "smoothstep", "simplebezier"];
+
 // @public
 export type OrganigramInput = {
     id?: string | null;
     slug?: string | null;
     name?: string | null;
     description?: string | null;
+    edgeType?: string | null;
+    nodePositions?: unknown;
     chainId?: string | null;
     organs: OrganInput[];
     procedures: ProcedureInput[];
@@ -1204,12 +1227,23 @@ export type OrganigramJson = {
     slug: string;
     name: string;
     description: string;
+    edgeType: OrganigramEdgeType;
+    nodePositions: OrganigramNodePositions;
     chainId: string;
     organs: OrganJson[];
     procedures: ProcedureJson[];
     assets: AssetJson[];
     workspaceId?: string | null;
 };
+
+// @public (undocumented)
+export type OrganigramNodePosition = {
+    x: number;
+    y: number;
+};
+
+// @public (undocumented)
+export type OrganigramNodePositions = Record<string, OrganigramNodePosition>;
 
 // @public (undocumented)
 export type OrganigramTransaction = {

@@ -15,6 +15,16 @@ export declare const procedureRoleTypes: {
     label: string;
     name: string;
 }[];
+export declare const organigramEdgeTypes: readonly ["default", "straight", "step", "smoothstep"];
+export type OrganigramEdgeType = (typeof organigramEdgeTypes)[number];
+export declare const defaultOrganigramEdgeType: OrganigramEdgeType;
+export type OrganigramNodePosition = {
+    x: number;
+    y: number;
+};
+export type OrganigramNodePositions = Record<string, OrganigramNodePosition>;
+export declare const normalizeOrganigramEdgeType: (edgeType?: string | null) => OrganigramEdgeType;
+export declare const normalizeOrganigramNodePositions: (nodePositions?: unknown) => OrganigramNodePositions;
 /**
  * JSON-safe serialized representation of an organigram.
  */
@@ -23,6 +33,8 @@ export type OrganigramJson = {
     slug: string;
     name: string;
     description: string;
+    edgeType: OrganigramEdgeType;
+    nodePositions: OrganigramNodePositions;
     chainId: string;
     organs: OrganJson[];
     procedures: ProcedureJson[];
@@ -37,6 +49,8 @@ export type OrganigramInput = {
     slug?: string | null;
     name?: string | null;
     description?: string | null;
+    edgeType?: string | null;
+    nodePositions?: unknown;
     chainId?: string | null;
     organs: OrganInput[];
     procedures: ProcedureInput[];
@@ -66,14 +80,18 @@ export declare class Organigram {
     slug: string;
     name: string;
     description: string;
+    edgeType: OrganigramEdgeType;
+    nodePositions: OrganigramNodePositions;
     workspaceId?: string | null;
     organigramClient?: OrganigramClient | null;
     walletClient?: WalletClient | null;
     publicClient?: PublicClient | null;
     constructor(input?: OrganigramInput | keyof typeof templates | string[]);
-    editDetails({ name, description }: {
+    editDetails({ name, description, edgeType, nodePositions }: {
         name?: string;
         description?: string;
+        edgeType?: OrganigramEdgeType;
+        nodePositions?: OrganigramNodePositions;
         contractAddresses?: string[];
     }): void;
     setOrgans(organs: Organ[]): void;

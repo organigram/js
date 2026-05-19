@@ -10,6 +10,33 @@ export const procedureRoleTypes = [
     { label: 'Approve proposals', name: 'deciders' },
     { label: 'Filter proposals', name: 'moderators' }
 ];
+export const organigramEdgeTypes = [
+    'default',
+    'straight',
+    'step',
+    'smoothstep'
+    // 'simplebezier'
+];
+export const defaultOrganigramEdgeType = 'default';
+export const normalizeOrganigramEdgeType = (edgeType) => organigramEdgeTypes.includes(edgeType)
+    ? edgeType
+    : defaultOrganigramEdgeType;
+export const normalizeOrganigramNodePositions = (nodePositions) => {
+    if (nodePositions == null || typeof nodePositions !== 'object') {
+        return {};
+    }
+    return Object.fromEntries(Object.entries(nodePositions).flatMap(([key, value]) => {
+        if (value != null &&
+            typeof value === 'object' &&
+            typeof value.x === 'number' &&
+            Number.isFinite(value.x) &&
+            typeof value.y === 'number' &&
+            Number.isFinite(value.y)) {
+            return [[key, { x: value.x, y: value.y }]];
+        }
+        return [];
+    }));
+};
 /**
  * Default chain id used by the SDK templates.
  */
@@ -29,6 +56,8 @@ export class Organigram {
     slug;
     name;
     description;
+    edgeType;
+    nodePositions;
     workspaceId;
     organigramClient;
     walletClient;
@@ -49,8 +78,9 @@ export class Organigram {
         }
         const initial = resolvedOrganigram;
         this.name = initial?.name ?? 'Blank project';
-        this.description =
-            initial?.description ?? 'This is the default organigram.';
+        this.description = initial?.description ?? 'This is the default organigram.';
+        this.edgeType = normalizeOrganigramEdgeType(initial?.edgeType);
+        this.nodePositions = normalizeOrganigramNodePositions(initial?.nodePositions);
         this.id = initial?.id ?? crypto.randomUUID();
         this.slug = initial?.slug ?? this.id;
         this.organs = initial?.organs ?? [];
@@ -62,11 +92,15 @@ export class Organigram {
         this.publicClient = initial?.publicClient;
         this.workspaceId = initial?.workspaceId;
     }
-    editDetails({ name, description }) {
+    editDetails({ name, description, edgeType, nodePositions }) {
         if (name !== undefined)
             this.name = name;
         if (description !== undefined)
             this.description = description;
+        if (edgeType !== undefined)
+            this.edgeType = edgeType;
+        if (nodePositions !== undefined)
+            this.nodePositions = nodePositions;
     }
     setOrgans(organs) {
         this.organs = organs;
@@ -121,6 +155,8 @@ export class Organigram {
         chainId: this.chainId,
         name: this.name,
         description: this.description,
+        edgeType: this.edgeType,
+        nodePositions: this.nodePositions,
         organs: this.organs.map(organ => organ.toJson?.() ?? organ),
         assets: this.assets.map(asset => asset.toJson?.() ?? asset),
         procedures: this.procedures.map(procedure => procedure.toJson?.() ?? procedure)

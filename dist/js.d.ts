@@ -249,6 +249,8 @@ export declare const decryptBytes: (encryptedBytes: ArrayBuffer | Uint8Array, ke
  */
 export declare const defaultChainId: string;
 
+export declare const defaultOrganigramEdgeType: OrganigramEdgeType;
+
 /**
  * Input used to deploy one ERC-20 asset contract.
  */
@@ -685,7 +687,7 @@ export declare const getWalletAddress: (walletClient: WalletClient) => Promise<A
 
 export declare const GROUP_KEY_ALGORITHM: "ECDH-P256+A256GCM";
 
-export declare const handleJsonBigInt: (key: string, value: any) => any;
+export declare const handleJsonBigInt: (_key: string, value: any) => any;
 
 export declare const importExtractableUserPublicKey: (publicKey: JsonWebKey) => Promise<CryptoKey>;
 
@@ -748,6 +750,10 @@ export declare class NominationProcedure extends Procedure {
 
 export declare const normalizeEncryptionKeyVersion: (keyVersion: number) => number | null;
 
+export declare const normalizeOrganigramEdgeType: (edgeType?: string | null) => OrganigramEdgeType;
+
+export declare const normalizeOrganigramNodePositions: (nodePositions?: unknown) => OrganigramNodePositions;
+
 export declare interface OperationParam {
     type: OperationParamType;
     action?: OperationParamAction;
@@ -783,7 +789,6 @@ export declare class Organ {
     forwarder: string;
     constructor({ address, chainId, publicClient, walletClient, balance, permissions, cid, entries, salt, isDeployed, name, description, organigramId, forwarder }: OrganInput);
     private getClients;
-    private getContract;
     updateCid: (cid: string, options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;
     addEntries: (entries: IOrganEntry[], options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;
     removeEntries: (indexes: string[], options?: TransactionOptions) => Promise<OrganigramTransactionReceipt>;
@@ -859,14 +864,18 @@ export declare class Organigram {
     slug: string;
     name: string;
     description: string;
+    edgeType: OrganigramEdgeType;
+    nodePositions: OrganigramNodePositions;
     workspaceId?: string | null;
     organigramClient?: OrganigramClient | null;
     walletClient?: WalletClient | null;
     publicClient?: PublicClient | null;
     constructor(input?: OrganigramInput | keyof typeof templates | string[]);
-    editDetails({ name, description }: {
+    editDetails({ name, description, edgeType, nodePositions }: {
         name?: string;
         description?: string;
+        edgeType?: OrganigramEdgeType;
+        nodePositions?: OrganigramNodePositions;
         contractAddresses?: string[];
     }): void;
     setOrgans(organs: Organ[]): void;
@@ -1066,6 +1075,10 @@ export declare class OrganigramClient {
     loadOrganigram(organigram: Organigram, cached?: boolean): Promise<Organigram>;
 }
 
+export declare type OrganigramEdgeType = (typeof organigramEdgeTypes)[number];
+
+export declare const organigramEdgeTypes: readonly ["default", "straight", "step", "smoothstep", "simplebezier"];
+
 /**
  * Input used to create an in-memory organigram model.
  */
@@ -1074,6 +1087,8 @@ export declare type OrganigramInput = {
     slug?: string | null;
     name?: string | null;
     description?: string | null;
+    edgeType?: string | null;
+    nodePositions?: unknown;
     chainId?: string | null;
     organs: OrganInput[];
     procedures: ProcedureInput[];
@@ -1093,12 +1108,21 @@ export declare type OrganigramJson = {
     slug: string;
     name: string;
     description: string;
+    edgeType: OrganigramEdgeType;
+    nodePositions: OrganigramNodePositions;
     chainId: string;
     organs: OrganJson[];
     procedures: ProcedureJson[];
     assets: AssetJson[];
     workspaceId?: string | null;
 };
+
+export declare type OrganigramNodePosition = {
+    x: number;
+    y: number;
+};
+
+export declare type OrganigramNodePositions = Record<string, OrganigramNodePosition>;
 
 export declare type OrganigramTransaction = {
     hash: Hex;
