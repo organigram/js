@@ -450,7 +450,7 @@ const markdown = async ({
     writeStream.on('error', reject)
     writeStream.on('finish', resolve)
 
-    writeStream.write(`export const metadata = { title: "⚙️ Typescript", order: 4.2 }
+    writeStream.write(`export const metadata = { title: "⚙️ Typescript", order: 5.2 }
 
 # Typescript reference ⚙️
 

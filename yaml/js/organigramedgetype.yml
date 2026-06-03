@@ -1,0 +1,11 @@
+### YamlMime:TSTypeAlias
+name: OrganigramEdgeType
+uid: '@organigram/js!OrganigramEdgeType:type'
+package: '@organigram/js!'
+fullName: OrganigramEdgeType
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+syntax: export type OrganigramEdgeType = (typeof organigramEdgeTypes)[number];

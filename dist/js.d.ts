@@ -1077,7 +1077,7 @@ export declare class OrganigramClient {
 
 export declare type OrganigramEdgeType = (typeof organigramEdgeTypes)[number];
 
-export declare const organigramEdgeTypes: readonly ["default", "straight", "step", "smoothstep", "simplebezier"];
+export declare const organigramEdgeTypes: readonly ["default", "straight", "step", "smoothstep"];
 
 /**
  * Input used to create an in-memory organigram model.

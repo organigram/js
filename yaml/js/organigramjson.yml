@@ -14,6 +14,8 @@ syntax: |-
       slug: string;
       name: string;
       description: string;
+      edgeType: OrganigramEdgeType;
+      nodePositions: OrganigramNodePositions;
       chainId: string;
       organs: OrganJson[];
       procedures: ProcedureJson[];

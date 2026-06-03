@@ -69,10 +69,16 @@ items:
             uid: '@organigram/js!Organigram:class'
           - name: OrganigramClient
             uid: '@organigram/js!OrganigramClient:class'
+          - name: OrganigramEdgeType
+            uid: '@organigram/js!OrganigramEdgeType:type'
           - name: OrganigramInput
             uid: '@organigram/js!OrganigramInput:type'
           - name: OrganigramJson
             uid: '@organigram/js!OrganigramJson:type'
+          - name: OrganigramNodePosition
+            uid: '@organigram/js!OrganigramNodePosition:type'
+          - name: OrganigramNodePositions
+            uid: '@organigram/js!OrganigramNodePositions:type'
           - name: OrganigramTransaction
             uid: '@organigram/js!OrganigramTransaction:type'
           - name: OrganigramTransactionReceipt

@@ -1200,7 +1200,7 @@ export class OrganigramClient {
 export type OrganigramEdgeType = (typeof organigramEdgeTypes)[number];
 
 // @public (undocumented)
-export const organigramEdgeTypes: readonly ["default", "straight", "step", "smoothstep", "simplebezier"];
+export const organigramEdgeTypes: readonly ["default", "straight", "step", "smoothstep"];
 
 // @public
 export type OrganigramInput = {

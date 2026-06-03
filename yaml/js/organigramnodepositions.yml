@@ -1,0 +1,11 @@
+### YamlMime:TSTypeAlias
+name: OrganigramNodePositions
+uid: '@organigram/js!OrganigramNodePositions:type'
+package: '@organigram/js!'
+fullName: OrganigramNodePositions
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+syntax: export type OrganigramNodePositions = Record<string, OrganigramNodePosition>;

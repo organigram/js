@@ -1,0 +1,15 @@
+### YamlMime:TSTypeAlias
+name: OrganigramNodePosition
+uid: '@organigram/js!OrganigramNodePosition:type'
+package: '@organigram/js!'
+fullName: OrganigramNodePosition
+summary: ''
+remarks: ''
+example: []
+isPreview: false
+isDeprecated: false
+syntax: |-
+  export type OrganigramNodePosition = {
+      x: number;
+      y: number;
+  };

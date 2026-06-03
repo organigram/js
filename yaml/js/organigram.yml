@@ -72,6 +72,19 @@ properties:
       content: 'description: string;'
       return:
         type: string
+  - name: edgeType
+    uid: '@organigram/js!Organigram#edgeType:member'
+    package: '@organigram/js!'
+    fullName: edgeType
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'edgeType: OrganigramEdgeType;'
+      return:
+        type: <xref uid="@organigram/js!OrganigramEdgeType:type" />
   - name: id
     uid: '@organigram/js!Organigram#id:member'
     package: '@organigram/js!'
@@ -119,6 +132,19 @@ properties:
       content: 'name: string;'
       return:
         type: string
+  - name: nodePositions
+    uid: '@organigram/js!Organigram#nodePositions:member'
+    package: '@organigram/js!'
+    fullName: nodePositions
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'nodePositions: OrganigramNodePositions;'
+      return:
+        type: <xref uid="@organigram/js!OrganigramNodePositions:type" />
   - name: organigramClient
     uid: '@organigram/js!Organigram#organigramClient:member'
     package: '@organigram/js!'
@@ -238,10 +264,10 @@ methods:
       return:
         type: Promise&lt;<xref uid="@organigram/js!Organigram:class" />&gt;
         description: ''
-  - name: editDetails({ name, description }, input)
+  - name: editDetails({ name, description, edgeType, nodePositions }, input)
     uid: '@organigram/js!Organigram#editDetails:member(1)'
     package: '@organigram/js!'
-    fullName: editDetails({ name, description }, input)
+    fullName: editDetails({ name, description, edgeType, nodePositions }, input)
     summary: ''
     remarks: ''
     example: []
@@ -252,10 +278,12 @@ methods:
         editDetails(input: {
                 name?: string;
                 description?: string;
+                edgeType?: OrganigramEdgeType;
+                nodePositions?: OrganigramNodePositions;
                 contractAddresses?: string[];
             }): void;
       parameters:
-        - id: '{ name, description }'
+        - id: '{ name, description, edgeType, nodePositions }'
           description: ''
           type: ''
         - id: input
@@ -264,6 +292,8 @@ methods:
             {
                     name?: string;
                     description?: string;
+                    edgeType?: <xref uid="@organigram/js!OrganigramEdgeType:type" />;
+                    nodePositions?: <xref uid="@organigram/js!OrganigramNodePositions:type" />;
                     contractAddresses?: string[];
                 }
       return:

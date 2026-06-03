@@ -15,8 +15,11 @@ typeAliases:
   - '@organigram/js!OperationParamAction:type'
   - '@organigram/js!OperationParamType:type'
   - '@organigram/js!OperationTag:type'
+  - '@organigram/js!OrganigramEdgeType:type'
   - '@organigram/js!OrganigramInput:type'
   - '@organigram/js!OrganigramJson:type'
+  - '@organigram/js!OrganigramNodePosition:type'
+  - '@organigram/js!OrganigramNodePositions:type'
   - '@organigram/js!OrganigramTransaction:type'
   - '@organigram/js!OrganigramTransactionReceipt:type'
   - '@organigram/js!PopulatedTransactionData:type'
@@ -1613,7 +1616,7 @@ functions:
       return:
         type: Promise&lt;<xref uid="abitype!Address:type" />&gt;
         description: ''
-  - name: handleJsonBigInt(key, value)
+  - name: handleJsonBigInt(_key, value)
     uid: '@organigram/js!handleJsonBigInt:function(1)'
     package: '@organigram/js!'
     summary: ''
@@ -1622,9 +1625,9 @@ functions:
     isPreview: false
     isDeprecated: false
     syntax:
-      content: 'handleJsonBigInt: (key: string, value: any) => any'
+      content: 'handleJsonBigInt: (_key: string, value: any) => any'
       parameters:
-        - id: key
+        - id: _key
           description: ''
           type: string
         - id: value
@@ -1892,6 +1895,40 @@ functions:
           type: number
       return:
         type: number | null
+        description: ''
+  - name: normalizeOrganigramEdgeType(edgeType)
+    uid: '@organigram/js!normalizeOrganigramEdgeType:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'normalizeOrganigramEdgeType: (edgeType?: string | null) => OrganigramEdgeType'
+      parameters:
+        - id: edgeType
+          description: ''
+          type: string | null
+      return:
+        type: <xref uid="@organigram/js!OrganigramEdgeType:type" />
+        description: ''
+  - name: normalizeOrganigramNodePositions(nodePositions)
+    uid: '@organigram/js!normalizeOrganigramNodePositions:function(1)'
+    package: '@organigram/js!'
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'normalizeOrganigramNodePositions: (nodePositions?: unknown) => OrganigramNodePositions'
+      parameters:
+        - id: nodePositions
+          description: ''
+          type: unknown
+      return:
+        type: <xref uid="@organigram/js!OrganigramNodePositions:type" />
         description: ''
   - name: parseCidRef(value)
     uid: '@organigram/js!parseCidRef:function(1)'

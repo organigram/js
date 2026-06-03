@@ -15528,7 +15528,7 @@
             },
             {
               "kind": "Content",
-              "text": "readonly [\"default\", \"straight\", \"step\", \"smoothstep\", \"simplebezier\"]"
+              "text": "readonly [\"default\", \"straight\", \"step\", \"smoothstep\"]"
             }
           ],
           "fileUrlPath": "dist/organigram.d.ts",
