@@ -615,14 +615,22 @@ export class OrganigramClient {
         if (this.walletClient == null) {
             throw new Error('Wallet client not connected.');
         }
-        const formattedAssets = input.assets.map(asset => ({
+        const organsToDeploy = input.organs.filter(organ => organ.isDeployed !== true);
+        const assetsToDeploy = input.assets.filter(asset => asset.isDeployed !== true);
+        const proceduresToDeploy = input.procedures.filter(procedure => procedure.isDeployed !== true);
+        if (organsToDeploy.length === 0 &&
+            assetsToDeploy.length === 0 &&
+            proceduresToDeploy.length === 0) {
+            return [[], [], []];
+        }
+        const formattedAssets = assetsToDeploy.map(asset => ({
             name: asset.name,
             symbol: asset.symbol,
             initialSupply: parseEther(asset.initialSupply?.toString() ?? ERC20_INITIAL_SUPPLY.toString()),
             salt: formatSalt(asset.salt)
         }));
-        const organsInput = prepareDeployOrgansInput(input.organs);
-        const proceduresInput = await prepareDeployProceduresInput(input.procedures, this.getClients());
+        const organsInput = prepareDeployOrgansInput(organsToDeploy);
+        const proceduresInput = await prepareDeployProceduresInput(proceduresToDeploy, this.getClients());
         const tx = await createContractWriteTransaction({
             address: this.address,
             abi: OrganigramClientContractABI.abi,

@@ -90,6 +90,10 @@ export interface DeployAssetInput {
   salt?: string | null
 }
 
+type MaybeDeployed = {
+  isDeployed?: boolean | null
+}
+
 /**
  * Optional transaction-level controls shared by write operations.
  */
@@ -924,7 +928,25 @@ export class OrganigramClient {
     if (this.walletClient == null) {
       throw new Error('Wallet client not connected.')
     }
-    const formattedAssets = input.assets.map(asset => ({
+    const organsToDeploy = input.organs.filter(
+      organ => (organ as MaybeDeployed).isDeployed !== true
+    )
+    const assetsToDeploy = input.assets.filter(
+      asset => (asset as MaybeDeployed).isDeployed !== true
+    )
+    const proceduresToDeploy = input.procedures.filter(
+      procedure => (procedure as MaybeDeployed).isDeployed !== true
+    )
+
+    if (
+      organsToDeploy.length === 0 &&
+      assetsToDeploy.length === 0 &&
+      proceduresToDeploy.length === 0
+    ) {
+      return [[], [], []] as unknown as readonly string[]
+    }
+
+    const formattedAssets = assetsToDeploy.map(asset => ({
       name: asset.name,
       symbol: asset.symbol,
       initialSupply: parseEther(
@@ -932,9 +954,9 @@ export class OrganigramClient {
       ),
       salt: formatSalt(asset.salt)
     }))
-    const organsInput = prepareDeployOrgansInput(input.organs)
+    const organsInput = prepareDeployOrgansInput(organsToDeploy)
     const proceduresInput = await prepareDeployProceduresInput(
-      input.procedures,
+      proceduresToDeploy,
       this.getClients()
     )
     const tx = await createContractWriteTransaction({
