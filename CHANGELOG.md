@@ -1,7 +1,13 @@
 # Change Log
 
 All notable changes to this project will be documented in this file.
-See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.]
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [0.1.4](https://github.com/organigram/organigram/compare/v0.1.3...v0.1.4) (2026-06-16)
+
+- Added IPFS encryption and scope-envelope helpers, including backup, manifest, storage, and SIWE-backed encryption key utilities.
+- Expanded deployment and organigram helpers for chain-aware behavior, logical keys, and richer node and edge typing.
+- Refreshed generated API artifacts and added tests for the new template and scope-envelope surfaces.
 
 ## [0.1.3](https://github.com/organigram/organigram/compare/v0.1.2...v0.1.3) (2026-05-04)
 
