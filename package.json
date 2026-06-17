@@ -1,11 +1,8 @@
 {
   "name": "@organigram/js",
   "version": "0.1.4",
-  "description": "JavaScript development kit for applications powered by Organigr.am.",
-  "author": "Organigram (https://organigram.io)",
-  "contributors": [
-    "alex <alex@organigram.io> (https://github.com/alxmhe)"
-  ],
+  "description": "JavaScript/TypeScript client for the Organigram protocol.",
+  "author": "Organigram (https://organigram.ai)",
   "license": "MIT",
   "repository": {
     "type": "git",
