@@ -1,6 +1,6 @@
 # Organigram JS
 
-Organigram JS is the JavaScript/TypeScript client for the [Organigram Protocol](https://github/com/organigram/protocol), a framework for building incorruptible governance systems on Ethereum. It provides tools to deploy and interact with blockchain organizations simply and safely, and is used under the hood at [Organigram.ai](https://www.organigram.ai).
+Organigram JS is the JavaScript/TypeScript client for the [Organigram Protocol](https://github.com/organigram/protocol), a framework for building incorruptible governance systems on Ethereum. It provides tools to deploy and interact with blockchain organizations simply and safely, and is used under the hood at [Organigram.ai](https://www.organigram.ai).
 
 See the official [documentation](https://organigram.ai/en/docs/reference/js) for detailed usage examples and API reference.
 

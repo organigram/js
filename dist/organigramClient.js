@@ -73,7 +73,7 @@ const createInitialProcedureInput = (input, chainId) => ({
     ...(input.data != null ? { data: input.data } : {})
 });
 /**
- * Main SDK entry point used to deploy and hydrate Organigram protocol objects.
+ * Main SDK entry point used to deploy and hydrate Organigram Protocol objects.
  *
  * It keeps a public client, an optional wallet client, the registered
  * procedure types for the current chain, and small in-memory caches for
