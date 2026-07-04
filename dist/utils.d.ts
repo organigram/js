@@ -31,3 +31,4 @@ export declare const PERMISSIONS: {
 };
 export declare const getPermissionsSet: (permissions: number) => string[];
 export declare const capitalize: (s: string) => string;
+export declare const parseFiniteNumber: (value: number | string | null | undefined, fallback: number) => number;

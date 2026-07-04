@@ -1056,6 +1056,8 @@ export interface OrganEntry {
     cid: string;
     // (undocumented)
     index: string;
+    // (undocumented)
+    name?: string | null;
 }
 
 // @public
@@ -1273,6 +1275,7 @@ export interface OrganInput {
         index: string;
         address: string;
         cid: string;
+        name?: string | null;
     }> | null;
     // (undocumented)
     forwarder?: string | null;
@@ -1339,6 +1342,9 @@ export interface ParsedCidRef {
 
 // @public (undocumented)
 export const parseEncryptionPublicKeySiweResource: (resources: string[] | undefined, address: string) => EncryptionPublicKeySiweResource | null;
+
+// @public (undocumented)
+export const parseFiniteNumber: (value: number | string | null | undefined, fallback: number) => number;
 
 // @public (undocumented)
 export const PERMISSIONS: {

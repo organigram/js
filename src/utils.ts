@@ -128,3 +128,12 @@ export const getPermissionsSet = (permissions: number): string[] =>
     .map((permission: [string, number]) => permission[0])
 
 export const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
+
+export const parseFiniteNumber = (
+  value: number | string | null | undefined,
+  fallback: number
+): number => {
+  const parsed =
+    typeof value === 'number' ? value : Number.parseFloat(value ?? '')
+  return Number.isFinite(parsed) ? parsed : fallback
+}

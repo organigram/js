@@ -12563,6 +12563,33 @@
                 "startIndex": 1,
                 "endIndex": 2
               }
+            },
+            {
+              "kind": "PropertySignature",
+              "canonicalReference": "@organigram/js!OrganEntry#name:member",
+              "docComment": "",
+              "excerptTokens": [
+                {
+                  "kind": "Content",
+                  "text": "name?: "
+                },
+                {
+                  "kind": "Content",
+                  "text": "string | null"
+                },
+                {
+                  "kind": "Content",
+                  "text": ";"
+                }
+              ],
+              "isReadonly": false,
+              "isOptional": true,
+              "releaseTag": "Public",
+              "name": "name",
+              "propertyTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              }
             }
           ],
           "extendsTokenRanges": []
@@ -13672,7 +13699,7 @@
         {
           "kind": "Class",
           "canonicalReference": "@organigram/js!OrganigramClient:class",
-          "docComment": "/**\n * Main SDK entry point used to deploy and hydrate Organigram protocol objects.\n *\n * It keeps a public client, an optional wallet client, the registered procedure types for the current chain, and small in-memory caches for loaded organs, procedures, and assets.\n */\n",
+          "docComment": "/**\n * Main SDK entry point used to deploy and hydrate Organigram Protocol objects.\n *\n * It keeps a public client, an optional wallet client, the registered procedure types for the current chain, and small in-memory caches for loaded organs, procedures, and assets.\n */\n",
           "excerptTokens": [
             {
               "kind": "Content",
@@ -16007,7 +16034,7 @@
                 },
                 {
                   "kind": "Content",
-                  "text": "<{\n        index: string;\n        address: string;\n        cid: string;\n    }> | null"
+                  "text": "<{\n        index: string;\n        address: string;\n        cid: string;\n        name?: string | null;\n    }> | null"
                 },
                 {
                   "kind": "Content",
@@ -16834,6 +16861,63 @@
             }
           ],
           "name": "parseEncryptionPublicKeySiweResource"
+        },
+        {
+          "kind": "Function",
+          "canonicalReference": "@organigram/js!parseFiniteNumber:function(1)",
+          "docComment": "",
+          "excerptTokens": [
+            {
+              "kind": "Content",
+              "text": "parseFiniteNumber: (value: "
+            },
+            {
+              "kind": "Content",
+              "text": "number | string | null | undefined"
+            },
+            {
+              "kind": "Content",
+              "text": ", fallback: "
+            },
+            {
+              "kind": "Content",
+              "text": "number"
+            },
+            {
+              "kind": "Content",
+              "text": ") => "
+            },
+            {
+              "kind": "Content",
+              "text": "number"
+            }
+          ],
+          "fileUrlPath": "dist/utils.d.ts",
+          "returnTypeTokenRange": {
+            "startIndex": 5,
+            "endIndex": 6
+          },
+          "releaseTag": "Public",
+          "overloadIndex": 1,
+          "parameters": [
+            {
+              "parameterName": "value",
+              "parameterTypeTokenRange": {
+                "startIndex": 1,
+                "endIndex": 2
+              },
+              "isOptional": false
+            },
+            {
+              "parameterName": "fallback",
+              "parameterTypeTokenRange": {
+                "startIndex": 3,
+                "endIndex": 4
+              },
+              "isOptional": false
+            }
+          ],
+          "name": "parseFiniteNumber"
         },
         {
           "kind": "Variable",

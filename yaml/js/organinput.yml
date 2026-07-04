@@ -90,6 +90,7 @@ properties:
                 index: string;
                 address: string;
                 cid: string;
+                name?: string | null;
             }> | null;
       return:
         type: |-
@@ -97,6 +98,7 @@ properties:
                   index: string;
                   address: string;
                   cid: string;
+                  name?: string | null;
               }&gt; | null
   - name: forwarder
     uid: '@organigram/js!OrganInput#forwarder:member'

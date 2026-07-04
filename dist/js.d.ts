@@ -832,6 +832,7 @@ export declare interface OrganEntry {
     index: string;
     address: string;
     cid: string;
+    name?: string | null;
 }
 
 /**
@@ -901,7 +902,7 @@ export declare class Organigram {
 }
 
 /**
- * Main SDK entry point used to deploy and hydrate Organigram protocol objects.
+ * Main SDK entry point used to deploy and hydrate Organigram Protocol objects.
  *
  * It keeps a public client, an optional wallet client, the registered
  * procedure types for the current chain, and small in-memory caches for
@@ -1145,6 +1146,7 @@ export declare interface OrganInput {
         index: string;
         address: string;
         cid: string;
+        name?: string | null;
     }> | null;
     salt?: string | null;
     isDeployed?: boolean | null;
@@ -1187,6 +1189,8 @@ export declare interface ParsedCidRef {
 }
 
 export declare const parseEncryptionPublicKeySiweResource: (resources: string[] | undefined, address: string) => EncryptionPublicKeySiweResource | null;
+
+export declare const parseFiniteNumber: (value: number | string | null | undefined, fallback: number) => number;
 
 export declare const PERMISSIONS: {
     ADMIN: number;

@@ -49,3 +49,16 @@ properties:
       content: 'index: string;'
       return:
         type: string
+  - name: name
+    uid: '@organigram/js!OrganEntry#name:member'
+    package: '@organigram/js!'
+    fullName: name
+    summary: ''
+    remarks: ''
+    example: []
+    isPreview: false
+    isDeprecated: false
+    syntax:
+      content: 'name?: string | null;'
+      return:
+        type: string | null

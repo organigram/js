@@ -68,3 +68,7 @@ export const getPermissionsSet = (permissions) => Object.entries(PERMISSIONS)
     .filter((permission) => (permissions & permission[1]) === permission[1])
     .map((permission) => permission[0]);
 export const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+export const parseFiniteNumber = (value, fallback) => {
+    const parsed = typeof value === 'number' ? value : Number.parseFloat(value ?? '');
+    return Number.isFinite(parsed) ? parsed : fallback;
+};
