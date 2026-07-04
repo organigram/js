@@ -5,6 +5,7 @@ export interface OrganEntry {
     index: string;
     address: string;
     cid: string;
+    name?: string | null;
 }
 /**
  * Entry payload used when creating or updating an organ entry.
@@ -38,6 +39,7 @@ export interface OrganInput {
         index: string;
         address: string;
         cid: string;
+        name?: string | null;
     }> | null;
     salt?: string | null;
     isDeployed?: boolean | null;

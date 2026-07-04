@@ -29,6 +29,7 @@ export interface OrganEntry {
   index: string
   address: string
   cid: string
+  name?: string | null
 }
 
 /**
@@ -66,6 +67,7 @@ export interface OrganInput {
     index: string
     address: string
     cid: string
+    name?: string | null
   }> | null
   salt?: string | null
   isDeployed?: boolean | null
