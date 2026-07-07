@@ -1,6 +1,6 @@
 {
   "name": "@organigram/js",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "JavaScript/TypeScript client for the Organigram Protocol.",
   "author": "Organigram (https://organigram.ai)",
   "license": "MIT",
