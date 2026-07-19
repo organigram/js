@@ -4,8 +4,7 @@ import type {
   ENCRYPTION_PUBLIC_KEY_SIWE_RESOURCE_KIND,
   GROUP_KEY_ALGORITHM,
   FILE_VERSION_MANIFEST_KIND,
-  SCOPE_ENVELOPE_KIND,
-  USER_ENCRYPTION_KEY_BACKUP_KIND
+  SCOPE_ENVELOPE_KIND
 } from './constants'
 
 export type AccessGroupScopeType =
@@ -160,19 +159,4 @@ export interface EncryptionPublicKeySiweResource {
   address: string
   publicKey: JsonWebKey
   keyVersion: number
-}
-
-export interface UserEncryptionKeyBackup {
-  kind: typeof USER_ENCRYPTION_KEY_BACKUP_KIND
-  address: string
-  publicKey: JsonWebKey
-  keyVersion: number
-  privateKey: {
-    algorithm: 'PBKDF2-SHA256+A256GCM'
-    iterations: number
-    salt: string
-    iv: string
-    ciphertext: string
-  }
-  createdAt: string
 }

@@ -390,8 +390,6 @@ export declare interface EncryptionPublicKeySiweResource {
     keyVersion: number;
 }
 
-export declare const ensureUserEncryptionKeyPair: (address: string) => Promise<StoredUserEncryptionKeyPair>;
-
 export declare const ERC20_INITIAL_SUPPLY = 10000000;
 
 export declare class ERC20VoteProcedure extends VoteProcedure {
@@ -412,8 +410,6 @@ export declare type ERC20VoteProcedureInput = Omit<VoteProcedureInput, 'type' | 
 };
 
 export declare const exportSymmetricKey: (key: CryptoKey) => Promise<Uint8Array>;
-
-export declare const exportUserEncryptionKeyBackup: (address: string, passphrase: string) => Promise<UserEncryptionKeyBackup>;
 
 export declare const exportUserPrivateKey: (keyPair: CryptoKeyPair) => Promise<JsonWebKey>;
 
@@ -693,8 +689,6 @@ export declare const importExtractableUserPublicKey: (publicKey: JsonWebKey) => 
 
 export declare const importSymmetricKey: (rawKey: ArrayBuffer | Uint8Array) => Promise<CryptoKey>;
 
-export declare const importUserEncryptionKeyBackup: (backup: UserEncryptionKeyBackup, passphrase: string) => Promise<StoredUserEncryptionKeyPair>;
-
 export declare const importUserPrivateKey: (privateKey: JsonWebKey) => Promise<CryptoKey>;
 
 export declare const importUserPublicKey: (publicKey: JsonWebKey) => Promise<CryptoKey>;
@@ -722,8 +716,6 @@ export declare const isScopeEnvelopeManifest: (value: unknown) => value is Scope
 export declare const isSupportedChainId: (chainId: string | number | bigint | null | undefined) => boolean;
 
 export declare const isValidEncryptionKeyVersion: (keyVersion: number) => boolean;
-
-export declare const loadUserEncryptionKeyPair: (address: string) => Promise<StoredUserEncryptionKeyPair | null>;
 
 export declare const MAX_ENCRYPTION_KEY_VERSION = 2147483647;
 
@@ -1630,8 +1622,6 @@ export declare const renewSaltsAndAddresses: (organigram: OrganigramInput, chain
 
 export declare const resolveDeployment: (chainId: string | number | bigint | null | undefined, deploymentName: ProtocolDeploymentName) => string | undefined;
 
-export declare const saveUserEncryptionKeyPair: (address: string, value: StoredUserEncryptionKeyPair) => Promise<void>;
-
 export declare const SCOPE_ENVELOPE_KIND: "organigram.scope-envelope.v1";
 
 export declare interface ScopeEnvelopeCheckpoint {
@@ -1854,23 +1844,6 @@ export declare interface TransactionOptions {
 export declare const unwrapContentKey: (wrappedContentKey: WrappedContentKey, groupKey: CryptoKey) => Promise<CryptoKey>;
 
 export declare const unwrapGroupKey: (wrappedGroupKey: WrappedGroupKey, recipientPrivateKey: CryptoKey) => Promise<CryptoKey>;
-
-export declare const USER_ENCRYPTION_KEY_BACKUP_KIND: "organigram.user-encryption-key-backup.v1";
-
-export declare interface UserEncryptionKeyBackup {
-    kind: typeof USER_ENCRYPTION_KEY_BACKUP_KIND;
-    address: string;
-    publicKey: JsonWebKey;
-    keyVersion: number;
-    privateKey: {
-        algorithm: 'PBKDF2-SHA256+A256GCM';
-        iterations: number;
-        salt: string;
-        iv: string;
-        ciphertext: string;
-    };
-    createdAt: string;
-}
 
 export declare class VoteProcedure extends Procedure {
     static INTERFACE: string;

@@ -10,5 +10,3 @@ export const ENCRYPTION_PUBLIC_KEY_SIWE_RESOURCE_KIND =
   'organigram.encryption-public-key.v1' as const
 export const ENCRYPTION_PUBLIC_KEY_SIWE_RESOURCE_PREFIX =
   'urn:organigram:encryption-public-key:' as const
-export const USER_ENCRYPTION_KEY_BACKUP_KIND =
-  'organigram.user-encryption-key-backup.v1' as const
