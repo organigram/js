@@ -3,13 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.6](https://github.com/organigram/organigram/compare/v0.1.5...v0.1.6) (2026-07-20)
+
+- Moved SDK reference generation to the shared docs pipeline and removed the package-local API Extractor/YAML documentation artifacts.
+- Removed the legacy browser-local user encryption key backup and storage helpers from the IPFS export surface.
+
 ## [0.1.5](https://github.com/organigram/organigram/compare/v0.1.4...v0.1.5) (2026-07-07)
 
-**Note:** Version bump only for package @organigram/js
-
-
-
-
+- Added optional `name` support on organ entries and organ entry inputs.
 
 ## [0.1.4](https://github.com/organigram/organigram/compare/v0.1.3...v0.1.4) (2026-06-16)
 
