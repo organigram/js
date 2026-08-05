@@ -6,10 +6,11 @@ import participatoryBudget from './budget.json' with { type: 'json' }
 import {
   capitalize,
   createRandom32BytesHexId,
+  PERMISSIONS,
   predictContractAddress
 } from '../utils'
 import { OrganigramInput } from '../organigram'
-import { OrganInput } from '../organ'
+import { OrganInput, type OrganPermission } from '../organ'
 import { ProcedureInput } from '../procedure'
 import { AssetInput } from '../asset'
 
@@ -29,6 +30,15 @@ type RenewableContractInput = {
   typeName?: string | null
   chainId?: string | null
 }
+
+type ImportableOrganPermission = Partial<OrganPermission> & {
+  procedureSalt?: string | null
+  permissionKeys?: string[] | null
+}
+
+const permissionValuesByKey = new Map<string, number>(
+  Object.entries(PERMISSIONS)
+)
 
 const setFirstValue = (
   target: Record<string, string>,
@@ -90,6 +100,39 @@ const resolveRenewedAddress = (
     ? ''
     : (renewal.addresses[reference] ?? renewal.addressBySalt[reference] ?? '')
 
+const resolvePermissionValue = (
+  permission: ImportableOrganPermission
+): number => {
+  if (typeof permission.permissionValue === 'number') {
+    return permission.permissionValue
+  }
+
+  return (permission.permissionKeys ?? []).reduce((value, key) => {
+    const permissionValue = permissionValuesByKey.get(key)
+    return typeof permissionValue === 'number' ? value | permissionValue : value
+  }, 0)
+}
+
+const normalizeOrganPermission = (
+  permission: ImportableOrganPermission,
+  procedureRenewal: ReturnType<typeof createRenewedContractValues>
+): OrganPermission | undefined => {
+  const permissionAddress = resolveRenewedAddress(
+    permission.permissionAddress ?? permission.procedureSalt,
+    procedureRenewal
+  )
+  const permissionValue = resolvePermissionValue(permission)
+
+  if (permissionAddress === '' || permissionValue <= 0) {
+    return undefined
+  }
+
+  return {
+    permissionAddress,
+    permissionValue
+  }
+}
+
 export const renewSaltsAndAddresses = (
   organigram: OrganigramInput,
   chainId: string
@@ -117,18 +160,14 @@ export const renewSaltsAndAddresses = (
     chainId,
     isDeployed: false,
     permissions: organ.permissions
-      ?.map(permission => ({
-        ...permission,
-        permissionAddress: resolveRenewedAddress(
-          permission.permissionAddress,
+      ?.map(permission =>
+        normalizeOrganPermission(
+          permission as ImportableOrganPermission,
           procedureRenewal
         )
-      }))
+      )
       .filter(
-        (
-          permission
-        ): permission is typeof permission & { permissionAddress: string } =>
-          permission.permissionAddress !== ''
+        (permission): permission is OrganPermission => permission != null
       )
   }))
 

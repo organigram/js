@@ -1,4 +1,5 @@
 import { renewSaltsAndAddresses } from '../src/template'
+import { PERMISSIONS } from '../src/utils'
 
 describe('renewSaltsAndAddresses', () => {
   it('renews duplicate placeholder salts and addresses independently', () => {
@@ -67,5 +68,46 @@ describe('renewSaltsAndAddresses', () => {
     expect(renewed.organs?.[0].permissions?.[0].permissionAddress).toBe(
       renewed.procedures?.[0].address
     )
+  })
+
+  it('resolves agent permission salts and keys to procedure permissions', () => {
+    const renewed = renewSaltsAndAddresses(
+      {
+        name: 'Imported organigram',
+        organs: [
+          {
+            salt: 'board-salt',
+            name: 'Board',
+            permissions: [
+              {
+                procedureSalt: 'election-salt',
+                permissionKeys: ['ADD_ENTRIES', 'REMOVE_ENTRIES']
+              }
+            ] as any
+          }
+        ],
+        procedures: [
+          {
+            salt: 'election-salt',
+            name: 'Elect board',
+            description: '',
+            typeName: 'vote',
+            deciders: 'board-salt',
+            proposers: 'board-salt',
+            withModeration: false,
+            data: '{}'
+          }
+        ],
+        assets: []
+      },
+      '11155111'
+    )
+
+    expect(renewed.organs?.[0].permissions).toEqual([
+      {
+        permissionAddress: renewed.procedures?.[0].address,
+        permissionValue: PERMISSIONS.ADD_ENTRIES | PERMISSIONS.REMOVE_ENTRIES
+      }
+    ])
   })
 })
