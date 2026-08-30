@@ -1,10 +1,14 @@
 import AssetContractABI from '@organigram/protocol/abi/Asset.sol/Asset.json'
+import EquityTokenABI from '@organigram/protocol/abi/EquityToken.sol/EquityToken.json'
+import ProcedureContractABI from '@organigram/protocol/abi/Procedure.sol/Procedure.json'
+import NominationProcedureContractABI from '@organigram/protocol/abi/Nomination.sol/NominationProcedure.json'
 import {
   createPublicClient,
   createWalletClient,
   getContract,
   http,
   isAddress,
+  encodeFunctionData,
   parseEther,
   type Address,
   type PublicClient,
@@ -29,6 +33,7 @@ import { VoteProcedure } from '../src/procedure/vote'
 import { ERC20VoteProcedure } from '../src/procedure/erc20Vote'
 
 const TEST_CHAIN_ID = anvil.id.toString()
+const proposalMetadataCid = 'og://workspace/test-workspace/proposal-metadata'
 
 const txOptions: TransactionOptions = {
   onTransaction: (tx, description) => {}
@@ -197,10 +202,10 @@ describe('Organigram JS Client', () => {
       expect(
         await assetContract.read.balanceOf([organ.address as Address])
       ).toBe(0n)
-      expect(
-        await assetContract.read.balanceOf([recipientAddress])
-      ).toBe(amount)
-      })
+      expect(await assetContract.read.balanceOf([recipientAddress])).toBe(
+        amount
+      )
+    })
 
     it('should deploy procedures in batch', async () => {
       const address = signerAddress
@@ -250,6 +255,103 @@ describe('Organigram JS Client', () => {
         ]
       })
       expect(organigram).not.toBeNull()
+    })
+
+    it('should settle an equity transfer through a nomination proposal', async () => {
+      const client = new OrganigramClient({ publicClient, walletClient })
+      const chairmanDraft = '0x0000000000000000000000000000000000000a11'
+      const registryDraft = '0x0000000000000000000000000000000000000a12'
+      const tokenDraft = '0x0000000000000000000000000000000000000a13'
+      const transferDraft = '0x0000000000000000000000000000000000000a14'
+      const deployed = await client.deployOrganigram({
+        organs: [
+          {
+            address: chairmanDraft,
+            salt: createRandom32BytesHexId(),
+            entries: [{ index: '0', address: signerAddress, cid: 'chairman' }]
+          },
+          {
+            address: registryDraft,
+            salt: createRandom32BytesHexId(),
+            permissions: [{ permissionAddress: tokenDraft, permissionValue: 4 }]
+          }
+        ],
+        assets: [
+          {
+            address: tokenDraft,
+            name: 'Equity',
+            symbol: 'EQT',
+            initialSupply: 100,
+            kind: 'equity',
+            decisionProcedure: transferDraft,
+            salt: createRandom32BytesHexId()
+          }
+        ],
+        procedures: [
+          {
+            address: transferDraft,
+            salt: createRandom32BytesHexId(),
+            typeName: 'nomination',
+            cid: 'approve-share-transfer',
+            deciders: chairmanDraft,
+            proposers: '0x0000000000000000000000000000000000000000',
+            moderators: '0x0000000000000000000000000000000000000000',
+            withModeration: false,
+            data: '{}'
+          }
+        ]
+      })
+      const [, assets, procedures] = deployed
+      const [tokenAddress] = assets
+      const [transferAddress] = procedures
+      const token = getContract({
+        address: tokenAddress as Address,
+        abi: EquityTokenABI.abi,
+        client: publicClient
+      })
+
+      expect(await token.read.decisionProcedure()).toBe(transferAddress)
+      expect(await token.read.decimals()).toBe(0)
+      expect(await token.read.totalSupply()).toBe(100n)
+
+      const buyer = privateKeyToAccount(generatePrivateKey()).address
+      const transfer = getContract({
+        address: transferAddress as Address,
+        abi: ProcedureContractABI.abi,
+        client: { public: publicClient, wallet: walletClient }
+      })
+      const settlementData = encodeFunctionData({
+        abi: EquityTokenABI.abi,
+        functionName: 'settleTransfer',
+        args: [buyer, 25n, 'movement-supporting-record']
+      })
+      const proposalHash = await transfer.write.propose(
+        [
+          'movement-supporting-record',
+          [
+            {
+              index: 0n,
+              target: tokenAddress as Address,
+              data: settlementData,
+              value: 0n,
+              processed: false
+            }
+          ]
+        ],
+        { account: signerAddress }
+      )
+      await publicClient.waitForTransactionReceipt({ hash: proposalHash })
+
+      const nomination = getContract({
+        address: transferAddress as Address,
+        abi: NominationProcedureContractABI.abi,
+        client: { public: publicClient, wallet: walletClient }
+      })
+      const approvalHash = await nomination.write.nominate([0n], {
+        account: signerAddress
+      })
+      await publicClient.waitForTransactionReceipt({ hash: approvalHash })
+      expect(await token.read.balanceOf([buyer])).toBe(25n)
     })
 
     it('should predict deterministic addresses', async () => {
@@ -404,7 +506,7 @@ describe('Organigram JS Client', () => {
           functionSelector: data.data?.substring(0, 10) as string
         }
         const proposal = await procedure.propose({
-          cid: '',
+          cid: proposalMetadataCid,
           operations: [operation]
         })
         proposalKey = proposal?.key
@@ -464,7 +566,7 @@ describe('Organigram JS Client', () => {
           functionSelector: data.data?.substring(0, 10) as string
         }
         const proposal = await moderatedProcedure.propose({
-          cid: '',
+          cid: proposalMetadataCid,
           operations: [operation]
         })
 
@@ -527,7 +629,7 @@ describe('Organigram JS Client', () => {
           functionSelector: data.data?.substring(0, 10) as string
         }
         const proposal = await procedure.propose({
-          cid: '',
+          cid: proposalMetadataCid,
           operations: [operation]
         })
         proposalKey = proposal?.key
@@ -565,7 +667,7 @@ describe('Organigram JS Client', () => {
           functionSelector: data.data?.substring(0, 10) as string
         }
         const proposal = await moderatedProcedure.propose({
-          cid: '',
+          cid: proposalMetadataCid,
           operations: [operation]
         })
         const receipt = await moderatedProcedure.blockProposal(proposal.key, '')
@@ -644,7 +746,7 @@ describe('Organigram JS Client', () => {
           functionSelector: data.data?.substring(0, 10) as string
         }
         const proposal = await procedure.propose({
-          cid: '',
+          cid: proposalMetadataCid,
           operations: [operation]
         })
         proposalKey = proposal?.key
@@ -691,7 +793,7 @@ describe('Organigram JS Client', () => {
           functionSelector: data.data?.substring(0, 10) as string
         }
         const proposal = await moderatedProcedure.propose({
-          cid: '',
+          cid: proposalMetadataCid,
           operations: [operation]
         })
         const receipt = await moderatedProcedure.blockProposal(proposal.key, '')
