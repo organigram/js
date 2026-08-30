@@ -28,6 +28,7 @@ import {
   prepareDeployProceduresInput,
   procedureTypeMetadata,
   ProcedureTypeName,
+  type ERC20VoteRoleMode,
   getProcedureType,
   getProcedureTypes
 } from './procedure/utils'
@@ -41,6 +42,13 @@ import {
   getContractInstance,
   getWalletAddress
 } from './contracts'
+import {
+  applyDeployedOrganigramAddresses,
+  createDeployOrganigramResult,
+  markExistingOrganigramDeployments,
+  refreshUndeployedContractReferences,
+  type DeployOrganigramResult
+} from './deploymentReferences'
 
 /**
  * Input used to deploy one organ through an {@link OrganigramClient}.
@@ -64,6 +72,10 @@ export interface DeployProceduresInput {
   moderators?: string | null
   deciders: string
   withModeration?: boolean | null
+  proposerMode?: ERC20VoteRoleMode | null
+  moderatorMode?: ERC20VoteRoleMode | null
+  voterMode?: ERC20VoteRoleMode | null
+  requireMemberMajority?: boolean | null
   forwarder?: string | null
   salt?: string | null
   options?: TransactionOptions
@@ -88,7 +100,16 @@ export interface DeployAssetInput {
   symbol: string
   initialSupply?: number | null
   salt?: string | null
+  kind?: 'asset' | 'equity'
+  decisionProcedure?: string | null
 }
+
+const formatAssetInitialSupply = (asset: DeployAssetInput): bigint =>
+  asset.kind === 'equity'
+    ? BigInt(asset.initialSupply ?? ERC20_INITIAL_SUPPLY)
+    : parseEther(
+        asset.initialSupply?.toString() ?? ERC20_INITIAL_SUPPLY.toString()
+      )
 
 type MaybeDeployed = {
   isDeployed?: boolean | null
@@ -197,6 +218,7 @@ const createInitialProcedureInput = (
   proposers: input.proposers ?? input.deciders,
   moderators: input.moderators ?? zeroAddress,
   withModeration: input.withModeration ?? false,
+  requireMemberMajority: input.requireMemberMajority ?? false,
   forwarder: input.forwarder ?? getDeployment(chainId, 'MetaGasStation'),
   salt: formatSalt(input.salt),
   ...(input.data != null ? { data: input.data } : {})
@@ -247,7 +269,8 @@ export class OrganigramClient {
     }
     this.address = resolvedAddress ?? ''
     this.chainId = resolvedChainId
-    this.procedureTypes = input.procedureTypes ?? Object.values(getProcedureTypes(resolvedChainId))
+    this.procedureTypes =
+      input.procedureTypes ?? Object.values(getProcedureTypes(resolvedChainId))
     this.organs = []
     this.procedures = []
     this.assets = []
@@ -623,10 +646,18 @@ export class OrganigramClient {
     }
     const { cid, permissions, salt, entries, options } = input ?? {}
     const resolvedSalt = formatSalt(salt)
-    const permissionAddresses: string[] = []
-    const permissionValues: string[] = []
+    const [preparedOrgan] = prepareDeployOrgansInput([
+      {
+        cid,
+        permissions,
+        entries,
+        salt: resolvedSalt
+      }
+    ])
+    const permissionAddresses = [...preparedOrgan.permissionAddresses]
+    const permissionValues = [...preparedOrgan.permissionValues]
 
-    if (!permissions || permissions.length === 0) {
+    if (permissionAddresses.length === 0) {
       permissionAddresses.push(await getWalletAddress(this.walletClient))
       permissionValues.push(toHex(PERMISSIONS.ADMIN).replace(/^0x/, '0x'))
       permissionValues[0] =
@@ -634,19 +665,6 @@ export class OrganigramClient {
           ? permissionValues[0]
           : `0x${permissionValues[0].slice(2).padStart(4, '0')}`
     }
-
-    permissions?.forEach(permission => {
-      permissionAddresses.push(permission.permissionAddress)
-      permissionValues.push(
-        `0x${toHex(permission.permissionValue).slice(2).padStart(4, '0')}`
-      )
-    })
-
-    const formattedEntries =
-      entries?.map(entry => ({
-        addr: entry.address,
-        cid: entry.cid ?? ''
-      })) ?? []
 
     const tx = await createContractWriteTransaction({
       address: this.address,
@@ -656,7 +674,7 @@ export class OrganigramClient {
         permissionAddresses,
         permissionValues,
         cid ?? '',
-        formattedEntries,
+        preparedOrgan.entries,
         resolvedSalt
       ],
       clients: this.getClients(),
@@ -773,10 +791,10 @@ export class OrganigramClient {
     const formattedAssets = assets.map(asset => ({
       name: asset.name,
       symbol: asset.symbol,
-      initialSupply: parseEther(
-        asset.initialSupply?.toString() ?? ERC20_INITIAL_SUPPLY.toString()
-      ),
-      salt: formatSalt(asset.salt)
+      initialSupply: formatAssetInitialSupply(asset),
+      salt: formatSalt(asset.salt),
+      isEquity: asset.kind === 'equity',
+      transferProcedure: asset.decisionProcedure ?? zeroAddress
     }))
     const tx = await createContractWriteTransaction({
       address: this.address,
@@ -816,7 +834,12 @@ export class OrganigramClient {
         proposers: input.proposers ?? input.deciders,
         moderators: input.moderators ?? zeroAddress,
         withModeration: input.withModeration ?? false,
-        forwarder: input.forwarder ?? getDeployment(this.chainId, 'MetaGasStation'),
+        proposerMode: input.proposerMode ?? undefined,
+        moderatorMode: input.moderatorMode ?? undefined,
+        voterMode: input.voterMode ?? undefined,
+        requireMemberMajority: input.requireMemberMajority ?? undefined,
+        forwarder:
+          input.forwarder ?? getDeployment(this.chainId, 'MetaGasStation'),
         args: input.args ?? []
       },
       this.getClients()
@@ -922,19 +945,23 @@ export class OrganigramClient {
    * @param input Batch deployment input for the whole organigram.
    * @returns The deployed organ, asset, and procedure addresses.
    */
-  async deployOrganigram(
-    input: DeployOrganigramInput
-  ): Promise<readonly string[]> {
+  async deployOrganigram<Input extends DeployOrganigramInput>(
+    input: Input
+  ): Promise<DeployOrganigramResult<Input>> {
     if (this.walletClient == null) {
       throw new Error('Wallet client not connected.')
     }
-    const organsToDeploy = input.organs.filter(
+    const refreshedInput = await markExistingOrganigramDeployments(
+      refreshUndeployedContractReferences(input, this.chainId),
+      this.publicClient
+    )
+    const organsToDeploy = refreshedInput.organs.filter(
       organ => (organ as MaybeDeployed).isDeployed !== true
     )
-    const assetsToDeploy = input.assets.filter(
+    const assetsToDeploy = refreshedInput.assets.filter(
       asset => (asset as MaybeDeployed).isDeployed !== true
     )
-    const proceduresToDeploy = input.procedures.filter(
+    const proceduresToDeploy = refreshedInput.procedures.filter(
       procedure => (procedure as MaybeDeployed).isDeployed !== true
     )
 
@@ -943,16 +970,19 @@ export class OrganigramClient {
       assetsToDeploy.length === 0 &&
       proceduresToDeploy.length === 0
     ) {
-      return [[], [], []] as unknown as readonly string[]
+      return createDeployOrganigramResult(
+        { organs: [], assets: [], procedures: [] },
+        refreshedInput
+      )
     }
 
     const formattedAssets = assetsToDeploy.map(asset => ({
       name: asset.name,
       symbol: asset.symbol,
-      initialSupply: parseEther(
-        asset.initialSupply?.toString() ?? ERC20_INITIAL_SUPPLY.toString()
-      ),
-      salt: formatSalt(asset.salt)
+      initialSupply: formatAssetInitialSupply(asset),
+      salt: formatSalt(asset.salt),
+      isEquity: asset.kind === 'equity',
+      transferProcedure: asset.decisionProcedure ?? zeroAddress
     }))
     const organsInput = prepareDeployOrgansInput(organsToDeploy)
     const proceduresInput = await prepareDeployProceduresInput(
@@ -967,12 +997,28 @@ export class OrganigramClient {
       clients: this.getClients()
     })
     const receipt = await tx.wait()
+    const deployedAddresses = {
+      organs: getDeploymentAddresses(receipt, 'organDeployed'),
+      assets: getDeploymentAddresses(receipt, 'assetDeployed'),
+      procedures: getDeploymentAddresses(receipt, 'procedureDeployed')
+    }
 
-    return [
-      getDeploymentAddresses(receipt, 'organDeployed'),
-      getDeploymentAddresses(receipt, 'assetDeployed'),
-      getDeploymentAddresses(receipt, 'procedureDeployed')
-    ] as unknown as readonly string[]
+    if (
+      deployedAddresses.organs.length !== organsToDeploy.length ||
+      deployedAddresses.assets.length !== assetsToDeploy.length ||
+      deployedAddresses.procedures.length !== proceduresToDeploy.length
+    ) {
+      throw new Error('Organigram deployment events did not match the input.')
+    }
+
+    return createDeployOrganigramResult(
+      deployedAddresses,
+      applyDeployedOrganigramAddresses(
+        refreshedInput,
+        deployedAddresses,
+        refreshedInput
+      )
+    )
   }
 
   /**

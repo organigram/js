@@ -1,10 +1,12 @@
 import type { Chain } from 'viem'
+import { isAddress } from 'viem'
 import * as chains from 'viem/chains'
 import { sepolia } from 'viem/chains'
 import rawDeployedAddresses from '@organigram/protocol/deployments.json' with { type: 'json' }
 
 export type ProtocolDeploymentName =
   | 'Asset'
+  | 'EquityToken'
   | 'Organ'
   | 'ERC20VoteProcedure'
   | 'NominationProcedure'
@@ -16,7 +18,7 @@ export type ProtocolDeploymentName =
 
 export type ProtocolDeployments = Record<
   string,
-  Record<ProtocolDeploymentName, string>
+  Partial<Record<ProtocolDeploymentName, string>>
 >
 
 const deployedAddresses: ProtocolDeployments = rawDeployedAddresses
@@ -87,7 +89,9 @@ export const resolveDeployment = (
 ): string | undefined => {
   const normalizedChainId = normalizeChainId(chainId)
   if (normalizedChainId === '') return undefined
-  return deployedAddresses[normalizedChainId]?.[deploymentName]
+  const deployment = deployedAddresses[normalizedChainId]?.[deploymentName]
+  if (deployment == null || deployment.trim() === '') return undefined
+  return deployment
 }
 
 export const getDeployment = (
@@ -99,6 +103,12 @@ export const getDeployment = (
     const normalizedChainId = normalizeChainId(chainId)
     throw new Error(
       `Missing ${deploymentName} deployment for chain ${normalizedChainId || 'unknown'}.`
+    )
+  }
+  if (!isAddress(deployment)) {
+    const normalizedChainId = normalizeChainId(chainId)
+    throw new Error(
+      `Invalid ${deploymentName} deployment for chain ${normalizedChainId || 'unknown'}: ${deployment}.`
     )
   }
   return deployment
