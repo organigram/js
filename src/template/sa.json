@@ -1,0 +1,197 @@
+{
+  "name": "Société Anonyme",
+  "description": "French SA template using the board-of-directors model. It covers governance, statutory registers and equity; a SA with a management board and supervisory board needs a tailored template.",
+  "organs": [
+    {
+      "address": "board-address",
+      "salt": "board-salt",
+      "name": "Board of directors",
+      "description": "Board of directors in the standard French SA governance model.",
+      "permissions": [
+        { "permissionValue": 12, "permissionAddress": "appoint-directors-address" }
+      ],
+      "entries": []
+    },
+    {
+      "address": "executive-management-address",
+      "salt": "executive-management-salt",
+      "name": "Executive management",
+      "description": "Chairman, Chief Executive Officer and delegated chief executives appointed by the board where applicable.",
+      "permissions": [
+        { "permissionValue": 12, "permissionAddress": "appoint-executive-management-address" }
+      ],
+      "entries": []
+    },
+    {
+      "address": "bylaws-address",
+      "salt": "bylaws-salt",
+      "name": "Bylaws",
+      "description": "Append-only history of the versions of the bylaws adopted by the extraordinary general meeting.",
+      "permissions": [
+        { "permissionValue": 20, "permissionAddress": "amend-bylaws-address" }
+      ],
+      "entries": []
+    },
+    {
+      "address": "board-minutes-address",
+      "salt": "board-minutes-salt",
+      "name": "Board minutes",
+      "description": "Append-only register of board deliberations and resolutions.",
+      "permissions": [
+        { "permissionValue": 4, "permissionAddress": "appoint-executive-management-address" },
+        { "permissionValue": 4, "permissionAddress": "approve-share-transfer-address" },
+        { "permissionValue": 4, "permissionAddress": "record-board-resolution-address" }
+      ],
+      "entries": []
+    },
+    {
+      "address": "general-meeting-minutes-address",
+      "salt": "general-meeting-minutes-salt",
+      "name": "Résolutions de l’assemblée générale",
+      "description": "Append-only register of each general-meeting decision and its recorded result, separate from the signed minutes.",
+      "permissions": [
+        { "permissionValue": 4, "permissionAddress": "appoint-directors-address" },
+        { "permissionValue": 4, "permissionAddress": "amend-bylaws-address" }
+      ],
+      "entries": []
+    },
+    {
+      "address": "sa-general-meeting-minutes-register",
+      "salt": "sa-general-meeting-minutes-register",
+      "name": "Procès-verbaux d’assemblée générale",
+      "description": "Append-only register of final signed general-meeting minutes, maintained only by Executive management.",
+      "permissions": [
+        { "permissionValue": 4, "permissionAddress": "sa-archive-meeting-minutes-procedure" }
+      ],
+      "entries": []
+    },
+    {
+      "address": "share-transfer-register-address",
+      "salt": "share-transfer-register-salt",
+      "name": "Share transfer register",
+      "description": "Append-only record of every issue, transfer, donation, pledge or split of equity.",
+      "permissions": [
+        { "permissionValue": 4, "permissionAddress": "approve-share-transfer-address" }
+      ],
+      "entries": []
+    },
+    {
+      "address": "financial-statements-address",
+      "salt": "financial-statements-salt",
+      "name": "Financial statements",
+      "description": "Append-only register of the annual financial statements approved by the general meeting.",
+      "permissions": [
+        { "permissionValue": 4, "permissionAddress": "amend-bylaws-address" }
+      ],
+      "entries": []
+    },
+    {
+      "address": "payments-address",
+      "salt": "payments-salt",
+      "name": "Payments",
+      "description": "Assets and token balances available for payments approved through the payment procedure.",
+      "permissions": [
+        { "permissionValue": 1348, "permissionAddress": "set-executive-compensation-address" }
+      ],
+      "entries": []
+    }
+  ],
+  "assets": [
+    {
+      "address": "shares-address",
+      "salt": "shares-salt",
+      "name": "Shares",
+      "symbol": "EQT",
+      "description": "Equity of the SA.",
+      "initialSupply": 10000000,
+      "kind": "equity",
+      "decisionProcedure": "approve-share-transfer-address"
+    }
+  ],
+  "procedures": [
+    {
+      "address": "appoint-directors-address",
+      "salt": "appoint-directors-salt",
+      "name": "Appoint directors",
+      "description": "The ordinary general meeting appoints, renews or revokes directors.",
+      "typeName": "erc20Vote",
+      "deciders": "",
+      "proposers": "",
+      "moderators": "executive-management-address",
+      "withModeration": true,
+      "data": "{\"erc20\":\"shares-address\",\"quorumSize\":\"20001\",\"voteDuration\":\"300\",\"majoritySize\":\"50001\",\"voterMode\":\"token\",\"proposerMode\":\"token\",\"moderatorMode\":\"organ\"}"
+    },
+    {
+      "address": "appoint-executive-management-address",
+      "salt": "appoint-executive-management-salt",
+      "name": "Appoint executive management",
+      "description": "The board appoints or revokes the Chairman, CEO and delegated chief executives where applicable.",
+      "typeName": "nomination",
+      "deciders": "board-address",
+      "proposers": "board-address",
+      "moderators": "",
+      "withModeration": false,
+      "data": "{}"
+    },
+    {
+      "address": "set-executive-compensation-address",
+      "salt": "set-executive-compensation-salt",
+      "name": "Make a payment",
+      "description": "The Board of directors approves payments from the Payments organ.",
+      "typeName": "nomination",
+      "deciders": "board-address",
+      "proposers": "board-address",
+      "moderators": "",
+      "withModeration": false,
+      "data": "{\"quorumSize\":\"50001\",\"voteDuration\":\"300\",\"majoritySize\":\"50001\"}"
+    },
+    {
+      "address": "approve-share-transfer-address",
+      "salt": "approve-share-transfer-salt",
+      "name": "Approve share transfer",
+      "description": "The board decides on a holder-initiated transfer when an approval clause in the bylaws applies, then records the movement atomically.",
+      "typeName": "vote",
+      "deciders": "board-address",
+      "proposers": "",
+      "moderators": "executive-management-address",
+      "withModeration": true,
+      "data": "{\"quorumSize\":\"50001\",\"voteDuration\":\"300\",\"majoritySize\":\"50001\",\"equityTransferRegister\":\"share-transfer-register-address\"}"
+    },
+    {
+      "address": "amend-bylaws-address",
+      "salt": "amend-bylaws-salt",
+      "name": "Amend bylaws",
+      "description": "The extraordinary general meeting adopts an amendment to the bylaws.",
+      "typeName": "erc20Vote",
+      "deciders": "",
+      "proposers": "board-address",
+      "moderators": "executive-management-address",
+      "withModeration": true,
+      "data": "{\"erc20\":\"shares-address\",\"quorumSize\":\"20001\",\"voteDuration\":\"300\",\"majoritySize\":\"66667\",\"voterMode\":\"token\",\"proposerMode\":\"organ\",\"moderatorMode\":\"organ\"}"
+    },
+    {
+      "address": "record-board-resolution-address",
+      "salt": "record-board-resolution-salt",
+      "name": "Record board resolution",
+      "description": "The board records a deliberation that does not belong to a more specific procedure.",
+      "typeName": "vote",
+      "deciders": "board-address",
+      "proposers": "board-address",
+      "moderators": "executive-management-address",
+      "withModeration": true,
+      "data": "{\"quorumSize\":\"50001\",\"voteDuration\":\"300\",\"majoritySize\":\"50001\"}"
+    },
+    {
+      "address": "sa-archive-meeting-minutes-procedure",
+      "salt": "sa-archive-meeting-minutes-procedure",
+      "name": "Archive meeting minutes",
+      "description": "Executive management appends the final signed meeting minutes to the append-only minutes register.",
+      "typeName": "nomination",
+      "deciders": "executive-management-address",
+      "proposers": "executive-management-address",
+      "moderators": "",
+      "withModeration": false,
+      "data": "{}"
+    }
+  ]
+}

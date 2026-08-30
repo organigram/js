@@ -1,0 +1,152 @@
+{
+  "name": "Société par Actions Simplifiée Unipersonnelle",
+  "description": "French SASU template covering the sole shareholder's decisions, statutory registers and equity. It must be tailored to the bylaws and the company's actual obligations.",
+  "organs": [
+    {
+      "address": "president-address",
+      "salt": "president-salt",
+      "name": "President",
+      "description": "The legal representative of the SASU.",
+      "permissions": [
+        { "permissionValue": 12, "permissionAddress": "appoint-president-address" }
+      ],
+      "entries": []
+    },
+    {
+      "address": "bylaws-address",
+      "salt": "bylaws-salt",
+      "name": "Bylaws",
+      "description": "Append-only history of the versions of the bylaws adopted by the sole shareholder.",
+      "permissions": [
+        { "permissionValue": 20, "permissionAddress": "amend-bylaws-address" }
+      ],
+      "entries": []
+    },
+    {
+      "address": "sole-shareholder-decisions-address",
+      "salt": "sole-shareholder-decisions-salt",
+      "name": "Résolutions de l’assemblée générale",
+      "description": "Append-only register of each sole-shareholder decision and its recorded result, separate from the signed minutes.",
+      "permissions": [
+        { "permissionValue": 4, "permissionAddress": "appoint-president-address" },
+        { "permissionValue": 4, "permissionAddress": "amend-bylaws-address" }
+      ],
+      "entries": []
+    },
+    {
+      "address": "sasu-general-meeting-minutes-register",
+      "salt": "sasu-general-meeting-minutes-register",
+      "name": "Procès-verbaux d’assemblée générale",
+      "description": "Append-only register of final signed meeting minutes, maintained only by the President.",
+      "permissions": [
+        { "permissionValue": 4, "permissionAddress": "sasu-archive-meeting-minutes-procedure" }
+      ],
+      "entries": []
+    },
+    {
+      "address": "share-transfer-register-address",
+      "salt": "share-transfer-register-salt",
+      "name": "Share transfer register",
+      "description": "Mandatory append-only record of every issue, transfer, donation, pledge or split of equity.",
+      "permissions": [
+        { "permissionValue": 4, "permissionAddress": "approve-share-transfer-address" }
+      ],
+      "entries": []
+    },
+    {
+      "address": "financial-statements-address",
+      "salt": "financial-statements-salt",
+      "name": "Financial statements",
+      "description": "Append-only register of the annual financial statements approved by the sole shareholder.",
+      "permissions": [
+        { "permissionValue": 4, "permissionAddress": "amend-bylaws-address" }
+      ],
+      "entries": []
+    },
+    {
+      "address": "payments-address",
+      "salt": "payments-salt",
+      "name": "Payments",
+      "description": "Assets and token balances available for payments approved through the payment procedure.",
+      "permissions": [
+        { "permissionValue": 1348, "permissionAddress": "set-executive-compensation-address" }
+      ],
+      "entries": []
+    }
+  ],
+  "assets": [
+    {
+      "address": "shares-address",
+      "salt": "shares-salt",
+      "name": "Shares",
+      "symbol": "EQT",
+      "description": "Equity of the SASU.",
+      "initialSupply": 10000000,
+      "kind": "equity",
+      "decisionProcedure": "approve-share-transfer-address"
+    }
+  ],
+  "procedures": [
+    {
+      "address": "appoint-president-address",
+      "salt": "appoint-president-salt",
+      "name": "Appoint president",
+      "description": "The sole shareholder appoints or revokes the President under the bylaws.",
+      "typeName": "erc20Vote",
+      "deciders": "",
+      "proposers": "",
+      "moderators": "president-address",
+      "withModeration": true,
+      "data": "{\"erc20\":\"shares-address\",\"quorumSize\":\"100000\",\"voteDuration\":\"300\",\"majoritySize\":\"50001\",\"voterMode\":\"token\",\"proposerMode\":\"token\",\"moderatorMode\":\"organ\"}"
+    },
+    {
+      "address": "approve-share-transfer-address",
+      "salt": "approve-share-transfer-salt",
+      "name": "Approve share transfer",
+      "description": "The President approves a holder-initiated share transfer when the bylaws require approval, then records the movement atomically.",
+      "typeName": "nomination",
+      "cid": "nomination",
+      "deciders": "president-address",
+      "proposers": "",
+      "moderators": "",
+      "withModeration": false,
+      "data": "{\"equityTransferRegister\":\"share-transfer-register-address\"}"
+    },
+    {
+      "address": "set-executive-compensation-address",
+      "salt": "set-executive-compensation-salt",
+      "name": "Make a payment",
+      "description": "The President approves payments from the Payments organ.",
+      "typeName": "nomination",
+      "deciders": "president-address",
+      "proposers": "president-address",
+      "moderators": "",
+      "withModeration": false,
+      "data": "{}"
+    },
+    {
+      "address": "amend-bylaws-address",
+      "salt": "amend-bylaws-salt",
+      "name": "Amend bylaws",
+      "description": "The sole shareholder adopts an amendment to the bylaws.",
+      "typeName": "erc20Vote",
+      "deciders": "",
+      "proposers": "",
+      "moderators": "president-address",
+      "withModeration": true,
+      "data": "{\"erc20\":\"shares-address\",\"quorumSize\":\"100000\",\"voteDuration\":\"300\",\"majoritySize\":\"50001\",\"voterMode\":\"token\",\"proposerMode\":\"token\",\"moderatorMode\":\"organ\"}"
+    },
+    {
+      "address": "sasu-archive-meeting-minutes-procedure",
+      "salt": "sasu-archive-meeting-minutes-procedure",
+      "name": "Archive meeting minutes",
+      "description": "The President appends the final signed meeting minutes to the append-only minutes register.",
+      "typeName": "nomination",
+      "deciders": "president-address",
+      "proposers": "president-address",
+      "moderators": "",
+      "withModeration": false,
+      "data": "{}"
+    }
+  ]
+}
