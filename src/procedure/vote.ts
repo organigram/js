@@ -14,7 +14,7 @@ import {
   type PopulateInitializeInput,
   type PopulatedTransactionData,
   ProcedureTypeName,
-  getProcedureTypes
+  getProcedureType
 } from './utils'
 import { decodeFunctionResult, encodeFunctionData, zeroAddress } from 'viem'
 import {
@@ -37,6 +37,16 @@ const normalizeElection = (election: any, proposalKey: string): Election => ({
   votesCount: (election.votesCount ?? election[2]).toString(),
   hasVoted: Boolean(election.hasVoted ?? election[1])
 })
+
+// viem normally returns block timestamps as bigint, but custom/local RPC
+// clients can return a number. Keep every timestamp comparison in bigint
+// space so an election load never mixes the two numeric representations.
+const asBigInt = (value: unknown): bigint => {
+  if (typeof value === 'bigint' || typeof value === 'number' || typeof value === 'string') {
+    return BigInt(value)
+  }
+  throw new Error('Invalid on-chain numeric value.')
+}
 
 export class VoteProcedure extends Procedure {
   static INTERFACE = '0xc9d27afe'
@@ -63,7 +73,7 @@ export class VoteProcedure extends Procedure {
     this.voteDuration = voteDuration
     this.majoritySize = majoritySize
     this.elections = elections
-    this.type = getProcedureTypes(this.chainId).vote
+    this.type = getProcedureType(this.chainId, 'vote')
     this.contract =
       this.publicClient != null
         ? getContractInstance({
@@ -114,7 +124,8 @@ export class VoteProcedure extends Procedure {
     proposalKey: string,
     clients: ContractClients,
     voteDuration?: bigint,
-    contract?: any
+    contract?: any,
+    blockTimestamp?: bigint
   ): Promise<Election> {
     const procedureContract =
       contract ??
@@ -131,12 +142,16 @@ export class VoteProcedure extends Procedure {
     if (!normalizedElection.start || normalizedElection.start === '0') {
       throw new Error('Election not found.')
     }
-    const currentVoteDuration =
+    const currentVoteDuration = asBigInt(
       voteDuration ?? (await procedureContract.read.voteDuration())
+    )
+    const currentBlockTimestamp = asBigInt(
+      blockTimestamp ?? (await clients.publicClient.getBlock()).timestamp
+    )
     const hasEnded =
-      Number(currentVoteDuration) + parseInt(normalizedElection.start) <
-      Date.now() / 1000
-    let approved
+      currentVoteDuration + BigInt(normalizedElection.start) <=
+      currentBlockTimestamp
+    let approved: boolean | undefined
     try {
       approved = hasEnded
         ? normalizedElection.votesCount !== '0'
@@ -145,11 +160,11 @@ export class VoteProcedure extends Procedure {
         : false
     } catch (error) {
       console.warn('Error while counting votes.', address, proposalKey, error)
-      approved = false
+      approved = undefined
     }
     return {
       ...normalizedElection,
-      approved: Boolean(approved)
+      ...(approved == null ? {} : { approved })
     }
   }
 
@@ -167,7 +182,10 @@ export class VoteProcedure extends Procedure {
       publicClient: clients.publicClient,
       walletClient: clients.walletClient
     })
-    const voteDuration = (await contract.read.voteDuration()) as bigint
+    const voteDuration = asBigInt(await contract.read.voteDuration())
+    const currentBlockTimestamp = asBigInt(
+      (await clients.publicClient.getBlock()).timestamp
+    )
     const multicallElections = await tryMulticall(
       clients,
       Array.from({ length: totalProposals }).map((_, index) => ({
@@ -194,7 +212,7 @@ export class VoteProcedure extends Procedure {
         election =>
           election != null &&
           election.start !== '0' &&
-          Number(voteDuration) + Number(election.start) < Date.now() / 1000 &&
+          voteDuration + BigInt(election.start) <= currentBlockTimestamp &&
           election.votesCount !== '0'
       )
       const countedResults =
@@ -217,11 +235,13 @@ export class VoteProcedure extends Procedure {
               }))
             )
           : []
-      const countedApprovals = new Map<string, boolean>()
+      const countedApprovals = new Map<string, boolean | undefined>()
       electionsToCount.forEach((election, index) => {
         countedApprovals.set(
           election!.proposalKey,
-          countedResults?.[index] != null ? Boolean(countedResults[index]) : false
+          countedResults?.[index] != null
+            ? Boolean(countedResults[index])
+            : undefined
         )
       })
 
@@ -232,7 +252,9 @@ export class VoteProcedure extends Procedure {
         )
         .map(election => ({
           ...election,
-          approved: countedApprovals.get(election.proposalKey) ?? false
+          ...(countedApprovals.get(election.proposalKey) == null
+            ? {}
+            : { approved: countedApprovals.get(election.proposalKey) })
         }))
     }
 
@@ -245,7 +267,8 @@ export class VoteProcedure extends Procedure {
             key,
             clients,
             voteDuration,
-            contract
+            contract,
+            currentBlockTimestamp
           ).catch((error: Error) => {
             console.warn(
               'Error while loading election in vote procedure.',
@@ -273,20 +296,23 @@ export class VoteProcedure extends Procedure {
       walletClient: clients.walletClient
     })
     const quorumSize = (await contract.read.quorumSize()) as bigint
-    const voteDuration = (await contract.read.voteDuration()) as bigint
+    const voteDuration = asBigInt(await contract.read.voteDuration())
     const majoritySize = (await contract.read.majoritySize()) as bigint
     const elections = await VoteProcedure.loadElections(
       address,
       clients,
       procedure.proposals.length
     )
+    const currentBlockTimestamp = asBigInt(
+      (await clients.publicClient.getBlock()).timestamp
+    )
     const proposals = procedure.proposals.map((proposal: ProcedureProposal) => {
       if (!proposal.blocked && !proposal.applied && !proposal.adopted) {
         const election = elections.find(candidate => candidate.proposalKey === proposal.key)
         if (election?.start) {
           proposal.blocked =
-            !election.approved &&
-            parseInt(election.start) + Number(voteDuration) <= Date.now() / 1000
+            election.approved === false &&
+            BigInt(election.start) + voteDuration <= currentBlockTimestamp
         }
       }
       return proposal

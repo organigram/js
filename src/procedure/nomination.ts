@@ -8,7 +8,7 @@ import {
   PopulateInitializeInput,
   PopulatedTransactionData,
   ProcedureTypeName,
-  getProcedureTypes
+  getProcedureType
 } from './utils'
 import {
   type ContractClients,
@@ -25,7 +25,7 @@ export class NominationProcedure extends Procedure {
 
   constructor(procedureInput: ProcedureInput) {
     super({ ...procedureInput, typeName: 'nomination' })
-    this.type = getProcedureTypes(this.chainId).nomination
+    this.type = getProcedureType(this.chainId, 'nomination')
     this.contract =
       this.publicClient != null
         ? getContractInstance({
@@ -41,15 +41,26 @@ export class NominationProcedure extends Procedure {
     input: PopulateInitializeInput,
     _clients: ContractClients
   ): Promise<PopulatedTransactionData> {
+    const deciders = input.deciders.trim()
+    if (deciders === '') {
+      throw new Error('Nomination procedure deciders address is required.')
+    }
+    const proposers =
+      input.proposers?.trim() === '' ? deciders : input.proposers ?? deciders
+    const moderators =
+      input.moderators?.trim() === ''
+        ? zeroAddress
+        : input.moderators ?? zeroAddress
+
     return {
       data: encodeFunctionData({
         abi: NominationProcedureContractABI.abi,
         functionName: 'initialize',
         args: [
           input.cid ?? 'nomination',
-          input.proposers ?? input.deciders ?? zeroAddress,
-          input.moderators ?? zeroAddress,
-          input.deciders,
+          proposers,
+          moderators,
+          deciders,
           input.withModeration ?? false,
           input.forwarder ??
             getDeployment(getDefaultChainId(), 'MetaGasStation')
