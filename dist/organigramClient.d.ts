@@ -2,9 +2,10 @@ import { type PublicClient, type WalletClient } from 'viem';
 import { Organ, OrganEntry, OrganInput, OrganPermission } from './organ';
 import { Procedure, ProcedureInput, ProcedureType } from './procedure';
 import { Organigram } from './organigram';
-import { ProcedureTypeName } from './procedure/utils';
+import { ProcedureTypeName, type ERC20VoteRoleMode } from './procedure/utils';
 import { Asset } from './asset';
 import { type OrganigramTransaction } from './contracts';
+import { type DeployOrganigramResult } from './deploymentReferences';
 /**
  * Input used to deploy one organ through an {@link OrganigramClient}.
  */
@@ -26,6 +27,10 @@ export interface DeployProceduresInput {
     moderators?: string | null;
     deciders: string;
     withModeration?: boolean | null;
+    proposerMode?: ERC20VoteRoleMode | null;
+    moderatorMode?: ERC20VoteRoleMode | null;
+    voterMode?: ERC20VoteRoleMode | null;
+    requireMemberMajority?: boolean | null;
     forwarder?: string | null;
     salt?: string | null;
     options?: TransactionOptions;
@@ -48,6 +53,8 @@ export interface DeployAssetInput {
     symbol: string;
     initialSupply?: number | null;
     salt?: string | null;
+    kind?: 'asset' | 'equity';
+    decisionProcedure?: string | null;
 }
 /**
  * Optional transaction-level controls shared by write operations.
@@ -215,7 +222,7 @@ export declare class OrganigramClient {
      * @param input Batch deployment input for the whole organigram.
      * @returns The deployed organ, asset, and procedure addresses.
      */
-    deployOrganigram(input: DeployOrganigramInput): Promise<readonly string[]>;
+    deployOrganigram<Input extends DeployOrganigramInput>(input: Input): Promise<DeployOrganigramResult<Input>>;
     /**
      * Attempt to load one deployed contract as an organ or procedure.
      *

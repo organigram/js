@@ -18,7 +18,7 @@ export declare class VoteProcedure extends Procedure {
     typeName: ProcedureTypeName;
     constructor({ quorumSize, voteDuration, majoritySize, elections, ...procedureInput }: VoteProcedureInput);
     static _populateInitialize(input: PopulateInitializeInput, clients: ContractClients): Promise<PopulatedTransactionData>;
-    static loadElection(address: string, proposalKey: string, clients: ContractClients, voteDuration?: bigint, contract?: any): Promise<Election>;
+    static loadElection(address: string, proposalKey: string, clients: ContractClients, voteDuration?: bigint, contract?: any, blockTimestamp?: bigint): Promise<Election>;
     static loadElections(address: string, clients: ContractClients, proposalsLength?: number): Promise<Election[]>;
     static load(address: string, clients: ContractClients, initialProcedure?: ProcedureInput): Promise<VoteProcedure>;
     vote(proposalKey: string, approval: boolean, options?: TransactionOptions): Promise<boolean>;

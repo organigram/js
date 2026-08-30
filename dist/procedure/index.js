@@ -1,10 +1,37 @@
 import ProcedureContractABI from '@organigram/protocol/abi/Procedure.sol/Procedure.json' with { type: 'json' };
-import { decodeAbiParameters, decodeFunctionResult, encodeAbiParameters, encodeFunctionData, encodePacked, keccak256, parseAbiParameters, toFunctionSelector, toHex, zeroAddress } from 'viem';
+import { decodeAbiParameters, decodeFunctionResult, encodeAbiParameters, encodeFunctionData, encodePacked, keccak256, parseAbiParameters, isAddress, toFunctionSelector, toHex, zeroAddress } from 'viem';
 import { capitalize, createRandom32BytesHexId, handleJsonBigInt, predictContractAddress } from '../utils';
 import { getDefaultChainId, getDeployment } from '../deployments';
+import { isCidRef } from '../ipfs/scopeEnvelope';
 import { tryMulticall } from '../multicall';
-import { ProcedureTypeNameEnum, getProcedureTypes } from './utils';
+import { ProcedureTypeNameEnum, getProcedureType } from './utils';
 import { createContractWriteTransaction, getContractInstance, getWalletAccount } from '../contracts';
+/** Reject malformed calls before a proposal can be persisted on-chain. */
+export const assertValidProposalOperations = (operations) => {
+    if (!Array.isArray(operations) || operations.length === 0) {
+        throw new Error('A proposal must contain at least one valid operation.');
+    }
+    operations.forEach((operation, index) => {
+        if (operation.target == null ||
+            !isAddress(operation.target) ||
+            operation.target.toLowerCase() === zeroAddress) {
+            throw new Error(`Operation ${index + 1} must target a non-zero contract address.`);
+        }
+        if (typeof operation.data !== 'string' ||
+            !/^0x[\da-fA-F]{8,}$/.test(operation.data) ||
+            operation.data.length % 2 !== 0) {
+            throw new Error(`Operation ${index + 1} must contain a contract call.`);
+        }
+        try {
+            if (BigInt(operation.index) < 0n || BigInt(operation.value ?? '0') < 0n) {
+                throw new Error('negative value');
+            }
+        }
+        catch {
+            throw new Error(`Operation ${index + 1} has an invalid index or value.`);
+        }
+    });
+};
 const normalizeProcedureData = (data) => ({
     cid: data.cid ?? data[0],
     proposers: data.proposers ?? data[1],
@@ -157,7 +184,7 @@ export class Procedure {
     publicClient;
     organigramId;
     type;
-    constructor({ address, deciders, typeName, name, description, salt, cid, chainId, publicClient, walletClient, metadata, proposers, withModeration, forwarder, moderators, proposals, isDeployed, type, data, organigramId }) {
+    constructor({ address, deciders, typeName, name, description, salt, cid, chainId, publicClient, walletClient, metadata, proposers, withModeration, forwarder, moderators, proposals, isDeployed, type, data, organigramId, }) {
         if (typeName == null || deciders == null) {
             throw new Error('typeName and deciders are required to create a procedure.');
         }
@@ -197,7 +224,7 @@ export class Procedure {
                     walletClient: this.walletClient
                 })
                 : undefined;
-        this.type = type ?? getProcedureTypes(this.chainId)[this.typeName];
+        this.type = type ?? getProcedureType(this.chainId, this.typeName);
         this.data = data ?? '';
     }
     getClients() {
@@ -286,8 +313,7 @@ export class Procedure {
             moderators: data.moderators,
             deciders: data.deciders,
             withModeration: data.withModeration,
-            forwarder: initialProcedure?.forwarder ??
-                getDeployment(chainId, 'MetaGasStation'),
+            forwarder: initialProcedure?.forwarder ?? getDeployment(chainId, 'MetaGasStation'),
             proposals,
             isDeployed: true
         });
@@ -407,6 +433,24 @@ export class Procedure {
         return tx;
     }
     async propose(input) {
+        if (input.cid.trim() === '') {
+            throw new Error('A proposal must include its metadata reference.');
+        }
+        if (!isCidRef(input.cid)) {
+            throw new Error('A proposal metadata reference must be scoped to its workspace.');
+        }
+        assertValidProposalOperations(input.operations);
+        const publicClient = this.publicClient;
+        if (publicClient == null)
+            throw new Error('Public client not connected.');
+        await Promise.all([...new Set(input.operations.map(operation => operation.target))].map(async (target) => {
+            const code = await publicClient.getCode({
+                address: target
+            });
+            if (code == null || code === '0x') {
+                throw new Error(`Proposal operation target ${target} is not deployed.`);
+            }
+        }));
         const currentProcedureData = await Procedure.loadData(this.address, this.getClients());
         const ops = input.operations.map(operation => ({
             index: operation.index != null && operation.index !== ''

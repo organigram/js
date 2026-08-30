@@ -45,6 +45,11 @@ const normalizeLoadedEntry = (entry, index) => ({
     address: entry.addr ?? entry.address ?? entry[0],
     cid: entry.cid ?? entry[1]
 });
+const isActiveLoadedEntry = (entry) => {
+    if (entry == null)
+        return false;
+    return (entry.address ?? zeroAddress) !== zeroAddress || (entry.cid ?? '') !== '';
+};
 const normalizeOrganFunctionCall = async ({ functionName, args, walletClient }) => {
     switch (functionName) {
         case OrganFunctionName.addEntries:
@@ -501,14 +506,14 @@ export class Organ {
             }
         })));
         if (multicallEntries != null) {
-            return multicallEntries.filter((entry) => entry != null && entry.address !== zeroAddress);
+            return multicallEntries.filter(isActiveLoadedEntry);
         }
         const entries = await Promise.all(indexes.map(async (index) => {
             const entry = await Organ.loadEntry(address, index.toString(), clients).catch((error) => {
                 console.warn('Error while loading entry in organ.', address, index.toString(), error.message);
                 return null;
             });
-            if (entry != null && entry.address !== zeroAddress) {
+            if (isActiveLoadedEntry(entry)) {
                 return entry;
             }
             return null;

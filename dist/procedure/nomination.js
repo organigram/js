@@ -2,7 +2,7 @@ import NominationProcedureContractABI from '@organigram/protocol/abi/Nomination.
 import { encodeFunctionData, zeroAddress } from 'viem';
 import { Procedure } from '.';
 import { getDefaultChainId, getDeployment } from '../deployments';
-import { getProcedureTypes } from './utils';
+import { getProcedureType } from './utils';
 import { createContractWriteTransaction, getContractInstance, getWalletAccount } from '../contracts';
 export class NominationProcedure extends Procedure {
     static INTERFACE = '0xc5f28e49';
@@ -10,7 +10,7 @@ export class NominationProcedure extends Procedure {
     typeName = 'nomination';
     constructor(procedureInput) {
         super({ ...procedureInput, typeName: 'nomination' });
-        this.type = getProcedureTypes(this.chainId).nomination;
+        this.type = getProcedureType(this.chainId, 'nomination');
         this.contract =
             this.publicClient != null
                 ? getContractInstance({
@@ -22,15 +22,23 @@ export class NominationProcedure extends Procedure {
                 : undefined;
     }
     static async _populateInitialize(input, _clients) {
+        const deciders = input.deciders.trim();
+        if (deciders === '') {
+            throw new Error('Nomination procedure deciders address is required.');
+        }
+        const proposers = input.proposers?.trim() === '' ? deciders : input.proposers ?? deciders;
+        const moderators = input.moderators?.trim() === ''
+            ? zeroAddress
+            : input.moderators ?? zeroAddress;
         return {
             data: encodeFunctionData({
                 abi: NominationProcedureContractABI.abi,
                 functionName: 'initialize',
                 args: [
                     input.cid ?? 'nomination',
-                    input.proposers ?? input.deciders ?? zeroAddress,
-                    input.moderators ?? zeroAddress,
-                    input.deciders,
+                    proposers,
+                    moderators,
+                    deciders,
                     input.withModeration ?? false,
                     input.forwarder ??
                         getDeployment(getDefaultChainId(), 'MetaGasStation')
