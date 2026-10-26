@@ -116,6 +116,9 @@ export type Election = {
   start: string
   votesCount: string
   hasVoted: boolean
+  approvals?: string
+  objections?: string
+  eligibleVotes?: string
   approved?: boolean
 }
 
@@ -465,6 +468,15 @@ export const procedureFunctions: ProcedureProposalOperationFunction[] = [
     tags: ['transfer'],
     params: ['address', 'amount', 'bytes'],
     target: 'organ'
+  },
+  {
+    funcSig: toFunctionSelector('transferEquity(address,address,uint256,string)'),
+    key: 'transferEquity',
+    signature: 'transferEquity(address,address,uint256,string)',
+    label: 'Transfer equity asset',
+    tags: ['transfer', 'erc20'],
+    params: ['address', 'address', 'amount', 'cid'],
+    target: 'self'
   }
 ]
 
@@ -869,7 +881,15 @@ export class Procedure {
     const publicClient = this.publicClient
     if (publicClient == null) throw new Error('Public client not connected.')
     await Promise.all(
-      [...new Set(input.operations.map(operation => operation.target!))].map(
+      [
+        ...new Set(
+          input.operations.map(operation =>
+            operation.target == null || operation.target === zeroAddress
+              ? this.address
+              : operation.target
+          )
+        )
+      ].map(
         async target => {
           const code = await publicClient.getCode({
             address: target as `0x${string}`

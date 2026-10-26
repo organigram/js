@@ -53,7 +53,6 @@ describe('refreshUndeployedContractReferences', () => {
           salt: procedureSalt,
           data: JSON.stringify({
             erc20: staleAssetAddress,
-            equityTransferRegister: staleOrganAddress,
             quorumSize: '20001',
             voteDuration: '3600',
             majoritySize: '50001'
@@ -98,9 +97,6 @@ describe('refreshUndeployedContractReferences', () => {
     expect(JSON.parse(refreshed.procedures[0].data ?? '{}').erc20).toBe(
       expectedAssetAddress
     )
-    expect(
-      JSON.parse(refreshed.procedures[0].data ?? '{}').equityTransferRegister
-    ).toBe(expectedOrganAddress)
     expect(input.procedures[0].deciders).toBe(staleOrganAddress)
   })
 

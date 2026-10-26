@@ -10,6 +10,7 @@ import {
   isAddress,
   encodeFunctionData,
   parseEther,
+  zeroAddress,
   type Address,
   type PublicClient,
   type WalletClient
@@ -260,7 +261,6 @@ describe('Organigram JS Client', () => {
     it('should settle an equity transfer through a nomination proposal', async () => {
       const client = new OrganigramClient({ publicClient, walletClient })
       const chairmanDraft = '0x0000000000000000000000000000000000000a11'
-      const registryDraft = '0x0000000000000000000000000000000000000a12'
       const tokenDraft = '0x0000000000000000000000000000000000000a13'
       const transferDraft = '0x0000000000000000000000000000000000000a14'
       const deployed = await client.deployOrganigram({
@@ -269,11 +269,6 @@ describe('Organigram JS Client', () => {
             address: chairmanDraft,
             salt: createRandom32BytesHexId(),
             entries: [{ index: '0', address: signerAddress, cid: 'chairman' }]
-          },
-          {
-            address: registryDraft,
-            salt: createRandom32BytesHexId(),
-            permissions: [{ permissionAddress: tokenDraft, permissionValue: 4 }]
           }
         ],
         assets: [
@@ -310,7 +305,7 @@ describe('Organigram JS Client', () => {
         client: publicClient
       })
 
-      expect(await token.read.decisionProcedure()).toBe(transferAddress)
+      expect(await token.read.isTransferProcedure([transferAddress])).toBe(true)
       expect(await token.read.decimals()).toBe(0)
       expect(await token.read.totalSupply()).toBe(100n)
 
@@ -321,9 +316,9 @@ describe('Organigram JS Client', () => {
         client: { public: publicClient, wallet: walletClient }
       })
       const settlementData = encodeFunctionData({
-        abi: EquityTokenABI.abi,
-        functionName: 'settleTransfer',
-        args: [buyer, 25n, 'movement-supporting-record']
+        abi: ProcedureContractABI.abi,
+        functionName: 'transferEquity',
+        args: [tokenAddress as Address, buyer, 25n, 'movement-supporting-record']
       })
       const proposalHash = await transfer.write.propose(
         [
@@ -331,7 +326,7 @@ describe('Organigram JS Client', () => {
           [
             {
               index: 0n,
-              target: tokenAddress as Address,
+              target: zeroAddress,
               data: settlementData,
               value: 0n,
               processed: false
@@ -352,6 +347,17 @@ describe('Organigram JS Client', () => {
       })
       await publicClient.waitForTransactionReceipt({ hash: approvalHash })
       expect(await token.read.balanceOf([buyer])).toBe(25n)
+      const [movement] = (await publicClient.getContractEvents({
+        address: tokenAddress as Address,
+        abi: EquityTokenABI.abi,
+        eventName: 'MovementSettled'
+      })) as any[]
+      expect(movement.args).toMatchObject({
+        seller: signerAddress,
+        recipient: buyer,
+        amount: 25n,
+        movementCid: 'movement-supporting-record'
+      })
     })
 
     it('should predict deterministic addresses', async () => {

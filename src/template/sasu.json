@@ -44,16 +44,6 @@
       "entries": []
     },
     {
-      "address": "share-transfer-register-address",
-      "salt": "share-transfer-register-salt",
-      "name": "Share transfer register",
-      "description": "Mandatory append-only record of every issue, transfer, donation, pledge or split of equity.",
-      "permissions": [
-        { "permissionValue": 4, "permissionAddress": "approve-share-transfer-address" }
-      ],
-      "entries": []
-    },
-    {
       "address": "financial-statements-address",
       "salt": "financial-statements-salt",
       "name": "Financial statements",
@@ -103,14 +93,14 @@
       "address": "approve-share-transfer-address",
       "salt": "approve-share-transfer-salt",
       "name": "Approve share transfer",
-      "description": "The President approves a holder-initiated share transfer when the bylaws require approval, then records the movement atomically.",
+      "description": "The President approves a holder-initiated share transfer when the bylaws require approval, and the share token records the movement.",
       "typeName": "nomination",
       "cid": "nomination",
       "deciders": "president-address",
       "proposers": "",
       "moderators": "",
       "withModeration": false,
-      "data": "{\"equityTransferRegister\":\"share-transfer-register-address\"}"
+      "data": "{}"
     },
     {
       "address": "set-executive-compensation-address",

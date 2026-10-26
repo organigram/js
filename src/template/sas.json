@@ -23,16 +23,6 @@
       "entries": []
     },
     {
-      "address": "share-transfer-register-address",
-      "permissions": [
-        { "permissionValue": 4, "permissionAddress": "register-share-transfer-address" }
-      ],
-      "name": "Share transfer register",
-      "description": "Append-only record of every issue, transfer, donation, pledge or split of equity.",
-      "salt": "share-transfer-register-salt",
-      "entries": []
-    },
-    {
       "address": "meeting-minutes-address",
       "permissions": [
         { "permissionValue": 4, "permissionAddress": "elect-chairman-address" },
@@ -119,14 +109,14 @@
       "address": "register-share-transfer-address",
       "salt": "register-share-transfer-salt",
       "name": "Approve share transfer",
-      "description": "The Chairman approves a holder-initiated share transfer when the bylaws require approval, then records the movement atomically.",
+      "description": "The Chairman approves a holder-initiated share transfer when the bylaws require approval, and the share token records the movement.",
       "cid": "nomination",
       "typeName": "nomination",
       "deciders": "chairman-address",
       "proposers": "",
       "moderators": "",
       "withModeration": false,
-      "data": "{\"equityTransferRegister\":\"share-transfer-register-address\"}"
+      "data": "{}"
     },
     {
       "address": "amend-bylaws-address",

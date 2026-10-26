@@ -222,14 +222,6 @@ export const renewSaltsAndAddresses = (
         ...(typeof data.erc20 === 'string'
           ? { erc20: resolveRenewedAddress(data.erc20, assetRenewal) }
           : {}),
-        ...(typeof data.equityTransferRegister === 'string'
-          ? {
-              equityTransferRegister: resolveRenewedAddress(
-                data.equityTransferRegister,
-                organRenewal
-              )
-            }
-          : {}),
       })
     })(),
     isDeployed: false,

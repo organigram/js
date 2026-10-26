@@ -56,16 +56,6 @@
       "entries": []
     },
     {
-      "address": "share-transfer-register-address",
-      "salt": "share-transfer-register-salt",
-      "name": "Share transfer register",
-      "description": "Append-only ledger of registered-unit movements and the evidence supporting the cession. It supplements the transfer deed and the required bylaws update.",
-      "permissions": [
-        { "permissionValue": 4, "permissionAddress": "approve-unit-transfer-address" }
-      ],
-      "entries": []
-    },
-    {
       "address": "financial-statements-address",
       "salt": "financial-statements-salt",
       "name": "Financial statements",
@@ -146,7 +136,7 @@
       "proposers": "",
       "moderators": "managers-address",
       "withModeration": true,
-      "data": "{\"erc20\":\"units-address\",\"quorumSize\":\"50001\",\"voteDuration\":\"300\",\"majoritySize\":\"50001\",\"proposerMode\":\"token\",\"moderatorMode\":\"organ\",\"voterMode\":\"organ\",\"requireMemberMajority\":true,\"equityTransferRegister\":\"share-transfer-register-address\"}"
+      "data": "{\"erc20\":\"units-address\",\"quorumSize\":\"50001\",\"voteDuration\":\"300\",\"majoritySize\":\"50001\",\"proposerMode\":\"token\",\"moderatorMode\":\"organ\",\"voterMode\":\"organ\",\"requireMemberMajority\":true}"
     },
     {
       "address": "amend-bylaws-address",

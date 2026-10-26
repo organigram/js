@@ -38,6 +38,15 @@ const normalizeElection = (election: any, proposalKey: string): Election => ({
   hasVoted: Boolean(election.hasVoted ?? election[1])
 })
 
+const normalizeElectionResults = (results: any): Pick<
+  Election,
+  'approvals' | 'objections' | 'eligibleVotes'
+> => ({
+  approvals: (results.approvals ?? results[0]).toString(),
+  objections: (results.objections ?? results[1]).toString(),
+  eligibleVotes: (results.eligibleVotes ?? results[2]).toString()
+})
+
 // viem normally returns block timestamps as bigint, but custom/local RPC
 // clients can return a number. Keep every timestamp comparison in bigint
 // space so an election load never mixes the two numeric representations.
@@ -152,6 +161,12 @@ export class VoteProcedure extends Procedure {
       currentVoteDuration + BigInt(normalizedElection.start) <=
       currentBlockTimestamp
     let approved: boolean | undefined
+    const results = await procedureContract.read
+      .getElectionResults([BigInt(proposalKey)])
+      .then(normalizeElectionResults)
+      // Read-only results were introduced after the initial vote contract.
+      // Keep older deployments usable while exposing the split when present.
+      .catch(() => undefined)
     try {
       approved = hasEnded
         ? normalizedElection.votesCount !== '0'
@@ -164,6 +179,7 @@ export class VoteProcedure extends Procedure {
     }
     return {
       ...normalizedElection,
+      ...(results ?? {}),
       ...(approved == null ? {} : { approved })
     }
   }
@@ -208,6 +224,35 @@ export class VoteProcedure extends Procedure {
     )
 
     if (multicallElections != null) {
+      const electionsWithResults = multicallElections.filter(
+        (election): election is Election =>
+          election != null && election.start !== '0'
+      )
+      const multicallResults = await tryMulticall(
+        clients,
+        electionsWithResults.map(election => ({
+          target: address,
+          callData: encodeFunctionData({
+            abi: VoteProcedureContractABI.abi,
+            functionName: 'getElectionResults',
+            args: [BigInt(election.proposalKey)]
+          }),
+          decode: returnData =>
+            normalizeElectionResults(
+              decodeFunctionResult({
+                abi: VoteProcedureContractABI.abi,
+                functionName: 'getElectionResults',
+                data: returnData
+              })
+            )
+        }))
+      )
+      const resultsByProposalKey = new Map(
+        electionsWithResults.map((election, index) => [
+          election.proposalKey,
+          multicallResults?.[index] ?? undefined
+        ])
+      )
       const electionsToCount = multicallElections.filter(
         election =>
           election != null &&
@@ -252,6 +297,7 @@ export class VoteProcedure extends Procedure {
         )
         .map(election => ({
           ...election,
+          ...(resultsByProposalKey.get(election.proposalKey) ?? {}),
           ...(countedApprovals.get(election.proposalKey) == null
             ? {}
             : { approved: countedApprovals.get(election.proposalKey) })

@@ -29,19 +29,7 @@ test('prepares every commercial equity template from ordinary procedure types', 
       const decision = template.procedures.find(
         procedure => procedure.address === shares.decisionProcedure
       )!
-      const equityTransferRegister = JSON.parse(
-        decision.data ?? '{}'
-      ).equityTransferRegister
-      const register = template.organs.find(
-        organ => organ.address === equityTransferRegister
-      )!
-
       expect(shares.decisionProcedure).toBe(decision.address)
-      expect(register.permissions).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ permissionAddress: decision.address })
-        ])
-      )
       expect(decision.typeName).not.toBe('shareTransfer' as never)
     }
   } finally {
