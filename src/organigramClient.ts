@@ -3,9 +3,11 @@ import OrganigramClientContractABI from '@organigram/protocol/abi/OrganigramClie
 import ProcedureContractABI from '@organigram/protocol/abi/Procedure.sol/Procedure.json' with { type: 'json' }
 import {
   decodeEventLog,
+  getAddress,
   isAddress,
   parseEther,
   toHex,
+  type Abi,
   type PublicClient,
   type WalletClient,
   zeroAddress
@@ -940,17 +942,14 @@ export class OrganigramClient {
   }
 
   /**
-   * Deploy a full organigram, including its organs, assets, and procedures.
+   * Resolve what remains to deploy in an organigram and encode the
+   * `deployOrganigram` arguments for it.
    *
    * @param input Batch deployment input for the whole organigram.
-   * @returns The deployed organ, asset, and procedure addresses.
    */
-  async deployOrganigram<Input extends DeployOrganigramInput>(
+  private async prepareOrganigramDeployment<Input extends DeployOrganigramInput>(
     input: Input
-  ): Promise<DeployOrganigramResult<Input>> {
-    if (this.walletClient == null) {
-      throw new Error('Wallet client not connected.')
-    }
+  ) {
     const refreshedInput = await markExistingOrganigramDeployments(
       refreshUndeployedContractReferences(input, this.chainId),
       this.publicClient
@@ -964,36 +963,82 @@ export class OrganigramClient {
     const proceduresToDeploy = refreshedInput.procedures.filter(
       procedure => (procedure as MaybeDeployed).isDeployed !== true
     )
-
-    if (
+    const isEmpty =
       organsToDeploy.length === 0 &&
       assetsToDeploy.length === 0 &&
       proceduresToDeploy.length === 0
-    ) {
+    const args = isEmpty
+      ? null
+      : [
+          prepareDeployOrgansInput(organsToDeploy),
+          assetsToDeploy.map(asset => ({
+            name: asset.name,
+            symbol: asset.symbol,
+            initialSupply: formatAssetInitialSupply(asset),
+            salt: formatSalt(asset.salt),
+            isEquity: asset.kind === 'equity',
+            transferProcedure: asset.decisionProcedure ?? zeroAddress
+          })),
+          await prepareDeployProceduresInput(proceduresToDeploy, this.getClients())
+        ]
+
+    return { refreshedInput, organsToDeploy, assetsToDeploy, proceduresToDeploy, args }
+  }
+
+  /**
+   * Estimate the gas a full organigram deployment would use, without a wallet.
+   *
+   * @param input Batch deployment input for the whole organigram.
+   * @param account Address the deployment would be sent from.
+   * @returns The estimated gas, or 0n when nothing remains to deploy.
+   */
+  async estimateDeployOrganigramGas(
+    input: DeployOrganigramInput,
+    account: string
+  ): Promise<bigint> {
+    const { args } = await this.prepareOrganigramDeployment(input)
+    if (args == null) return 0n
+    return await this.publicClient.estimateContractGas({
+      address: getAddress(this.address),
+      abi: OrganigramClientContractABI.abi as Abi,
+      functionName: 'deployOrganigram',
+      args,
+      account: getAddress(account)
+    })
+  }
+
+  /**
+   * Deploy a full organigram, including its organs, assets, and procedures.
+   *
+   * @param input Batch deployment input for the whole organigram.
+   * @returns The deployed organ, asset, and procedure addresses.
+   */
+  async deployOrganigram<Input extends DeployOrganigramInput>(
+    input: Input
+  ): Promise<DeployOrganigramResult<Input>> {
+    if (this.walletClient == null) {
+      throw new Error('Wallet client not connected.')
+    }
+    const {
+      refreshedInput,
+      organsToDeploy,
+      assetsToDeploy,
+      proceduresToDeploy,
+      args
+    } = await this.prepareOrganigramDeployment(input)
+
+    if (args == null) {
       return createDeployOrganigramResult(
         { organs: [], assets: [], procedures: [] },
         refreshedInput
       )
     }
 
-    const formattedAssets = assetsToDeploy.map(asset => ({
-      name: asset.name,
-      symbol: asset.symbol,
-      initialSupply: formatAssetInitialSupply(asset),
-      salt: formatSalt(asset.salt),
-      isEquity: asset.kind === 'equity',
-      transferProcedure: asset.decisionProcedure ?? zeroAddress
-    }))
-    const organsInput = prepareDeployOrgansInput(organsToDeploy)
-    const proceduresInput = await prepareDeployProceduresInput(
-      proceduresToDeploy,
-      this.getClients()
-    )
     const tx = await createContractWriteTransaction({
       address: this.address,
       abi: OrganigramClientContractABI.abi,
       functionName: 'deployOrganigram',
-      args: [organsInput, formattedAssets, proceduresInput],
+      args,
       clients: this.getClients()
     })
     const receipt = await tx.wait()

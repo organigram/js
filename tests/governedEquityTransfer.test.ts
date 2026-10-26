@@ -104,14 +104,11 @@ test('keeps annual accounts with the commercial decision procedure only', () => 
     for (const organName of removedOrganNames) {
       expect(organNames).not.toContain(organName)
     }
-    expect(financialStatements?.permissions).toEqual(
-      expect.arrayContaining([
-        {
-          permissionAddress: annualAccountsProcedure?.address,
-          permissionValue: PERMISSIONS.ADD_ENTRIES
-        }
-      ])
+    const permission = financialStatements?.permissions?.find(
+      candidate => candidate.permissionAddress === annualAccountsProcedure?.address
     )
+    expect((permission?.permissionValue ?? 0) & PERMISSIONS.ADD_ENTRIES)
+      .toBe(PERMISSIONS.ADD_ENTRIES)
   }
 })
 

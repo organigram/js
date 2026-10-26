@@ -247,6 +247,7 @@ export interface ProcedureProposal {
   adopted: boolean
   applied: boolean
   operations: ProcedureProposalOperation[]
+  transactionHash?: string
   metadata?: ProposalMetadata
 }
 
@@ -928,15 +929,19 @@ export class Procedure {
       tx,
       `Create proposal with CID ${input.cid} on procedure ${this.address}`
     )
-    await tx.wait()
+    const receipt = await tx.wait()
     const proposalKey = currentProcedureData.proposalsLength.toString()
     const proposal = await Procedure.loadProposal(
       this.address,
       proposalKey,
       this.getClients()
     )
-    this.proposals.push(proposal)
-    return proposal
+    const proposalWithTransaction = {
+      ...proposal,
+      transactionHash: receipt.transactionHash
+    }
+    this.proposals.push(proposalWithTransaction)
+    return proposalWithTransaction
   }
 
   async signProposal(input: SignedProposalInput): Promise<string> {

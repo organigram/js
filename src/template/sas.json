@@ -15,7 +15,7 @@
     {
       "address": "bylaws-address",
       "permissions": [
-        { "permissionValue": 20, "permissionAddress": "amend-bylaws-address" }
+        { "permissionValue": 23, "permissionAddress": "amend-bylaws-address" }
       ],
       "name": "Bylaws",
       "description": "Append-only history of the versions of the bylaws adopted by the shareholders.",
@@ -26,7 +26,7 @@
       "address": "meeting-minutes-address",
       "permissions": [
         { "permissionValue": 4, "permissionAddress": "elect-chairman-address" },
-        { "permissionValue": 4, "permissionAddress": "amend-bylaws-address" },
+        { "permissionValue": 7, "permissionAddress": "amend-bylaws-address" },
         { "permissionValue": 4, "permissionAddress": "shareholders-meeting-address" }
       ],
       "name": "Résolutions de l’assemblée générale",
@@ -40,7 +40,8 @@
       "name": "Procès-verbaux d’assemblée générale",
       "description": "Append-only register of final signed general-meeting minutes, maintained only by the Chairman.",
       "permissions": [
-        { "permissionValue": 4, "permissionAddress": "sas-archive-meeting-minutes-procedure" }
+        { "permissionValue": 4, "permissionAddress": "sas-archive-meeting-minutes-procedure" },
+        { "permissionValue": 3, "permissionAddress": "amend-bylaws-address" }
       ],
       "entries": []
     },
@@ -50,7 +51,8 @@
       "name": "Financial statements",
       "description": "Append-only register of the annual financial statements approved by the shareholders.",
       "permissions": [
-        { "permissionValue": 4, "permissionAddress": "shareholders-meeting-address" }
+        { "permissionValue": 4, "permissionAddress": "shareholders-meeting-address" },
+        { "permissionValue": 3, "permissionAddress": "amend-bylaws-address" }
       ],
       "entries": []
     },
@@ -60,7 +62,8 @@
       "name": "Payments",
       "description": "Assets and token balances available for payments approved through the payment procedure.",
       "permissions": [
-        { "permissionValue": 1348, "permissionAddress": "set-executive-compensation-address" }
+        { "permissionValue": 1348, "permissionAddress": "set-executive-compensation-address" },
+        { "permissionValue": 3, "permissionAddress": "amend-bylaws-address" }
       ],
       "entries": []
     }

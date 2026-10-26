@@ -98,9 +98,6 @@ export class VoteProcedure extends Procedure {
     input: PopulateInitializeInput,
     clients: ContractClients
   ): Promise<PopulatedTransactionData> {
-    if (clients.walletClient == null) {
-      throw new Error('Wallet client not connected.')
-    }
     const [quorumSize, voteDuration, majoritySize] = input.args as string[]
     if (!quorumSize || !voteDuration || !majoritySize) {
       throw new Error(
