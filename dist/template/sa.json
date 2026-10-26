@@ -66,16 +66,6 @@
             "entries": []
         },
         {
-            "address": "share-transfer-register-address",
-            "salt": "share-transfer-register-salt",
-            "name": "Share transfer register",
-            "description": "Append-only record of every issue, transfer, donation, pledge or split of equity.",
-            "permissions": [
-                { "permissionValue": 4, "permissionAddress": "approve-share-transfer-address" }
-            ],
-            "entries": []
-        },
-        {
             "address": "financial-statements-address",
             "salt": "financial-statements-salt",
             "name": "Financial statements",
@@ -149,13 +139,13 @@
             "address": "approve-share-transfer-address",
             "salt": "approve-share-transfer-salt",
             "name": "Approve share transfer",
-            "description": "The board decides on a holder-initiated transfer when an approval clause in the bylaws applies, then records the movement atomically.",
+            "description": "The board decides on a holder-initiated transfer when an approval clause in the bylaws applies, and the share token records the movement.",
             "typeName": "vote",
             "deciders": "board-address",
             "proposers": "",
             "moderators": "executive-management-address",
             "withModeration": true,
-            "data": "{\"quorumSize\":\"50001\",\"voteDuration\":\"300\",\"majoritySize\":\"50001\",\"equityTransferRegister\":\"share-transfer-register-address\"}"
+            "data": "{\"quorumSize\":\"50001\",\"voteDuration\":\"300\",\"majoritySize\":\"50001\"}"
         },
         {
             "address": "amend-bylaws-address",

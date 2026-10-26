@@ -81,6 +81,19 @@ export class NominationProcedure extends Procedure {
         const receipt = await tx.wait();
         return receipt.status === 'success';
     }
+    async reject(proposalKey, options) {
+        const tx = await createContractWriteTransaction({
+            address: this.address,
+            abi: NominationProcedureContractABI.abi,
+            functionName: 'reject',
+            args: [BigInt(proposalKey)],
+            clients: this.getClients(),
+            nonce: options?.nonce
+        });
+        options?.onTransaction?.(tx, 'Reject Nomination procedure proposal.');
+        const receipt = await tx.wait();
+        return receipt.status === 'success';
+    }
     async signNomination(input) {
         if (this.walletClient == null) {
             throw new Error('Connected wallet cannot sign typed data.');

@@ -34,9 +34,6 @@ const replaceKnownAddressesInData = (data, replacements) => {
             erc20: typeof parsed.erc20 === 'string'
                 ? replaceKnownAddress(parsed.erc20, replacements)
                 : parsed.erc20,
-            equityTransferRegister: typeof parsed.equityTransferRegister === 'string'
-                ? replaceKnownAddress(parsed.equityTransferRegister, replacements)
-                : parsed.equityTransferRegister,
             requireMemberMajority: parsed.requireMemberMajority
         });
     }

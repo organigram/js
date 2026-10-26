@@ -15,7 +15,7 @@
         {
             "address": "bylaws-address",
             "permissions": [
-                { "permissionValue": 20, "permissionAddress": "amend-bylaws-address" }
+                { "permissionValue": 23, "permissionAddress": "amend-bylaws-address" }
             ],
             "name": "Bylaws",
             "description": "Append-only history of the versions of the bylaws adopted by the shareholders.",
@@ -23,20 +23,10 @@
             "entries": []
         },
         {
-            "address": "share-transfer-register-address",
-            "permissions": [
-                { "permissionValue": 4, "permissionAddress": "register-share-transfer-address" }
-            ],
-            "name": "Share transfer register",
-            "description": "Append-only record of every issue, transfer, donation, pledge or split of equity.",
-            "salt": "share-transfer-register-salt",
-            "entries": []
-        },
-        {
             "address": "meeting-minutes-address",
             "permissions": [
                 { "permissionValue": 4, "permissionAddress": "elect-chairman-address" },
-                { "permissionValue": 4, "permissionAddress": "amend-bylaws-address" },
+                { "permissionValue": 7, "permissionAddress": "amend-bylaws-address" },
                 { "permissionValue": 4, "permissionAddress": "shareholders-meeting-address" }
             ],
             "name": "Résolutions de l’assemblée générale",
@@ -50,7 +40,8 @@
             "name": "Procès-verbaux d’assemblée générale",
             "description": "Append-only register of final signed general-meeting minutes, maintained only by the Chairman.",
             "permissions": [
-                { "permissionValue": 4, "permissionAddress": "sas-archive-meeting-minutes-procedure" }
+                { "permissionValue": 4, "permissionAddress": "sas-archive-meeting-minutes-procedure" },
+                { "permissionValue": 3, "permissionAddress": "amend-bylaws-address" }
             ],
             "entries": []
         },
@@ -60,7 +51,8 @@
             "name": "Financial statements",
             "description": "Append-only register of the annual financial statements approved by the shareholders.",
             "permissions": [
-                { "permissionValue": 4, "permissionAddress": "shareholders-meeting-address" }
+                { "permissionValue": 4, "permissionAddress": "shareholders-meeting-address" },
+                { "permissionValue": 3, "permissionAddress": "amend-bylaws-address" }
             ],
             "entries": []
         },
@@ -70,7 +62,8 @@
             "name": "Payments",
             "description": "Assets and token balances available for payments approved through the payment procedure.",
             "permissions": [
-                { "permissionValue": 1348, "permissionAddress": "set-executive-compensation-address" }
+                { "permissionValue": 1348, "permissionAddress": "set-executive-compensation-address" },
+                { "permissionValue": 3, "permissionAddress": "amend-bylaws-address" }
             ],
             "entries": []
         }
@@ -119,14 +112,14 @@
             "address": "register-share-transfer-address",
             "salt": "register-share-transfer-salt",
             "name": "Approve share transfer",
-            "description": "The Chairman approves a holder-initiated share transfer when the bylaws require approval, then records the movement atomically.",
+            "description": "The Chairman approves a holder-initiated share transfer when the bylaws require approval, and the share token records the movement.",
             "cid": "nomination",
             "typeName": "nomination",
             "deciders": "chairman-address",
             "proposers": "",
             "moderators": "",
             "withModeration": false,
-            "data": "{\"equityTransferRegister\":\"share-transfer-register-address\"}"
+            "data": "{}"
         },
         {
             "address": "amend-bylaws-address",

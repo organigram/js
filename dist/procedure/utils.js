@@ -255,9 +255,6 @@ export const getProcedureClass = async (typeName) => {
     }
 };
 export const populateInitializeProcedure = async (input, clients) => {
-    if (clients.walletClient == null) {
-        throw new Error('Wallet client not connected.');
-    }
     const procedureClass = await getProcedureClass(input.typeName);
     try {
         return await procedureClass._populateInitialize(input, clients);

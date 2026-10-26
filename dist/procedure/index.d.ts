@@ -72,6 +72,9 @@ export type Election = {
     start: string;
     votesCount: string;
     hasVoted: boolean;
+    approvals?: string;
+    objections?: string;
+    eligibleVotes?: string;
     approved?: boolean;
 };
 export type AccountInOrgans = {
@@ -148,6 +151,7 @@ export interface ProcedureProposal {
     adopted: boolean;
     applied: boolean;
     operations: ProcedureProposalOperation[];
+    transactionHash?: string;
     metadata?: ProposalMetadata;
 }
 /** Reject malformed calls before a proposal can be persisted on-chain. */

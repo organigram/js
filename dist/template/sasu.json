@@ -8,7 +8,8 @@
             "name": "President",
             "description": "The legal representative of the SASU.",
             "permissions": [
-                { "permissionValue": 12, "permissionAddress": "appoint-president-address" }
+                { "permissionValue": 12, "permissionAddress": "appoint-president-address" },
+                { "permissionValue": 3, "permissionAddress": "amend-bylaws-address" }
             ],
             "entries": []
         },
@@ -18,7 +19,7 @@
             "name": "Bylaws",
             "description": "Append-only history of the versions of the bylaws adopted by the sole shareholder.",
             "permissions": [
-                { "permissionValue": 20, "permissionAddress": "amend-bylaws-address" }
+                { "permissionValue": 23, "permissionAddress": "amend-bylaws-address" }
             ],
             "entries": []
         },
@@ -29,7 +30,7 @@
             "description": "Append-only register of each sole-shareholder decision and its recorded result, separate from the signed minutes.",
             "permissions": [
                 { "permissionValue": 4, "permissionAddress": "appoint-president-address" },
-                { "permissionValue": 4, "permissionAddress": "amend-bylaws-address" }
+                { "permissionValue": 7, "permissionAddress": "amend-bylaws-address" }
             ],
             "entries": []
         },
@@ -39,17 +40,8 @@
             "name": "Procès-verbaux d’assemblée générale",
             "description": "Append-only register of final signed meeting minutes, maintained only by the President.",
             "permissions": [
-                { "permissionValue": 4, "permissionAddress": "sasu-archive-meeting-minutes-procedure" }
-            ],
-            "entries": []
-        },
-        {
-            "address": "share-transfer-register-address",
-            "salt": "share-transfer-register-salt",
-            "name": "Share transfer register",
-            "description": "Mandatory append-only record of every issue, transfer, donation, pledge or split of equity.",
-            "permissions": [
-                { "permissionValue": 4, "permissionAddress": "approve-share-transfer-address" }
+                { "permissionValue": 4, "permissionAddress": "sasu-archive-meeting-minutes-procedure" },
+                { "permissionValue": 3, "permissionAddress": "amend-bylaws-address" }
             ],
             "entries": []
         },
@@ -59,7 +51,7 @@
             "name": "Financial statements",
             "description": "Append-only register of the annual financial statements approved by the sole shareholder.",
             "permissions": [
-                { "permissionValue": 4, "permissionAddress": "amend-bylaws-address" }
+                { "permissionValue": 7, "permissionAddress": "amend-bylaws-address" }
             ],
             "entries": []
         },
@@ -69,7 +61,8 @@
             "name": "Payments",
             "description": "Assets and token balances available for payments approved through the payment procedure.",
             "permissions": [
-                { "permissionValue": 1348, "permissionAddress": "set-executive-compensation-address" }
+                { "permissionValue": 1348, "permissionAddress": "set-executive-compensation-address" },
+                { "permissionValue": 3, "permissionAddress": "amend-bylaws-address" }
             ],
             "entries": []
         }
@@ -103,14 +96,14 @@
             "address": "approve-share-transfer-address",
             "salt": "approve-share-transfer-salt",
             "name": "Approve share transfer",
-            "description": "The President approves a holder-initiated share transfer when the bylaws require approval, then records the movement atomically.",
+            "description": "The President approves a holder-initiated share transfer when the bylaws require approval, and the share token records the movement.",
             "typeName": "nomination",
             "cid": "nomination",
             "deciders": "president-address",
             "proposers": "",
             "moderators": "",
             "withModeration": false,
-            "data": "{\"equityTransferRegister\":\"share-transfer-register-address\"}"
+            "data": "{}"
         },
         {
             "address": "set-executive-compensation-address",

@@ -155,6 +155,15 @@ export const procedureFunctions = [
         tags: ['transfer'],
         params: ['address', 'amount', 'bytes'],
         target: 'organ'
+    },
+    {
+        funcSig: toFunctionSelector('transferEquity(address,address,uint256,string)'),
+        key: 'transferEquity',
+        signature: 'transferEquity(address,address,uint256,string)',
+        label: 'Transfer equity asset',
+        tags: ['transfer', 'erc20'],
+        params: ['address', 'address', 'amount', 'cid'],
+        target: 'self'
     }
 ];
 /**
@@ -443,7 +452,11 @@ export class Procedure {
         const publicClient = this.publicClient;
         if (publicClient == null)
             throw new Error('Public client not connected.');
-        await Promise.all([...new Set(input.operations.map(operation => operation.target))].map(async (target) => {
+        await Promise.all([
+            ...new Set(input.operations.map(operation => operation.target == null || operation.target === zeroAddress
+                ? this.address
+                : operation.target))
+        ].map(async (target) => {
             const code = await publicClient.getCode({
                 address: target
             });
@@ -470,11 +483,15 @@ export class Procedure {
             nonce: input.options?.nonce
         });
         input.options?.onTransaction?.(tx, `Create proposal with CID ${input.cid} on procedure ${this.address}`);
-        await tx.wait();
+        const receipt = await tx.wait();
         const proposalKey = currentProcedureData.proposalsLength.toString();
         const proposal = await Procedure.loadProposal(this.address, proposalKey, this.getClients());
-        this.proposals.push(proposal);
-        return proposal;
+        const proposalWithTransaction = {
+            ...proposal,
+            transactionHash: receipt.transactionHash
+        };
+        this.proposals.push(proposalWithTransaction);
+        return proposalWithTransaction;
     }
     async signProposal(input) {
         if (this.walletClient == null) {

@@ -217,6 +217,21 @@ export declare class OrganigramClient {
      */
     deployProcedures(deployProceduresInput: DeployProceduresInput[]): Promise<Procedure[]>;
     /**
+     * Resolve what remains to deploy in an organigram and encode the
+     * `deployOrganigram` arguments for it.
+     *
+     * @param input Batch deployment input for the whole organigram.
+     */
+    private prepareOrganigramDeployment;
+    /**
+     * Estimate the gas a full organigram deployment would use, without a wallet.
+     *
+     * @param input Batch deployment input for the whole organigram.
+     * @param account Address the deployment would be sent from.
+     * @returns The estimated gas, or 0n when nothing remains to deploy.
+     */
+    estimateDeployOrganigramGas(input: DeployOrganigramInput, account: string): Promise<bigint>;
+    /**
      * Deploy a full organigram, including its organs, assets, and procedures.
      *
      * @param input Batch deployment input for the whole organigram.
