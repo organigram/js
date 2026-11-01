@@ -7,6 +7,7 @@ import {
   encodePacked,
   keccak256,
   parseAbiParameters,
+  isAddress,
   toFunctionSelector,
   toHex,
   type PublicClient,
@@ -22,13 +23,15 @@ import {
   predictContractAddress
 } from '../utils'
 import { getDefaultChainId, getDeployment } from '../deployments'
+import { isCidRef } from '../ipfs/scopeEnvelope'
 import { tryMulticall } from '../multicall'
 import {
   type PopulateInitializeInput,
   type PopulatedTransactionData,
+  type ERC20VoteRoleMode,
   ProcedureTypeName,
   ProcedureTypeNameEnum,
-  getProcedureTypes
+  getProcedureType
 } from './utils'
 import {
   type ContractClients,
@@ -94,6 +97,10 @@ export type ProcedureJson = {
   proposers: string
   moderators: string
   withModeration: boolean
+  proposerMode?: ERC20VoteRoleMode
+  moderatorMode?: ERC20VoteRoleMode
+  voterMode?: ERC20VoteRoleMode
+  requireMemberMajority?: boolean
   forwarder: string
   proposals?: ProcedureProposal[]
   args?: unknown[]
@@ -109,6 +116,9 @@ export type Election = {
   start: string
   votesCount: string
   hasVoted: boolean
+  approvals?: string
+  objections?: string
+  eligibleVotes?: string
   approved?: boolean
 }
 
@@ -237,7 +247,42 @@ export interface ProcedureProposal {
   adopted: boolean
   applied: boolean
   operations: ProcedureProposalOperation[]
+  transactionHash?: string
   metadata?: ProposalMetadata
+}
+
+/** Reject malformed calls before a proposal can be persisted on-chain. */
+export const assertValidProposalOperations = (
+  operations: ProcedureProposalOperation[]
+) => {
+  if (!Array.isArray(operations) || operations.length === 0) {
+    throw new Error('A proposal must contain at least one valid operation.')
+  }
+  operations.forEach((operation, index) => {
+    if (
+      operation.target == null ||
+      !isAddress(operation.target) ||
+      operation.target.toLowerCase() === zeroAddress
+    ) {
+      throw new Error(
+        `Operation ${index + 1} must target a non-zero contract address.`
+      )
+    }
+    if (
+      typeof operation.data !== 'string' ||
+      !/^0x[\da-fA-F]{8,}$/.test(operation.data) ||
+      operation.data.length % 2 !== 0
+    ) {
+      throw new Error(`Operation ${index + 1} must contain a contract call.`)
+    }
+    try {
+      if (BigInt(operation.index) < 0n || BigInt(operation.value ?? '0') < 0n) {
+        throw new Error('negative value')
+      }
+    } catch {
+      throw new Error(`Operation ${index + 1} has an invalid index or value.`)
+    }
+  })
 }
 
 export type ProposalKey =
@@ -284,6 +329,10 @@ export interface ProcedureInput {
   metadata?: string | null
   proposers?: string | null
   withModeration?: boolean | null
+  proposerMode?: ERC20VoteRoleMode | null
+  moderatorMode?: ERC20VoteRoleMode | null
+  voterMode?: ERC20VoteRoleMode | null
+  requireMemberMajority?: boolean | null
   moderators?: string | null
   forwarder?: string | null
   proposals?: ProcedureProposal[] | null
@@ -420,6 +469,15 @@ export const procedureFunctions: ProcedureProposalOperationFunction[] = [
     tags: ['transfer'],
     params: ['address', 'amount', 'bytes'],
     target: 'organ'
+  },
+  {
+    funcSig: toFunctionSelector('transferEquity(address,address,uint256,string)'),
+    key: 'transferEquity',
+    signature: 'transferEquity(address,address,uint256,string)',
+    label: 'Transfer equity asset',
+    tags: ['transfer', 'erc20'],
+    params: ['address', 'address', 'amount', 'cid'],
+    target: 'self'
   }
 ]
 
@@ -474,7 +532,7 @@ export class Procedure {
     isDeployed,
     type,
     data,
-    organigramId
+    organigramId,
   }: ProcedureInput) {
     if (typeName == null || deciders == null) {
       throw new Error(
@@ -519,7 +577,7 @@ export class Procedure {
             walletClient: this.walletClient
           })
         : undefined
-    this.type = type ?? getProcedureTypes(this.chainId)[this.typeName]
+    this.type = type ?? getProcedureType(this.chainId, this.typeName)
     this.data = data ?? ''
   }
 
@@ -656,8 +714,7 @@ export class Procedure {
       deciders: data.deciders,
       withModeration: data.withModeration,
       forwarder:
-        initialProcedure?.forwarder ??
-        getDeployment(chainId, 'MetaGasStation'),
+        initialProcedure?.forwarder ?? getDeployment(chainId, 'MetaGasStation'),
       proposals,
       isDeployed: true
     })
@@ -813,6 +870,39 @@ export class Procedure {
     operations: ProcedureProposalOperation[]
     options?: TransactionOptions
   }): Promise<ProcedureProposal> {
+    if (input.cid.trim() === '') {
+      throw new Error('A proposal must include its metadata reference.')
+    }
+    if (!isCidRef(input.cid)) {
+      throw new Error(
+        'A proposal metadata reference must be scoped to its workspace.'
+      )
+    }
+    assertValidProposalOperations(input.operations)
+    const publicClient = this.publicClient
+    if (publicClient == null) throw new Error('Public client not connected.')
+    await Promise.all(
+      [
+        ...new Set(
+          input.operations.map(operation =>
+            operation.target == null || operation.target === zeroAddress
+              ? this.address
+              : operation.target
+          )
+        )
+      ].map(
+        async target => {
+          const code = await publicClient.getCode({
+            address: target as `0x${string}`
+          })
+          if (code == null || code === '0x') {
+            throw new Error(
+              `Proposal operation target ${target} is not deployed.`
+            )
+          }
+        }
+      )
+    )
     const currentProcedureData = await Procedure.loadData(
       this.address,
       this.getClients()
@@ -839,15 +929,19 @@ export class Procedure {
       tx,
       `Create proposal with CID ${input.cid} on procedure ${this.address}`
     )
-    await tx.wait()
+    const receipt = await tx.wait()
     const proposalKey = currentProcedureData.proposalsLength.toString()
     const proposal = await Procedure.loadProposal(
       this.address,
       proposalKey,
       this.getClients()
     )
-    this.proposals.push(proposal)
-    return proposal
+    const proposalWithTransaction = {
+      ...proposal,
+      transactionHash: receipt.transactionHash
+    }
+    this.proposals.push(proposalWithTransaction)
+    return proposalWithTransaction
   }
 
   async signProposal(input: SignedProposalInput): Promise<string> {

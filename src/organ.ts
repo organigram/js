@@ -147,6 +147,13 @@ const normalizeLoadedEntry = (entry: any, index: string): OrganEntry => ({
   cid: entry.cid ?? entry[1]
 })
 
+const isActiveLoadedEntry = (
+  entry: OrganEntry | null | undefined
+): entry is OrganEntry => {
+  if (entry == null) return false
+  return (entry.address ?? zeroAddress) !== zeroAddress || (entry.cid ?? '') !== ''
+}
+
 const normalizeOrganFunctionCall = async ({
   functionName,
   args,
@@ -790,10 +797,7 @@ export class Organ {
     )
 
     if (multicallEntries != null) {
-      return multicallEntries.filter(
-        (entry): entry is OrganEntry =>
-          entry != null && entry.address !== zeroAddress
-      )
+      return multicallEntries.filter(isActiveLoadedEntry)
     }
 
     const entries = await Promise.all(
@@ -811,7 +815,7 @@ export class Organ {
           )
           return null
         })
-        if (entry != null && entry.address !== zeroAddress) {
+        if (isActiveLoadedEntry(entry)) {
           return entry
         }
         return null

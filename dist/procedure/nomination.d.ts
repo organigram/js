@@ -10,6 +10,7 @@ export declare class NominationProcedure extends Procedure {
     static _populateInitialize(input: PopulateInitializeInput, _clients: ContractClients): Promise<PopulatedTransactionData>;
     static load(address: string, clients: ContractClients, initialProcedure?: ProcedureInput): Promise<NominationProcedure>;
     nominate(proposalKey: string, options?: TransactionOptions): Promise<boolean>;
+    reject(proposalKey: string, options?: TransactionOptions): Promise<boolean>;
     signNomination(input: {
         proposalKey: string;
         nonce: bigint;

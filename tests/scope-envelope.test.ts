@@ -99,6 +99,20 @@ describe('scope envelope helpers', () => {
     })
   })
 
+  it('pins a logical cid ref to an immutable manifest version', () => {
+    const cid = formatCidRef(
+      { scopeType: 'workspace', scopeId: 'workspace-1' },
+      'file:transfer-agreement',
+      'bafybeimanifest'
+    )
+
+    expect(parseCidRef(cid)).toEqual({
+      scopeRef: { scopeType: 'workspace', scopeId: 'workspace-1' },
+      logicalKey: 'file:transfer-agreement',
+      manifestCid: 'bafybeimanifest'
+    })
+  })
+
   it('serializes the scope envelope checkpoint into a deterministic signature message', () => {
     const checkpoint = createScopeEnvelopeCheckpoint({
       epoch: 3,

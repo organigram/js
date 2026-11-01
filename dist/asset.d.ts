@@ -13,6 +13,9 @@ export interface AssetJson {
     salt?: string | null;
     image?: string | null;
     userBalance: string;
+    kind: 'asset' | 'equity';
+    /** Procedure authorized to settle this equity token's transfers. */
+    decisionProcedure?: string | null;
     organigramId?: string | null;
 }
 /**
@@ -30,6 +33,9 @@ export interface AssetInput {
     isDeployed?: boolean;
     userBalance?: string | null;
     organigramId?: string | null;
+    kind?: 'asset' | 'equity' | null;
+    /** Procedure authorized to settle this equity token's transfers. */
+    decisionProcedure?: string | null;
 }
 /**
  * In-memory representation of one ERC-20 asset managed by an organigram.
@@ -46,6 +52,8 @@ export declare class Asset {
     isDeployed: boolean;
     userBalance: string;
     organigramId?: string | null;
+    kind: 'asset' | 'equity';
+    decisionProcedure?: string | null;
     constructor(input: AssetInput);
     /**
      * Hydrate an asset from chain state.

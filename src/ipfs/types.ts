@@ -41,6 +41,8 @@ export interface ScopeEnvelopeReference {
 export interface ParsedCidRef {
   scopeRef: ScopeEnvelopeReference
   logicalKey: string
+  /** Pins the reference to one immutable file-version manifest when present. */
+  manifestCid?: string
 }
 
 export interface EncryptedCidAccessGroup {

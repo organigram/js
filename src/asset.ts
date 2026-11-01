@@ -2,7 +2,7 @@ import AssetContract from '@organigram/protocol/abi/Asset.sol/Asset.json' with {
 import {
   decodeFunctionResult,
   encodeFunctionData,
-  formatEther,
+  formatUnits,
   zeroAddress
 } from 'viem'
 import { createRandom32BytesHexId, predictContractAddress } from './utils'
@@ -29,6 +29,9 @@ export interface AssetJson {
   salt?: string | null
   image?: string | null
   userBalance: string
+  kind: 'asset' | 'equity'
+  /** Procedure authorized to settle this equity token's transfers. */
+  decisionProcedure?: string | null
   organigramId?: string | null
 }
 
@@ -47,6 +50,9 @@ export interface AssetInput {
   isDeployed?: boolean
   userBalance?: string | null
   organigramId?: string | null
+  kind?: 'asset' | 'equity' | null
+  /** Procedure authorized to settle this equity token's transfers. */
+  decisionProcedure?: string | null
 }
 
 /**
@@ -64,7 +70,8 @@ export class Asset {
   isDeployed: boolean
   userBalance: string
   organigramId?: string | null
-
+  kind: 'asset' | 'equity'
+  decisionProcedure?: string | null
   constructor(input: AssetInput) {
     if (!input.address && !input.chainId) {
       throw new Error(
@@ -77,10 +84,11 @@ export class Asset {
     this.salt =
       input.salt || (this.isDeployed ? undefined : createRandom32BytesHexId())
     this.chainId = input.chainId ?? getDefaultChainId()
+    this.kind = input.kind ?? 'asset'
     this.address =
       input.address ??
       predictContractAddress({
-        type: 'Asset',
+        type: this.kind === 'equity' ? 'EquityToken' : 'Asset',
         chainId: this.chainId,
         salt: this.salt!
       })
@@ -89,6 +97,7 @@ export class Asset {
     this.image = input.image ?? undefined
     this.userBalance = input.userBalance ?? '0'
     this.organigramId = input.organigramId ?? null
+    this.decisionProcedure = input.decisionProcedure ?? null
   }
 
   /**
@@ -118,6 +127,19 @@ export class Asset {
         : undefined
 
     const multicallValues = await tryMulticall(clients, [
+      {
+        target: address,
+        callData: encodeFunctionData({
+          abi: AssetContract.abi,
+          functionName: 'decimals'
+        }),
+        decode: returnData =>
+          decodeFunctionResult({
+            abi: AssetContract.abi,
+            functionName: 'decimals',
+            data: returnData
+          })
+      },
       {
         target: address,
         callData: encodeFunctionData({
@@ -179,7 +201,8 @@ export class Asset {
             Promise.resolve(multicallValues[0] as string),
             Promise.resolve(multicallValues[1] as string),
             Promise.resolve(multicallValues[2] as bigint),
-            Promise.resolve((multicallValues[3] ?? 0n) as bigint),
+            Promise.resolve(multicallValues[3] as number),
+            Promise.resolve((multicallValues[4] ?? 0n) as bigint),
             initialAsset?.chainId != null
               ? Promise.resolve(initialAsset.chainId)
               : clients.publicClient.getChainId().then(String)
@@ -188,6 +211,7 @@ export class Asset {
             Promise.resolve((await contract.read.name()) as string),
             Promise.resolve((await contract.read.symbol()) as string),
             Promise.resolve((await contract.read.totalSupply()) as bigint),
+            Promise.resolve((await contract.read.decimals()) as number),
             walletAddress != null
               ? Promise.resolve(
                   (await contract.read.balanceOf([walletAddress])) as bigint
@@ -197,11 +221,11 @@ export class Asset {
               ? Promise.resolve(initialAsset.chainId)
               : clients.publicClient.getChainId().then(String)
           ])
-    const [name, symbol, initialSupplyRaw, userBalanceRaw, chainId] =
+    const [name, symbol, initialSupplyRaw, decimals, userBalanceRaw, chainId] =
       loadedValues
 
-    const initialSupply = parseInt((+formatEther(initialSupplyRaw)).toFixed(0))
-    let userBalance = formatEther(userBalanceRaw)
+    const initialSupply = parseInt((+formatUnits(initialSupplyRaw, decimals)).toFixed(0))
+    let userBalance = formatUnits(userBalanceRaw, decimals)
     userBalance = (+userBalance).toFixed(0)
 
     return new Asset({
@@ -230,7 +254,9 @@ export class Asset {
       image: this.image,
       isDeployed: this.isDeployed,
       userBalance: this.userBalance,
-      organigramId: this.organigramId
+      organigramId: this.organigramId,
+      kind: this.kind,
+      decisionProcedure: this.decisionProcedure,
     }
   }
 }

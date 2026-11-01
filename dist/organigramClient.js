@@ -1,7 +1,7 @@
 import OrganLibraryContractABI from '@organigram/protocol/abi/OrganLibrary.sol/OrganLibrary.json' with { type: 'json' };
 import OrganigramClientContractABI from '@organigram/protocol/abi/OrganigramClient.sol/OrganigramClient.json' with { type: 'json' };
 import ProcedureContractABI from '@organigram/protocol/abi/Procedure.sol/Procedure.json' with { type: 'json' };
-import { decodeEventLog, isAddress, parseEther, toHex, zeroAddress } from 'viem';
+import { decodeEventLog, getAddress, isAddress, parseEther, toHex, zeroAddress } from 'viem';
 import { createRandom32BytesHexId, getDefaultChainId, getDeployment, formatSalt, PERMISSIONS } from './utils';
 import { Organ } from './organ';
 import { Procedure } from './procedure';
@@ -9,6 +9,10 @@ import { Organigram } from './organigram';
 import { getProcedureClass, populateInitializeProcedure, prepareDeployOrgansInput, prepareDeployProceduresInput, procedureTypeMetadata, getProcedureType, getProcedureTypes } from './procedure/utils';
 import { Asset, ERC20_INITIAL_SUPPLY } from './asset';
 import { createContractWriteTransaction, createDeployTransaction, getContractInstance, getWalletAddress } from './contracts';
+import { applyDeployedOrganigramAddresses, createDeployOrganigramResult, markExistingOrganigramDeployments, refreshUndeployedContractReferences } from './deploymentReferences';
+const formatAssetInitialSupply = (asset) => asset.kind === 'equity'
+    ? BigInt(asset.initialSupply ?? ERC20_INITIAL_SUPPLY)
+    : parseEther(asset.initialSupply?.toString() ?? ERC20_INITIAL_SUPPLY.toString());
 const linkContractBytecode = (bytecode, linkReferences, libraries) => {
     let linkedBytecode = bytecode;
     for (const contracts of Object.values(linkReferences)) {
@@ -68,6 +72,7 @@ const createInitialProcedureInput = (input, chainId) => ({
     proposers: input.proposers ?? input.deciders,
     moderators: input.moderators ?? zeroAddress,
     withModeration: input.withModeration ?? false,
+    requireMemberMajority: input.requireMemberMajority ?? false,
     forwarder: input.forwarder ?? getDeployment(chainId, 'MetaGasStation'),
     salt: formatSalt(input.salt),
     ...(input.data != null ? { data: input.data } : {})
@@ -105,7 +110,8 @@ export class OrganigramClient {
         }
         this.address = resolvedAddress ?? '';
         this.chainId = resolvedChainId;
-        this.procedureTypes = input.procedureTypes ?? Object.values(getProcedureTypes(resolvedChainId));
+        this.procedureTypes =
+            input.procedureTypes ?? Object.values(getProcedureTypes(resolvedChainId));
         this.organs = [];
         this.procedures = [];
         this.assets = [];
@@ -391,9 +397,17 @@ export class OrganigramClient {
         }
         const { cid, permissions, salt, entries, options } = input ?? {};
         const resolvedSalt = formatSalt(salt);
-        const permissionAddresses = [];
-        const permissionValues = [];
-        if (!permissions || permissions.length === 0) {
+        const [preparedOrgan] = prepareDeployOrgansInput([
+            {
+                cid,
+                permissions,
+                entries,
+                salt: resolvedSalt
+            }
+        ]);
+        const permissionAddresses = [...preparedOrgan.permissionAddresses];
+        const permissionValues = [...preparedOrgan.permissionValues];
+        if (permissionAddresses.length === 0) {
             permissionAddresses.push(await getWalletAddress(this.walletClient));
             permissionValues.push(toHex(PERMISSIONS.ADMIN).replace(/^0x/, '0x'));
             permissionValues[0] =
@@ -401,14 +415,6 @@ export class OrganigramClient {
                     ? permissionValues[0]
                     : `0x${permissionValues[0].slice(2).padStart(4, '0')}`;
         }
-        permissions?.forEach(permission => {
-            permissionAddresses.push(permission.permissionAddress);
-            permissionValues.push(`0x${toHex(permission.permissionValue).slice(2).padStart(4, '0')}`);
-        });
-        const formattedEntries = entries?.map(entry => ({
-            addr: entry.address,
-            cid: entry.cid ?? ''
-        })) ?? [];
         const tx = await createContractWriteTransaction({
             address: this.address,
             abi: OrganigramClientContractABI.abi,
@@ -417,7 +423,7 @@ export class OrganigramClient {
                 permissionAddresses,
                 permissionValues,
                 cid ?? '',
-                formattedEntries,
+                preparedOrgan.entries,
                 resolvedSalt
             ],
             clients: this.getClients(),
@@ -504,8 +510,10 @@ export class OrganigramClient {
         const formattedAssets = assets.map(asset => ({
             name: asset.name,
             symbol: asset.symbol,
-            initialSupply: parseEther(asset.initialSupply?.toString() ?? ERC20_INITIAL_SUPPLY.toString()),
-            salt: formatSalt(asset.salt)
+            initialSupply: formatAssetInitialSupply(asset),
+            salt: formatSalt(asset.salt),
+            isEquity: asset.kind === 'equity',
+            transferProcedure: asset.decisionProcedure ?? zeroAddress
         }));
         const tx = await createContractWriteTransaction({
             address: this.address,
@@ -541,6 +549,10 @@ export class OrganigramClient {
             proposers: input.proposers ?? input.deciders,
             moderators: input.moderators ?? zeroAddress,
             withModeration: input.withModeration ?? false,
+            proposerMode: input.proposerMode ?? undefined,
+            moderatorMode: input.moderatorMode ?? undefined,
+            voterMode: input.voterMode ?? undefined,
+            requireMemberMajority: input.requireMemberMajority ?? undefined,
             forwarder: input.forwarder ?? getDeployment(this.chainId, 'MetaGasStation'),
             args: input.args ?? []
         }, this.getClients());
@@ -606,6 +618,55 @@ export class OrganigramClient {
         }));
     }
     /**
+     * Resolve what remains to deploy in an organigram and encode the
+     * `deployOrganigram` arguments for it.
+     *
+     * @param input Batch deployment input for the whole organigram.
+     */
+    async prepareOrganigramDeployment(input) {
+        const refreshedInput = await markExistingOrganigramDeployments(refreshUndeployedContractReferences(input, this.chainId), this.publicClient);
+        const organsToDeploy = refreshedInput.organs.filter(organ => organ.isDeployed !== true);
+        const assetsToDeploy = refreshedInput.assets.filter(asset => asset.isDeployed !== true);
+        const proceduresToDeploy = refreshedInput.procedures.filter(procedure => procedure.isDeployed !== true);
+        const isEmpty = organsToDeploy.length === 0 &&
+            assetsToDeploy.length === 0 &&
+            proceduresToDeploy.length === 0;
+        const args = isEmpty
+            ? null
+            : [
+                prepareDeployOrgansInput(organsToDeploy),
+                assetsToDeploy.map(asset => ({
+                    name: asset.name,
+                    symbol: asset.symbol,
+                    initialSupply: formatAssetInitialSupply(asset),
+                    salt: formatSalt(asset.salt),
+                    isEquity: asset.kind === 'equity',
+                    transferProcedure: asset.decisionProcedure ?? zeroAddress
+                })),
+                await prepareDeployProceduresInput(proceduresToDeploy, this.getClients())
+            ];
+        return { refreshedInput, organsToDeploy, assetsToDeploy, proceduresToDeploy, args };
+    }
+    /**
+     * Estimate the gas a full organigram deployment would use, without a wallet.
+     *
+     * @param input Batch deployment input for the whole organigram.
+     * @param account Address the deployment would be sent from.
+     * @returns The estimated gas, or 0n when nothing remains to deploy.
+     */
+    async estimateDeployOrganigramGas(input, account) {
+        const { args } = await this.prepareOrganigramDeployment(input);
+        if (args == null)
+            return 0n;
+        return await this.publicClient.estimateContractGas({
+            address: getAddress(this.address),
+            abi: OrganigramClientContractABI.abi,
+            functionName: 'deployOrganigram',
+            args,
+            account: getAddress(account)
+        });
+    }
+    /**
      * Deploy a full organigram, including its organs, assets, and procedures.
      *
      * @param input Batch deployment input for the whole organigram.
@@ -615,35 +676,29 @@ export class OrganigramClient {
         if (this.walletClient == null) {
             throw new Error('Wallet client not connected.');
         }
-        const organsToDeploy = input.organs.filter(organ => organ.isDeployed !== true);
-        const assetsToDeploy = input.assets.filter(asset => asset.isDeployed !== true);
-        const proceduresToDeploy = input.procedures.filter(procedure => procedure.isDeployed !== true);
-        if (organsToDeploy.length === 0 &&
-            assetsToDeploy.length === 0 &&
-            proceduresToDeploy.length === 0) {
-            return [[], [], []];
+        const { refreshedInput, organsToDeploy, assetsToDeploy, proceduresToDeploy, args } = await this.prepareOrganigramDeployment(input);
+        if (args == null) {
+            return createDeployOrganigramResult({ organs: [], assets: [], procedures: [] }, refreshedInput);
         }
-        const formattedAssets = assetsToDeploy.map(asset => ({
-            name: asset.name,
-            symbol: asset.symbol,
-            initialSupply: parseEther(asset.initialSupply?.toString() ?? ERC20_INITIAL_SUPPLY.toString()),
-            salt: formatSalt(asset.salt)
-        }));
-        const organsInput = prepareDeployOrgansInput(organsToDeploy);
-        const proceduresInput = await prepareDeployProceduresInput(proceduresToDeploy, this.getClients());
         const tx = await createContractWriteTransaction({
             address: this.address,
             abi: OrganigramClientContractABI.abi,
             functionName: 'deployOrganigram',
-            args: [organsInput, formattedAssets, proceduresInput],
+            args,
             clients: this.getClients()
         });
         const receipt = await tx.wait();
-        return [
-            getDeploymentAddresses(receipt, 'organDeployed'),
-            getDeploymentAddresses(receipt, 'assetDeployed'),
-            getDeploymentAddresses(receipt, 'procedureDeployed')
-        ];
+        const deployedAddresses = {
+            organs: getDeploymentAddresses(receipt, 'organDeployed'),
+            assets: getDeploymentAddresses(receipt, 'assetDeployed'),
+            procedures: getDeploymentAddresses(receipt, 'procedureDeployed')
+        };
+        if (deployedAddresses.organs.length !== organsToDeploy.length ||
+            deployedAddresses.assets.length !== assetsToDeploy.length ||
+            deployedAddresses.procedures.length !== proceduresToDeploy.length) {
+            throw new Error('Organigram deployment events did not match the input.');
+        }
+        return createDeployOrganigramResult(deployedAddresses, applyDeployedOrganigramAddresses(refreshedInput, deployedAddresses, refreshedInput));
     }
     /**
      * Attempt to load one deployed contract as an organ or procedure.

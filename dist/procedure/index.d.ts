@@ -1,6 +1,6 @@
 import { type PublicClient, type WalletClient } from 'viem';
 import type { TransactionOptions } from '../organigramClient';
-import { type PopulateInitializeInput, type PopulatedTransactionData, ProcedureTypeName } from './utils';
+import { type PopulateInitializeInput, type PopulatedTransactionData, type ERC20VoteRoleMode, ProcedureTypeName } from './utils';
 import { type ContractClients, type OrganigramTransaction, type OrganigramTransactionReceipt } from '../contracts';
 /**
  * Declarative description of one procedure configuration field.
@@ -54,6 +54,10 @@ export type ProcedureJson = {
     proposers: string;
     moderators: string;
     withModeration: boolean;
+    proposerMode?: ERC20VoteRoleMode;
+    moderatorMode?: ERC20VoteRoleMode;
+    voterMode?: ERC20VoteRoleMode;
+    requireMemberMajority?: boolean;
     forwarder: string;
     proposals?: ProcedureProposal[];
     args?: unknown[];
@@ -68,6 +72,9 @@ export type Election = {
     start: string;
     votesCount: string;
     hasVoted: boolean;
+    approvals?: string;
+    objections?: string;
+    eligibleVotes?: string;
     approved?: boolean;
 };
 export type AccountInOrgans = {
@@ -144,8 +151,11 @@ export interface ProcedureProposal {
     adopted: boolean;
     applied: boolean;
     operations: ProcedureProposalOperation[];
+    transactionHash?: string;
     metadata?: ProposalMetadata;
 }
+/** Reject malformed calls before a proposal can be persisted on-chain. */
+export declare const assertValidProposalOperations: (operations: ProcedureProposalOperation[]) => void;
 export type ProposalKey = 'addEntries' | 'removeEntries' | 'replaceEntry' | 'addPermission' | 'removePermission' | 'replacePermission' | 'updateMetadata' | 'withdrawEther' | 'withdrawERC20' | 'withdrawERC721' | 'externalCall' | string;
 /**
  * Rich content attached to a proposal, usually stored off-chain.
@@ -176,6 +186,10 @@ export interface ProcedureInput {
     metadata?: string | null;
     proposers?: string | null;
     withModeration?: boolean | null;
+    proposerMode?: ERC20VoteRoleMode | null;
+    moderatorMode?: ERC20VoteRoleMode | null;
+    voterMode?: ERC20VoteRoleMode | null;
+    requireMemberMajority?: boolean | null;
     moderators?: string | null;
     forwarder?: string | null;
     proposals?: ProcedureProposal[] | null;
@@ -211,7 +225,7 @@ export declare class Procedure {
     publicClient?: PublicClient;
     organigramId: string;
     type: ProcedureType;
-    constructor({ address, deciders, typeName, name, description, salt, cid, chainId, publicClient, walletClient, metadata, proposers, withModeration, forwarder, moderators, proposals, isDeployed, type, data, organigramId }: ProcedureInput);
+    constructor({ address, deciders, typeName, name, description, salt, cid, chainId, publicClient, walletClient, metadata, proposers, withModeration, forwarder, moderators, proposals, isDeployed, type, data, organigramId, }: ProcedureInput);
     protected getClients(): ContractClients;
     static _populateInitialize(_populateInitializeInput: PopulateInitializeInput, _clients: ContractClients): Promise<PopulatedTransactionData>;
     static loadData(address: string, clients: ContractClients): Promise<ProcedureContractData>;

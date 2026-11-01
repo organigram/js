@@ -1,34 +1,78 @@
 import none from './none.json' with { type: 'json' }
-import forProfit from './for-profit.json' with { type: 'json' }
 import nonProfit from './non-profit.json' with { type: 'json' }
 import openSource from './open-source.json' with { type: 'json' }
 import participatoryBudget from './budget.json' with { type: 'json' }
+import sas from './sas.json' with { type: 'json' }
+import sasu from './sasu.json' with { type: 'json' }
+import sa from './sa.json' with { type: 'json' }
+import sarl from './sarl.json' with { type: 'json' }
+import accountingRecords from './accounting-records.json' with { type: 'json' }
+import employmentSafetyRecords from './employment-safety-records.json' with { type: 'json' }
+import dataProcessingRegister from './data-processing-register.json' with { type: 'json' }
+import corporateFilings from './corporate-filings.json' with { type: 'json' }
 import {
   capitalize,
   createRandom32BytesHexId,
+  PERMISSIONS,
   predictContractAddress
 } from '../utils'
 import { OrganigramInput } from '../organigram'
-import { OrganInput } from '../organ'
+import { OrganInput, type OrganPermission } from '../organ'
 import { ProcedureInput } from '../procedure'
 import { AssetInput } from '../asset'
+import { resolveDeployment, type ProtocolDeploymentName } from '../deployments'
 
 export const templates = {
   none,
-  forProfit,
   nonProfit,
   openSource,
-  participatoryBudget
+  participatoryBudget,
+  sas: sas as OrganigramInput,
+  sasu: sasu as OrganigramInput,
+  sa: sa as OrganigramInput,
+  sarl: sarl as OrganigramInput,
+  accountingRecords,
+  employmentSafetyRecords,
+  dataProcessingRegister,
+  corporateFilings
 }
 
 export type TemplateName = keyof typeof templates
+
+const templateDeploymentRequirements: Partial<
+  Record<TemplateName, ProtocolDeploymentName[]>
+> = {
+  sas: ['EquityToken'],
+  sasu: ['EquityToken'],
+  sa: ['EquityToken'],
+  sarl: ['EquityToken']
+}
+
+/** Returns whether every protocol implementation required by a template exists on a chain. */
+export const isTemplateSupportedOnChain = (
+  templateName: TemplateName,
+  chainId: string
+): boolean =>
+  (templateDeploymentRequirements[templateName] ?? []).every(
+    deploymentName => resolveDeployment(chainId, deploymentName) != null
+  )
 
 type RenewableContractInput = {
   address?: string | null
   salt?: string | null
   typeName?: string | null
   chainId?: string | null
+  kind?: 'asset' | 'equity' | null
 }
+
+type ImportableOrganPermission = Partial<OrganPermission> & {
+  procedureSalt?: string | null
+  permissionKeys?: string[] | null
+}
+
+const permissionValuesByKey = new Map<string, number>(
+  Object.entries(PERMISSIONS)
+)
 
 const setFirstValue = (
   target: Record<string, string>,
@@ -52,7 +96,9 @@ const createRenewedContractValues = <T extends RenewableContractInput>(
         type:
           type === 'Procedure'
             ? ((capitalize(item.typeName!) + type) as 'NominationProcedure')
-            : (type as 'Organ'),
+            : item.kind === 'equity'
+              ? 'EquityToken'
+              : (type as 'Organ'),
         chainId,
         salt
       })
@@ -90,6 +136,41 @@ const resolveRenewedAddress = (
     ? ''
     : (renewal.addresses[reference] ?? renewal.addressBySalt[reference] ?? '')
 
+const resolvePermissionValue = (
+  permission: ImportableOrganPermission
+): number => {
+  if (typeof permission.permissionValue === 'number') {
+    return permission.permissionValue
+  }
+
+  return (permission.permissionKeys ?? []).reduce((value, key) => {
+    const permissionValue = permissionValuesByKey.get(key)
+    return typeof permissionValue === 'number' ? value | permissionValue : value
+  }, 0)
+}
+
+const normalizeOrganPermission = (
+  permission: ImportableOrganPermission,
+  procedureRenewal: ReturnType<typeof createRenewedContractValues>,
+  assetRenewal: ReturnType<typeof createRenewedContractValues>
+): OrganPermission | undefined => {
+  const permissionReference =
+    permission.permissionAddress ?? permission.procedureSalt
+  const permissionAddress =
+    resolveRenewedAddress(permissionReference, procedureRenewal) ||
+    resolveRenewedAddress(permissionReference, assetRenewal)
+  const permissionValue = resolvePermissionValue(permission)
+
+  if (permissionAddress === '' || permissionValue <= 0) {
+    return undefined
+  }
+
+  return {
+    permissionAddress,
+    permissionValue
+  }
+}
+
 export const renewSaltsAndAddresses = (
   organigram: OrganigramInput,
   chainId: string
@@ -117,18 +198,15 @@ export const renewSaltsAndAddresses = (
     chainId,
     isDeployed: false,
     permissions: organ.permissions
-      ?.map(permission => ({
-        ...permission,
-        permissionAddress: resolveRenewedAddress(
-          permission.permissionAddress,
-          procedureRenewal
+      ?.map(permission =>
+        normalizeOrganPermission(
+          permission as ImportableOrganPermission,
+          procedureRenewal,
+          assetRenewal
         )
-      }))
+      )
       .filter(
-        (
-          permission
-        ): permission is typeof permission & { permissionAddress: string } =>
-          permission.permissionAddress !== ''
+        (permission): permission is OrganPermission => permission != null
       )
   }))
 
@@ -137,17 +215,15 @@ export const renewSaltsAndAddresses = (
     ...procedure,
     salt,
     chainId,
-    data: JSON.parse(procedure.data ?? '{}').erc20
-      ? JSON.stringify({
-          erc20: resolveRenewedAddress(
-            JSON.parse(procedure.data!).erc20,
-            assetRenewal
-          ),
-          quorumSize: JSON.parse(procedure.data!).quorumSize,
-          voteDuration: JSON.parse(procedure.data!).voteDuration,
-          majoritySize: JSON.parse(procedure.data!).majoritySize
-        })
-      : (procedure.data ?? '{}'),
+    data: (() => {
+      const data = JSON.parse(procedure.data ?? '{}') as Record<string, unknown>
+      return JSON.stringify({
+        ...data,
+        ...(typeof data.erc20 === 'string'
+          ? { erc20: resolveRenewedAddress(data.erc20, assetRenewal) }
+          : {}),
+      })
+    })(),
     isDeployed: false,
     address,
     deciders: resolveRenewedAddress(procedure.deciders, organRenewal),
@@ -163,7 +239,11 @@ export const renewSaltsAndAddresses = (
     chainId,
     isDeployed: false,
     salt,
-    address
+    address,
+    decisionProcedure:
+      asset.kind === 'equity'
+        ? resolveRenewedAddress(asset.decisionProcedure, procedureRenewal)
+        : asset.decisionProcedure
   }))
 
   return {
@@ -178,4 +258,8 @@ export const renewSaltsAndAddresses = (
 export const getTemplate = (
   templateName: TemplateName,
   chainId: string
-) => renewSaltsAndAddresses(templates[templateName], chainId)
+) =>
+  renewSaltsAndAddresses(
+    templates[templateName],
+    chainId
+  )

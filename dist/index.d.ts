@@ -1,4 +1,5 @@
 export * from './asset';
+export * from './deploymentReferences';
 export * from './contracts';
 export * from './ipfs/enveloppe';
 export * from './organ';

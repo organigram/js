@@ -1,0 +1,33 @@
+{
+  "name": "Corporate filings",
+  "description": "Standalone register for corporate filing receipts and supporting documents. Adapt it to the company's legal form and filing obligations.",
+  "organs": [
+    {
+      "address": "corporate-records-officer-address",
+      "salt": "corporate-records-officer-salt",
+      "name": "Président",
+      "entries": [],
+      "permissions": []
+    },
+    {
+      "address": "corporate-filings-address",
+      "salt": "corporate-filings-salt",
+      "name": "Corporate filings",
+      "entries": [],
+      "permissions": [{ "permissionAddress": "maintain-corporate-filings-address", "permissionValue": 4 }]
+    }
+  ],
+  "procedures": [
+    {
+      "address": "maintain-corporate-filings-address",
+      "salt": "maintain-corporate-filings-salt",
+      "name": "Maintain corporate filings",
+      "typeName": "nomination",
+      "deciders": "corporate-records-officer-address",
+      "proposers": "corporate-records-officer-address",
+      "withModeration": false,
+      "data": "{}"
+    }
+  ],
+  "assets": []
+}

@@ -1,0 +1,89 @@
+{
+    "name": "Employment and safety records",
+    "description": "Standalone employment, health and safety registers. Keep only the registers applicable to the organisation and its workforce.",
+    "organs": [
+        {
+            "address": "employment-safety-officer-address",
+            "salt": "employment-safety-officer-salt",
+            "name": "Président",
+            "entries": [],
+            "permissions": []
+        },
+        {
+            "address": "staff-register-address",
+            "salt": "staff-register-salt",
+            "name": "Staff register",
+            "entries": [],
+            "permissions": [{ "permissionAddress": "maintain-workplace-compliance-records-address", "permissionValue": 4 }]
+        },
+        {
+            "address": "occupational-risk-assessment-address",
+            "salt": "occupational-risk-assessment-salt",
+            "name": "Occupational risk assessment",
+            "entries": [],
+            "permissions": [{ "permissionAddress": "maintain-workplace-compliance-records-address", "permissionValue": 4 }]
+        },
+        {
+            "address": "public-health-environmental-alerts-address",
+            "salt": "public-health-environmental-alerts-salt",
+            "name": "Public health and environmental alerts",
+            "entries": [],
+            "permissions": [{ "permissionAddress": "maintain-workplace-compliance-records-address", "permissionValue": 4 }]
+        },
+        {
+            "address": "cse-questions-address",
+            "salt": "cse-questions-salt",
+            "name": "CSE questions",
+            "entries": [],
+            "permissions": [{ "permissionAddress": "maintain-workplace-compliance-records-address", "permissionValue": 4 }]
+        },
+        {
+            "address": "special-weekly-rest-register-address",
+            "salt": "special-weekly-rest-register-salt",
+            "name": "Special weekly rest register",
+            "entries": [],
+            "permissions": [{ "permissionAddress": "maintain-workplace-compliance-records-address", "permissionValue": 4 }]
+        },
+        {
+            "address": "team-work-organization-address",
+            "salt": "team-work-organization-salt",
+            "name": "Team-work organization",
+            "entries": [],
+            "permissions": [{ "permissionAddress": "maintain-workplace-compliance-records-address", "permissionValue": 4 }]
+        },
+        {
+            "address": "safety-inspections-address",
+            "salt": "safety-inspections-salt",
+            "name": "Safety inspections",
+            "entries": [],
+            "permissions": [{ "permissionAddress": "maintain-workplace-compliance-records-address", "permissionValue": 4 }]
+        },
+        {
+            "address": "serious-imminent-danger-register-address",
+            "salt": "serious-imminent-danger-register-salt",
+            "name": "Serious and imminent danger register",
+            "entries": [],
+            "permissions": [{ "permissionAddress": "maintain-workplace-compliance-records-address", "permissionValue": 4 }]
+        },
+        {
+            "address": "electrical-inspections-address",
+            "salt": "electrical-inspections-salt",
+            "name": "Electrical inspections",
+            "entries": [],
+            "permissions": [{ "permissionAddress": "maintain-workplace-compliance-records-address", "permissionValue": 4 }]
+        }
+    ],
+    "procedures": [
+        {
+            "address": "maintain-workplace-compliance-records-address",
+            "salt": "maintain-workplace-compliance-records-salt",
+            "name": "Maintain workplace compliance records",
+            "typeName": "nomination",
+            "deciders": "employment-safety-officer-address",
+            "proposers": "employment-safety-officer-address",
+            "withModeration": false,
+            "data": "{}"
+        }
+    ],
+    "assets": []
+}

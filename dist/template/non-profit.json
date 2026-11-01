@@ -1,180 +1,200 @@
 {
-    "name": "Non-profit organization",
+    "name": "Association law of 1 July 1901",
+    "description": "French association template for the ordinary law of 1 July 1901. It must be tailored to the association's bylaws, funding, staff and sectoral rules.",
     "organs": [
         {
-            "salt": "board-of-directors-salt",
-            "address": "board-of-directors-address",
-            "name": "Board of directors",
-            "entries": [],
-            "permissions": [
-                {
-                    "permissionAddress": "elect-directors-address",
-                    "permissionValue": 12
-                },
-                {
-                    "permissionAddress": "amend-bylaws-address",
-                    "permissionValue": 19
-                }
-            ]
-        },
-        {
-            "salt": "executive-team-salt",
-            "address": "executive-team-address",
-            "name": "Executive team",
-            "entries": [],
-            "permissions": [
-                {
-                    "permissionAddress": "elect-executive-team-address",
-                    "permissionValue": 12
-                },
-                {
-                    "permissionAddress": "amend-bylaws-address",
-                    "permissionValue": 19
-                }
-            ]
-        },
-        {
-            "salt": "members-salt",
             "address": "members-address",
+            "salt": "members-salt",
             "name": "Members",
+            "description": "Membership register and current list of members, with the rights defined by the bylaws.",
             "entries": [],
             "permissions": [
-                {
-                    "permissionAddress": "amend-bylaws-address",
-                    "permissionValue": 19
-                },
-                {
-                    "permissionAddress": "manage-members-address",
-                    "permissionValue": 12
-                }
+                { "permissionValue": 12, "permissionAddress": "manage-members-address" }
             ]
         },
         {
-            "salt": "bylaws-salt",
+            "address": "board-of-directors-address",
+            "salt": "board-of-directors-salt",
+            "name": "Board of directors",
+            "description": "Default governing body where the bylaws provide for a board of directors.",
+            "entries": [],
+            "permissions": [
+                { "permissionValue": 12, "permissionAddress": "elect-directors-address" }
+            ]
+        },
+        {
+            "address": "president-address",
+            "salt": "president-salt",
+            "name": "President",
+            "description": "Legal representative of the association where the bylaws provide for a president.",
+            "entries": [],
+            "permissions": [
+                { "permissionValue": 12, "permissionAddress": "appoint-officers-address" }
+            ]
+        },
+        {
+            "address": "secretary-address",
+            "salt": "secretary-salt",
+            "name": "Secretary",
+            "description": "Officer responsible for the association's minutes and administrative records where the bylaws provide for a secretary.",
+            "entries": [],
+            "permissions": [
+                { "permissionValue": 12, "permissionAddress": "appoint-officers-address" }
+            ]
+        },
+        {
+            "address": "treasurer-address",
+            "salt": "treasurer-salt",
+            "name": "Treasurer",
+            "description": "Officer responsible for financial administration where the bylaws provide for a treasurer.",
+            "entries": [],
+            "permissions": [
+                { "permissionValue": 12, "permissionAddress": "appoint-officers-address" },
+                { "permissionValue": 1344, "permissionAddress": "make-a-payment-address" }
+            ]
+        },
+        {
             "address": "bylaws-address",
+            "salt": "bylaws-salt",
             "name": "Bylaws",
+            "description": "Append-only history of the association's signed bylaws and amendments.",
             "entries": [],
             "permissions": [
-                {
-                    "permissionAddress": "amend-bylaws-address",
-                    "permissionValue": 31
-                }
+                { "permissionValue": 4, "permissionAddress": "amend-bylaws-address" }
             ]
         },
         {
-            "salt": "meeting-minutes-salt",
-            "address": "meeting-minutes-address",
-            "name": "Meeting minutes",
+            "address": "general-meeting-minutes-address",
+            "salt": "general-meeting-minutes-salt",
+            "name": "General meeting minutes",
+            "description": "Append-only record of general-meeting resolutions and their annexes, including attendance sheets and proxies where used.",
             "entries": [],
             "permissions": [
-                {
-                    "permissionAddress": "amend-bylaws-address",
-                    "permissionValue": 19
-                },
-                {
-                    "permissionAddress": "general-meeting-address",
-                    "permissionValue": 4
-                }
+                { "permissionValue": 4, "permissionAddress": "elect-directors-address" },
+                { "permissionValue": 4, "permissionAddress": "amend-bylaws-address" },
+                { "permissionValue": 4, "permissionAddress": "general-meeting-address" }
             ]
         },
         {
-            "salt": "financial-statements-salt",
-            "address": "financial-statements-address",
-            "name": "Financial statements",
+            "address": "board-minutes-address",
+            "salt": "board-minutes-salt",
+            "name": "Board minutes",
+            "description": "Append-only record of board resolutions and their annexes, including attendance evidence where used.",
             "entries": [],
             "permissions": [
-                {
-                    "permissionAddress": "amend-bylaws-address",
-                    "permissionValue": 19
-                },
-                {
-                    "permissionAddress": "general-meeting-address",
-                    "permissionValue": 4
-                }
+                { "permissionValue": 4, "permissionAddress": "appoint-officers-address" },
+                { "permissionValue": 4, "permissionAddress": "record-board-resolution-address" }
             ]
         },
         {
-            "salt": "treasury-salt",
-            "address": "treasury-address",
-            "name": "Treasury",
+            "address": "association-filings-address",
+            "salt": "association-filings-salt",
+            "name": "Association filings",
+            "description": "Archive of the declaration, receipts, JOAFE evidence, administration changes, amended bylaws and, if applicable, property declarations. It preserves evidence without claiming that the former registre spécial is mandatory.",
             "entries": [],
             "permissions": [
-                {
-                    "permissionAddress": "amend-bylaws-address",
-                    "permissionValue": 19
-                },
-                {
-                    "permissionAddress": "manage-treasury-address",
-                    "permissionValue": 2028
-                },
-                {
-                    "permissionAddress": "manage-members-address",
-                    "permissionValue": 4
-                }
+                { "permissionValue": 4, "permissionAddress": "amend-bylaws-address" },
+                { "permissionValue": 4, "permissionAddress": "maintain-association-filings-address" }
             ]
         }
     ],
     "procedures": [
         {
-            "salt": "elect-executive-team-salt",
-            "address": "elect-executive-team-address",
-            "name": "Elect executive team",
-            "typeName": "vote",
-            "data": "{\"quorumSize\":\"20001\",\"voteDuration\":\"3600\",\"majoritySize\":\"50001\"}",
-            "deciders": "board-of-directors-address",
-            "proposers": "board-of-directors-address"
-        },
-        {
-            "salt": "elect-directors-salt",
             "address": "elect-directors-address",
+            "salt": "elect-directors-salt",
             "name": "Elect directors",
-            "typeName": "erc20Vote",
-            "data": "{\"quorumSize\":\"20001\",\"voteDuration\":\"3600\",\"majoritySize\":\"50001\",\"erc20\":\"shares-address\"}",
-            "deciders": "members-address",
-            "proposers": "members-address"
-        },
-        {
-            "salt": "manage-members-salt",
-            "address": "manage-members-address",
-            "name": "Manage members",
-            "typeName": "nomination",
-            "data": "{}",
-            "deciders": "members-address",
-            "proposers": "members-address"
-        },
-        {
-            "salt": "amend-bylaws-salt",
-            "address": "amend-bylaws-address",
-            "name": "Amend bylaws",
+            "description": "Members elect directors where the bylaws provide for a board of directors.",
             "typeName": "vote",
-            "data": "{\"quorumSize\":\"20001\",\"voteDuration\":\"3600\",\"majoritySize\":\"50001\"}",
             "deciders": "members-address",
-            "proposers": "board-of-directors-address"
+            "proposers": "members-address",
+            "moderators": "",
+            "withModeration": false,
+            "data": "{\"quorumSize\":\"20001\",\"voteDuration\":\"300\",\"majoritySize\":\"50001\"}"
         },
         {
-            "salt": "general-meeting-salt",
-            "address": "general-meeting-address",
-            "name": "General meeting",
-            "typeName": "erc20Vote",
-            "data": "{\"quorumSize\":\"20001\",\"voteDuration\":\"3600\",\"majoritySize\":\"50001\",\"erc20\":\"shares-address\"}",
-            "deciders": "members-address",
-            "proposers": "members-address"
+            "address": "appoint-officers-address",
+            "salt": "appoint-officers-salt",
+            "name": "Elect officers",
+            "description": "The board elects the president, secretary and treasurer where the bylaws provide for those offices.",
+            "typeName": "vote",
+            "deciders": "board-of-directors-address",
+            "proposers": "board-of-directors-address",
+            "moderators": "",
+            "withModeration": false,
+            "data": "{\"quorumSize\":\"20001\",\"voteDuration\":\"300\",\"majoritySize\":\"50001\"}"
         },
         {
-            "salt": "manage-treasury-salt",
-            "address": "manage-treasury-address",
-            "name": "Manage treasury",
+            "address": "manage-members-address",
+            "salt": "manage-members-salt",
+            "name": "Manage members",
+            "description": "The board admits, removes or updates members as permitted by the bylaws.",
             "typeName": "nomination",
-            "deciders": "executive-team-address",
-            "proposers": "executive-team-address"
+            "deciders": "board-of-directors-address",
+            "proposers": "board-of-directors-address",
+            "moderators": "",
+            "withModeration": false,
+            "data": "{}"
+        },
+        {
+            "address": "amend-bylaws-address",
+            "salt": "amend-bylaws-salt",
+            "name": "Amend bylaws",
+            "description": "Members amend the bylaws under the conditions stated in the bylaws.",
+            "typeName": "vote",
+            "deciders": "members-address",
+            "proposers": "board-of-directors-address",
+            "moderators": "",
+            "withModeration": false,
+            "data": "{\"quorumSize\":\"20001\",\"voteDuration\":\"300\",\"majoritySize\":\"50001\"}"
+        },
+        {
+            "address": "general-meeting-address",
+            "salt": "general-meeting-salt",
+            "name": "General meeting",
+            "description": "Members record a general-meeting decision under the association's bylaws.",
+            "typeName": "vote",
+            "deciders": "members-address",
+            "proposers": "members-address",
+            "moderators": "",
+            "withModeration": false,
+            "data": "{\"quorumSize\":\"20001\",\"voteDuration\":\"300\",\"majoritySize\":\"50001\"}"
+        },
+        {
+            "address": "record-board-resolution-address",
+            "salt": "record-board-resolution-salt",
+            "name": "Record board resolution",
+            "description": "The board records a resolution within the powers given to it by the bylaws.",
+            "typeName": "vote",
+            "deciders": "board-of-directors-address",
+            "proposers": "board-of-directors-address",
+            "moderators": "",
+            "withModeration": false,
+            "data": "{\"quorumSize\":\"20001\",\"voteDuration\":\"300\",\"majoritySize\":\"50001\"}"
+        },
+        {
+            "address": "maintain-association-filings-address",
+            "salt": "maintain-association-filings-salt",
+            "name": "Maintain association filings",
+            "description": "The president archives association declarations, receipts and administrative evidence.",
+            "typeName": "nomination",
+            "deciders": "president-address",
+            "proposers": "president-address",
+            "moderators": "",
+            "withModeration": false,
+            "data": "{}"
+        },
+        {
+            "address": "make-a-payment-address",
+            "salt": "make-a-payment-salt",
+            "name": "Make a payment",
+            "description": "The treasurer authorises an outbound payment under the president's moderation.",
+            "typeName": "nomination",
+            "deciders": "treasurer-address",
+            "proposers": "treasurer-address",
+            "moderators": "president-address",
+            "withModeration": true,
+            "data": "{}"
         }
     ],
-    "assets": [
-        {
-            "salt": "shares-salt",
-            "address": "shares-address",
-            "name": "Shares",
-            "symbol": "SHR"
-        }
-    ]
+    "assets": []
 }

@@ -3,7 +3,7 @@ import { Procedure } from '../procedure';
 import { handleJsonBigInt } from '../utils';
 import { getDeployment } from '../deployments';
 import { tryMulticall } from '../multicall';
-import { getProcedureTypes } from './utils';
+import { getProcedureType } from './utils';
 import { decodeFunctionResult, encodeFunctionData, zeroAddress } from 'viem';
 import { createContractWriteTransaction, getContractInstance, getWalletAccount } from '../contracts';
 const normalizeElection = (election, proposalKey) => ({
@@ -12,6 +12,20 @@ const normalizeElection = (election, proposalKey) => ({
     votesCount: (election.votesCount ?? election[2]).toString(),
     hasVoted: Boolean(election.hasVoted ?? election[1])
 });
+const normalizeElectionResults = (results) => ({
+    approvals: (results.approvals ?? results[0]).toString(),
+    objections: (results.objections ?? results[1]).toString(),
+    eligibleVotes: (results.eligibleVotes ?? results[2]).toString()
+});
+// viem normally returns block timestamps as bigint, but custom/local RPC
+// clients can return a number. Keep every timestamp comparison in bigint
+// space so an election load never mixes the two numeric representations.
+const asBigInt = (value) => {
+    if (typeof value === 'bigint' || typeof value === 'number' || typeof value === 'string') {
+        return BigInt(value);
+    }
+    throw new Error('Invalid on-chain numeric value.');
+};
 export class VoteProcedure extends Procedure {
     static INTERFACE = '0xc9d27afe';
     contract;
@@ -29,7 +43,7 @@ export class VoteProcedure extends Procedure {
         this.voteDuration = voteDuration;
         this.majoritySize = majoritySize;
         this.elections = elections;
-        this.type = getProcedureTypes(this.chainId).vote;
+        this.type = getProcedureType(this.chainId, 'vote');
         this.contract =
             this.publicClient != null
                 ? getContractInstance({
@@ -41,9 +55,6 @@ export class VoteProcedure extends Procedure {
                 : undefined;
     }
     static async _populateInitialize(input, clients) {
-        if (clients.walletClient == null) {
-            throw new Error('Wallet client not connected.');
-        }
         const [quorumSize, voteDuration, majoritySize] = input.args;
         if (!quorumSize || !voteDuration || !majoritySize) {
             throw new Error('Missing some required election parameters. Received:' +
@@ -68,7 +79,7 @@ export class VoteProcedure extends Procedure {
             })
         };
     }
-    static async loadElection(address, proposalKey, clients, voteDuration, contract) {
+    static async loadElection(address, proposalKey, clients, voteDuration, contract, blockTimestamp) {
         const procedureContract = contract ??
             getContractInstance({
                 address,
@@ -83,10 +94,17 @@ export class VoteProcedure extends Procedure {
         if (!normalizedElection.start || normalizedElection.start === '0') {
             throw new Error('Election not found.');
         }
-        const currentVoteDuration = voteDuration ?? (await procedureContract.read.voteDuration());
-        const hasEnded = Number(currentVoteDuration) + parseInt(normalizedElection.start) <
-            Date.now() / 1000;
+        const currentVoteDuration = asBigInt(voteDuration ?? (await procedureContract.read.voteDuration()));
+        const currentBlockTimestamp = asBigInt(blockTimestamp ?? (await clients.publicClient.getBlock()).timestamp);
+        const hasEnded = currentVoteDuration + BigInt(normalizedElection.start) <=
+            currentBlockTimestamp;
         let approved;
+        const results = await procedureContract.read
+            .getElectionResults([BigInt(proposalKey)])
+            .then(normalizeElectionResults)
+            // Read-only results were introduced after the initial vote contract.
+            // Keep older deployments usable while exposing the split when present.
+            .catch(() => undefined);
         try {
             approved = hasEnded
                 ? normalizedElection.votesCount !== '0'
@@ -96,11 +114,12 @@ export class VoteProcedure extends Procedure {
         }
         catch (error) {
             console.warn('Error while counting votes.', address, proposalKey, error);
-            approved = false;
+            approved = undefined;
         }
         return {
             ...normalizedElection,
-            approved: Boolean(approved)
+            ...(results ?? {}),
+            ...(approved == null ? {} : { approved })
         };
     }
     static async loadElections(address, clients, proposalsLength) {
@@ -112,7 +131,8 @@ export class VoteProcedure extends Procedure {
             publicClient: clients.publicClient,
             walletClient: clients.walletClient
         });
-        const voteDuration = (await contract.read.voteDuration());
+        const voteDuration = asBigInt(await contract.read.voteDuration());
+        const currentBlockTimestamp = asBigInt((await clients.publicClient.getBlock()).timestamp);
         const multicallElections = await tryMulticall(clients, Array.from({ length: totalProposals }).map((_, index) => ({
             target: address,
             callData: encodeFunctionData({
@@ -127,9 +147,27 @@ export class VoteProcedure extends Procedure {
             }), index.toString())
         })));
         if (multicallElections != null) {
+            const electionsWithResults = multicallElections.filter((election) => election != null && election.start !== '0');
+            const multicallResults = await tryMulticall(clients, electionsWithResults.map(election => ({
+                target: address,
+                callData: encodeFunctionData({
+                    abi: VoteProcedureContractABI.abi,
+                    functionName: 'getElectionResults',
+                    args: [BigInt(election.proposalKey)]
+                }),
+                decode: returnData => normalizeElectionResults(decodeFunctionResult({
+                    abi: VoteProcedureContractABI.abi,
+                    functionName: 'getElectionResults',
+                    data: returnData
+                }))
+            })));
+            const resultsByProposalKey = new Map(electionsWithResults.map((election, index) => [
+                election.proposalKey,
+                multicallResults?.[index] ?? undefined
+            ]));
             const electionsToCount = multicallElections.filter(election => election != null &&
                 election.start !== '0' &&
-                Number(voteDuration) + Number(election.start) < Date.now() / 1000 &&
+                voteDuration + BigInt(election.start) <= currentBlockTimestamp &&
                 election.votesCount !== '0');
             const countedResults = electionsToCount.length > 0
                 ? await tryMulticall(clients, electionsToCount.map(election => ({
@@ -148,18 +186,23 @@ export class VoteProcedure extends Procedure {
                 : [];
             const countedApprovals = new Map();
             electionsToCount.forEach((election, index) => {
-                countedApprovals.set(election.proposalKey, countedResults?.[index] != null ? Boolean(countedResults[index]) : false);
+                countedApprovals.set(election.proposalKey, countedResults?.[index] != null
+                    ? Boolean(countedResults[index])
+                    : undefined);
             });
             return multicallElections
                 .filter((election) => election != null && election.start !== '0')
                 .map(election => ({
                 ...election,
-                approved: countedApprovals.get(election.proposalKey) ?? false
+                ...(resultsByProposalKey.get(election.proposalKey) ?? {}),
+                ...(countedApprovals.get(election.proposalKey) == null
+                    ? {}
+                    : { approved: countedApprovals.get(election.proposalKey) })
             }));
         }
         return (await Promise.all(Array.from({ length: totalProposals }).map(async (_, index) => {
             const key = index.toString();
-            return await VoteProcedure.loadElection(address, key, clients, voteDuration, contract).catch((error) => {
+            return await VoteProcedure.loadElection(address, key, clients, voteDuration, contract, currentBlockTimestamp).catch((error) => {
                 console.warn('Error while loading election in vote procedure.', address, key, error.message);
                 return null;
             });
@@ -174,16 +217,17 @@ export class VoteProcedure extends Procedure {
             walletClient: clients.walletClient
         });
         const quorumSize = (await contract.read.quorumSize());
-        const voteDuration = (await contract.read.voteDuration());
+        const voteDuration = asBigInt(await contract.read.voteDuration());
         const majoritySize = (await contract.read.majoritySize());
         const elections = await VoteProcedure.loadElections(address, clients, procedure.proposals.length);
+        const currentBlockTimestamp = asBigInt((await clients.publicClient.getBlock()).timestamp);
         const proposals = procedure.proposals.map((proposal) => {
             if (!proposal.blocked && !proposal.applied && !proposal.adopted) {
                 const election = elections.find(candidate => candidate.proposalKey === proposal.key);
                 if (election?.start) {
                     proposal.blocked =
-                        !election.approved &&
-                            parseInt(election.start) + Number(voteDuration) <= Date.now() / 1000;
+                        election.approved === false &&
+                            BigInt(election.start) + voteDuration <= currentBlockTimestamp;
                 }
             }
             return proposal;

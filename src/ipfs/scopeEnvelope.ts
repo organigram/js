@@ -64,7 +64,8 @@ export const createScopeEnvelopeCheckpoint = (input: {
 
 export const formatCidRef = (
   scopeRef: ScopeEnvelopeReference,
-  logicalKey: string
+  logicalKey: string,
+  manifestCid?: string
 ): string => {
   if (scopeRef.scopeType !== 'workspace') {
     throw new Error('Only workspace scope references are supported.')
@@ -72,14 +73,18 @@ export const formatCidRef = (
   if (scopeRef.scopeId === '' || logicalKey === '') {
     throw new Error('scopeId and logicalKey are required to format a CID ref.')
   }
-  return `${CID_REF_PREFIX}${encodeURIComponent(scopeRef.scopeId)}/${encodeURIComponent(logicalKey)}`
+  const reference = `${CID_REF_PREFIX}${encodeURIComponent(scopeRef.scopeId)}/${encodeURIComponent(logicalKey)}`
+  return manifestCid == null || manifestCid === ''
+    ? reference
+    : `${reference}?version=${encodeURIComponent(manifestCid)}`
 }
 
 export const parseCidRef = (value?: string | null): ParsedCidRef | null => {
   if (value == null || !value.startsWith(CID_REF_PREFIX)) {
     return null
   }
-  const parts = value.slice(CID_REF_PREFIX.length).split('/')
+  const [path, query] = value.slice(CID_REF_PREFIX.length).split('?', 2)
+  const parts = path.split('/')
   if (parts.length < 2) {
     return null
   }
@@ -89,12 +94,14 @@ export const parseCidRef = (value?: string | null): ParsedCidRef | null => {
   if (scopeId === '' || logicalKey === '') {
     return null
   }
+  const manifestCid = new URLSearchParams(query).get('version') ?? undefined
   return {
     scopeRef: {
       scopeType: 'workspace',
       scopeId
     },
-    logicalKey
+    logicalKey,
+    ...(manifestCid != null && manifestCid !== '' ? { manifestCid } : {})
   }
 }
 

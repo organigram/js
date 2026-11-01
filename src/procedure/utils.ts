@@ -1,19 +1,24 @@
-import { OrganEntry } from '../organ'
+import type { OrganEntry } from '../organ'
 import {
   DeployOrganInput,
   DeployProceduresInput,
   TransactionOptions
 } from '../organigramClient'
+import { createRandom32BytesHexId, formatSalt } from '../utils'
 import {
-  createRandom32BytesHexId,
-  formatSalt
-} from '../utils'
-import { getDefaultChainId, getDeployment } from '../deployments'
+  getDefaultChainId,
+  getDeployment,
+  resolveDeployment
+} from '../deployments'
 import type { ContractClients } from '../contracts'
 import type { ProcedureType } from './index'
 import { encodeFunctionData, isAddress, padHex, toHex, zeroAddress } from 'viem'
 
-export type ProcedureTypeName = 'erc20Vote' | 'nomination' | 'vote'
+export type ProcedureTypeName =
+  | 'erc20Vote'
+  | 'nomination'
+  | 'vote'
+export type ERC20VoteRoleMode = 'organ' | 'token' | 'disabled'
 export enum ProcedureTypeNameEnum {
   erc20Vote = 'erc20Vote',
   nomination = 'nomination',
@@ -28,12 +33,55 @@ export interface PopulateInitializeInput {
   moderators: string
   deciders: string
   withModeration: boolean
+  proposerMode?: ERC20VoteRoleMode
+  moderatorMode?: ERC20VoteRoleMode
+  voterMode?: ERC20VoteRoleMode
+  requireMemberMajority?: boolean
   forwarder: string
   args: unknown[]
 }
 
 export type PopulatedTransactionData = {
   data: string
+}
+
+const normalizeOptionalAddress = (
+  value: string | null | undefined
+): string | undefined => {
+  const normalized = value?.trim()
+  return normalized == null || normalized === '' ? undefined : normalized
+}
+
+const normalizeOptionalString = (
+  value: string | null | undefined
+): string | undefined => {
+  const normalized = value?.trim()
+  return normalized == null || normalized === '' ? undefined : normalized
+}
+
+const getProcedureInitializationArgs = (
+  procedure: DeployProceduresInput,
+  parsedData: Record<string, unknown>
+): unknown[] => {
+  if (procedure.args != null) return procedure.args
+
+  switch (procedure.typeName) {
+    case 'erc20Vote':
+      return [
+        parsedData.erc20,
+        parsedData.quorumSize,
+        parsedData.voteDuration,
+        parsedData.majoritySize
+      ]
+    case 'vote':
+      return [
+        parsedData.quorumSize,
+        parsedData.voteDuration,
+        parsedData.majoritySize
+      ]
+    default:
+      return Object.values(parsedData)
+  }
 }
 
 const encodeDynamicFunctionData = encodeFunctionData as (parameters: {
@@ -55,8 +103,8 @@ export const electionFields = {
     name: 'voteDuration',
     label: 'Vote duration',
     description:
-      'Duration of the vote phase, as a number of seconds. Default: 3600 seconds (1 hour)',
-    defaultValue: '3600',
+      'Duration of the vote phase, as a number of seconds. Default: 300 seconds (5 minutes)',
+    defaultValue: '300',
     type: 'number'
   },
   majoritySize: {
@@ -78,15 +126,47 @@ export const procedureMetadata = {
 export const procedureTypeMetadata = {
   erc20Vote: {
     key: 'erc20Vote',
-      fields: {
-        ...electionFields,
-        erc20: {
-          name: 'erc20',
+    fields: {
+      ...electionFields,
+      erc20: {
+        name: 'erc20',
         label: 'ERC20Votes Token',
         description:
           'Address of the ERC20Votes-compatible token used for weighting the voting power.',
         defaultValue: '',
         type: 'string'
+      },
+      proposerMode: {
+        name: 'proposerMode',
+        label: 'Proposal creation rights',
+        description:
+          'Choose whether proposal creation is authorized by the source organ or by token holders.',
+        defaultValue: 'organ',
+        type: 'roleMode'
+      },
+      moderatorMode: {
+        name: 'moderatorMode',
+        label: 'Moderation rights',
+        description:
+          'Choose whether moderation is disabled, authorized by the source organ, or authorized by token holders.',
+        defaultValue: 'organ',
+        type: 'moderatorRoleMode'
+      },
+      voterMode: {
+        name: 'voterMode',
+        label: 'Voting rights',
+        description:
+          'Choose whether voting is authorized by the source organ or by token holders.',
+        defaultValue: 'organ',
+        type: 'roleMode'
+      },
+      requireMemberMajority: {
+        name: 'requireMemberMajority',
+        label: 'Member majority required',
+        description:
+          'When voters are members of an organ, require more than half of those members to approve in addition to the token-weighted vote.',
+        defaultValue: 'false',
+        type: 'boolean'
       }
     },
     metadata: {
@@ -126,21 +206,33 @@ const procedureTypeDeploymentNames = {
 const buildProcedureType = (
   chainId: string,
   typeName: ProcedureTypeName
-): ProcedureType => ({
-  ...procedureTypeMetadata[typeName],
-  address: getDeployment(chainId, procedureTypeDeploymentNames[typeName])
-})
+): ProcedureType | undefined => {
+  const address = resolveDeployment(
+    chainId,
+    procedureTypeDeploymentNames[typeName]
+  )
+  return address == null
+    ? undefined
+    : { ...procedureTypeMetadata[typeName], address }
+}
 
-export const getProcedureTypes = (chainId = getDefaultChainId()) => ({
-  erc20Vote: buildProcedureType(chainId, 'erc20Vote'),
-  nomination: buildProcedureType(chainId, 'nomination'),
-  vote: buildProcedureType(chainId, 'vote')
-})
+export const getProcedureTypes = (chainId = getDefaultChainId()) =>
+  Object.fromEntries(
+    (Object.keys(procedureTypeDeploymentNames) as ProcedureTypeName[]).flatMap(
+      typeName => {
+        const type = buildProcedureType(chainId, typeName)
+        return type == null ? [] : [[typeName, type]]
+      }
+    )
+  ) as Partial<Record<ProcedureTypeName, ProcedureType>>
 
 export const getProcedureType = (
   chainId: string,
   typeName: ProcedureTypeName
-): ProcedureType => getProcedureTypes(chainId)[typeName]
+): ProcedureType => ({
+  ...procedureTypeMetadata[typeName],
+  address: getDeployment(chainId, procedureTypeDeploymentNames[typeName])
+})
 
 export const procedureTypes = getProcedureTypes()
 
@@ -151,16 +243,32 @@ export const prepareDeployOrgansInput = (
     const permissionAddresses: string[] = []
     const permissionValues: string[] = []
     organ.permissions?.forEach(permission => {
-      permissionAddresses.push(permission.permissionAddress)
+      const permissionAddress = normalizeOptionalAddress(
+        permission.permissionAddress
+      )
+      if (permissionAddress == null) return
+
+      permissionAddresses.push(permissionAddress)
       permissionValues.push(
         padHex(toHex(permission.permissionValue), { size: 2 })
       )
     })
     const entries =
-      organ.entries?.map((entry: OrganEntry) => ({
-        addr: entry.address,
-        cid: entry.cid ?? ''
-      })) ?? []
+      organ.entries
+        ?.map((entry: OrganEntry) => {
+          const address = normalizeOptionalAddress(entry.address)
+          const cid = normalizeOptionalString(entry.cid)
+
+          if (address == null && cid == null) return null
+
+          return {
+            addr: address ?? zeroAddress,
+            cid: cid ?? ''
+          }
+        })
+        .filter(
+          (entry): entry is { addr: string; cid: string } => entry != null
+        ) ?? []
     return {
       permissionAddresses,
       permissionValues,
@@ -188,22 +296,42 @@ export const prepareDeployProceduresInput = async (
         )
       }
       const parsedData = procedure.data ? JSON.parse(procedure.data) : {}
-      const rawArgs = procedure.args ?? Object.values(parsedData)
+      const rawArgs = getProcedureInitializationArgs(procedure, parsedData)
+      const voterMode = procedure.voterMode ?? parsedData.voterMode
+      const requireMemberMajority =
+        procedure.requireMemberMajority ?? parsedData.requireMemberMajority ?? false
+      const deciders =
+        normalizeOptionalAddress(procedure.deciders) ??
+        (procedure.typeName === 'erc20Vote' && voterMode === 'token'
+          ? zeroAddress
+          : undefined)
+      if (deciders == null) {
+        throw new Error('Procedure deciders address is required.')
+      }
+      const proposers =
+        normalizeOptionalAddress(procedure.proposers) ?? deciders
+      const moderators =
+        normalizeOptionalAddress(procedure.moderators) ?? zeroAddress
+      const forwarder =
+        normalizeOptionalAddress(procedure.forwarder) ??
+        getDeployment(
+          procedure.chainId ?? getDefaultChainId(),
+          'MetaGasStation'
+        )
       const initialize = await populateInitializeProcedure(
         {
           typeName: procedure.typeName,
           options: procedure.options ?? {},
           cid: procedure.cid ?? '',
-          moderators: procedure.moderators ?? zeroAddress,
-          deciders: procedure.deciders,
-          proposers: procedure.proposers ?? procedure.deciders,
+          moderators,
+          deciders,
+          proposers,
           withModeration: procedure.withModeration ?? false,
-          forwarder:
-            procedure.forwarder ??
-            getDeployment(
-              procedure.chainId ?? getDefaultChainId(),
-              'MetaGasStation'
-            ),
+          proposerMode: procedure.proposerMode ?? parsedData.proposerMode,
+          moderatorMode: procedure.moderatorMode ?? parsedData.moderatorMode,
+          voterMode,
+          requireMemberMajority,
+          forwarder,
           args: rawArgs.map(arg =>
             typeof arg === 'string'
               ? isAddress(arg as `0x${string}`) || arg.startsWith('0x')
@@ -217,11 +345,10 @@ export const prepareDeployProceduresInput = async (
         clients
       )
       return {
-        procedureType:
-          getProcedureType(
-            procedure.chainId ?? getDefaultChainId(),
-            procedure.typeName
-          ).address,
+        procedureType: getProcedureType(
+          procedure.chainId ?? getDefaultChainId(),
+          procedure.typeName
+        ).address,
         data: initialize.data,
         salt: formatSalt(procedure.salt),
         options: procedure.options
@@ -256,9 +383,6 @@ export const populateInitializeProcedure = async (
   input: PopulateInitializeInput,
   clients: ContractClients
 ): Promise<PopulatedTransactionData> => {
-  if (clients.walletClient == null) {
-    throw new Error('Wallet client not connected.')
-  }
   const procedureClass = await getProcedureClass(input.typeName!)
   try {
     return await procedureClass._populateInitialize(input, clients)

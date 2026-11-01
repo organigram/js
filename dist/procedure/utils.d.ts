@@ -2,6 +2,7 @@ import { DeployOrganInput, DeployProceduresInput, TransactionOptions } from '../
 import type { ContractClients } from '../contracts';
 import type { ProcedureType } from './index';
 export type ProcedureTypeName = 'erc20Vote' | 'nomination' | 'vote';
+export type ERC20VoteRoleMode = 'organ' | 'token' | 'disabled';
 export declare enum ProcedureTypeNameEnum {
     erc20Vote = "erc20Vote",
     nomination = "nomination",
@@ -15,6 +16,10 @@ export interface PopulateInitializeInput {
     moderators: string;
     deciders: string;
     withModeration: boolean;
+    proposerMode?: ERC20VoteRoleMode;
+    moderatorMode?: ERC20VoteRoleMode;
+    voterMode?: ERC20VoteRoleMode;
+    requireMemberMajority?: boolean;
     forwarder: string;
     args: unknown[];
 }
@@ -59,6 +64,34 @@ export declare const procedureTypeMetadata: {
                 readonly description: "Address of the ERC20Votes-compatible token used for weighting the voting power.";
                 readonly defaultValue: "";
                 readonly type: "string";
+            };
+            readonly proposerMode: {
+                readonly name: "proposerMode";
+                readonly label: "Proposal creation rights";
+                readonly description: "Choose whether proposal creation is authorized by the source organ or by token holders.";
+                readonly defaultValue: "organ";
+                readonly type: "roleMode";
+            };
+            readonly moderatorMode: {
+                readonly name: "moderatorMode";
+                readonly label: "Moderation rights";
+                readonly description: "Choose whether moderation is disabled, authorized by the source organ, or authorized by token holders.";
+                readonly defaultValue: "organ";
+                readonly type: "moderatorRoleMode";
+            };
+            readonly voterMode: {
+                readonly name: "voterMode";
+                readonly label: "Voting rights";
+                readonly description: "Choose whether voting is authorized by the source organ or by token holders.";
+                readonly defaultValue: "organ";
+                readonly type: "roleMode";
+            };
+            readonly requireMemberMajority: {
+                readonly name: "requireMemberMajority";
+                readonly label: "Member majority required";
+                readonly description: "When voters are members of an organ, require more than half of those members to approve in addition to the token-weighted vote.";
+                readonly defaultValue: "false";
+                readonly type: "boolean";
             };
             readonly quorumSize: {
                 name: string;
@@ -130,17 +163,9 @@ export declare const procedureTypeMetadata: {
         };
     };
 };
-export declare const getProcedureTypes: (chainId?: string) => {
-    erc20Vote: ProcedureType;
-    nomination: ProcedureType;
-    vote: ProcedureType;
-};
+export declare const getProcedureTypes: (chainId?: string) => Partial<Record<ProcedureTypeName, ProcedureType>>;
 export declare const getProcedureType: (chainId: string, typeName: ProcedureTypeName) => ProcedureType;
-export declare const procedureTypes: {
-    erc20Vote: ProcedureType;
-    nomination: ProcedureType;
-    vote: ProcedureType;
-};
+export declare const procedureTypes: Partial<Record<ProcedureTypeName, ProcedureType>>;
 export declare const prepareDeployOrgansInput: (deployOrgansInput: DeployOrganInput[]) => {
     permissionAddresses: string[];
     permissionValues: string[];
@@ -157,6 +182,6 @@ export declare const prepareDeployProceduresInput: (deployProceduresInput: Deplo
     salt: string;
     options: TransactionOptions | undefined;
 }[]>;
-export declare const getProcedureClass: (typeName: string) => Promise<typeof import("./vote").VoteProcedure | typeof import("./erc20Vote").ERC20VoteProcedure | typeof import("./nomination").NominationProcedure>;
+export declare const getProcedureClass: (typeName: string) => Promise<typeof import("./erc20Vote").ERC20VoteProcedure | typeof import("./vote").VoteProcedure | typeof import("./nomination").NominationProcedure>;
 export declare const populateInitializeProcedure: (input: PopulateInitializeInput, clients: ContractClients) => Promise<PopulatedTransactionData>;
 export declare const encodeProcedureInitialization: (abi: unknown, functionName: string, args: unknown[]) => PopulatedTransactionData;

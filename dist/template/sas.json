@@ -1,0 +1,161 @@
+{
+    "name": "Société par Actions Simplifiée",
+    "description": "French SAS template covering governance, statutory registers and equity. It must be tailored to the bylaws and the company's actual obligations.",
+    "organs": [
+        {
+            "address": "chairman-address",
+            "permissions": [
+                { "permissionValue": 12, "permissionAddress": "elect-chairman-address" },
+                { "permissionValue": 19, "permissionAddress": "amend-bylaws-address" }
+            ],
+            "name": "Chairman",
+            "salt": "chairman-salt",
+            "entries": []
+        },
+        {
+            "address": "bylaws-address",
+            "permissions": [
+                { "permissionValue": 23, "permissionAddress": "amend-bylaws-address" }
+            ],
+            "name": "Bylaws",
+            "description": "Append-only history of the versions of the bylaws adopted by the shareholders.",
+            "salt": "bylaws-salt",
+            "entries": []
+        },
+        {
+            "address": "meeting-minutes-address",
+            "permissions": [
+                { "permissionValue": 4, "permissionAddress": "elect-chairman-address" },
+                { "permissionValue": 7, "permissionAddress": "amend-bylaws-address" },
+                { "permissionValue": 4, "permissionAddress": "shareholders-meeting-address" }
+            ],
+            "name": "Résolutions de l’assemblée générale",
+            "description": "Append-only register of each shareholder decision and its recorded result, separate from the signed minutes.",
+            "salt": "meeting-minutes-salt",
+            "entries": []
+        },
+        {
+            "address": "sas-general-meeting-minutes-register",
+            "salt": "sas-general-meeting-minutes-register",
+            "name": "Procès-verbaux d’assemblée générale",
+            "description": "Append-only register of final signed general-meeting minutes, maintained only by the Chairman.",
+            "permissions": [
+                { "permissionValue": 4, "permissionAddress": "sas-archive-meeting-minutes-procedure" },
+                { "permissionValue": 3, "permissionAddress": "amend-bylaws-address" }
+            ],
+            "entries": []
+        },
+        {
+            "address": "financial-statements-address",
+            "salt": "financial-statements-salt",
+            "name": "Financial statements",
+            "description": "Append-only register of the annual financial statements approved by the shareholders.",
+            "permissions": [
+                { "permissionValue": 4, "permissionAddress": "shareholders-meeting-address" },
+                { "permissionValue": 3, "permissionAddress": "amend-bylaws-address" }
+            ],
+            "entries": []
+        },
+        {
+            "address": "payments-address",
+            "salt": "payments-salt",
+            "name": "Payments",
+            "description": "Assets and token balances available for payments approved through the payment procedure.",
+            "permissions": [
+                { "permissionValue": 1348, "permissionAddress": "set-executive-compensation-address" },
+                { "permissionValue": 3, "permissionAddress": "amend-bylaws-address" }
+            ],
+            "entries": []
+        }
+    ],
+    "assets": [
+        {
+            "address": "shares-address",
+            "description": "Equity of the company.",
+            "salt": "shares-salt",
+            "name": "Shares",
+            "symbol": "EQT",
+            "image": null,
+            "initialSupply": 10000000,
+            "organigrams": [],
+            "isReferencedIn": [],
+            "kind": "equity",
+            "decisionProcedure": "register-share-transfer-address"
+        }
+    ],
+    "procedures": [
+        {
+            "address": "elect-chairman-address",
+            "salt": "elect-chairman-salt",
+            "name": "Elect chairman",
+            "description": "Shareholders appoint or revoke the Chairman under the bylaws.",
+            "typeName": "erc20Vote",
+            "deciders": "",
+            "proposers": "",
+            "moderators": "chairman-address",
+            "withModeration": true,
+            "data": "{\"erc20\":\"shares-address\",\"quorumSize\":\"20001\",\"voteDuration\":\"300\",\"majoritySize\":\"100000\",\"voterMode\":\"token\",\"proposerMode\":\"token\",\"moderatorMode\":\"organ\"}"
+        },
+        {
+            "address": "set-executive-compensation-address",
+            "salt": "set-executive-compensation-salt",
+            "name": "Make a payment",
+            "description": "The Chairman approves payments from the Payments organ.",
+            "typeName": "nomination",
+            "deciders": "chairman-address",
+            "proposers": "chairman-address",
+            "moderators": "",
+            "withModeration": false,
+            "data": "{}"
+        },
+        {
+            "address": "register-share-transfer-address",
+            "salt": "register-share-transfer-salt",
+            "name": "Approve share transfer",
+            "description": "The Chairman approves a holder-initiated share transfer when the bylaws require approval, and the share token records the movement.",
+            "cid": "nomination",
+            "typeName": "nomination",
+            "deciders": "chairman-address",
+            "proposers": "",
+            "moderators": "",
+            "withModeration": false,
+            "data": "{}"
+        },
+        {
+            "address": "amend-bylaws-address",
+            "salt": "amend-bylaws-salt",
+            "name": "Amend bylaws",
+            "description": "Shareholders adopt an amendment to the bylaws under the majority specified in the bylaws.",
+            "typeName": "erc20Vote",
+            "deciders": "",
+            "proposers": "chairman-address",
+            "moderators": "chairman-address",
+            "withModeration": true,
+            "data": "{\"erc20\":\"shares-address\",\"quorumSize\":\"20001\",\"voteDuration\":\"300\",\"majoritySize\":\"100000\",\"voterMode\":\"token\",\"proposerMode\":\"organ\",\"moderatorMode\":\"organ\"}"
+        },
+        {
+            "address": "shareholders-meeting-address",
+            "salt": "shareholders-meeting-salt",
+            "name": "Adopt a resolution",
+            "description": "Shareholders adopt a collective resolution when the bylaws reserve the decision to them.",
+            "typeName": "erc20Vote",
+            "deciders": "",
+            "proposers": "chairman-address",
+            "moderators": "chairman-address",
+            "withModeration": true,
+            "data": "{\"erc20\":\"shares-address\",\"quorumSize\":\"20001\",\"voteDuration\":\"300\",\"majoritySize\":\"50001\",\"voterMode\":\"token\",\"proposerMode\":\"organ\",\"moderatorMode\":\"organ\"}"
+        },
+        {
+            "address": "sas-archive-meeting-minutes-procedure",
+            "salt": "sas-archive-meeting-minutes-procedure",
+            "name": "Archive meeting minutes",
+            "description": "The Chairman appends the final signed meeting minutes to the append-only minutes register.",
+            "typeName": "nomination",
+            "deciders": "chairman-address",
+            "proposers": "chairman-address",
+            "moderators": "",
+            "withModeration": false,
+            "data": "{}"
+        }
+    ]
+}

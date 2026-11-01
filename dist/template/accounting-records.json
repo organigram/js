@@ -1,0 +1,61 @@
+{
+    "name": "Accounting records",
+    "description": "Standalone accounting registers. Adapt the contents and retention rules to the organisation's accounting obligations.",
+    "organs": [
+        {
+            "address": "accounting-records-manager-address",
+            "salt": "accounting-records-manager-salt",
+            "name": "Président",
+            "entries": [],
+            "permissions": []
+        },
+        {
+            "address": "general-journal-address",
+            "salt": "general-journal-salt",
+            "name": "General journal",
+            "entries": [],
+            "permissions": [{ "permissionAddress": "maintain-accounting-records-address", "permissionValue": 4 }]
+        },
+        {
+            "address": "general-ledger-address",
+            "salt": "general-ledger-salt",
+            "name": "General ledger",
+            "entries": [],
+            "permissions": [{ "permissionAddress": "maintain-accounting-records-address", "permissionValue": 4 }]
+        },
+        {
+            "address": "annual-inventory-address",
+            "salt": "annual-inventory-salt",
+            "name": "Annual inventory",
+            "entries": [],
+            "permissions": [{ "permissionAddress": "maintain-accounting-records-address", "permissionValue": 4 }]
+        },
+        {
+            "address": "accounting-procedures-manual-address",
+            "salt": "accounting-procedures-manual-salt",
+            "name": "Accounting procedures manual",
+            "entries": [],
+            "permissions": [{ "permissionAddress": "maintain-accounting-records-address", "permissionValue": 4 }]
+        },
+        {
+            "address": "accounting-supporting-documents-address",
+            "salt": "accounting-supporting-documents-salt",
+            "name": "Accounting supporting documents",
+            "entries": [],
+            "permissions": [{ "permissionAddress": "maintain-accounting-records-address", "permissionValue": 4 }]
+        }
+    ],
+    "procedures": [
+        {
+            "address": "maintain-accounting-records-address",
+            "salt": "maintain-accounting-records-salt",
+            "name": "Maintain accounting records",
+            "typeName": "nomination",
+            "deciders": "accounting-records-manager-address",
+            "proposers": "accounting-records-manager-address",
+            "withModeration": false,
+            "data": "{}"
+        }
+    ],
+    "assets": []
+}

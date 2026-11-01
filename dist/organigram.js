@@ -141,9 +141,12 @@ export class Organigram {
         if (!this.organigramClient) {
             throw new Error('Organigram client not set.');
         }
-        return await this.organigramClient
-            .deployOrganigram(this)
-            .then(async () => await this.load());
+        const deployment = await this.organigramClient.deployOrganigram(this);
+        const deployedOrganigram = deployment.organigram;
+        this.setOrgans(deployedOrganigram.organs);
+        this.setAssets(deployedOrganigram.assets);
+        this.setProcedures(deployedOrganigram.procedures);
+        return await this.load();
     }
     /**
      * Convert the organigram into a JSON-safe structure suitable for persistence or transport.

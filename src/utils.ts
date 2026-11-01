@@ -29,6 +29,7 @@ export {
 export type ContractName =
   | 'Organ'
   | 'Asset'
+  | 'EquityToken'
   | 'ERC20VoteProcedure'
   | 'VoteProcedure'
   | 'NominationProcedure'
@@ -74,6 +75,8 @@ export const predictContractAddress = ({
         ? getDeployment(chainId, 'CloneableOrgan')
         : type === 'Asset'
           ? getDeployment(chainId, 'CloneableAsset')
+          : type === 'EquityToken'
+            ? getDeployment(chainId, 'EquityToken')
           : getDeployment(chainId, type.replace('Erc', 'ERC') as ContractName)
     ) as `0x${string}`
   })

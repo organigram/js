@@ -26,7 +26,9 @@ export const predictContractAddress = ({ type, chainId, salt }) => {
             ? getDeployment(chainId, 'CloneableOrgan')
             : type === 'Asset'
                 ? getDeployment(chainId, 'CloneableAsset')
-                : getDeployment(chainId, type.replace('Erc', 'ERC')))
+                : type === 'EquityToken'
+                    ? getDeployment(chainId, 'EquityToken')
+                    : getDeployment(chainId, type.replace('Erc', 'ERC')))
     });
 };
 export const createRandom32BytesHexId = () => bytesToHex(crypto.getRandomValues(new Uint8Array(32)));

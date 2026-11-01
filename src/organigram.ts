@@ -243,9 +243,13 @@ export class Organigram {
     if (!this.organigramClient) {
       throw new Error('Organigram client not set.')
     }
-    return await this.organigramClient
-      .deployOrganigram(this)
-      .then(async () => await this.load())
+    const deployment = await this.organigramClient.deployOrganigram(this)
+    const deployedOrganigram = deployment.organigram
+    this.setOrgans(deployedOrganigram.organs as Organ[])
+    this.setAssets(deployedOrganigram.assets as Asset[])
+    this.setProcedures(deployedOrganigram.procedures as Procedure[])
+
+    return await this.load()
   }
 
   /**

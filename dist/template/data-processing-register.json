@@ -1,0 +1,33 @@
+{
+    "name": "Data processing register",
+    "description": "Standalone record of processing activities. Adapt it to the organisation's actual processing activities and privacy obligations.",
+    "organs": [
+        {
+            "address": "data-protection-officer-address",
+            "salt": "data-protection-officer-salt",
+            "name": "Président",
+            "entries": [],
+            "permissions": []
+        },
+        {
+            "address": "data-processing-register-address",
+            "salt": "data-processing-register-salt",
+            "name": "Data processing register",
+            "entries": [],
+            "permissions": [{ "permissionAddress": "maintain-data-processing-register-address", "permissionValue": 4 }]
+        }
+    ],
+    "procedures": [
+        {
+            "address": "maintain-data-processing-register-address",
+            "salt": "maintain-data-processing-register-salt",
+            "name": "Maintain data processing register",
+            "typeName": "nomination",
+            "deciders": "data-protection-officer-address",
+            "proposers": "data-protection-officer-address",
+            "withModeration": false,
+            "data": "{}"
+        }
+    ],
+    "assets": []
+}

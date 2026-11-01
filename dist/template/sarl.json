@@ -1,0 +1,182 @@
+{
+    "name": "SARL / EURL",
+    "description": "French SARL/EURL template covering the manager, associate decisions, statutory registers and registered company units. It must be tailored to the bylaws, the date of incorporation and the company's actual obligations.",
+    "organs": [
+        {
+            "address": "managers-address",
+            "salt": "managers-salt",
+            "name": "Managers",
+            "description": "The manager or managers who represent the SARL or EURL.",
+            "permissions": [
+                { "permissionValue": 12, "permissionAddress": "appoint-managers-address" },
+                { "permissionValue": 3, "permissionAddress": "amend-bylaws-address" }
+            ],
+            "entries": []
+        },
+        {
+            "address": "shareholders-address",
+            "salt": "shareholders-salt",
+            "name": "Shareholders",
+            "description": "Verified associates entitled to take part in associate decisions. Keep this organ aligned with the registered-unit ledger.",
+            "permissions": [
+                { "permissionValue": 12, "permissionAddress": "maintain-shareholder-register-address" }
+            ],
+            "entries": []
+        },
+        {
+            "address": "bylaws-address",
+            "salt": "bylaws-salt",
+            "name": "Bylaws",
+            "description": "Append-only history of the versions of the bylaws adopted by the associates or the sole shareholder.",
+            "permissions": [
+                { "permissionValue": 23, "permissionAddress": "amend-bylaws-address" }
+            ],
+            "entries": []
+        },
+        {
+            "address": "shareholder-decisions-address",
+            "salt": "shareholder-decisions-salt",
+            "name": "Résolutions de l’assemblée générale",
+            "description": "Append-only register of each general-meeting decision and its recorded result, separate from the signed minutes.",
+            "permissions": [
+                { "permissionValue": 4, "permissionAddress": "appoint-managers-address" },
+                { "permissionValue": 7, "permissionAddress": "amend-bylaws-address" },
+                { "permissionValue": 4, "permissionAddress": "record-shareholder-decision-address" },
+                { "permissionValue": 4, "permissionAddress": "approve-unit-transfer-address" }
+            ],
+            "entries": []
+        },
+        {
+            "address": "sarl-general-meeting-minutes-register",
+            "salt": "sarl-general-meeting-minutes-register",
+            "name": "Procès-verbaux d’assemblée générale",
+            "description": "Append-only register of final signed general-meeting minutes, maintained only by the Managers.",
+            "permissions": [
+                { "permissionValue": 4, "permissionAddress": "sarl-archive-meeting-minutes-procedure" },
+                { "permissionValue": 3, "permissionAddress": "amend-bylaws-address" }
+            ],
+            "entries": []
+        },
+        {
+            "address": "financial-statements-address",
+            "salt": "financial-statements-salt",
+            "name": "Financial statements",
+            "description": "Append-only register of the annual financial statements approved by the associates.",
+            "permissions": [
+                { "permissionValue": 4, "permissionAddress": "record-shareholder-decision-address" },
+                { "permissionValue": 3, "permissionAddress": "amend-bylaws-address" }
+            ],
+            "entries": []
+        },
+        {
+            "address": "payments-address",
+            "salt": "payments-salt",
+            "name": "Payments",
+            "description": "Assets and token balances available for payments approved through the payment procedure.",
+            "permissions": [
+                { "permissionValue": 1348, "permissionAddress": "set-executive-compensation-address" },
+                { "permissionValue": 3, "permissionAddress": "amend-bylaws-address" }
+            ],
+            "entries": []
+        }
+    ],
+    "assets": [
+        {
+            "address": "units-address",
+            "salt": "units-salt",
+            "name": "Company units",
+            "symbol": "UNT",
+            "description": "Registered company units of the SARL or EURL.",
+            "initialSupply": 10000000,
+            "kind": "equity",
+            "decisionProcedure": "approve-unit-transfer-address"
+        }
+    ],
+    "procedures": [
+        {
+            "address": "appoint-managers-address",
+            "salt": "appoint-managers-salt",
+            "name": "Appoint managers",
+            "description": "Associates appoint or revoke the manager or managers under the applicable statutory majority.",
+            "typeName": "erc20Vote",
+            "deciders": "",
+            "proposers": "",
+            "moderators": "managers-address",
+            "withModeration": true,
+            "data": "{\"erc20\":\"units-address\",\"quorumSize\":\"50001\",\"voteDuration\":\"300\",\"majoritySize\":\"50001\",\"voterMode\":\"token\",\"proposerMode\":\"token\",\"moderatorMode\":\"organ\"}"
+        },
+        {
+            "address": "maintain-shareholder-register-address",
+            "salt": "maintain-shareholder-register-salt",
+            "name": "Maintain shareholder register",
+            "description": "Managers keep the associate organ aligned with verified registered-unit holders after a transfer or other capital event.",
+            "typeName": "nomination",
+            "cid": "nomination",
+            "deciders": "managers-address",
+            "proposers": "managers-address",
+            "moderators": "",
+            "withModeration": false,
+            "data": "{}"
+        },
+        {
+            "address": "set-executive-compensation-address",
+            "salt": "set-executive-compensation-salt",
+            "name": "Make a payment",
+            "description": "The manager or managers approve payments from the Payments organ.",
+            "typeName": "nomination",
+            "deciders": "managers-address",
+            "proposers": "managers-address",
+            "moderators": "",
+            "withModeration": false,
+            "data": "{}"
+        },
+        {
+            "address": "approve-unit-transfer-address",
+            "salt": "approve-unit-transfer-salt",
+            "name": "Approve unit transfer",
+            "description": "Associates vote with unit weight; a majority of associate members must also approve. Configure or remove this gate when the transfer is freely permitted by law or the bylaws.",
+            "typeName": "erc20Vote",
+            "deciders": "shareholders-address",
+            "proposers": "",
+            "moderators": "managers-address",
+            "withModeration": true,
+            "data": "{\"erc20\":\"units-address\",\"quorumSize\":\"50001\",\"voteDuration\":\"300\",\"majoritySize\":\"50001\",\"proposerMode\":\"token\",\"moderatorMode\":\"organ\",\"voterMode\":\"organ\",\"requireMemberMajority\":true}"
+        },
+        {
+            "address": "amend-bylaws-address",
+            "salt": "amend-bylaws-salt",
+            "name": "Amend bylaws",
+            "description": "Associates adopt a bylaws amendment using the statutory majority applicable to the company and its incorporation date.",
+            "typeName": "erc20Vote",
+            "deciders": "shareholders-address",
+            "proposers": "managers-address",
+            "moderators": "managers-address",
+            "withModeration": true,
+            "data": "{\"erc20\":\"units-address\",\"quorumSize\":\"50001\",\"voteDuration\":\"300\",\"majoritySize\":\"75001\",\"proposerMode\":\"organ\",\"moderatorMode\":\"organ\",\"voterMode\":\"organ\"}"
+        },
+        {
+            "address": "record-shareholder-decision-address",
+            "salt": "record-shareholder-decision-salt",
+            "name": "Record shareholder decision",
+            "description": "Associates record a general-meeting decision that does not belong to a more specific procedure.",
+            "typeName": "erc20Vote",
+            "deciders": "shareholders-address",
+            "proposers": "managers-address",
+            "moderators": "managers-address",
+            "withModeration": true,
+            "data": "{\"erc20\":\"units-address\",\"quorumSize\":\"50001\",\"voteDuration\":\"300\",\"majoritySize\":\"50001\",\"proposerMode\":\"organ\",\"moderatorMode\":\"organ\",\"voterMode\":\"organ\"}"
+        },
+        {
+            "address": "sarl-archive-meeting-minutes-procedure",
+            "salt": "sarl-archive-meeting-minutes-procedure",
+            "name": "Archive meeting minutes",
+            "description": "Managers append the final signed meeting minutes to the append-only minutes register.",
+            "typeName": "nomination",
+            "deciders": "managers-address",
+            "proposers": "managers-address",
+            "moderators": "",
+            "withModeration": false,
+            "data": "{}"
+        }
+    ]
+}

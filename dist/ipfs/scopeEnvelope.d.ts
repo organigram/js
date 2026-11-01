@@ -6,7 +6,7 @@ export declare const createScopeEnvelopeCheckpoint: (input: {
     membershipHash: string;
     rootHash: string;
 }) => ScopeEnvelopeCheckpoint;
-export declare const formatCidRef: (scopeRef: ScopeEnvelopeReference, logicalKey: string) => string;
+export declare const formatCidRef: (scopeRef: ScopeEnvelopeReference, logicalKey: string, manifestCid?: string) => string;
 export declare const parseCidRef: (value?: string | null) => ParsedCidRef | null;
 export declare const isCidRef: (value?: string | null) => boolean;
 export declare const createScopeEnvelopeItem: (input: {
