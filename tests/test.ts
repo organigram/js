@@ -53,7 +53,8 @@ describe('Organigram JS Client', () => {
     // ipfs = await loadIpfs()
     publicClient = createPublicClient({
       chain: anvil,
-      transport: http('http://127.0.0.1:8545/')
+      transport: http('http://127.0.0.1:8545/'),
+      pollingInterval: 100
     })
     walletClient = createWalletClient({
       chain: anvil,
@@ -318,7 +319,12 @@ describe('Organigram JS Client', () => {
       const settlementData = encodeFunctionData({
         abi: ProcedureContractABI.abi,
         functionName: 'transferEquity',
-        args: [tokenAddress as Address, buyer, 25n, 'movement-supporting-record']
+        args: [
+          tokenAddress as Address,
+          buyer,
+          25n,
+          'movement-supporting-record'
+        ]
       })
       const proposalHash = await transfer.write.propose(
         [
@@ -537,8 +543,7 @@ describe('Organigram JS Client', () => {
       })
 
       it('should approve a proposal', async () => {
-        const nominated = await procedure.nominate(proposalKey)
-        expect(nominated).toBe(true)
+        await expect(procedure.nominate(proposalKey)).resolves.toBeUndefined()
       })
 
       it('should reload an organ with newly approved entries', async () => {

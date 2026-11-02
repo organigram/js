@@ -21,7 +21,7 @@ export declare class VoteProcedure extends Procedure {
     static loadElection(address: string, proposalKey: string, clients: ContractClients, voteDuration?: bigint, contract?: any, blockTimestamp?: bigint): Promise<Election>;
     static loadElections(address: string, clients: ContractClients, proposalsLength?: number): Promise<Election[]>;
     static load(address: string, clients: ContractClients, initialProcedure?: ProcedureInput): Promise<VoteProcedure>;
-    vote(proposalKey: string, approval: boolean, options?: TransactionOptions): Promise<boolean>;
+    vote(proposalKey: string, approval: boolean, options?: TransactionOptions): Promise<void>;
     signVote(input: {
         proposalKey: string;
         approval: boolean;
@@ -34,7 +34,7 @@ export declare class VoteProcedure extends Procedure {
         nonce: bigint;
         deadline: bigint | number;
         signature: string;
-    }): Promise<boolean>;
+    }): Promise<void>;
     count(proposalKey: string): Promise<boolean>;
     toJson: () => ProcedureJson;
 }

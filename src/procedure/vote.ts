@@ -395,7 +395,7 @@ export class VoteProcedure extends Procedure {
     proposalKey: string,
     approval: boolean,
     options?: TransactionOptions
-  ): Promise<boolean> {
+  ): Promise<void> {
     const tx = await createContractWriteTransaction({
       address: this.address,
       abi: VoteProcedureContractABI.abi,
@@ -408,8 +408,7 @@ export class VoteProcedure extends Procedure {
       throw error
     })
     options?.onTransaction?.(tx, 'Initialize Nomination procedure.')
-    const receipt = await tx.wait()
-    return receipt.status === 'success'
+    await tx.wait()
   }
 
   async signVote(input: {
@@ -449,7 +448,7 @@ export class VoteProcedure extends Procedure {
     nonce: bigint
     deadline: bigint | number
     signature: string
-  }): Promise<boolean> {
+  }): Promise<void> {
     const tx = await createContractWriteTransaction({
       address: this.address,
       abi: VoteProcedureContractABI.abi,
@@ -463,8 +462,7 @@ export class VoteProcedure extends Procedure {
       ],
       clients: this.getClients()
     })
-    const receipt = await tx.wait()
-    return receipt.status === 'success'
+    await tx.wait()
   }
 
   async count(proposalKey: string): Promise<boolean> {

@@ -99,7 +99,7 @@ export class NominationProcedure extends Procedure {
   async nominate(
     proposalKey: string,
     options?: TransactionOptions
-  ): Promise<boolean> {
+  ): Promise<void> {
     const tx = await createContractWriteTransaction({
       address: this.address,
       abi: NominationProcedureContractABI.abi,
@@ -109,14 +109,13 @@ export class NominationProcedure extends Procedure {
       nonce: options?.nonce
     })
     options?.onTransaction?.(tx, 'Initialize Nomination procedure.')
-    const receipt = await tx.wait()
-    return receipt.status === 'success'
+    await tx.wait()
   }
 
   async reject(
     proposalKey: string,
     options?: TransactionOptions
-  ): Promise<boolean> {
+  ): Promise<void> {
     const tx = await createContractWriteTransaction({
       address: this.address,
       abi: NominationProcedureContractABI.abi,
@@ -126,8 +125,7 @@ export class NominationProcedure extends Procedure {
       nonce: options?.nonce
     })
     options?.onTransaction?.(tx, 'Reject Nomination procedure proposal.')
-    const receipt = await tx.wait()
-    return receipt.status === 'success'
+    await tx.wait()
   }
 
   async signNomination(input: {
@@ -163,7 +161,7 @@ export class NominationProcedure extends Procedure {
     nonce: bigint
     deadline: bigint | number
     signature: string
-  }): Promise<boolean> {
+  }): Promise<void> {
     const tx = await createContractWriteTransaction({
       address: this.address,
       abi: NominationProcedureContractABI.abi,
@@ -176,7 +174,6 @@ export class NominationProcedure extends Procedure {
       ],
       clients: this.getClients()
     })
-    const receipt = await tx.wait()
-    return receipt.status === 'success'
+    await tx.wait()
   }
 }

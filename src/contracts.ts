@@ -64,6 +64,10 @@ const createTransaction = (
       publicClient.waitForTransactionReceipt({ hash }),
       publicClient.getTransaction({ hash }).catch(() => null)
     ])
+    // A mined transaction can still have reverted: never report it as done.
+    if (receipt.status !== 'success') {
+      throw new Error(`Transaction ${hash} reverted.`)
+    }
     return {
       ...receipt,
       gasPrice: transaction?.gasPrice ?? receipt.effectiveGasPrice ?? null
@@ -110,15 +114,22 @@ export const createContractWriteTransaction = async <
 }): Promise<OrganigramTransaction> => {
   const walletClient = requireWalletClient(clients)
   const account = await getWalletAccount(walletClient)
-  const hash = await (walletClient.writeContract as any)({
+  const request = {
     address: getAddress(address as Address),
     abi: abi as Abi,
     functionName: functionName as never,
     args: (args ?? []) as never,
     account,
-    chain: getTransactionChain(walletClient),
-    ...(nonce != null ? { nonce } : {}),
     ...(value != null ? { value } : {})
+  }
+  const gas = bufferEstimatedGas(
+    await clients.publicClient.estimateContractGas(request as any)
+  )
+  const hash = await (walletClient.writeContract as any)({
+    ...request,
+    gas,
+    chain: getTransactionChain(walletClient),
+    ...(nonce != null ? { nonce } : {})
   })
   return createTransaction(clients.publicClient, hash)
 }

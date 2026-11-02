@@ -23,6 +23,6 @@ export declare class ERC20VoteProcedure extends VoteProcedure {
     static _populateInitialize(input: PopulateInitializeInput, _clients: ContractClients): Promise<PopulatedTransactionData>;
     static load(address: string, clients: ContractClients, initialProcedure?: ProcedureInput): Promise<ERC20VoteProcedure>;
     erc20Balance(account?: string): Promise<bigint>;
-    vote(proposalKey: string, approval: boolean, options: TransactionOptions): Promise<boolean>;
+    vote(proposalKey: string, approval: boolean, options: TransactionOptions): Promise<void>;
     toJson: () => ProcedureJson;
 }

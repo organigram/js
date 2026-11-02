@@ -222,7 +222,7 @@ export class ERC20VoteProcedure extends VoteProcedure {
             throw error;
         });
         options?.onTransaction?.(tx, 'Initialize ERC20 Vote procedure.');
-        return (await tx.wait()).status === 'success';
+        await tx.wait();
     }
     toJson = () => JSON.parse(JSON.stringify({
         address: this.address,
