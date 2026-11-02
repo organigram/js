@@ -27,6 +27,10 @@ const createTransaction = (publicClient, hash) => ({
             publicClient.waitForTransactionReceipt({ hash }),
             publicClient.getTransaction({ hash }).catch(() => null)
         ]);
+        // A mined transaction can still have reverted: never report it as done.
+        if (receipt.status !== 'success') {
+            throw new Error(`Transaction ${hash} reverted.`);
+        }
         return {
             ...receipt,
             gasPrice: transaction?.gasPrice ?? receipt.effectiveGasPrice ?? null
@@ -43,15 +47,20 @@ export const getContractInstance = ({ address, abi, publicClient, walletClient }
 export const createContractWriteTransaction = async ({ address, abi, functionName, args, clients, nonce, value }) => {
     const walletClient = requireWalletClient(clients);
     const account = await getWalletAccount(walletClient);
-    const hash = await walletClient.writeContract({
+    const request = {
         address: getAddress(address),
         abi: abi,
         functionName: functionName,
         args: (args ?? []),
         account,
-        chain: getTransactionChain(walletClient),
-        ...(nonce != null ? { nonce } : {}),
         ...(value != null ? { value } : {})
+    };
+    const gas = bufferEstimatedGas(await clients.publicClient.estimateContractGas(request));
+    const hash = await walletClient.writeContract({
+        ...request,
+        gas,
+        chain: getTransactionChain(walletClient),
+        ...(nonce != null ? { nonce } : {})
     });
     return createTransaction(clients.publicClient, hash);
 };

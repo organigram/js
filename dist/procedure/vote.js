@@ -273,8 +273,7 @@ export class VoteProcedure extends Procedure {
             throw error;
         });
         options?.onTransaction?.(tx, 'Initialize Nomination procedure.');
-        const receipt = await tx.wait();
-        return receipt.status === 'success';
+        await tx.wait();
     }
     async signVote(input) {
         if (this.walletClient == null) {
@@ -315,8 +314,7 @@ export class VoteProcedure extends Procedure {
             ],
             clients: this.getClients()
         });
-        const receipt = await tx.wait();
-        return receipt.status === 'success';
+        await tx.wait();
     }
     async count(proposalKey) {
         const contract = this.contract ??

@@ -274,7 +274,7 @@ export class ERC20VoteProcedure extends VoteProcedure {
     proposalKey: string,
     approval: boolean,
     options: TransactionOptions
-  ): Promise<boolean> {
+  ): Promise<void> {
     const tx = await createContractWriteTransaction({
       address: this.address,
       abi: ERC20VoteProcedureContractABI.abi,
@@ -287,7 +287,7 @@ export class ERC20VoteProcedure extends VoteProcedure {
       throw error
     })
     options?.onTransaction?.(tx, 'Initialize ERC20 Vote procedure.')
-    return (await tx.wait()).status === 'success'
+    await tx.wait()
   }
 
   toJson = (): ProcedureJson =>

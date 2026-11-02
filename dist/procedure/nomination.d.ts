@@ -9,8 +9,8 @@ export declare class NominationProcedure extends Procedure {
     constructor(procedureInput: ProcedureInput);
     static _populateInitialize(input: PopulateInitializeInput, _clients: ContractClients): Promise<PopulatedTransactionData>;
     static load(address: string, clients: ContractClients, initialProcedure?: ProcedureInput): Promise<NominationProcedure>;
-    nominate(proposalKey: string, options?: TransactionOptions): Promise<boolean>;
-    reject(proposalKey: string, options?: TransactionOptions): Promise<boolean>;
+    nominate(proposalKey: string, options?: TransactionOptions): Promise<void>;
+    reject(proposalKey: string, options?: TransactionOptions): Promise<void>;
     signNomination(input: {
         proposalKey: string;
         nonce: bigint;
@@ -21,5 +21,5 @@ export declare class NominationProcedure extends Procedure {
         nonce: bigint;
         deadline: bigint | number;
         signature: string;
-    }): Promise<boolean>;
+    }): Promise<void>;
 }

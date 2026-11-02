@@ -78,8 +78,7 @@ export class NominationProcedure extends Procedure {
             nonce: options?.nonce
         });
         options?.onTransaction?.(tx, 'Initialize Nomination procedure.');
-        const receipt = await tx.wait();
-        return receipt.status === 'success';
+        await tx.wait();
     }
     async reject(proposalKey, options) {
         const tx = await createContractWriteTransaction({
@@ -91,8 +90,7 @@ export class NominationProcedure extends Procedure {
             nonce: options?.nonce
         });
         options?.onTransaction?.(tx, 'Reject Nomination procedure proposal.');
-        const receipt = await tx.wait();
-        return receipt.status === 'success';
+        await tx.wait();
     }
     async signNomination(input) {
         if (this.walletClient == null) {
@@ -130,7 +128,6 @@ export class NominationProcedure extends Procedure {
             ],
             clients: this.getClients()
         });
-        const receipt = await tx.wait();
-        return receipt.status === 'success';
+        await tx.wait();
     }
 }
