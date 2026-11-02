@@ -5,6 +5,7 @@ import rawDeployedAddresses from '@organigram/protocol/deployments.json' with { 
 const deployedAddresses = rawDeployedAddresses;
 const localHostnames = new Set(['localhost', '127.0.0.1']);
 const anvilChainId = '31337';
+const mainnetChainId = '1';
 const sepoliaChainId = sepolia.id.toString();
 const createUrl = (hostUrl) => {
     if (hostUrl == null || hostUrl === '')
@@ -87,21 +88,11 @@ export const getSupportedChains = () => {
         .filter((chain) => chain != null);
 };
 export const getChainExplorerBaseUrl = (chainId) => getConfiguredChain(chainId)?.blockExplorers?.default.url;
-const isProductionRuntime = () => {
-    const nodeEnv = getProcessEnv('NODE_ENV');
-    if (nodeEnv != null)
-        return nodeEnv === 'production';
-    return typeof window !== 'undefined' && !isLocalHost();
-};
-export const getDefaultChainId = () => {
-    // Prefer Mainnet in production, but fall back to the first deployed chain
-    // until the mainnet deployment is actually present in deployments.json.
-    return isLocalHost() || !isProductionRuntime()
-        ? isSupportedChainId(anvilChainId)
-            ? anvilChainId
-            : sepoliaChainId
-        : isSupportedChainId('1')
-            ? '1'
-            : (getSupportedChainIds()[0] ?? sepoliaChainId);
-};
+/**
+ * Default network: Anvil when local deployments are loaded, Ethereum mainnet
+ * otherwise. Pass a chain id explicitly to use any other network.
+ *
+ * @returns The default chain id.
+ */
+export const getDefaultChainId = () => isSupportedChainId(anvilChainId) ? anvilChainId : mainnetChainId;
 export default deployedAddresses;
