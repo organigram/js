@@ -11,5 +11,11 @@ export declare const getDeployment: (chainId: string | number | bigint | null | 
 export declare const getConfiguredChain: (chainId: string) => Chain | undefined;
 export declare const getSupportedChains: () => Chain[];
 export declare const getChainExplorerBaseUrl: (chainId: string) => string | undefined;
+/**
+ * Default network: Anvil when local deployments are loaded, Ethereum mainnet
+ * otherwise. Pass a chain id explicitly to use any other network.
+ *
+ * @returns The default chain id.
+ */
 export declare const getDefaultChainId: () => string;
 export default deployedAddresses;

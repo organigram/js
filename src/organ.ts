@@ -802,19 +802,26 @@ export class Organ {
 
     const entries = await Promise.all(
       indexes.map(async index => {
-        const entry = await Organ.loadEntry(
-          address,
-          index.toString(),
-          clients
-        ).catch((error: Error) => {
-          console.warn(
-            'Error while loading entry in organ.',
-            address,
-            index.toString(),
-            error.message
-          )
-          return null
-        })
+        // A load-balanced RPC node may be a block behind the one that returned
+        // entriesLength: retry for about a block before reporting it missing.
+        let entry: OrganEntry | null = null
+        for (let attempt = 0; attempt < 4; attempt++) {
+          try {
+            entry = await Organ.loadEntry(address, index.toString(), clients)
+            break
+          } catch (error) {
+            if (attempt === 3) {
+              console.warn(
+                'Error while loading entry in organ.',
+                address,
+                index.toString(),
+                (error as Error).message
+              )
+            } else {
+              await new Promise(resolve => setTimeout(resolve, 4_000))
+            }
+          }
+        }
         if (isActiveLoadedEntry(entry)) {
           return entry
         }
