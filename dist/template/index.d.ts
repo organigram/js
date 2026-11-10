@@ -1,4 +1,5 @@
 import { OrganigramInput } from '../organigram';
+/** Ready-made organigrams, from company forms (`sas`, `sarl`…) to registers. */
 export declare const templates: {
     none: {
         name: string;
@@ -201,8 +202,15 @@ export declare const templates: {
         assets: never[];
     };
 };
+/** Name of a template. */
 export type TemplateName = keyof typeof templates;
-/** Returns whether every protocol implementation required by a template exists on a chain. */
+/** Tell whether a chain has every protocol contract a template needs. */
 export declare const isTemplateSupportedOnChain: (templateName: TemplateName, chainId: string) => boolean;
+/**
+ * Give every contract of an organigram a new salt and address, and update the references between them.
+ */
 export declare const renewSaltsAndAddresses: (organigram: OrganigramInput, chainId: string) => OrganigramInput;
+/**
+ * Return a copy of a template, with new salts and addresses for the given chain.
+ */
 export declare const getTemplate: (templateName: TemplateName, chainId: string) => OrganigramInput;

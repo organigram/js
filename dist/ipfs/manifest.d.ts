@@ -1,21 +1,6 @@
-import type { EncryptedCidAccessGroup, EncryptedCidContentType, EncryptedCidManifest, FileVersionManifest, PublicFileVersionManifest, WrappedContentKey } from './types';
-export declare const createEncryptedCidManifest: (input: {
-    contentType: EncryptedCidContentType;
-    accessGroup?: EncryptedCidAccessGroup;
-    scopeRef?: FileVersionManifest["scopeRef"];
-    logicalKey?: string;
-    retentionState?: FileVersionManifest["retentionState"];
-    previousManifestCid?: string;
-    encryptedCid: string;
-    encryptedContentIv: string;
-    encryptedContentSize: number;
-    wrappedContentKey: WrappedContentKey;
-    mime?: string;
-    name?: string;
-    scopeEnvelope?: FileVersionManifest["scopeEnvelope"];
-    signature?: string;
-    signedByAddress?: string;
-}) => EncryptedCidManifest;
+import type { EncryptedCidManifest, FileVersionManifest, PublicFileVersionManifest } from './types';
+/** Tell whether a value is the manifest of an encrypted file. */
 export declare const isEncryptedCidManifest: (value: unknown) => value is EncryptedCidManifest;
 export declare const isPublicFileVersionManifest: (value: unknown) => value is PublicFileVersionManifest;
+/** Tell whether a value is a file-version manifest, public or encrypted. */
 export declare const isFileVersionManifest: (value: unknown) => value is FileVersionManifest;

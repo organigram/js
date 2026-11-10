@@ -26,13 +26,25 @@ const asBigInt = (value) => {
     }
     throw new Error('Invalid on-chain numeric value.');
 };
+/**
+ * A procedure in which the members of the deciders organ vote on each proposal.
+ *
+ * @remarks The vote opens when a proposal is presented. Once it is over, anyone calls `applyProposal()` to count the ballots and settle the proposal.
+ */
 export class VoteProcedure extends Procedure {
+    /** ERC-165 interface identifier of vote procedures. */
     static INTERFACE = '0xc9d27afe';
+    /** viem contract instance, once loaded. */
     contract;
+    /** Share of the voters who must vote, in thousandths of a percent. */
     quorumSize;
+    /** Duration of the vote, in seconds. */
     voteDuration;
+    /** Share of the ballots that must approve, in thousandths of a percent. */
     majoritySize;
+    /** State of the vote on each proposal. */
     elections;
+    /** Always `vote`. */
     typeName = 'vote';
     constructor({ quorumSize, voteDuration, majoritySize, elections, ...procedureInput }) {
         super({
@@ -54,6 +66,7 @@ export class VoteProcedure extends Procedure {
                 })
                 : undefined;
     }
+    /** @internal */
     static async _populateInitialize(input, clients) {
         const [quorumSize, voteDuration, majoritySize] = input.args;
         if (!quorumSize || !voteDuration || !majoritySize) {
@@ -79,6 +92,7 @@ export class VoteProcedure extends Procedure {
             })
         };
     }
+    /** Read the state of the vote on one proposal. */
     static async loadElection(address, proposalKey, clients, voteDuration, contract, blockTimestamp) {
         const procedureContract = contract ??
             getContractInstance({
@@ -108,7 +122,7 @@ export class VoteProcedure extends Procedure {
         try {
             approved = hasEnded
                 ? normalizedElection.votesCount !== '0'
-                    ? await procedureContract.read.count([BigInt(proposalKey)])
+                    ? (await procedureContract.read.count([BigInt(proposalKey)]))
                     : false
                 : false;
         }
@@ -122,6 +136,7 @@ export class VoteProcedure extends Procedure {
             ...(approved == null ? {} : { approved })
         };
     }
+    /** Read the state of the vote on every proposal. */
     static async loadElections(address, clients, proposalsLength) {
         const totalProposals = proposalsLength ??
             Number((await Procedure.loadData(address, clients)).proposalsLength);
@@ -208,6 +223,7 @@ export class VoteProcedure extends Procedure {
             });
         }))).filter((election) => election != null);
     }
+    /** Read a vote procedure from chain, with its proposals and elections. */
     static async load(address, clients, initialProcedure) {
         const procedure = await Procedure.load(address, clients, initialProcedure);
         const contract = getContractInstance({
@@ -260,12 +276,13 @@ export class VoteProcedure extends Procedure {
                 })
         });
     }
-    async vote(proposalKey, approval, options) {
+    /** Vote for or against a proposal, as a decider. */
+    async vote(proposalKey, choice, options) {
         const tx = await createContractWriteTransaction({
             address: this.address,
             abi: VoteProcedureContractABI.abi,
             functionName: 'vote',
-            args: [BigInt(proposalKey), approval],
+            args: [BigInt(proposalKey), choice === 'for'],
             clients: this.getClients(),
             nonce: options?.nonce
         }).catch((error) => {
@@ -275,6 +292,11 @@ export class VoteProcedure extends Procedure {
         options?.onTransaction?.(tx, 'Initialize Nomination procedure.');
         await tx.wait();
     }
+    /**
+     * Sign a vote, for `voteBySig()`.
+     *
+     * @remarks The signer pays no gas: any account can submit the signature with the matching `…BySig` method.
+     */
     async signVote(input) {
         if (this.walletClient == null) {
             throw new Error('Connected wallet cannot sign typed data.');
@@ -300,6 +322,7 @@ export class VoteProcedure extends Procedure {
             }
         });
     }
+    /** Cast a vote signed by a decider. */
     async voteBySig(input) {
         const tx = await createContractWriteTransaction({
             address: this.address,
@@ -316,6 +339,7 @@ export class VoteProcedure extends Procedure {
         });
         await tx.wait();
     }
+    /** Tell whether a proposal passed, once its vote is over. */
     async count(proposalKey) {
         const contract = this.contract ??
             getContractInstance({
@@ -328,6 +352,7 @@ export class VoteProcedure extends Procedure {
             return false;
         });
     }
+    /** Convert the procedure into plain JSON. */
     toJson = () => JSON.parse(JSON.stringify({
         address: this.address,
         chainId: this.chainId,

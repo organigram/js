@@ -21,6 +21,7 @@ export type ProtocolDeployments = Record<
   Partial<Record<ProtocolDeploymentName, string>>
 >
 
+/** Addresses of the protocol contracts on each supported chain, by chain id. */
 const deployedAddresses: ProtocolDeployments = rawDeployedAddresses
 
 const localHostnames = new Set(['localhost', '127.0.0.1'])
@@ -59,12 +60,16 @@ const parseLocalDeployments = (): ProtocolDeployments => {
 
 Object.assign(deployedAddresses, parseLocalDeployments())
 
+/**
+ * URL of the Organigram app: `NEXT_PUBLIC_HOST_URL`, or the current page origin in a browser.
+ */
 export const getHostUrl = (
   hostUrl = getProcessEnv('NEXT_PUBLIC_HOST_URL')
 ): URL | null =>
   createUrl(hostUrl) ??
   (typeof window !== 'undefined' ? createUrl(window.location.origin) : null)
 
+/** Tell whether the app runs on a local host name. */
 export const isLocalHost = (hostUrl?: string): boolean =>
   localHostnames.has(getHostUrl(hostUrl)?.hostname ?? '')
 
@@ -72,9 +77,11 @@ const normalizeChainId = (
   chainId: string | number | bigint | null | undefined
 ): string => (chainId == null ? '' : chainId.toString())
 
+/** List the chains the protocol is deployed on. */
 export const getSupportedChainIds = (): string[] =>
   Object.keys(deployedAddresses)
 
+/** Tell whether the protocol is deployed on a chain. */
 export const isSupportedChainId = (
   chainId: string | number | bigint | null | undefined
 ): boolean => {
@@ -95,6 +102,9 @@ export const resolveDeployment = (
   return deployment
 }
 
+/**
+ * Return the address of a protocol contract on a chain, and throw if it is not deployed there.
+ */
 export const getDeployment = (
   chainId: string | number | bigint | null | undefined,
   deploymentName: ProtocolDeploymentName
@@ -130,6 +140,7 @@ const sortSupportedChainIds = (chainIds: string[]): string[] =>
     return Number(a) - Number(b)
   })
 
+/** Return the viem chain definition of a chain id. */
 export const getConfiguredChain = (chainId: string): Chain | undefined => {
   const chain = chainId === sepoliaChainId ? sepolia : getChainById(chainId)
   if (chain == null) return undefined
@@ -143,6 +154,7 @@ export const getSupportedChains = (): Chain[] => {
     .filter((chain): chain is Chain => chain != null)
 }
 
+/** Return the block explorer URL of a chain. */
 export const getChainExplorerBaseUrl = (chainId: string): string | undefined =>
   getConfiguredChain(chainId)?.blockExplorers?.default.url
 

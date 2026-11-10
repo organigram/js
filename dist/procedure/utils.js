@@ -141,6 +141,7 @@ const buildProcedureType = (chainId, typeName) => {
         ? undefined
         : { ...procedureTypeMetadata[typeName], address };
 };
+/** Return the procedure types registered on a chain. */
 export const getProcedureTypes = (chainId = getDefaultChainId()) => Object.fromEntries(Object.keys(procedureTypeDeploymentNames).flatMap(typeName => {
     const type = buildProcedureType(chainId, typeName);
     return type == null ? [] : [[typeName, type]];
@@ -231,6 +232,7 @@ export const prepareDeployProceduresInput = async (deployProceduresInput, client
         options: procedure.options
     };
 }));
+/** Return the SDK class of a procedure type. */
 export const getProcedureClass = async (typeName) => {
     try {
         let procedureClass;

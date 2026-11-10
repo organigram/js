@@ -1,4 +1,5 @@
 import { getAddress, getContract } from 'viem';
+/** Add a 20% margin plus 25,000 gas to a gas estimate. */
 export const bufferEstimatedGas = (estimatedGas) => (estimatedGas * 120n) / 100n + 25000n;
 const requireWalletClient = (clients) => {
     if (clients.walletClient == null) {
@@ -15,6 +16,7 @@ export const getWalletAccount = async (walletClient) => {
     }
     return address;
 };
+/** Return the address of the account a wallet client signs with. */
 export const getWalletAddress = async (walletClient) => {
     const account = await getWalletAccount(walletClient);
     return typeof account === 'string' ? account : account.address;
@@ -44,6 +46,9 @@ export const getContractInstance = ({ address, abi, publicClient, walletClient }
         ? { public: publicClient, wallet: walletClient }
         : publicClient
 });
+/**
+ * Send a contract call with a buffered gas estimate, and return it as an `OrganigramTransaction`.
+ */
 export const createContractWriteTransaction = async ({ address, abi, functionName, args, clients, nonce, value }) => {
     const walletClient = requireWalletClient(clients);
     const account = await getWalletAccount(walletClient);

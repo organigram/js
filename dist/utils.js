@@ -1,6 +1,7 @@
 import deployedAddresses, { getChainExplorerBaseUrl, getConfiguredChain, getDefaultChainId, getDeployment, getHostUrl, getSupportedChainIds, getSupportedChains, isSupportedChainId, isLocalHost, resolveDeployment } from './deployments';
-import { bytesToHex, getCreate2Address, keccak256, padHex, toHex } from 'viem';
+import { bytesToHex, encodeAbiParameters, getCreate2Address, keccak256, padHex, toHex } from 'viem';
 export { deployedAddresses, getChainExplorerBaseUrl, getConfiguredChain, getDefaultChainId, getDeployment, getHostUrl, getSupportedChainIds, getSupportedChains, isSupportedChainId, isLocalHost, resolveDeployment };
+/** A `JSON.stringify` replacer that writes bigints as strings ending in `n`. */
 export const handleJsonBigInt = (_key, value) => {
     if (typeof value === 'bigint') {
         return value.toString() + 'n';
@@ -15,13 +16,22 @@ export function cloneInitCodeHash(implementation) {
         '5af43d82803e903d91602b57fd5bf3';
     return keccak256(initCode);
 }
-export const predictContractAddress = ({ type, chainId, salt }) => {
+/**
+ * Predict the address of a clone deployed by the OrganigramClient.
+ *
+ * The client binds each salt to the account deploying the clone, so only an
+ * address predicted with `deployer` is the address the clone will have.
+ * Without it, the result is merely a unique placeholder for a draft.
+ */
+export const predictContractAddress = ({ type, chainId, salt, deployer }) => {
     const normalizedSalt = /^0x[0-9a-fA-F]{64}$/.test(salt)
         ? salt
         : padHex(toHex(salt), { size: 32 });
     return getCreate2Address({
         from: getDeployment(chainId, 'OrganigramClient'),
-        salt: normalizedSalt,
+        salt: deployer == null
+            ? normalizedSalt
+            : keccak256(encodeAbiParameters([{ type: 'address' }, { type: 'bytes32' }], [deployer, normalizedSalt])),
         bytecodeHash: cloneInitCodeHash(type === 'Organ'
             ? getDeployment(chainId, 'CloneableOrgan')
             : type === 'Asset'
@@ -31,6 +41,7 @@ export const predictContractAddress = ({ type, chainId, salt }) => {
                     : getDeployment(chainId, type.replace('Erc', 'ERC')))
     });
 };
+/** Generate a random 32-byte hex string, for example a salt. */
 export const createRandom32BytesHexId = () => bytesToHex(crypto.getRandomValues(new Uint8Array(32)));
 export const formatSalt = (salt) => {
     if (salt == null) {
@@ -47,6 +58,14 @@ export const formatSalt = (salt) => {
         return salt;
 };
 // Organ permissions granted to procedures
+/**
+ * Bit flags of the permissions an address can hold on an organ. Combine them with `|`.
+ *
+ * @example
+ * ```ts
+ * PERMISSIONS.ADD_ENTRIES | PERMISSIONS.REMOVE_ENTRIES
+ * ```
+ */
 export const PERMISSIONS = {
     ADMIN: 0xffff,
     ALL: 0x1fff,
@@ -57,19 +76,20 @@ export const PERMISSIONS = {
     ADD_ENTRIES: 0x0004,
     REMOVE_ENTRIES: 0x0008,
     UPDATE_METADATA: 0x0010,
-    DEPOSIT_ETHER: 0x0020,
+    // 0x0020, 0x0080 and 0x0200 are retired deposit permissions: keep them unused.
     WITHDRAW_ETHER: 0x0040,
-    DEPOSIT_COINS: 0x0080,
     WITHDRAW_COINS: 0x0100,
-    DEPOSIT_COLLECTIBLES: 0x0200,
     WITHDRAW_COLLECTIBLES: 0x0400,
     EXECUTE_WHITELISTED: 0x0800,
     MANAGE_EXECUTION_WHITELIST: 0x1000
 };
+/** List the names of the permissions in a permission value. */
 export const getPermissionsSet = (permissions) => Object.entries(PERMISSIONS)
     .filter((permission) => (permissions & permission[1]) === permission[1])
     .map((permission) => permission[0]);
+/** Uppercase the first letter of a string. */
 export const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+/** Parse a number, or return the fallback if the result is not finite. */
 export const parseFiniteNumber = (value, fallback) => {
     const parsed = typeof value === 'number' ? value : Number.parseFloat(value ?? '');
     return Number.isFinite(parsed) ? parsed : fallback;

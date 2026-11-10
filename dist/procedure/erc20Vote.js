@@ -37,14 +37,29 @@ const asBigInt = (value) => {
     }
     throw new Error('Invalid on-chain numeric value.');
 };
+/**
+ * A vote procedure in which each ballot weighs the token balance of the voter.
+ *
+ * @remarks Ballots weigh the balances held just before the vote opened, so tokens moved during the vote do not count twice.
+ */
 export class ERC20VoteProcedure extends VoteProcedure {
+    /** ERC-165 interface identifier of ERC-20 vote procedures. */
     static INTERFACE = '0xc9d27afe';
+    /** Token whose balances weigh the votes. */
     erc20;
+    /** Whether proposers are organ members, token holders, or nobody. */
     proposerMode;
+    /** Whether moderators are organ members, token holders, or nobody. */
     moderatorMode;
+    /** Whether voters are organ members or token holders. */
     voterMode;
+    /**
+     * Whether a majority of the deciders organ must also approve, besides the token-weighted vote.
+     */
     requireMemberMajority;
+    /** viem contract instance, once loaded. */
     contract;
+    /** Always `erc20Vote`. */
     typeName = 'erc20Vote';
     constructor({ erc20, proposerMode, moderatorMode, voterMode, requireMemberMajority, ...voteProcedureArguments }) {
         super({
@@ -67,6 +82,7 @@ export class ERC20VoteProcedure extends VoteProcedure {
                 })
                 : undefined;
     }
+    /** @internal */
     static async _populateInitialize(input, _clients) {
         const [erc20, quorumSize, voteDuration, majoritySize] = input.args;
         const proposerMode = input.proposerMode;
@@ -101,6 +117,9 @@ export class ERC20VoteProcedure extends VoteProcedure {
             ...(requireMemberMajority ? [true] : [])
         ]);
     }
+    /**
+     * Read an ERC-20 vote procedure from chain, with its proposals and elections.
+     */
     static async load(address, clients, initialProcedure) {
         const procedure = await Procedure.load(address, clients, initialProcedure);
         const contract = getContractInstance({
@@ -178,6 +197,7 @@ export class ERC20VoteProcedure extends VoteProcedure {
                 })
         });
     }
+    /** Read the token balance of an account, or of the connected wallet. */
     async erc20Balance(account) {
         const erc20 = (await this.contract?.read.tokenContract());
         if (erc20 == null || this.publicClient == null) {
@@ -209,12 +229,13 @@ export class ERC20VoteProcedure extends VoteProcedure {
             return 0n;
         return (await erc20Contract.read.balanceOf([resolvedAccount]));
     }
-    async vote(proposalKey, approval, options) {
+    /** Vote for or against a proposal, with the weight of your tokens. */
+    async vote(proposalKey, choice, options) {
         const tx = await createContractWriteTransaction({
             address: this.address,
             abi: ERC20VoteProcedureContractABI.abi,
             functionName: 'vote',
-            args: [BigInt(proposalKey), approval],
+            args: [BigInt(proposalKey), choice === 'for'],
             clients: this.getClients(),
             nonce: options?.nonce
         }).catch((error) => {
@@ -224,6 +245,7 @@ export class ERC20VoteProcedure extends VoteProcedure {
         options?.onTransaction?.(tx, 'Initialize ERC20 Vote procedure.');
         await tx.wait();
     }
+    /** Convert the procedure into plain JSON. */
     toJson = () => JSON.parse(JSON.stringify({
         address: this.address,
         salt: this.salt,

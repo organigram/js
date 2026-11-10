@@ -11,6 +11,7 @@ import {
 import { normalizeEncryptionKeyVersion } from './keyVersion'
 import type { EncryptionPublicKeySiweResource } from './types'
 
+/** Build the message a user signs to register an encryption public key. */
 export const createEncryptionPublicKeyMessage = (
   address: string,
   publicKey: JsonWebKey,
@@ -23,6 +24,7 @@ export const createEncryptionPublicKeyMessage = (
     `Public key: ${JSON.stringify(publicKey)}`
   ].join('\n')
 
+/** Encode an encryption public key as a Sign-In with Ethereum resource. */
 export const createEncryptionPublicKeySiweResource = (
   address: string,
   publicKey: JsonWebKey,
@@ -39,6 +41,9 @@ export const createEncryptionPublicKeySiweResource = (
   )}`
 }
 
+/**
+ * Find the encryption public key of an address among Sign-In with Ethereum resources.
+ */
 export const parseEncryptionPublicKeySiweResource = (
   resources: string[] | undefined,
   address: string

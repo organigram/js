@@ -10,6 +10,7 @@ import { DeployOrganigramInput } from '../src'
 describe('refreshUndeployedContractReferences', () => {
   it('refreshes stale draft addresses before batch deployment', () => {
     const chainId = '31337'
+    const deployer = '0x0000000000000000000000000000000000000d01'
     const staleAssetAddress = '0x0000000000000000000000000000000000000a01'
     const staleOrganAddress = '0x0000000000000000000000000000000000000b01'
     const staleProcedureAddress = '0x0000000000000000000000000000000000000c01'
@@ -63,22 +64,26 @@ describe('refreshUndeployedContractReferences', () => {
 
     const refreshed = refreshUndeployedContractReferences(
       input as DeployOrganigramInput,
-      chainId
+      chainId,
+      deployer
     )
     const expectedAssetAddress = predictContractAddress({
       type: 'Asset',
       chainId,
-      salt: assetSalt
+      salt: assetSalt,
+      deployer
     })
     const expectedOrganAddress = predictContractAddress({
       type: 'Organ',
       chainId,
-      salt: organSalt
+      salt: organSalt,
+      deployer
     })
     const expectedProcedureAddress = predictContractAddress({
       type: 'ERC20VoteProcedure',
       chainId,
-      salt: procedureSalt
+      salt: procedureSalt,
+      deployer
     })
 
     expect((refreshed.assets[0] as { address?: string }).address).toBe(
@@ -98,6 +103,15 @@ describe('refreshUndeployedContractReferences', () => {
       expectedAssetAddress
     )
     expect(input.procedures[0].deciders).toBe(staleOrganAddress)
+    // The deployer is part of the prediction: another account gets another address.
+    expect(
+      predictContractAddress({
+        type: 'Organ',
+        chainId,
+        salt: organSalt,
+        deployer: '0x0000000000000000000000000000000000000e01'
+      })
+    ).not.toBe(expectedOrganAddress)
   })
 
   it('returns deployed event addresses without mutating the original draft input', () => {

@@ -21,13 +21,23 @@ import {
   type ContractClients,
   createContractWriteTransaction,
   getContractInstance,
-  getWalletAccount
+  getWalletAccount,
+  type OrganigramContract
 } from '../contracts'
 
+/** The data of a vote procedure. */
 export type VoteProcedureInput = ProcedureInput & {
+  /**
+   * Share of the voters who must vote, in thousandths of a percent: `20001` is 20.001%.
+   */
   quorumSize: string
+  /** Duration of the vote, in seconds. */
   voteDuration: string
+  /**
+   * Share of the ballots that must approve, in thousandths of a percent: `50001` is 50.001%.
+   */
   majoritySize: string
+  /** State of the vote on each proposal. */
   elections: Election[]
 }
 
@@ -57,14 +67,26 @@ const asBigInt = (value: unknown): bigint => {
   throw new Error('Invalid on-chain numeric value.')
 }
 
+/**
+ * A procedure in which the members of the deciders organ vote on each proposal.
+ *
+ * @remarks The vote opens when a proposal is presented. Once it is over, anyone calls `applyProposal()` to count the ballots and settle the proposal.
+ */
 export class VoteProcedure extends Procedure {
+  /** ERC-165 interface identifier of vote procedures. */
   static INTERFACE = '0xc9d27afe'
 
-  contract?: any
+  /** viem contract instance, once loaded. */
+  contract?: OrganigramContract
+  /** Share of the voters who must vote, in thousandths of a percent. */
   quorumSize: string
+  /** Duration of the vote, in seconds. */
   voteDuration: string
+  /** Share of the ballots that must approve, in thousandths of a percent. */
   majoritySize: string
+  /** State of the vote on each proposal. */
   elections: Election[]
+  /** Always `vote`. */
   typeName: ProcedureTypeName = 'vote'
 
   constructor({
@@ -94,6 +116,7 @@ export class VoteProcedure extends Procedure {
         : undefined
   }
 
+  /** @internal */
   static async _populateInitialize(
     input: PopulateInitializeInput,
     clients: ContractClients
@@ -125,12 +148,13 @@ export class VoteProcedure extends Procedure {
     }
   }
 
+  /** Read the state of the vote on one proposal. */
   static async loadElection(
     address: string,
     proposalKey: string,
     clients: ContractClients,
     voteDuration?: bigint,
-    contract?: any,
+    contract?: OrganigramContract,
     blockTimestamp?: bigint
   ): Promise<Election> {
     const procedureContract =
@@ -167,7 +191,7 @@ export class VoteProcedure extends Procedure {
     try {
       approved = hasEnded
         ? normalizedElection.votesCount !== '0'
-          ? await procedureContract.read.count([BigInt(proposalKey)])
+          ? ((await procedureContract.read.count([BigInt(proposalKey)])) as boolean)
           : false
         : false
     } catch (error) {
@@ -181,6 +205,7 @@ export class VoteProcedure extends Procedure {
     }
   }
 
+  /** Read the state of the vote on every proposal. */
   static async loadElections(
     address: string,
     clients: ContractClients,
@@ -326,6 +351,7 @@ export class VoteProcedure extends Procedure {
     ).filter((election): election is Election => election != null)
   }
 
+  /** Read a vote procedure from chain, with its proposals and elections. */
   static async load(
     address: string,
     clients: ContractClients,
@@ -391,16 +417,17 @@ export class VoteProcedure extends Procedure {
     })
   }
 
+  /** Vote for or against a proposal, as a decider. */
   async vote(
     proposalKey: string,
-    approval: boolean,
+    choice: 'for' | 'against',
     options?: TransactionOptions
   ): Promise<void> {
     const tx = await createContractWriteTransaction({
       address: this.address,
       abi: VoteProcedureContractABI.abi,
       functionName: 'vote',
-      args: [BigInt(proposalKey), approval],
+      args: [BigInt(proposalKey), choice === 'for'],
       clients: this.getClients(),
       nonce: options?.nonce
     }).catch((error: Error) => {
@@ -411,6 +438,11 @@ export class VoteProcedure extends Procedure {
     await tx.wait()
   }
 
+  /**
+   * Sign a vote, for `voteBySig()`.
+   *
+   * @remarks The signer pays no gas: any account can submit the signature with the matching `…BySig` method.
+   */
   async signVote(input: {
     proposalKey: string
     approval: boolean
@@ -442,6 +474,7 @@ export class VoteProcedure extends Procedure {
     })
   }
 
+  /** Cast a vote signed by a decider. */
   async voteBySig(input: {
     proposalKey: string
     approval: boolean
@@ -465,6 +498,7 @@ export class VoteProcedure extends Procedure {
     await tx.wait()
   }
 
+  /** Tell whether a proposal passed, once its vote is over. */
   async count(proposalKey: string): Promise<boolean> {
     const contract =
       this.contract ??
@@ -473,7 +507,7 @@ export class VoteProcedure extends Procedure {
         abi: VoteProcedureContractABI.abi,
         ...this.getClients()
       })
-    return await contract.read.count([BigInt(proposalKey)]).catch((error: Error) => {
+    return await (contract.read.count([BigInt(proposalKey)]) as Promise<boolean>).catch((error: Error) => {
       console.error(
         'Error while counting.',
         this.address,
@@ -484,6 +518,7 @@ export class VoteProcedure extends Procedure {
     })
   }
 
+  /** Convert the procedure into plain JSON. */
   toJson = (): ProcedureJson =>
     JSON.parse(
       JSON.stringify(

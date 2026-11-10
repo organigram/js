@@ -1,12 +1,14 @@
 import { ENCRYPTION_PUBLIC_KEY_SIWE_RESOURCE_KIND, ENCRYPTION_PUBLIC_KEY_SIWE_RESOURCE_PREFIX } from './constants';
 import { base64UrlToBytes, bytesToBase64Url, bytesToText, textToBytes } from './encoding';
 import { normalizeEncryptionKeyVersion } from './keyVersion';
+/** Build the message a user signs to register an encryption public key. */
 export const createEncryptionPublicKeyMessage = (address, publicKey, keyVersion) => [
     'Organigram encryption public key registration',
     `Address: ${address.toLowerCase()}`,
     `Key version: ${keyVersion}`,
     `Public key: ${JSON.stringify(publicKey)}`
 ].join('\n');
+/** Encode an encryption public key as a Sign-In with Ethereum resource. */
 export const createEncryptionPublicKeySiweResource = (address, publicKey, keyVersion) => {
     const payload = {
         kind: ENCRYPTION_PUBLIC_KEY_SIWE_RESOURCE_KIND,
@@ -16,6 +18,9 @@ export const createEncryptionPublicKeySiweResource = (address, publicKey, keyVer
     };
     return `${ENCRYPTION_PUBLIC_KEY_SIWE_RESOURCE_PREFIX}${bytesToBase64Url(textToBytes(JSON.stringify(payload)))}`;
 };
+/**
+ * Find the encryption public key of an address among Sign-In with Ethereum resources.
+ */
 export const parseEncryptionPublicKeySiweResource = (resources, address) => {
     const resource = resources?.find(resource => resource.startsWith(ENCRYPTION_PUBLIC_KEY_SIWE_RESOURCE_PREFIX));
     if (resource == null)

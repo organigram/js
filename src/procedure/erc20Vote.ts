@@ -15,17 +15,26 @@ import { parseAbi, zeroAddress } from 'viem'
 import {
   type ContractClients,
   createContractWriteTransaction,
-  getContractInstance
+  getContractInstance,
+  type OrganigramContract
 } from '../contracts'
 
+/** The data of an ERC-20 vote procedure. */
 export type ERC20VoteProcedureInput = Omit<
   VoteProcedureInput,
   'type' | 'typeName'
 > & {
+  /** Token whose balances weigh the votes. */
   erc20: string
+  /** Whether proposers are organ members, token holders, or nobody. */
   proposerMode?: ERC20VoteRoleMode
+  /** Whether moderators are organ members, token holders, or nobody. */
   moderatorMode?: ERC20VoteRoleMode
+  /** Whether voters are organ members or token holders. */
   voterMode?: ERC20VoteRoleMode
+  /**
+   * Whether a majority of the deciders organ must also approve, besides the token-weighted vote.
+   */
   requireMemberMajority?: boolean
 }
 
@@ -65,15 +74,30 @@ const asBigInt = (value: unknown): bigint => {
   throw new Error('Invalid on-chain numeric value.')
 }
 
+/**
+ * A vote procedure in which each ballot weighs the token balance of the voter.
+ *
+ * @remarks Ballots weigh the balances held just before the vote opened, so tokens moved during the vote do not count twice.
+ */
 export class ERC20VoteProcedure extends VoteProcedure {
+  /** ERC-165 interface identifier of ERC-20 vote procedures. */
   static INTERFACE = '0xc9d27afe'
 
+  /** Token whose balances weigh the votes. */
   erc20: string
+  /** Whether proposers are organ members, token holders, or nobody. */
   proposerMode: ERC20VoteRoleMode
+  /** Whether moderators are organ members, token holders, or nobody. */
   moderatorMode: ERC20VoteRoleMode
+  /** Whether voters are organ members or token holders. */
   voterMode: ERC20VoteRoleMode
+  /**
+   * Whether a majority of the deciders organ must also approve, besides the token-weighted vote.
+   */
   requireMemberMajority: boolean
-  contract?: any
+  /** viem contract instance, once loaded. */
+  contract?: OrganigramContract
+  /** Always `erc20Vote`. */
   typeName = 'erc20Vote' as ProcedureTypeName
 
   constructor({
@@ -105,6 +129,7 @@ export class ERC20VoteProcedure extends VoteProcedure {
         : undefined
   }
 
+  /** @internal */
   static async _populateInitialize(
     input: PopulateInitializeInput,
     _clients: ContractClients
@@ -149,6 +174,9 @@ export class ERC20VoteProcedure extends VoteProcedure {
     )
   }
 
+  /**
+   * Read an ERC-20 vote procedure from chain, with its proposals and elections.
+   */
   static async load(
     address: string,
     clients: ContractClients,
@@ -238,6 +266,7 @@ export class ERC20VoteProcedure extends VoteProcedure {
     })
   }
 
+  /** Read the token balance of an account, or of the connected wallet. */
   async erc20Balance(account?: string): Promise<bigint> {
     const erc20 = (await this.contract?.read.tokenContract()) as string | undefined
     if (erc20 == null || this.publicClient == null) {
@@ -270,16 +299,17 @@ export class ERC20VoteProcedure extends VoteProcedure {
     return (await erc20Contract.read.balanceOf([resolvedAccount])) as bigint
   }
 
+  /** Vote for or against a proposal, with the weight of your tokens. */
   async vote(
     proposalKey: string,
-    approval: boolean,
-    options: TransactionOptions
+    choice: 'for' | 'against',
+    options?: TransactionOptions
   ): Promise<void> {
     const tx = await createContractWriteTransaction({
       address: this.address,
       abi: ERC20VoteProcedureContractABI.abi,
       functionName: 'vote',
-      args: [BigInt(proposalKey), approval],
+      args: [BigInt(proposalKey), choice === 'for'],
       clients: this.getClients(),
       nonce: options?.nonce
     }).catch((error: Error) => {
@@ -290,6 +320,7 @@ export class ERC20VoteProcedure extends VoteProcedure {
     await tx.wait()
   }
 
+  /** Convert the procedure into plain JSON. */
   toJson = (): ProcedureJson =>
     JSON.parse(
       JSON.stringify(

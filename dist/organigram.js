@@ -2,14 +2,7 @@ import OrganigramClient from './organigramClient';
 import { getTemplate, templates } from './template';
 import { getDefaultChainId } from './deployments';
 import { handleJsonBigInt } from './utils';
-/**
- * Human-readable labels for the procedure role slots expected by the protocol.
- */
-export const procedureRoleTypes = [
-    { label: 'Create proposals', name: 'proposers' },
-    { label: 'Approve proposals', name: 'deciders' },
-    { label: 'Filter proposals', name: 'moderators' }
-];
+/** Line styles available to draw the links of an organigram. */
 export const organigramEdgeTypes = [
     'default',
     'straight',
@@ -17,6 +10,7 @@ export const organigramEdgeTypes = [
     'smoothstep'
     // 'simplebezier'
 ];
+/** Line style used when none is set. */
 export const defaultOrganigramEdgeType = 'default';
 export const normalizeOrganigramEdgeType = (edgeType) => organigramEdgeTypes.includes(edgeType)
     ? edgeType
@@ -37,30 +31,49 @@ export const normalizeOrganigramNodePositions = (nodePositions) => {
         return [];
     }));
 };
-/**
- * Default chain id used by the SDK templates.
- */
+/** Chain used by templates when none is given. */
 export const defaultChainId = getDefaultChainId();
 /**
- * In-memory representation of an Organigram project.
+ * A whole organization: its organs, procedures and assets, as a draft or as deployed contracts.
  *
- * The class can be created from raw inputs, a built-in template name, or left
- * blank to start from the default empty template.
+ * @remarks The organigram itself has no contract. Create one from a template or from data, attach an `OrganigramClient`, then call `deploy()`.
+ *
+ * @example
+ * ```ts
+ * const organigram = await new Organigram({
+ *   ...getTemplate('nonProfit', client.chainId),
+ *   organigramClient: client
+ * }).deploy()
+ * ```
  */
 export class Organigram {
+    /** Identifier of the organigram. */
     id;
+    /** Organs of the organization. */
     organs = [];
+    /** Assets of the organization. */
     assets = [];
+    /** Procedures connecting the organs. */
     procedures = [];
+    /** Chain the organigram is deployed on. */
     chainId;
+    /** URL-friendly name. */
     slug;
+    /** Display name. */
     name;
+    /** Free description. */
     description;
+    /** Line style of the diagram links. */
     edgeType;
+    /** Positions of the diagram nodes. */
     nodePositions;
+    /** Workspace the organigram belongs to in the Organigram app. */
     workspaceId;
+    /** Client used to deploy and load the organigram. */
     organigramClient;
+    /** Client that signs transactions, when no `organigramClient` is attached. */
     walletClient;
+    /** Client used for reads, when no `organigramClient` is attached. */
     publicClient;
     constructor(input) {
         let resolvedOrganigram;
@@ -92,6 +105,7 @@ export class Organigram {
         this.publicClient = initial?.publicClient;
         this.workspaceId = initial?.workspaceId;
     }
+    /** Change the name, description or diagram layout. */
     editDetails({ name, description, edgeType, nodePositions }) {
         if (name !== undefined)
             this.name = name;
@@ -102,19 +116,22 @@ export class Organigram {
         if (nodePositions !== undefined)
             this.nodePositions = nodePositions;
     }
+    /** Replace the organs. */
     setOrgans(organs) {
         this.organs = organs;
     }
+    /** Replace the assets. */
     setAssets(assets) {
         this.assets = assets;
     }
+    /** Replace the procedures. */
     setProcedures(procedures) {
         this.procedures = procedures;
     }
     /**
-     * Hydrate every deployed object referenced by this organigram.
+     * Read every deployed organ, procedure and asset of the organigram from chain.
      *
-     * @param input Optional viem clients used when the organigram has no attached client yet.
+     * @param input - viem clients, used when no `organigramClient` is attached.
      */
     load = async (input) => {
         const publicClient = input?.publicClient ??
@@ -135,7 +152,9 @@ export class Organigram {
         return await client.loadOrganigram(this);
     };
     /**
-     * Deploy the full organigram through its attached client, then reload it from chain state.
+     * Deploy every contract of the organigram in one transaction, then read them back from chain.
+     *
+     * @remarks Requires an attached `organigramClient` with a wallet client.
      */
     async deploy() {
         if (!this.organigramClient) {
@@ -148,9 +167,7 @@ export class Organigram {
         this.setProcedures(deployedOrganigram.procedures);
         return await this.load();
     }
-    /**
-     * Convert the organigram into a JSON-safe structure suitable for persistence or transport.
-     */
+    /** Convert the organigram into plain JSON. */
     toJson = () => JSON.parse(JSON.stringify({
         id: this.id,
         slug: this.slug,

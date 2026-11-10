@@ -22,29 +22,35 @@ import {
   type OrganigramTransactionReceipt,
   createContractWriteTransaction,
   getContractInstance,
-  getWalletAddress
+  getWalletAddress,
+  type OrganigramContract
 } from './contracts'
 
+/** One entry of an organ registry: a member, a document, or both. */
 export interface OrganEntry {
+  /** Position in the registry, starting at 1. */
   index: string
+  /** Ethereum address of the member, or the zero address. */
   address: string
+  /** Reference to a document, or an empty string. */
   cid: string
+  /** Display name. */
   name?: string | null
 }
 
-/**
- * Entry payload used when creating or updating an organ entry.
- */
-export interface IOrganEntry {
+/** An entry to add to an organ: an address, a document reference, or both. */
+export interface OrganEntryInput {
+  /** Ethereum address of the member. */
   address?: string
+  /** Reference to a document. */
   cid?: string
 }
 
-/**
- * Permission grant applied to a procedure or address on an organ.
- */
+/** The permissions one address holds on an organ. */
 export interface OrganPermission {
+  /** Address granted the permissions, usually a procedure. */
   permissionAddress: string
+  /** Bit field of `PERMISSIONS` flags. */
   permissionValue: number
 }
 
@@ -55,57 +61,88 @@ type OrganContractData = {
   entriesCount: bigint
 }
 
+/** The data of an organ, deployed or still a draft. */
 export interface OrganInput {
+  /** Contract address, or a predicted address while it is a draft. */
   address?: string | null
+  /** Chain the organ lives on. */
   chainId?: string | null
+  /** Client used for reads. */
   publicClient?: PublicClient | null
+  /** Client that signs transactions. */
   walletClient?: WalletClient | null
+  /** Ether balance, in wei. */
   balance?: string | null
+  /** Reference to the off-chain metadata of the organ. */
   cid?: string | null
+  /** Addresses allowed to act on the organ, with their permission flags. */
   permissions?: OrganPermission[] | null
+  /** Members and documents registered in the organ. */
   entries?: Array<{
     index: string
     address: string
     cid: string
     name?: string | null
   }> | null
+  /** Salt that determines the clone address. */
   salt?: string | null
+  /** Whether the contract exists on chain. */
   isDeployed?: boolean | null
+  /** Display name. */
   name?: string | null
+  /** Free description. */
   description?: string | null
+  /** Organigram the organ belongs to. */
   organigramId?: string | null
+  /** Trusted forwarder relaying gasless transactions. */
   forwarder?: string | null
 }
 
-/**
- * JSON-safe serialized representation of one organ.
- */
+/** An organ as plain JSON, to store or send it. */
 export interface OrganJson {
+  /** Contract address, or a predicted address while it is a draft. */
   address: string
+  /** Display name. */
   name: string
+  /** Whether the contract exists on chain. */
   isDeployed: boolean
+  /** Free description. */
   description: string
+  /** Reference to the off-chain metadata of the organ. */
   cid: string
+  /** Members and documents registered in the organ. */
   entries: OrganEntry[]
+  /** Addresses allowed to act on the organ, with their permission flags. */
   permissions: OrganPermission[]
+  /** Salt that determines the clone address. */
   salt?: string | null
+  /** Chain the organ lives on. */
   chainId: string
+  /** Organigram the organ belongs to. */
   organigramId: string
+  /** Ether balance, in wei. */
   balance: string
 }
 
-/**
- * High-level names for the writable organ functions exposed by the SDK.
- */
+/** The organ functions a proposal operation can call. */
 export enum OrganFunctionName {
+  /** Add entries. */
   addEntries = 'addEntries',
+  /** Remove entries. */
   removeEntries = 'removeEntries',
+  /** Replace one entry. */
   replaceEntry = 'replaceEntry',
+  /** Grant permissions to an address. */
   addPermission = 'addPermission',
+  /** Revoke the permissions of an address. */
   removePermission = 'removePermission',
+  /** Move permissions to another address. */
   replacePermission = 'replacePermission',
+  /** Send ether. */
   withdrawEther = 'withdrawEther',
+  /** Send ERC-20 tokens. */
   withdrawERC20 = 'withdrawERC20',
+  /** Send an ERC-721 token. */
   withdrawERC721 = 'withdrawERC721'
 }
 
@@ -117,12 +154,12 @@ const formatPermissionValue = (value: number | string | bigint) =>
     { size: 2 }
   )
 
-const normalizeEntry = (entry: IOrganEntry) => ({
+const normalizeEntry = (entry: OrganEntryInput) => ({
   addr: entry.address ?? zeroAddress,
   cid: entry.cid ?? ''
 })
 
-const isNonEmptyEntry = (entry: IOrganEntry) =>
+const isNonEmptyEntry = (entry: OrganEntryInput) =>
   (entry.address != null && entry.address !== '') ||
   (entry.cid != null && entry.cid !== '')
 
@@ -167,7 +204,7 @@ const normalizeOrganFunctionCall = async ({
     case OrganFunctionName.addEntries:
       return {
         functionName: 'addEntries',
-        args: [(args[0] as IOrganEntry[]).map(normalizeEntry)]
+        args: [(args[0] as OrganEntryInput[]).map(normalizeEntry)]
       }
     case OrganFunctionName.removeEntries:
       return {
@@ -175,7 +212,7 @@ const normalizeOrganFunctionCall = async ({
         args: [(args[0] as string[]).map(index => BigInt(index))]
       }
     case OrganFunctionName.replaceEntry: {
-      const [index, entry] = args as [number | string | bigint, IOrganEntry]
+      const [index, entry] = args as [number | string | bigint, OrganEntryInput]
       if (!isNonEmptyEntry(entry)) {
         throw new Error('Entry must include an address or a CID.')
       }
@@ -263,25 +300,43 @@ const normalizeOrganFunctionCall = async ({
 }
 
 /**
- * In-memory representation of one deployed or planned organ.
+ * A group of the organization: a registry of members and documents, a list of permissions, and a balance of assets.
+ *
+ * @remarks Every change to an organ must come from an address holding the matching permission. In a governed organization, that address is a procedure, so that each change goes through a decision.
  */
 export class Organ {
+  /** ERC-165 interface identifier of organ contracts. */
   static INTERFACE = '0xf81b1307'
 
+  /** Display name. */
   name: string
+  /** Free description. */
   description: string
+  /** Contract address, or a predicted address while it is a draft. */
   address: string
+  /** Salt that determines the clone address. */
   salt: string | undefined
+  /** Chain the organ lives on. */
   chainId: string
+  /** Ether balance, in wei. */
   balance: string
+  /** Addresses allowed to act on the organ, with their permission flags. */
   permissions: OrganPermission[] = []
+  /** Reference to the off-chain metadata of the organ. */
   cid: string
+  /** Members and documents registered in the organ. */
   entries: OrganEntry[] = []
+  /** Client that signs transactions. */
   walletClient?: WalletClient
+  /** Client used for reads. */
   publicClient?: PublicClient
-  contract?: any
+  /** viem contract instance, once loaded. */
+  contract?: OrganigramContract
+  /** Whether the contract exists on chain. */
   isDeployed: boolean
+  /** Organigram the organ belongs to. */
   organigramId: string
+  /** Trusted forwarder relaying gasless transactions. */
   forwarder: string
 
   public constructor({
@@ -342,6 +397,7 @@ export class Organ {
     }
   }
 
+  /** Replace the reference to the off-chain metadata of the organ. */
   public updateCid = async (
     cid: string,
     options?: TransactionOptions
@@ -358,8 +414,9 @@ export class Organ {
     return await tx.wait()
   }
 
+  /** Add members or documents to the registry. */
   public addEntries = async (
-    entries: IOrganEntry[],
+    entries: OrganEntryInput[],
     options?: TransactionOptions
   ): Promise<OrganigramTransactionReceipt> => {
     const normalizedEntries = entries
@@ -388,6 +445,7 @@ export class Organ {
     return await tx.wait()
   }
 
+  /** Remove entries from the registry, by index. */
   public removeEntries = async (
     indexes: string[],
     options?: TransactionOptions
@@ -407,9 +465,10 @@ export class Organ {
     return await tx.wait()
   }
 
+  /** Replace one entry of the registry. */
   public replaceEntry = async (
     index: number,
-    entry: IOrganEntry,
+    entry: OrganEntryInput,
     options?: TransactionOptions
   ): Promise<OrganigramTransactionReceipt> => {
     if (!isNonEmptyEntry(entry)) {
@@ -427,6 +486,7 @@ export class Organ {
     return await tx.wait()
   }
 
+  /** Grant permissions to an address. */
   public addPermission = async (
     permission: OrganPermission,
     options?: TransactionOptions
@@ -449,6 +509,7 @@ export class Organ {
     return await tx.wait()
   }
 
+  /** Revoke every permission of an address. */
   public removePermission = async (
     permission: string,
     options?: TransactionOptions
@@ -468,6 +529,7 @@ export class Organ {
     return await tx.wait()
   }
 
+  /** Move permissions from one address to another. */
   public replacePermission = async (
     oldPermissionAddress: string,
     newOrganPermission: OrganPermission,
@@ -492,6 +554,7 @@ export class Organ {
     return await tx.wait()
   }
 
+  /** Send ether held by the organ. */
   public withdrawEther = async (
     to: string,
     value: string | number | bigint,
@@ -512,6 +575,7 @@ export class Organ {
     return await tx.wait()
   }
 
+  /** Send ERC-20 tokens held by the organ. */
   public withdrawERC20 = async (
     token: string,
     to: string,
@@ -537,6 +601,7 @@ export class Organ {
     return await tx.wait()
   }
 
+  /** Send an ERC-721 token held by the organ. */
   public withdrawERC721 = async (
     token: string,
     to: string,
@@ -562,6 +627,7 @@ export class Organ {
     return await tx.wait()
   }
 
+  /** Read an organ from chain: its entries, permissions and metadata. */
   static async load(
     address: string,
     clients: ContractClients,
@@ -599,6 +665,7 @@ export class Organ {
     })
   }
 
+  /** Tell whether a contract is an organ. */
   static async isOrgan(
     address: string,
     clients: ContractClients
@@ -613,6 +680,7 @@ export class Organ {
     return Boolean(await contract.read.supportsInterface([Organ.INTERFACE]))
   }
 
+  /** Read the ether balance of an organ, in wei. */
   static async getBalance(
     address: string,
     clients: ContractClients
@@ -622,6 +690,7 @@ export class Organ {
     })
   }
 
+  /** Read the metadata reference and registry sizes of an organ. */
   static async loadData(
     address: string,
     clients: ContractClients
@@ -640,6 +709,7 @@ export class Organ {
       })
   }
 
+  /** Find the entry of an address in an organ, if it is a member. */
   static async loadEntryForAccount(
     address: string,
     account: string,
@@ -658,6 +728,7 @@ export class Organ {
     )
   }
 
+  /** Read the permission flags an address holds on an organ. */
   static async checkAddressPermissions(
     organAddress: string,
     addressToCheck: string,
@@ -677,6 +748,7 @@ export class Organ {
     return typeof result === 'string' ? parseInt(result, 16) : Number(result)
   }
 
+  /** Read one permission of an organ, by index. */
   static async loadPermission(
     address: string,
     index: string,
@@ -698,6 +770,7 @@ export class Organ {
     return normalizeLoadedPermission(permission as any)
   }
 
+  /** Read every permission of an organ. */
   static async loadPermissions(
     address: string,
     clients: ContractClients,
@@ -752,6 +825,7 @@ export class Organ {
     ).filter((permission): permission is OrganPermission => permission != null)
   }
 
+  /** Read one entry of an organ, by index. */
   static async loadEntry(
     address: string,
     index: string,
@@ -766,6 +840,7 @@ export class Organ {
     return normalizeLoadedEntry(entry, index)
   }
 
+  /** Read every entry of an organ. */
   static async loadEntries(
     address: string,
     clients: ContractClients,
@@ -832,6 +907,17 @@ export class Organ {
     return entries.filter((entry): entry is OrganEntry => entry != null)
   }
 
+  /**
+   * Encode a call to an organ function, to use it as a proposal operation with `Procedure.createOperation()`.
+   *
+   * @example
+   * ```ts
+   * const call = await Organ.populateTransaction(organAddress, walletClient, 'addEntries', [
+   *   { address: memberAddress }
+   * ])
+   * const operation = Procedure.createOperation(call)
+   * ```
+   */
   static async populateTransaction(
     address: string,
     walletClient: WalletClient,
@@ -854,6 +940,7 @@ export class Organ {
     }
   }
 
+  /** Read the whole organ again from chain. */
   async reload(): Promise<Organ> {
     const { permissions, cid, entries } = await Organ.load(
       this.address,
@@ -865,6 +952,7 @@ export class Organ {
     return this
   }
 
+  /** Read the entries again from chain. */
   async reloadEntries(): Promise<Organ> {
     this.entries = await Organ.loadEntries(this.address, this.getClients()).catch(
       (error: Error) => {
@@ -879,6 +967,7 @@ export class Organ {
     return this
   }
 
+  /** Read the permissions again from chain. */
   async reloadPermissions(): Promise<Organ> {
     this.permissions = await Organ.loadPermissions(
       this.address,
@@ -894,12 +983,14 @@ export class Organ {
     return this
   }
 
+  /** Read the metadata reference again from chain. */
   async reloadData(): Promise<Organ> {
     const data = await Organ.loadData(this.address, this.getClients())
     this.cid = data?.cid
     return this
   }
 
+  /** Convert the organ into plain JSON. */
   toJson = (): OrganJson =>
     JSON.parse(
       JSON.stringify({

@@ -1,4 +1,4 @@
-import { CID_REF_PREFIX, ENCRYPTION_ALGORITHM, FILE_VERSION_MANIFEST_KIND, SCOPE_ENVELOPE_KIND } from './constants';
+import { CID_REF_PREFIX, ENCRYPTION_ALGORITHM, FILE_VERSION_MANIFEST_KIND } from './constants';
 import { textToBytes } from './encoding';
 import { bytesToHex } from 'viem';
 const canonicalize = (value) => {
@@ -24,11 +24,20 @@ export const sha256Hex = async (value) => {
     const { createHash } = await import('node:crypto');
     return createHash('sha256').update(value).digest('hex');
 };
+/** Create a workspace checkpoint. */
 export const createScopeEnvelopeCheckpoint = (input) => ({
     epoch: input.epoch,
     membershipHash: input.membershipHash,
     rootHash: input.rootHash
 });
+/**
+ * Build a CID reference, `og://workspace/<workspace>/<key>`, optionally pinned to one version.
+ *
+ * @example
+ * ```ts
+ * formatCidRef({ scopeType: 'workspace', scopeId: workspaceId }, 'bylaws')
+ * ```
+ */
 export const formatCidRef = (scopeRef, logicalKey, manifestCid) => {
     if (scopeRef.scopeType !== 'workspace') {
         throw new Error('Only workspace scope references are supported.');
@@ -41,6 +50,7 @@ export const formatCidRef = (scopeRef, logicalKey, manifestCid) => {
         ? reference
         : `${reference}?version=${encodeURIComponent(manifestCid)}`;
 };
+/** Split a CID reference into its parts, or return `null` if it is not one. */
 export const parseCidRef = (value) => {
     if (value == null || !value.startsWith(CID_REF_PREFIX)) {
         return null;
@@ -66,7 +76,9 @@ export const parseCidRef = (value) => {
         ...(manifestCid != null && manifestCid !== '' ? { manifestCid } : {})
     };
 };
+/** Tell whether a string is a CID reference. */
 export const isCidRef = (value) => parseCidRef(value) != null;
+/** Describe the current version of one file for a workspace checkpoint. */
 export const createScopeEnvelopeItem = (input) => ({
     logicalKey: input.logicalKey,
     currentManifestCid: input.currentManifestCid,
@@ -78,12 +90,14 @@ export const createScopeEnvelopeItem = (input) => ({
         ? input.updatedAt.toISOString()
         : input.updatedAt ?? new Date().toISOString()
 });
+/** Hash every file entry of a workspace into the root hash of a checkpoint. */
 export const computeScopeEnvelopeRoot = async (items) => {
     const sortedItems = Object.keys(items)
         .sort((a, b) => a.localeCompare(b))
         .map(key => [key, items[key]]);
     return await sha256Hex(stableStringify(sortedItems));
 };
+/** Build the message a member signs to vouch for a workspace checkpoint. */
 export const createScopeEnvelopeSignatureMessage = (input) => [
     'Organigram scope envelope checkpoint',
     `scopeType: ${input.scopeRef.scopeType}`,
@@ -96,29 +110,7 @@ export const createScopeEnvelopeSignatureMessage = (input) => [
         .map(key => [key, input.items[key]]))}`,
     `previousEnvelopeCid: ${input.previousEnvelopeCid ?? ''}`
 ].join('\n');
-export const createScopeEnvelopeManifest = (input) => ({
-    kind: SCOPE_ENVELOPE_KIND,
-    version: 1,
-    scopeRef: input.scopeRef,
-    checkpoint: input.checkpoint,
-    items: input.items,
-    wrappedEnvelopeKey: input.wrappedEnvelopeKey,
-    previousEnvelopeCid: input.previousEnvelopeCid ?? undefined,
-    signature: input.signature ?? undefined,
-    signedByAddress: input.signedByAddress?.toLowerCase(),
-    createdAt: input.createdAt instanceof Date
-        ? input.createdAt.toISOString()
-        : input.createdAt ?? new Date().toISOString()
-});
-export const isScopeEnvelopeManifest = (value) => {
-    const candidate = value;
-    return (candidate?.kind === SCOPE_ENVELOPE_KIND &&
-        candidate.version === 1 &&
-        candidate.scopeRef?.scopeType === 'workspace' &&
-        candidate.scopeRef.scopeId != null &&
-        candidate.checkpoint?.rootHash != null &&
-        candidate.wrappedEnvelopeKey?.ciphertext != null);
-};
+/** Describe a new version of an encrypted file. */
 export const createFileVersionManifest = (input) => ({
     kind: FILE_VERSION_MANIFEST_KIND,
     version: 1,
@@ -143,6 +135,7 @@ export const createFileVersionManifest = (input) => ({
         ? input.createdAt.toISOString()
         : input.createdAt ?? new Date().toISOString()
 });
+/** Describe a new version of a file stored in clear. */
 export const createPublicFileVersionManifest = (input) => ({
     kind: FILE_VERSION_MANIFEST_KIND,
     version: 1,

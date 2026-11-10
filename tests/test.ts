@@ -4,6 +4,7 @@ import ProcedureContractABI from '@organigram/protocol/abi/Procedure.sol/Procedu
 import NominationProcedureContractABI from '@organigram/protocol/abi/Nomination.sol/NominationProcedure.json'
 import {
   createPublicClient,
+  createTestClient,
   createWalletClient,
   getContract,
   http,
@@ -25,6 +26,7 @@ import {
   Organ,
   OrganigramClient,
   predictContractAddress,
+  Procedure,
   ProcedureProposalOperation
 } from '../src'
 import { type TransactionOptions } from '../src/organigramClient'
@@ -110,13 +112,11 @@ describe('Organigram JS Client', () => {
     })
 
     it('should deploy an ERC20 asset', async () => {
-      asset = await organigramClient.deployAsset(
-        'ERC20',
-        'ERC',
-        ERC20_INITIAL_SUPPLY,
-        undefined,
-        txOptions
-      )
+      asset = await organigramClient.deployAsset({
+        name: 'ERC20',
+        symbol: 'ERC',
+        options: txOptions
+      })
       expect(isAddress(asset)).toBe(true)
     })
 
@@ -377,32 +377,38 @@ describe('Organigram JS Client', () => {
       const predictedAddress = predictContractAddress({
         type: 'Organ',
         chainId: TEST_CHAIN_ID,
-        salt
+        salt,
+        deployer: signerAddress
       })
       const predictedAddress2 = predictContractAddress({
         type: 'Organ',
         chainId: TEST_CHAIN_ID,
-        salt: salt2
+        salt: salt2,
+        deployer: signerAddress
       })
       const predictedAddress3 = predictContractAddress({
         type: 'NominationProcedure',
         chainId: TEST_CHAIN_ID,
-        salt: salt3
+        salt: salt3,
+        deployer: signerAddress
       })
       const predictedAddress4 = predictContractAddress({
         type: 'ERC20VoteProcedure',
         chainId: TEST_CHAIN_ID,
-        salt: salt4
+        salt: salt4,
+        deployer: signerAddress
       })
       const predictedAddress5 = predictContractAddress({
         type: 'VoteProcedure',
         chainId: TEST_CHAIN_ID,
-        salt: salt5
+        salt: salt5,
+        deployer: signerAddress
       })
       const predictedAddress6 = predictContractAddress({
         type: 'Asset',
         chainId: TEST_CHAIN_ID,
-        salt: salt6
+        salt: salt6,
+        deployer: signerAddress
       })
       const organigram = {
         organs: [
@@ -701,13 +707,11 @@ describe('Organigram JS Client', () => {
         const address = signerAddress
         const erc20VotesAsset =
           asset ??
-          (await organigramClient.deployAsset(
-            'ERC20Votes',
-            'VOTE',
-            ERC20_INITIAL_SUPPLY,
-            undefined,
-            txOptions
-          ))
+          (await organigramClient.deployAsset({
+            name: 'ERC20Votes',
+            symbol: 'VOTE',
+            options: txOptions
+          }))
         procedure = (await organigramClient.deployProcedure({
           typeName: 'erc20Vote',
           options: {},
@@ -769,13 +773,11 @@ describe('Organigram JS Client', () => {
         const address = signerAddress
         const erc20VotesAsset =
           asset ??
-          (await organigramClient.deployAsset(
-            'ERC20Votes',
-            'VOTE',
-            ERC20_INITIAL_SUPPLY,
-            undefined,
-            txOptions
-          ))
+          (await organigramClient.deployAsset({
+            name: 'ERC20Votes',
+            symbol: 'VOTE',
+            options: txOptions
+          }))
         const moderatedProcedure = (await organigramClient.deployProcedure({
           typeName: 'erc20Vote',
           options: {},
@@ -816,6 +818,238 @@ describe('Organigram JS Client', () => {
         )
         expect(receipt.status).toBe('success')
         expect(payload.blocked).toBe(true)
+      })
+    })
+
+    describe('Signatures', () => {
+      // The signer holds no ether: the funded test wallet relays every signed action.
+      const signer = privateKeyToAccount(generatePrivateKey())
+      const member = privateKeyToAccount(generatePrivateKey())
+      let procedureAddress: string
+      let organAddress: string
+      let proposalKey: string
+
+      const signerWallet = () =>
+        createWalletClient({
+          account: signer,
+          chain: anvil,
+          transport: http('http://127.0.0.1:8545/')
+        })
+      const loadAs = async <P extends Procedure>(
+        wallet: WalletClient,
+        address = procedureAddress
+      ): Promise<P> =>
+        (await (
+          await OrganigramClient.load({ publicClient, walletClient: wallet })
+        ).loadProcedure(address, { fresh: true })) as P
+      const deadline = async () =>
+        (await publicClient.getBlock()).timestamp + 3600n
+      const addMemberOperation = async (organ = organAddress) =>
+        Procedure.createOperation(
+          await Organ.populateTransaction(organ, walletClient, 'addEntries', [
+            { address: member.address }
+          ])
+        )
+      const proposeAsSigner = async (cid = proposalMetadataCid) => {
+        const relayer = await loadAs<NominationProcedure>(walletClient)
+        const signed = {
+          cid,
+          operations: [await addMemberOperation()],
+          nonce: await relayer.getNonce(signer.address),
+          deadline: await deadline()
+        }
+        const signature = await (
+          await loadAs<NominationProcedure>(signerWallet())
+        ).signProposal(signed)
+        await relayer.proposeBySig({ ...signed, signature })
+        return (await relayer.reloadProposals()).proposals.at(-1)
+      }
+
+      it('relays a proposal signed by an account without ether', async () => {
+        const procedure = await organigramClient.deployProcedure({
+          typeName: 'nomination',
+          proposers: signer.address,
+          moderators: signer.address,
+          deciders: signer.address,
+          withModeration: true
+        })
+        procedureAddress = procedure.address
+        organAddress = (
+          await organigramClient.deployOrgan({
+            permissions: [
+              { permissionAddress: procedureAddress, permissionValue: PERMISSIONS.ADMIN }
+            ]
+          })
+        ).address
+
+        const proposal = await proposeAsSigner()
+        proposalKey = proposal?.key as string
+
+        expect(proposal?.creator.toLowerCase()).toBe(signer.address.toLowerCase())
+        expect(proposal?.presented).toBe(false)
+        expect(await publicClient.getBalance({ address: signer.address })).toBe(0n)
+      })
+
+      it('rejects an altered or replayed signature', async () => {
+        const relayer = await loadAs<NominationProcedure>(walletClient)
+        const signed = {
+          cid: proposalMetadataCid,
+          operations: [await addMemberOperation()],
+          nonce: await relayer.getNonce(signer.address),
+          deadline: await deadline()
+        }
+        const signature = await (
+          await loadAs<NominationProcedure>(signerWallet())
+        ).signProposal(signed)
+
+        await expect(
+          relayer.proposeBySig({ ...signed, cid: `${proposalMetadataCid}-altered`, signature })
+        ).rejects.toThrow()
+        await relayer.proposeBySig({ ...signed, signature })
+        await expect(relayer.proposeBySig({ ...signed, signature })).rejects.toThrow()
+      })
+
+      it('relays a signed moderation, then a signed nomination', async () => {
+        const signerProcedure = await loadAs<NominationProcedure>(signerWallet())
+        const relayer = await loadAs<NominationProcedure>(walletClient)
+        const action = async () => ({
+          proposalKey,
+          nonce: await relayer.getNonce(signer.address),
+          deadline: await deadline()
+        })
+
+        const present = await action()
+        await relayer.presentProposalBySig({
+          ...present,
+          signature: await signerProcedure.signPresentProposal(present)
+        })
+        const nomination = await action()
+        await relayer.nominateBySig({
+          ...nomination,
+          signature: await signerProcedure.signNomination(nomination)
+        })
+
+        const proposal = await Procedure.loadProposal(procedureAddress, proposalKey, clients)
+        const organ = await Organ.load(organAddress, clients)
+        expect(proposal.presented).toBe(true)
+        expect(proposal.applied).toBe(true)
+        expect(organ.entries.map(entry => entry.address.toLowerCase())).toContain(
+          member.address.toLowerCase()
+        )
+      })
+
+      it('relays a signed block', async () => {
+        const proposal = await proposeAsSigner()
+        const signerProcedure = await loadAs<NominationProcedure>(signerWallet())
+        const relayer = await loadAs<NominationProcedure>(walletClient)
+        const block = {
+          proposalKey: proposal?.key as string,
+          reason: 'Out of scope',
+          nonce: await relayer.getNonce(signer.address),
+          deadline: await deadline()
+        }
+
+        await relayer.blockProposalBySig({
+          ...block,
+          signature: await signerProcedure.signBlockProposal(block)
+        })
+
+        const blocked = await Procedure.loadProposal(procedureAddress, block.proposalKey, clients)
+        expect(blocked.blocked).toBe(true)
+        expect(blocked.blockReason).toBe('Out of scope')
+      })
+
+      describe('Vote', () => {
+        let voteAddress: string
+        let voteOrganAddress: string
+        let voteKey: string
+        // Real waits rather than time travel: moving the anvil clock ahead
+        // would expire the deadlines the app computes from the wall clock.
+        const voteDuration = 4
+        const testClient = createTestClient({
+          mode: 'anvil',
+          chain: anvil,
+          transport: http('http://127.0.0.1:8545/')
+        })
+        // Mining at the current time moves the chain clock to the wall clock.
+        const waitSeconds = async (seconds: number) => {
+          await new Promise(resolve => setTimeout(resolve, seconds * 1000))
+          await testClient.mine({ blocks: 1 })
+        }
+
+        it('relays a signed vote', async () => {
+          // Counting reads the size of the deciders organ, so they must be one.
+          const voters = await organigramClient.deployOrgan({
+            entries: [{ index: '1', address: signer.address, cid: '' }]
+          })
+          const procedure = await organigramClient.deployProcedure({
+            typeName: 'vote',
+            proposers: signerAddress,
+            deciders: voters.address,
+            data: JSON.stringify({
+              quorumSize: '1',
+              voteDuration: String(voteDuration),
+              majoritySize: '50001'
+            })
+          })
+          voteAddress = procedure.address
+          voteOrganAddress = (
+            await organigramClient.deployOrgan({
+              permissions: [
+                { permissionAddress: voteAddress, permissionValue: PERMISSIONS.ADMIN }
+              ]
+            })
+          ).address
+          voteKey = (
+            await procedure.propose({
+              cid: proposalMetadataCid,
+              operations: [await addMemberOperation(voteOrganAddress)]
+            })
+          ).key
+          // Votes are accepted once the election start is in the past.
+          await waitSeconds(1.1)
+
+          const relayer = await loadAs<VoteProcedure>(walletClient, voteAddress)
+          const vote = {
+            proposalKey: voteKey,
+            approval: true,
+            nonce: await relayer.getNonce(signer.address),
+            deadline: await deadline()
+          }
+          await relayer.voteBySig({
+            ...vote,
+            signature: await (
+              await loadAs<VoteProcedure>(signerWallet(), voteAddress)
+            ).signVote(vote)
+          })
+
+          const election = await VoteProcedure.loadElection(voteAddress, voteKey, clients)
+          expect(election.votesCount).toBe('1')
+        })
+
+        it('relays a signed application of the vote result', async () => {
+          await waitSeconds(voteDuration)
+          const relayer = await loadAs<VoteProcedure>(walletClient, voteAddress)
+          const application = {
+            proposalKey: voteKey,
+            nonce: await relayer.getNonce(signer.address),
+            deadline: await deadline()
+          }
+
+          await relayer.applyProposalBySig({
+            ...application,
+            signature: await (
+              await loadAs<VoteProcedure>(signerWallet(), voteAddress)
+            ).signApplyProposal(application)
+          })
+
+          const proposal = await Procedure.loadProposal(voteAddress, voteKey, clients)
+          const organ = await Organ.load(voteOrganAddress, clients)
+          expect(proposal.adopted && proposal.applied).toBe(true)
+          expect(organ.entries.map(entry => entry.address.toLowerCase())).toContain(
+            member.address.toLowerCase()
+          )
+        })
       })
     })
   })

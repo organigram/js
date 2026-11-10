@@ -4,9 +4,15 @@ import { Procedure } from '.';
 import { getDefaultChainId, getDeployment } from '../deployments';
 import { getProcedureType } from './utils';
 import { createContractWriteTransaction, getContractInstance, getWalletAccount } from '../contracts';
+/**
+ * A procedure in which any one member of the deciders adopts or rejects a proposal alone.
+ */
 export class NominationProcedure extends Procedure {
+    /** ERC-165 interface identifier of nomination procedures. */
     static INTERFACE = '0xc5f28e49';
+    /** viem contract instance, once loaded. */
     contract;
+    /** Always `nomination`. */
     typeName = 'nomination';
     constructor(procedureInput) {
         super({ ...procedureInput, typeName: 'nomination' });
@@ -21,6 +27,7 @@ export class NominationProcedure extends Procedure {
                 })
                 : undefined;
     }
+    /** @internal */
     static async _populateInitialize(input, _clients) {
         const deciders = input.deciders.trim();
         if (deciders === '') {
@@ -46,6 +53,7 @@ export class NominationProcedure extends Procedure {
             })
         };
     }
+    /** Read a nomination procedure from chain, with its proposals. */
     static async load(address, clients, initialProcedure) {
         const procedure = await Procedure.load(address, clients, initialProcedure);
         return new NominationProcedure({
@@ -68,6 +76,7 @@ export class NominationProcedure extends Procedure {
             data: initialProcedure?.data ?? ''
         });
     }
+    /** Adopt a proposal as a decider, which runs its operations. */
     async nominate(proposalKey, options) {
         const tx = await createContractWriteTransaction({
             address: this.address,
@@ -80,6 +89,7 @@ export class NominationProcedure extends Procedure {
         options?.onTransaction?.(tx, 'Initialize Nomination procedure.');
         await tx.wait();
     }
+    /** Reject a proposal as a decider. */
     async reject(proposalKey, options) {
         const tx = await createContractWriteTransaction({
             address: this.address,
@@ -92,6 +102,11 @@ export class NominationProcedure extends Procedure {
         options?.onTransaction?.(tx, 'Reject Nomination procedure proposal.');
         await tx.wait();
     }
+    /**
+     * Sign the adoption of a proposal, for `nominateBySig()`.
+     *
+     * @remarks The signer pays no gas: any account can submit the signature with the matching `…BySig` method.
+     */
     async signNomination(input) {
         if (this.walletClient == null) {
             throw new Error('Connected wallet cannot sign typed data.');
@@ -115,6 +130,7 @@ export class NominationProcedure extends Procedure {
             }
         });
     }
+    /** Adopt a proposal with an adoption signed by a decider. */
     async nominateBySig(input) {
         const tx = await createContractWriteTransaction({
             address: this.address,

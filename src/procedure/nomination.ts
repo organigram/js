@@ -14,13 +14,20 @@ import {
   type ContractClients,
   createContractWriteTransaction,
   getContractInstance,
-  getWalletAccount
+  getWalletAccount,
+  type OrganigramContract
 } from '../contracts'
 
+/**
+ * A procedure in which any one member of the deciders adopts or rejects a proposal alone.
+ */
 export class NominationProcedure extends Procedure {
+  /** ERC-165 interface identifier of nomination procedures. */
   static INTERFACE = '0xc5f28e49'
 
-  contract?: any
+  /** viem contract instance, once loaded. */
+  contract?: OrganigramContract
+  /** Always `nomination`. */
   typeName = 'nomination' as ProcedureTypeName
 
   constructor(procedureInput: ProcedureInput) {
@@ -37,6 +44,7 @@ export class NominationProcedure extends Procedure {
         : undefined
   }
 
+  /** @internal */
   static async _populateInitialize(
     input: PopulateInitializeInput,
     _clients: ContractClients
@@ -69,6 +77,7 @@ export class NominationProcedure extends Procedure {
     }
   }
 
+  /** Read a nomination procedure from chain, with its proposals. */
   static async load(
     address: string,
     clients: ContractClients,
@@ -96,6 +105,7 @@ export class NominationProcedure extends Procedure {
     })
   }
 
+  /** Adopt a proposal as a decider, which runs its operations. */
   async nominate(
     proposalKey: string,
     options?: TransactionOptions
@@ -112,6 +122,7 @@ export class NominationProcedure extends Procedure {
     await tx.wait()
   }
 
+  /** Reject a proposal as a decider. */
   async reject(
     proposalKey: string,
     options?: TransactionOptions
@@ -128,6 +139,11 @@ export class NominationProcedure extends Procedure {
     await tx.wait()
   }
 
+  /**
+   * Sign the adoption of a proposal, for `nominateBySig()`.
+   *
+   * @remarks The signer pays no gas: any account can submit the signature with the matching `…BySig` method.
+   */
   async signNomination(input: {
     proposalKey: string
     nonce: bigint
@@ -156,6 +172,7 @@ export class NominationProcedure extends Procedure {
     })
   }
 
+  /** Adopt a proposal with an adoption signed by a decider. */
   async nominateBySig(input: {
     proposalKey: string
     nonce: bigint

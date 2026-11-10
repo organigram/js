@@ -1,28 +1,49 @@
-import { DeployOrganInput, DeployProceduresInput, TransactionOptions } from '../organigramClient';
+import { DeployOrganInput, DeployProcedureInput, TransactionOptions } from '../organigramClient';
 import type { ContractClients } from '../contracts';
 import type { ProcedureType } from './index';
+/** Name of a procedure type. */
 export type ProcedureTypeName = 'erc20Vote' | 'nomination' | 'vote';
+/**
+ * Who holds a role in an ERC-20 vote: the members of an organ, the token holders, or nobody.
+ */
 export type ERC20VoteRoleMode = 'organ' | 'token' | 'disabled';
 export declare enum ProcedureTypeNameEnum {
     erc20Vote = "erc20Vote",
     nomination = "nomination",
     vote = "vote"
 }
+/** Everything needed to encode the initialization of a procedure clone. */
 export interface PopulateInitializeInput {
+    /** Transaction options. */
     options?: TransactionOptions;
+    /** Procedure type. */
     typeName?: ProcedureTypeName;
+    /** Reference to the procedure metadata. */
     cid: string;
+    /** Proposers organ or address. */
     proposers: string;
+    /** Moderators organ or address. */
     moderators: string;
+    /** Deciders organ or address. */
     deciders: string;
+    /** Whether moderation is enabled. */
     withModeration: boolean;
+    /** Whether proposers are organ members, token holders, or nobody. */
     proposerMode?: ERC20VoteRoleMode;
+    /** Whether moderators are organ members, token holders, or nobody. */
     moderatorMode?: ERC20VoteRoleMode;
+    /** Whether voters are organ members or token holders. */
     voterMode?: ERC20VoteRoleMode;
+    /**
+     * Whether a majority of the deciders organ must also approve, besides the token-weighted vote.
+     */
     requireMemberMajority?: boolean;
+    /** Trusted forwarder relaying gasless transactions. */
     forwarder: string;
+    /** Parameters specific to the procedure type, as hex strings. */
     args: unknown[];
 }
+/** Encoded call data. */
 export type PopulatedTransactionData = {
     data: string;
 };
@@ -32,21 +53,21 @@ export declare const electionFields: {
         label: string;
         description: string;
         defaultValue: string;
-        type: string;
+        type: "number";
     };
     voteDuration: {
         name: string;
         label: string;
         description: string;
         defaultValue: string;
-        type: string;
+        type: "number";
     };
     majoritySize: {
         name: string;
         label: string;
         description: string;
         defaultValue: string;
-        type: string;
+        type: "number";
     };
 };
 export declare const procedureMetadata: {
@@ -98,21 +119,21 @@ export declare const procedureTypeMetadata: {
                 label: string;
                 description: string;
                 defaultValue: string;
-                type: string;
+                type: "number";
             };
             readonly voteDuration: {
                 name: string;
                 label: string;
                 description: string;
                 defaultValue: string;
-                type: string;
+                type: "number";
             };
             readonly majoritySize: {
                 name: string;
                 label: string;
                 description: string;
                 defaultValue: string;
-                type: string;
+                type: "number";
             };
         };
         readonly metadata: {
@@ -140,21 +161,21 @@ export declare const procedureTypeMetadata: {
                 label: string;
                 description: string;
                 defaultValue: string;
-                type: string;
+                type: "number";
             };
             voteDuration: {
                 name: string;
                 label: string;
                 description: string;
                 defaultValue: string;
-                type: string;
+                type: "number";
             };
             majoritySize: {
                 name: string;
                 label: string;
                 description: string;
                 defaultValue: string;
-                type: string;
+                type: "number";
             };
         };
         readonly metadata: {
@@ -163,6 +184,7 @@ export declare const procedureTypeMetadata: {
         };
     };
 };
+/** Return the procedure types registered on a chain. */
 export declare const getProcedureTypes: (chainId?: string) => Partial<Record<ProcedureTypeName, ProcedureType>>;
 export declare const getProcedureType: (chainId: string, typeName: ProcedureTypeName) => ProcedureType;
 export declare const procedureTypes: Partial<Record<ProcedureTypeName, ProcedureType>>;
@@ -176,12 +198,13 @@ export declare const prepareDeployOrgansInput: (deployOrgansInput: DeployOrganIn
     }[];
     salt: string;
 }[];
-export declare const prepareDeployProceduresInput: (deployProceduresInput: DeployProceduresInput[], clients: ContractClients) => Promise<{
+export declare const prepareDeployProceduresInput: (deployProceduresInput: DeployProcedureInput[], clients: ContractClients) => Promise<{
     procedureType: string;
     data: string;
     salt: string;
     options: TransactionOptions | undefined;
 }[]>;
+/** Return the SDK class of a procedure type. */
 export declare const getProcedureClass: (typeName: string) => Promise<typeof import("./erc20Vote").ERC20VoteProcedure | typeof import("./vote").VoteProcedure | typeof import("./nomination").NominationProcedure>;
 export declare const populateInitializeProcedure: (input: PopulateInitializeInput, clients: ContractClients) => Promise<PopulatedTransactionData>;
 export declare const encodeProcedureInitialization: (abi: unknown, functionName: string, args: unknown[]) => PopulatedTransactionData;

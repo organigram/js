@@ -1,3 +1,4 @@
+/** Copy bytes into a standalone `ArrayBuffer`. */
 export const bytesToArrayBuffer = (value) => {
     if (value instanceof ArrayBuffer) {
         return value;
@@ -29,6 +30,7 @@ export const base64ToBytes = (value) => {
     return bytes;
 };
 export const textToBytes = (value) => new TextEncoder().encode(value);
+/** Decode UTF-8 bytes into a string. */
 export const bytesToText = (value) => new TextDecoder().decode(value);
 export const bytesToBase64Url = (bytes) => bytesToBase64(bytes)
     .replaceAll('+', '-')
