@@ -12,6 +12,7 @@ import dataProcessingRegister from './data-processing-register.json' with { type
 import corporateFilings from './corporate-filings.json' with { type: 'json' };
 import { capitalize, createRandom32BytesHexId, PERMISSIONS, predictContractAddress } from '../utils';
 import { resolveDeployment } from '../deployments';
+/** Ready-made organigrams, from company forms (`sas`, `sarl`…) to registers. */
 export const templates = {
     none,
     nonProfit,
@@ -32,7 +33,7 @@ const templateDeploymentRequirements = {
     sa: ['EquityToken'],
     sarl: ['EquityToken']
 };
-/** Returns whether every protocol implementation required by a template exists on a chain. */
+/** Tell whether a chain has every protocol contract a template needs. */
 export const isTemplateSupportedOnChain = (templateName, chainId) => (templateDeploymentRequirements[templateName] ?? []).every(deploymentName => resolveDeployment(chainId, deploymentName) != null);
 const permissionValuesByKey = new Map(Object.entries(PERMISSIONS));
 const setFirstValue = (target, key, value) => {
@@ -98,6 +99,9 @@ const normalizeOrganPermission = (permission, procedureRenewal, assetRenewal) =>
         permissionValue
     };
 };
+/**
+ * Give every contract of an organigram a new salt and address, and update the references between them.
+ */
 export const renewSaltsAndAddresses = (organigram, chainId) => {
     const organRenewal = createRenewedContractValues(organigram.organs, 'Organ', chainId);
     const assetRenewal = createRenewedContractValues(organigram.assets, 'Asset', chainId);
@@ -151,4 +155,7 @@ export const renewSaltsAndAddresses = (organigram, chainId) => {
         assets
     };
 };
+/**
+ * Return a copy of a template, with new salts and addresses for the given chain.
+ */
 export const getTemplate = (templateName, chainId) => renewSaltsAndAddresses(templates[templateName], chainId);

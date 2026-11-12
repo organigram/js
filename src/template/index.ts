@@ -22,6 +22,7 @@ import { ProcedureInput } from '../procedure'
 import { AssetInput } from '../asset'
 import { resolveDeployment, type ProtocolDeploymentName } from '../deployments'
 
+/** Ready-made organigrams, from company forms (`sas`, `sarl`…) to registers. */
 export const templates = {
   none,
   nonProfit,
@@ -37,6 +38,7 @@ export const templates = {
   corporateFilings
 }
 
+/** Name of a template. */
 export type TemplateName = keyof typeof templates
 
 const templateDeploymentRequirements: Partial<
@@ -48,7 +50,7 @@ const templateDeploymentRequirements: Partial<
   sarl: ['EquityToken']
 }
 
-/** Returns whether every protocol implementation required by a template exists on a chain. */
+/** Tell whether a chain has every protocol contract a template needs. */
 export const isTemplateSupportedOnChain = (
   templateName: TemplateName,
   chainId: string
@@ -171,6 +173,9 @@ const normalizeOrganPermission = (
   }
 }
 
+/**
+ * Give every contract of an organigram a new salt and address, and update the references between them.
+ */
 export const renewSaltsAndAddresses = (
   organigram: OrganigramInput,
   chainId: string
@@ -255,6 +260,9 @@ export const renewSaltsAndAddresses = (
   }
 }
 
+/**
+ * Return a copy of a template, with new salts and addresses for the given chain.
+ */
 export const getTemplate = (
   templateName: TemplateName,
   chainId: string

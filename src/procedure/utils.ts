@@ -1,7 +1,7 @@
 import type { OrganEntry } from '../organ'
 import {
   DeployOrganInput,
-  DeployProceduresInput,
+  DeployProcedureInput,
   TransactionOptions
 } from '../organigramClient'
 import { createRandom32BytesHexId, formatSalt } from '../utils'
@@ -11,13 +11,17 @@ import {
   resolveDeployment
 } from '../deployments'
 import type { ContractClients } from '../contracts'
-import type { ProcedureType } from './index'
+import type { ProcedureType, ProcedureTypeField } from './index'
 import { encodeFunctionData, isAddress, padHex, toHex, zeroAddress } from 'viem'
 
+/** Name of a procedure type. */
 export type ProcedureTypeName =
   | 'erc20Vote'
   | 'nomination'
   | 'vote'
+/**
+ * Who holds a role in an ERC-20 vote: the members of an organ, the token holders, or nobody.
+ */
 export type ERC20VoteRoleMode = 'organ' | 'token' | 'disabled'
 export enum ProcedureTypeNameEnum {
   erc20Vote = 'erc20Vote',
@@ -25,22 +29,39 @@ export enum ProcedureTypeNameEnum {
   vote = 'vote'
 }
 
+/** Everything needed to encode the initialization of a procedure clone. */
 export interface PopulateInitializeInput {
+  /** Transaction options. */
   options?: TransactionOptions
+  /** Procedure type. */
   typeName?: ProcedureTypeName
+  /** Reference to the procedure metadata. */
   cid: string
+  /** Proposers organ or address. */
   proposers: string
+  /** Moderators organ or address. */
   moderators: string
+  /** Deciders organ or address. */
   deciders: string
+  /** Whether moderation is enabled. */
   withModeration: boolean
+  /** Whether proposers are organ members, token holders, or nobody. */
   proposerMode?: ERC20VoteRoleMode
+  /** Whether moderators are organ members, token holders, or nobody. */
   moderatorMode?: ERC20VoteRoleMode
+  /** Whether voters are organ members or token holders. */
   voterMode?: ERC20VoteRoleMode
+  /**
+   * Whether a majority of the deciders organ must also approve, besides the token-weighted vote.
+   */
   requireMemberMajority?: boolean
+  /** Trusted forwarder relaying gasless transactions. */
   forwarder: string
+  /** Parameters specific to the procedure type, as hex strings. */
   args: unknown[]
 }
 
+/** Encoded call data. */
 export type PopulatedTransactionData = {
   data: string
 }
@@ -60,7 +81,7 @@ const normalizeOptionalString = (
 }
 
 const getProcedureInitializationArgs = (
-  procedure: DeployProceduresInput,
+  procedure: DeployProcedureInput,
   parsedData: Record<string, unknown>
 ): unknown[] => {
   if (procedure.args != null) return procedure.args
@@ -115,7 +136,7 @@ export const electionFields = {
     defaultValue: '50001',
     type: 'number'
   }
-}
+} satisfies Record<string, ProcedureTypeField>
 
 export const procedureMetadata = {
   _type: 'procedureType',
@@ -216,6 +237,7 @@ const buildProcedureType = (
     : { ...procedureTypeMetadata[typeName], address }
 }
 
+/** Return the procedure types registered on a chain. */
 export const getProcedureTypes = (chainId = getDefaultChainId()) =>
   Object.fromEntries(
     (Object.keys(procedureTypeDeploymentNames) as ProcedureTypeName[]).flatMap(
@@ -279,7 +301,7 @@ export const prepareDeployOrgansInput = (
   })
 
 export const prepareDeployProceduresInput = async (
-  deployProceduresInput: DeployProceduresInput[],
+  deployProceduresInput: DeployProcedureInput[],
   clients: ContractClients
 ) =>
   await Promise.all(
@@ -356,6 +378,7 @@ export const prepareDeployProceduresInput = async (
     })
   )
 
+/** Return the SDK class of a procedure type. */
 export const getProcedureClass = async (typeName: string) => {
   try {
     let procedureClass

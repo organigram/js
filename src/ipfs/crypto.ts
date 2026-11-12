@@ -14,6 +14,7 @@ const userKeyAlgorithm = { name: 'ECDH', namedCurve: 'P-256' } as const
 export const aesKeyAlgorithm = { name: 'AES-GCM', length: 256 } as const
 const aesIvLength = 12
 
+/** Return the Web Crypto API, and throw where it is unavailable. */
 export const getCrypto = (): Crypto => {
   if (globalThis.crypto?.subtle == null) {
     throw new Error('Web Crypto is not available in this environment.')
@@ -21,9 +22,15 @@ export const getCrypto = (): Crypto => {
   return globalThis.crypto
 }
 
+/** Generate a random 12-byte initialization vector for AES-GCM. */
 export const getRandomIv = (): Uint8Array =>
   getCrypto().getRandomValues(new Uint8Array(aesIvLength))
 
+/**
+ * Generate the ECDH P-256 key pair a user decrypts their group keys with.
+ *
+ * @remarks Keep the private key on the user's device: never send it to a server or log it.
+ */
 export const generateUserEncryptionKeyPair =
   async (): Promise<CryptoKeyPair> =>
     await getCrypto().subtle.generateKey(userKeyAlgorithm, true, [
@@ -31,6 +38,7 @@ export const generateUserEncryptionKeyPair =
       'deriveBits'
     ])
 
+/** Export the public half of a user key pair as a JSON Web Key, to publish it. */
 export const exportUserPublicKey = async (
   keyPair: CryptoKeyPair
 ): Promise<JsonWebKey> => await getCrypto().subtle.exportKey('jwk', keyPair.publicKey)
@@ -40,15 +48,22 @@ export const importUserPublicKey = async (
 ): Promise<CryptoKey> =>
   await getCrypto().subtle.importKey('jwk', publicKey, userKeyAlgorithm, false, [])
 
+/** Import a user public key from a JSON Web Key, keeping it exportable. */
 export const importExtractableUserPublicKey = async (
   publicKey: JsonWebKey
 ): Promise<CryptoKey> =>
   await getCrypto().subtle.importKey('jwk', publicKey, userKeyAlgorithm, true, [])
 
+/**
+ * Export the private half of a user key pair as a JSON Web Key.
+ *
+ * @remarks Only store the result encrypted, for example in a passkey vault.
+ */
 export const exportUserPrivateKey = async (
   keyPair: CryptoKeyPair
 ): Promise<JsonWebKey> => await getCrypto().subtle.exportKey('jwk', keyPair.privateKey)
 
+/** Import a user private key from a JSON Web Key. */
 export const importUserPrivateKey = async (
   privateKey: JsonWebKey
 ): Promise<CryptoKey> =>
@@ -57,12 +72,14 @@ export const importUserPrivateKey = async (
     'deriveBits'
   ])
 
+/** Generate the AES key shared by the members of an access group. */
 export const generateGroupKey = async (): Promise<CryptoKey> =>
   await getCrypto().subtle.generateKey(aesKeyAlgorithm, true, [
     'encrypt',
     'decrypt'
   ])
 
+/** Generate the AES key that encrypts one file. */
 export const generateContentKey = async (): Promise<CryptoKey> =>
   await getCrypto().subtle.generateKey(aesKeyAlgorithm, true, [
     'encrypt',
@@ -95,6 +112,7 @@ const deriveWrappingKey = async (
     ['encrypt', 'decrypt']
   )
 
+/** Encrypt a group key for one member, with their public key. */
 export const wrapGroupKeyForRecipient = async (
   groupKey: CryptoKey,
   recipient: RecipientEncryptionKey
@@ -123,6 +141,7 @@ export const wrapGroupKeyForRecipient = async (
   }
 }
 
+/** Decrypt a group key with the private key of its recipient. */
 export const unwrapGroupKey = async (
   wrappedGroupKey: WrappedGroupKey,
   recipientPrivateKey: CryptoKey
@@ -142,6 +161,7 @@ export const unwrapGroupKey = async (
   return await importSymmetricKey(rawGroupKey)
 }
 
+/** Encrypt a content key with a group key. */
 export const wrapContentKey = async (
   contentKey: CryptoKey,
   groupKey: CryptoKey
@@ -160,6 +180,7 @@ export const wrapContentKey = async (
   }
 }
 
+/** Decrypt a content key with a group key. */
 export const unwrapContentKey = async (
   wrappedContentKey: WrappedContentKey,
   groupKey: CryptoKey
@@ -175,6 +196,9 @@ export const unwrapContentKey = async (
   return await importSymmetricKey(rawContentKey)
 }
 
+/**
+ * Encrypt bytes with AES-GCM, and return the ciphertext with its initialization vector.
+ */
 export const encryptBytes = async (
   bytes: ArrayBuffer | Uint8Array,
   key: CryptoKey
@@ -191,6 +215,7 @@ export const encryptBytes = async (
   }
 }
 
+/** Decrypt bytes encrypted by `encryptBytes()`. */
 export const decryptBytes = async (
   encryptedBytes: ArrayBuffer | Uint8Array,
   key: CryptoKey,

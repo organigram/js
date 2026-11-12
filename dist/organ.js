@@ -4,19 +4,26 @@ import { createRandom32BytesHexId, predictContractAddress } from './utils';
 import { getDefaultChainId, getDeployment } from './deployments';
 import { tryMulticall } from './multicall';
 import { createContractWriteTransaction, getContractInstance, getWalletAddress } from './contracts';
-/**
- * High-level names for the writable organ functions exposed by the SDK.
- */
+/** The organ functions a proposal operation can call. */
 export var OrganFunctionName;
 (function (OrganFunctionName) {
+    /** Add entries. */
     OrganFunctionName["addEntries"] = "addEntries";
+    /** Remove entries. */
     OrganFunctionName["removeEntries"] = "removeEntries";
+    /** Replace one entry. */
     OrganFunctionName["replaceEntry"] = "replaceEntry";
+    /** Grant permissions to an address. */
     OrganFunctionName["addPermission"] = "addPermission";
+    /** Revoke the permissions of an address. */
     OrganFunctionName["removePermission"] = "removePermission";
+    /** Move permissions to another address. */
     OrganFunctionName["replacePermission"] = "replacePermission";
+    /** Send ether. */
     OrganFunctionName["withdrawEther"] = "withdrawEther";
+    /** Send ERC-20 tokens. */
     OrganFunctionName["withdrawERC20"] = "withdrawERC20";
+    /** Send an ERC-721 token. */
     OrganFunctionName["withdrawERC721"] = "withdrawERC721";
 })(OrganFunctionName || (OrganFunctionName = {}));
 const formatPermissionValue = (value) => padHex((typeof value === 'string' && value.startsWith('0x')
@@ -145,24 +152,42 @@ const normalizeOrganFunctionCall = async ({ functionName, args, walletClient }) 
     }
 };
 /**
- * In-memory representation of one deployed or planned organ.
+ * A group of the organization: a registry of members and documents, a list of permissions, and a balance of assets.
+ *
+ * @remarks Every change to an organ must come from an address holding the matching permission. In a governed organization, that address is a procedure, so that each change goes through a decision.
  */
 export class Organ {
+    /** ERC-165 interface identifier of organ contracts. */
     static INTERFACE = '0xf81b1307';
+    /** Display name. */
     name;
+    /** Free description. */
     description;
+    /** Contract address, or a predicted address while it is a draft. */
     address;
+    /** Salt that determines the clone address. */
     salt;
+    /** Chain the organ lives on. */
     chainId;
+    /** Ether balance, in wei. */
     balance;
+    /** Addresses allowed to act on the organ, with their permission flags. */
     permissions = [];
+    /** Reference to the off-chain metadata of the organ. */
     cid;
+    /** Members and documents registered in the organ. */
     entries = [];
+    /** Client that signs transactions. */
     walletClient;
+    /** Client used for reads. */
     publicClient;
+    /** viem contract instance, once loaded. */
     contract;
+    /** Whether the contract exists on chain. */
     isDeployed;
+    /** Organigram the organ belongs to. */
     organigramId;
+    /** Trusted forwarder relaying gasless transactions. */
     forwarder;
     constructor({ address, chainId, publicClient, walletClient, balance, permissions, cid, entries, salt, isDeployed, name, description, organigramId, forwarder }) {
         this.name = name ?? 'Unnamed Organ';
@@ -205,6 +230,7 @@ export class Organ {
             walletClient: this.walletClient
         };
     }
+    /** Replace the reference to the off-chain metadata of the organ. */
     updateCid = async (cid, options) => {
         const tx = await createContractWriteTransaction({
             address: this.address,
@@ -217,6 +243,7 @@ export class Organ {
         options?.onTransaction?.(tx, `Update CID of organ ${this.address} to ${cid}.`);
         return await tx.wait();
     };
+    /** Add members or documents to the registry. */
     addEntries = async (entries, options) => {
         const normalizedEntries = entries
             .map(entry => {
@@ -240,6 +267,7 @@ export class Organ {
         options?.onTransaction?.(tx, `Add ${normalizedEntries.length} entries to organ ${this.address}.`);
         return await tx.wait();
     };
+    /** Remove entries from the registry, by index. */
     removeEntries = async (indexes, options) => {
         const tx = await createContractWriteTransaction({
             address: this.address,
@@ -252,6 +280,7 @@ export class Organ {
         options?.onTransaction?.(tx, `Remove ${indexes.length} entries from organ ${this.address}.`);
         return await tx.wait();
     };
+    /** Replace one entry of the registry. */
     replaceEntry = async (index, entry, options) => {
         if (!isNonEmptyEntry(entry)) {
             throw new Error('Entry must include an address or a CID.');
@@ -267,6 +296,7 @@ export class Organ {
         options?.onTransaction?.(tx, `Replace entry ${index} of organ ${this.address}.`);
         return await tx.wait();
     };
+    /** Grant permissions to an address. */
     addPermission = async (permission, options) => {
         const tx = await createContractWriteTransaction({
             address: this.address,
@@ -282,6 +312,7 @@ export class Organ {
         options?.onTransaction?.(tx, `Add permission ${permission.permissionAddress} to organ ${this.address}.`);
         return await tx.wait();
     };
+    /** Revoke every permission of an address. */
     removePermission = async (permission, options) => {
         const tx = await createContractWriteTransaction({
             address: this.address,
@@ -294,6 +325,7 @@ export class Organ {
         options?.onTransaction?.(tx, `Remove permission ${permission} from organ ${this.address}.`);
         return await tx.wait();
     };
+    /** Move permissions from one address to another. */
     replacePermission = async (oldPermissionAddress, newOrganPermission, options) => {
         const tx = await createContractWriteTransaction({
             address: this.address,
@@ -310,6 +342,7 @@ export class Organ {
         options?.onTransaction?.(tx, `Replace procedure ${oldPermissionAddress} with ${newOrganPermission.permissionAddress} in organ ${this.address}.`);
         return await tx.wait();
     };
+    /** Send ether held by the organ. */
     withdrawEther = async (to, value, options) => {
         const tx = await createContractWriteTransaction({
             address: this.address,
@@ -322,6 +355,7 @@ export class Organ {
         options?.onTransaction?.(tx, `Withdraw ${value.toString()} wei from organ ${this.address} to ${to}.`);
         return await tx.wait();
     };
+    /** Send ERC-20 tokens held by the organ. */
     withdrawERC20 = async (token, to, amount, options) => {
         if (this.walletClient == null) {
             throw new Error('Wallet client not connected.');
@@ -338,6 +372,7 @@ export class Organ {
         options?.onTransaction?.(tx, `Withdraw ${amount.toString()} ERC20 units from organ ${this.address} to ${to}.`);
         return await tx.wait();
     };
+    /** Send an ERC-721 token held by the organ. */
     withdrawERC721 = async (token, to, tokenId, options) => {
         if (this.walletClient == null) {
             throw new Error('Wallet client not connected.');
@@ -354,6 +389,7 @@ export class Organ {
         options?.onTransaction?.(tx, `Withdraw ERC721 token ${tokenId.toString()} from organ ${this.address} to ${to}.`);
         return await tx.wait();
     };
+    /** Read an organ from chain: its entries, permissions and metadata. */
     static async load(address, clients, initialOrgan) {
         if (!address) {
             throw new Error('Cannot load organ: No address provided.');
@@ -384,6 +420,7 @@ export class Organ {
             isDeployed: true
         });
     }
+    /** Tell whether a contract is an organ. */
     static async isOrgan(address, clients) {
         const contract = getContractInstance({
             address,
@@ -395,11 +432,13 @@ export class Organ {
             return false;
         return Boolean(await contract.read.supportsInterface([Organ.INTERFACE]));
     }
+    /** Read the ether balance of an organ, in wei. */
     static async getBalance(address, clients) {
         return await clients.publicClient.getBalance({
             address: address
         });
     }
+    /** Read the metadata reference and registry sizes of an organ. */
     static async loadData(address, clients) {
         const contract = getContractInstance({
             address,
@@ -414,6 +453,7 @@ export class Organ {
             throw error;
         });
     }
+    /** Find the entry of an address in an organ, if it is a member. */
     static async loadEntryForAccount(address, account, clients) {
         const contract = getContractInstance({
             address,
@@ -423,6 +463,7 @@ export class Organ {
         const index = (await contract.read.getEntryIndexForAddress([account]));
         return await Organ.loadEntry(address, index.toString(), clients).catch(() => undefined);
     }
+    /** Read the permission flags an address holds on an organ. */
     static async checkAddressPermissions(organAddress, addressToCheck, clients) {
         const contract = getContractInstance({
             address: organAddress,
@@ -435,6 +476,7 @@ export class Organ {
         });
         return typeof result === 'string' ? parseInt(result, 16) : Number(result);
     }
+    /** Read one permission of an organ, by index. */
     static async loadPermission(address, index, clients) {
         const contract = getContractInstance({
             address,
@@ -451,6 +493,7 @@ export class Organ {
         }
         return normalizeLoadedPermission(permission);
     }
+    /** Read every permission of an organ. */
     static async loadPermissions(address, clients, data) {
         const organData = data ?? (await Organ.loadData(address, clients));
         const multicallPermissions = await tryMulticall(clients, Array.from({ length: Number(organData.permissionsLength) }).map((_, index) => ({
@@ -477,6 +520,7 @@ export class Organ {
             return null;
         })))).filter((permission) => permission != null);
     }
+    /** Read one entry of an organ, by index. */
     static async loadEntry(address, index, clients) {
         const contract = getContractInstance({
             address,
@@ -486,6 +530,7 @@ export class Organ {
         const entry = (await contract.read.getEntry([BigInt(index)]));
         return normalizeLoadedEntry(entry, index);
     }
+    /** Read every entry of an organ. */
     static async loadEntries(address, clients, data) {
         const organData = data ?? (await Organ.loadData(address, clients));
         const indexes = Array.from({ length: Math.max(Number(organData.entriesLength) - 1, 0) }, (_, index) => index + 1);
@@ -533,6 +578,17 @@ export class Organ {
         }));
         return entries.filter((entry) => entry != null);
     }
+    /**
+     * Encode a call to an organ function, to use it as a proposal operation with `Procedure.createOperation()`.
+     *
+     * @example
+     * ```ts
+     * const call = await Organ.populateTransaction(organAddress, walletClient, 'addEntries', [
+     *   { address: memberAddress }
+     * ])
+     * const operation = Procedure.createOperation(call)
+     * ```
+     */
     static async populateTransaction(address, walletClient, functionName, ...args) {
         const normalizedCall = await normalizeOrganFunctionCall({
             functionName,
@@ -549,6 +605,7 @@ export class Organ {
             })
         };
     }
+    /** Read the whole organ again from chain. */
     async reload() {
         const { permissions, cid, entries } = await Organ.load(this.address, this.getClients());
         this.cid = cid;
@@ -556,6 +613,7 @@ export class Organ {
         this.entries = entries;
         return this;
     }
+    /** Read the entries again from chain. */
     async reloadEntries() {
         this.entries = await Organ.loadEntries(this.address, this.getClients()).catch((error) => {
             console.warn("Error while reloading organ's entries", this.address, error.message);
@@ -563,6 +621,7 @@ export class Organ {
         });
         return this;
     }
+    /** Read the permissions again from chain. */
     async reloadPermissions() {
         this.permissions = await Organ.loadPermissions(this.address, this.getClients()).catch((error) => {
             console.warn("Error while reloading organ's permissions", this.address, error.message);
@@ -570,11 +629,13 @@ export class Organ {
         });
         return this;
     }
+    /** Read the metadata reference again from chain. */
     async reloadData() {
         const data = await Organ.loadData(this.address, this.getClients());
         this.cid = data?.cid;
         return this;
     }
+    /** Convert the organ into plain JSON. */
     toJson = () => JSON.parse(JSON.stringify({
         address: this.address,
         name: this.name,

@@ -2,6 +2,7 @@ import { isAddress } from 'viem';
 import * as chains from 'viem/chains';
 import { sepolia } from 'viem/chains';
 import rawDeployedAddresses from '@organigram/protocol/deployments.json' with { type: 'json' };
+/** Addresses of the protocol contracts on each supported chain, by chain id. */
 const deployedAddresses = rawDeployedAddresses;
 const localHostnames = new Set(['localhost', '127.0.0.1']);
 const anvilChainId = '31337';
@@ -35,11 +36,17 @@ const parseLocalDeployments = () => {
     }
 };
 Object.assign(deployedAddresses, parseLocalDeployments());
+/**
+ * URL of the Organigram app: `NEXT_PUBLIC_HOST_URL`, or the current page origin in a browser.
+ */
 export const getHostUrl = (hostUrl = getProcessEnv('NEXT_PUBLIC_HOST_URL')) => createUrl(hostUrl) ??
     (typeof window !== 'undefined' ? createUrl(window.location.origin) : null);
+/** Tell whether the app runs on a local host name. */
 export const isLocalHost = (hostUrl) => localHostnames.has(getHostUrl(hostUrl)?.hostname ?? '');
 const normalizeChainId = (chainId) => (chainId == null ? '' : chainId.toString());
+/** List the chains the protocol is deployed on. */
 export const getSupportedChainIds = () => Object.keys(deployedAddresses);
+/** Tell whether the protocol is deployed on a chain. */
 export const isSupportedChainId = (chainId) => {
     const normalizedChainId = normalizeChainId(chainId);
     return (normalizedChainId !== '' && deployedAddresses[normalizedChainId] != null);
@@ -53,6 +60,9 @@ export const resolveDeployment = (chainId, deploymentName) => {
         return undefined;
     return deployment;
 };
+/**
+ * Return the address of a protocol contract on a chain, and throw if it is not deployed there.
+ */
 export const getDeployment = (chainId, deploymentName) => {
     const deployment = resolveDeployment(chainId, deploymentName);
     if (deployment == null) {
@@ -76,6 +86,7 @@ const sortSupportedChainIds = (chainIds) => [...chainIds].sort((a, b) => {
         return -1;
     return Number(a) - Number(b);
 });
+/** Return the viem chain definition of a chain id. */
 export const getConfiguredChain = (chainId) => {
     const chain = chainId === sepoliaChainId ? sepolia : getChainById(chainId);
     if (chain == null)
@@ -87,6 +98,7 @@ export const getSupportedChains = () => {
         .map(chainId => getConfiguredChain(chainId))
         .filter((chain) => chain != null);
 };
+/** Return the block explorer URL of a chain. */
 export const getChainExplorerBaseUrl = (chainId) => getConfiguredChain(chainId)?.blockExplorers?.default.url;
 /**
  * Default network: Anvil when local deployments are loaded, Ethereum mainnet

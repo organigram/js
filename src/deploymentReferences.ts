@@ -15,18 +15,19 @@ type DeployedOrganigramAddresses = {
   procedures: string[]
 }
 
-export type DeployOrganigramResult<
-  Input extends DeployOrganigramInput = DeployOrganigramInput
-> = readonly [organs: string[], assets: string[], procedures: string[]] & {
-  organigram: Input
+/** The input is copied with its new addresses: class instances come back as plain objects. */
+export type DeployOrganigramResult = readonly [
+  organs: string[],
+  assets: string[],
+  procedures: string[]
+] & {
+  organigram: DeployOrganigramInput
 }
 
-export const createDeployOrganigramResult = <
-  Input extends DeployOrganigramInput
->(
+export const createDeployOrganigramResult = (
   addresses: DeployedOrganigramAddresses,
-  organigram: Input
-): DeployOrganigramResult<Input> =>
+  organigram: DeployOrganigramInput
+): DeployOrganigramResult =>
   Object.assign(
     [addresses.organs, addresses.assets, addresses.procedures] as [
       string[],
@@ -96,6 +97,7 @@ const replaceKnownAddressesInData = (
 const getPredictedAddress = (
   type: Omit<ContractName, 'OrganigramClient'>,
   chainId: string,
+  deployer: string,
   item: MaybeAddressed
 ) => {
   if (item.isDeployed === true || item.salt == null || item.salt === '') {
@@ -105,7 +107,8 @@ const getPredictedAddress = (
   return predictContractAddress({
     type,
     chainId,
-    salt: item.salt
+    salt: item.salt,
+    deployer
   })
 }
 
@@ -113,7 +116,8 @@ export const refreshUndeployedContractReferences = <
   Input extends DeployOrganigramInput
 >(
   input: Input,
-  chainId: string
+  chainId: string,
+  deployer: string
 ): Input => {
   const replacements = new Map<string, string>()
 
@@ -129,27 +133,29 @@ export const refreshUndeployedContractReferences = <
 
   input.organs.forEach(organ =>
     addReplacement(
-      organ as MaybeAddressed,
-      getPredictedAddress('Organ', chainId, organ as MaybeAddressed)
+      organ,
+      getPredictedAddress('Organ', chainId, deployer, organ)
     )
   )
   input.assets.forEach(asset =>
     addReplacement(
-      asset as MaybeAddressed,
+      asset,
       getPredictedAddress(
         asset.kind === 'equity' ? 'EquityToken' : 'Asset',
         chainId,
-        asset as MaybeAddressed
+        deployer,
+        asset
       )
     )
   )
   input.procedures.forEach(procedure =>
     addReplacement(
-      procedure as MaybeAddressed,
+      procedure,
       getPredictedAddress(
         procedureContractNames[procedure.typeName],
         chainId,
-        procedure as MaybeAddressed
+        deployer,
+        procedure
       )
     )
   )
@@ -157,8 +163,8 @@ export const refreshUndeployedContractReferences = <
   const organs = input.organs.map(organ => ({
     ...organ,
     address:
-      getPredictedAddress('Organ', chainId, organ as MaybeAddressed) ??
-      (organ as MaybeAddressed).address,
+      getPredictedAddress('Organ', chainId, deployer, organ) ??
+      organ.address,
     permissions: organ.permissions?.map(permission => ({
       ...permission,
       permissionAddress: replaceKnownAddress(
@@ -174,8 +180,9 @@ export const refreshUndeployedContractReferences = <
       getPredictedAddress(
         asset.kind === 'equity' ? 'EquityToken' : 'Asset',
         chainId,
-        asset as MaybeAddressed
-      ) ?? (asset as MaybeAddressed).address,
+        deployer,
+        asset
+      ) ?? asset.address,
     decisionProcedure: replaceKnownAddress(
       asset.decisionProcedure,
       replacements
@@ -188,8 +195,9 @@ export const refreshUndeployedContractReferences = <
       getPredictedAddress(
         procedureContractNames[procedure.typeName],
         chainId,
-        procedure as MaybeAddressed
-      ) ?? (procedure as MaybeAddressed).address,
+        deployer,
+        procedure
+      ) ?? procedure.address,
     deciders: replaceKnownAddress(procedure.deciders, replacements) as string,
     proposers: replaceKnownAddress(procedure.proposers, replacements),
     moderators: replaceKnownAddress(procedure.moderators, replacements),
@@ -228,42 +236,42 @@ export const applyDeployedOrganigramAddresses = <
   }
 
   const originalOrgans = input.organs.filter(
-    organ => (organ as MaybeAddressed).isDeployed !== true
+    organ => organ.isDeployed !== true
   )
   const refreshedOrgans = refreshedInput.organs.filter(
-    organ => (organ as MaybeAddressed).isDeployed !== true
+    organ => organ.isDeployed !== true
   )
   const originalAssets = input.assets.filter(
-    asset => (asset as MaybeAddressed).isDeployed !== true
+    asset => asset.isDeployed !== true
   )
   const refreshedAssets = refreshedInput.assets.filter(
-    asset => (asset as MaybeAddressed).isDeployed !== true
+    asset => asset.isDeployed !== true
   )
   const originalProcedures = input.procedures.filter(
-    procedure => (procedure as MaybeAddressed).isDeployed !== true
+    procedure => procedure.isDeployed !== true
   )
   const refreshedProcedures = refreshedInput.procedures.filter(
-    procedure => (procedure as MaybeAddressed).isDeployed !== true
+    procedure => procedure.isDeployed !== true
   )
 
   originalOrgans.forEach((organ, index) =>
     addAddressReplacement(
-      organ as MaybeAddressed,
-      refreshedOrgans[index] as MaybeAddressed | undefined,
+      organ,
+      refreshedOrgans[index],
       deployedAddresses.organs[index]
     )
   )
   originalAssets.forEach((asset, index) =>
     addAddressReplacement(
-      asset as MaybeAddressed,
-      refreshedAssets[index] as MaybeAddressed | undefined,
+      asset,
+      refreshedAssets[index],
       deployedAddresses.assets[index]
     )
   )
   originalProcedures.forEach((procedure, index) =>
     addAddressReplacement(
-      procedure as MaybeAddressed,
-      refreshedProcedures[index] as MaybeAddressed | undefined,
+      procedure,
+      refreshedProcedures[index],
       deployedAddresses.procedures[index]
     )
   )
@@ -271,14 +279,14 @@ export const applyDeployedOrganigramAddresses = <
   let organIndex = 0
   const organs = input.organs.map(organ => {
     const deployedAddress =
-      (organ as MaybeAddressed).isDeployed === true
+      organ.isDeployed === true
         ? undefined
         : deployedAddresses.organs[organIndex++]
     return {
       ...organ,
-      address: deployedAddress ?? (organ as MaybeAddressed).address,
+      address: deployedAddress ?? organ.address,
       isDeployed:
-        deployedAddress != null ? true : (organ as MaybeAddressed).isDeployed,
+        deployedAddress != null ? true : organ.isDeployed,
       permissions: organ.permissions?.map(permission => ({
         ...permission,
         permissionAddress: replaceKnownAddress(
@@ -292,30 +300,30 @@ export const applyDeployedOrganigramAddresses = <
   let assetIndex = 0
   const assets = input.assets.map(asset => {
     const deployedAddress =
-      (asset as MaybeAddressed).isDeployed === true
+      asset.isDeployed === true
         ? undefined
         : deployedAddresses.assets[assetIndex++]
     return {
       ...asset,
-      address: deployedAddress ?? (asset as MaybeAddressed).address,
+      address: deployedAddress ?? asset.address,
       isDeployed:
-        deployedAddress != null ? true : (asset as MaybeAddressed).isDeployed
+        deployedAddress != null ? true : asset.isDeployed
     }
   })
 
   let procedureIndex = 0
   const procedures = input.procedures.map(procedure => {
     const deployedAddress =
-      (procedure as MaybeAddressed).isDeployed === true
+      procedure.isDeployed === true
         ? undefined
         : deployedAddresses.procedures[procedureIndex++]
     return {
       ...procedure,
-      address: deployedAddress ?? (procedure as MaybeAddressed).address,
+      address: deployedAddress ?? procedure.address,
       isDeployed:
         deployedAddress != null
           ? true
-          : (procedure as MaybeAddressed).isDeployed,
+          : procedure.isDeployed,
       deciders: replaceKnownAddress(procedure.deciders, replacements) as string,
       proposers: replaceKnownAddress(procedure.proposers, replacements),
       moderators: replaceKnownAddress(procedure.moderators, replacements),
@@ -354,24 +362,24 @@ export const markExistingOrganigramDeployments = async <
 
   const organs = await Promise.all(
     input.organs.map(async organ =>
-      (organ as MaybeAddressed).isDeployed === true ||
-      !(await hasCode((organ as MaybeAddressed).address))
+      organ.isDeployed === true ||
+      !(await hasCode(organ.address))
         ? organ
         : { ...organ, isDeployed: true }
     )
   )
   const assets = await Promise.all(
     input.assets.map(async asset =>
-      (asset as MaybeAddressed).isDeployed === true ||
-      !(await hasCode((asset as MaybeAddressed).address))
+      asset.isDeployed === true ||
+      !(await hasCode(asset.address))
         ? asset
         : { ...asset, isDeployed: true }
     )
   )
   const procedures = await Promise.all(
     input.procedures.map(async procedure =>
-      (procedure as MaybeAddressed).isDeployed === true ||
-      !(await hasCode((procedure as MaybeAddressed).address))
+      procedure.isDeployed === true ||
+      !(await hasCode(procedure.address))
         ? procedure
         : { ...procedure, isDeployed: true }
     )

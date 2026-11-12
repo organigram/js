@@ -1,3 +1,4 @@
+/** Copy bytes into a standalone `ArrayBuffer`. */
 export const bytesToArrayBuffer = (
   value: ArrayBuffer | Uint8Array
 ): ArrayBuffer => {
@@ -36,6 +37,7 @@ export const base64ToBytes = (value: string): Uint8Array => {
 export const textToBytes = (value: string): Uint8Array =>
   new TextEncoder().encode(value)
 
+/** Decode UTF-8 bytes into a string. */
 export const bytesToText = (value: ArrayBuffer | Uint8Array): string =>
   new TextDecoder().decode(value)
 

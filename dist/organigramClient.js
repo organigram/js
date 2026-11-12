@@ -6,13 +6,26 @@ import { createRandom32BytesHexId, getDefaultChainId, getDeployment, formatSalt,
 import { Organ } from './organ';
 import { Procedure } from './procedure';
 import { Organigram } from './organigram';
-import { getProcedureClass, populateInitializeProcedure, prepareDeployOrgansInput, prepareDeployProceduresInput, procedureTypeMetadata, getProcedureType, getProcedureTypes } from './procedure/utils';
+import { getProcedureClass, prepareDeployOrgansInput, prepareDeployProceduresInput, procedureTypeMetadata, getProcedureType, getProcedureTypes } from './procedure/utils';
 import { Asset, ERC20_INITIAL_SUPPLY } from './asset';
 import { createContractWriteTransaction, createDeployTransaction, getContractInstance, getWalletAddress } from './contracts';
 import { applyDeployedOrganigramAddresses, createDeployOrganigramResult, markExistingOrganigramDeployments, refreshUndeployedContractReferences } from './deploymentReferences';
-const formatAssetInitialSupply = (asset) => asset.kind === 'equity'
-    ? BigInt(asset.initialSupply ?? ERC20_INITIAL_SUPPLY)
-    : parseEther(asset.initialSupply?.toString() ?? ERC20_INITIAL_SUPPLY.toString());
+/** Encode an asset for the `deployAssets` and `deployOrganigram` contract calls. */
+const prepareDeployAssetInput = (asset) => {
+    if (asset.name == null || asset.name === '' || asset.symbol == null || asset.symbol === '') {
+        throw new Error('An asset needs a name and a symbol to be deployed.');
+    }
+    return {
+        name: asset.name,
+        symbol: asset.symbol,
+        initialSupply: asset.kind === 'equity'
+            ? BigInt(asset.initialSupply ?? ERC20_INITIAL_SUPPLY)
+            : parseEther((asset.initialSupply ?? ERC20_INITIAL_SUPPLY).toString()),
+        salt: formatSalt(asset.salt),
+        isEquity: asset.kind === 'equity',
+        transferProcedure: asset.decisionProcedure ?? zeroAddress
+    };
+};
 const linkContractBytecode = (bytecode, linkReferences, libraries) => {
     let linkedBytecode = bytecode;
     for (const contracts of Object.values(linkReferences)) {
@@ -85,15 +98,23 @@ const createInitialProcedureInput = (input, chainId) => ({
  * loaded organs, procedures, and assets.
  */
 export class OrganigramClient {
+    /** Address of the `OrganigramClient` contract. */
     address;
+    /** Chain the client is connected to. */
     chainId;
+    /** Procedure types registered on this chain. */
     procedureTypes;
+    /** Organs loaded so far, kept in cache. */
     organs;
+    /** Procedures loaded so far, kept in cache. */
     procedures;
+    /** Assets loaded so far, kept in cache. */
     assets;
-    cids;
+    /** Client used for every read. */
     publicClient;
+    /** viem contract instance of the `OrganigramClient` contract. */
     contract;
+    /** Client that signs transactions. Without it, the client is read-only. */
     walletClient;
     constructor(input) {
         const publicClientChainId = input.publicClient.chain?.id?.toString();
@@ -115,7 +136,6 @@ export class OrganigramClient {
         this.organs = [];
         this.procedures = [];
         this.assets = [];
-        this.cids = [];
         this.walletClient = input.walletClient;
         this.publicClient = input.publicClient;
         this.contract =
@@ -136,7 +156,7 @@ export class OrganigramClient {
     /**
      * Deploy a fresh Organigram client contract together with its linked library.
      *
-     * @param input Clients used to broadcast deployments and wait for receipts.
+     * @param input - Clients used to broadcast deployments and wait for receipts.
      * @returns A ready-to-use SDK instance pointing at the newly deployed client.
      */
     static async deployClient(input) {
@@ -173,8 +193,8 @@ export class OrganigramClient {
     /**
      * Load metadata for one deployed procedure implementation.
      *
-     * @param input Address and optional CID used to identify the procedure type.
-     * @param publicClient Read-only client used for interface checks.
+     * @param input - Address and optional CID used to identify the procedure type.
+     * @param publicClient - Read-only client used for interface checks.
      */
     static async loadProcedureType({ addr, cid }, publicClient) {
         const contract = getContractInstance({
@@ -206,7 +226,7 @@ export class OrganigramClient {
     /**
      * Read the procedure registry and resolve every supported procedure type.
      *
-     * @param input Optional client contract address and the public client used to query it.
+     * @param input - Optional client contract address and the public client used to query it.
      */
     static async loadProcedureTypes({ address, publicClient }) {
         const chainId = String(await publicClient.getChainId());
@@ -228,7 +248,7 @@ export class OrganigramClient {
     /**
      * Connect the SDK to an already deployed Organigram client contract.
      *
-     * @param input Address override plus the viem clients used for reads and writes.
+     * @param input - Address override plus the viem clients used for reads and writes.
      */
     static async load(input) {
         const chainId = await input.publicClient
@@ -271,7 +291,7 @@ export class OrganigramClient {
     /**
      * Infer the registered procedure type of a deployed procedure clone.
      *
-     * @param procedureAddress Address of the deployed procedure instance.
+     * @param procedureAddress - Address of the deployed procedure instance.
      */
     async getProcedureType(procedureAddress) {
         const code = await this.publicClient.getBytecode({
@@ -285,18 +305,18 @@ export class OrganigramClient {
         return procedureType;
     }
     /**
-     * Load one deployed organ and memoize it in the client cache.
+     * Load one deployed organ and keep it in the client cache.
      *
-     * @param address Organ contract address.
-     * @param cached Whether an already hydrated organ can be reused from memory.
-     * @param initialOrgan Optional fallback metadata merged into the loaded organ.
+     * @param address - Organ contract address.
+     * @param input - `fresh` reads the chain even when the organ is cached;
+     * `initial` holds fallback metadata merged into the loaded organ.
      */
-    async getDeployedOrgan(address, cached = true, initialOrgan) {
+    async loadOrgan(address, { fresh = false, initial } = {}) {
         const index = this.organs.findIndex(organ => organ.address.toLowerCase() === address.toLowerCase() &&
             organ.chainId === this.chainId);
-        let organ = cached && index >= 0 ? this.organs[index] : undefined;
+        let organ = !fresh && index >= 0 ? this.organs[index] : undefined;
         if (organ == null) {
-            organ = await Organ.load(address, this.getClients(), initialOrgan).catch((error) => {
+            organ = await Organ.load(address, this.getClients(), initial).catch((error) => {
                 console.error('Error loading organ ', address, error.message);
                 return undefined;
             });
@@ -315,18 +335,18 @@ export class OrganigramClient {
         return organ;
     }
     /**
-     * Load one deployed asset and memoize it in the client cache.
+     * Load one deployed asset and keep it in the client cache.
      *
-     * @param address Asset contract address.
-     * @param cached Whether an already hydrated asset can be reused from memory.
-     * @param initialAsset Optional fallback metadata merged into the loaded asset.
+     * @param address - Asset contract address.
+     * @param input - `fresh` reads the chain even when the asset is cached;
+     * `initial` holds fallback metadata merged into the loaded asset.
      */
-    async getDeployedAsset(address, cached = true, initialAsset) {
+    async loadAsset(address, { fresh = false, initial } = {}) {
         const index = this.assets.findIndex(asset => asset.address.toLowerCase() === address.toLowerCase() &&
             asset.chainId === this.chainId);
-        let asset = cached && index >= 0 ? this.assets[index] : undefined;
+        let asset = !fresh && index >= 0 ? this.assets[index] : undefined;
         if (asset == null) {
-            asset = await Asset.load(address, this.getClients(), initialAsset).catch((error) => {
+            asset = await Asset.load(address, this.getClients(), initial).catch((error) => {
                 console.error('Error loading asset ', address, error.message);
                 return undefined;
             });
@@ -345,30 +365,30 @@ export class OrganigramClient {
         return asset;
     }
     /**
-     * Load one deployed procedure and memoize it in the client cache.
+     * Load one deployed procedure and keep it in the client cache.
      *
-     * @param address Procedure contract address.
-     * @param cached Whether an already hydrated procedure can be reused from memory.
-     * @param initialProcedure Optional fallback metadata merged into the loaded procedure.
+     * @param address - Procedure contract address.
+     * @param input - `fresh` reads the chain even when the procedure is cached;
+     * `initial` holds fallback metadata merged into the loaded procedure.
      */
-    async getDeployedProcedure(address, cached = true, initialProcedure) {
-        const procedureType = initialProcedure?.type ??
-            (initialProcedure?.typeName != null
-                ? getProcedureType(initialProcedure.chainId ?? this.chainId, initialProcedure.typeName)
+    async loadProcedure(address, { fresh = false, initial } = {}) {
+        const procedureType = initial?.type ??
+            (initial?.typeName != null
+                ? getProcedureType(initial.chainId ?? this.chainId, initial.typeName)
                 : undefined) ??
             (await this.getProcedureType(address).catch((error) => {
                 console.error(error.message);
                 return null;
             }));
         if (procedureType == null) {
-            throw new Error('getDeployedProcedure: Procedure not supported.');
+            throw new Error('loadProcedure: Procedure not supported.');
         }
-        let procedure = cached
+        let procedure = !fresh
             ? this.procedures.find(existingProcedure => existingProcedure.address === address)
             : undefined;
         if (procedure == null) {
             const ProcedureClass = await getProcedureClass(procedureType.key);
-            procedure = await ProcedureClass.load(address, this.getClients(), initialProcedure)
+            procedure = await ProcedureClass.load(address, this.getClients(), initial)
                 .then((loadedProcedure) => Object.assign(loadedProcedure, { type: procedureType }))
                 .catch((error) => {
                 console.error('Unable to load procedure.', error.message);
@@ -389,7 +409,7 @@ export class OrganigramClient {
      * When no permissions are provided, the connected wallet is granted the full
      * admin bitmask by default so the organ remains operable after deployment.
      *
-     * @param input Optional organ metadata, permissions, entries, and transaction options.
+     * @param input - Optional organ metadata, permissions, entries, and transaction options.
      */
     async deployOrgan(input) {
         if (this.walletClient == null) {
@@ -435,7 +455,7 @@ export class OrganigramClient {
         if (organAddress == null) {
             throw new Error('Organ creation failed.');
         }
-        return await this.getDeployedOrgan(organAddress, false).catch((error) => {
+        return await this.loadOrgan(organAddress, { fresh: true }).catch((error) => {
             console.error('Unable to load organ with address ' +
                 organAddress +
                 ' after creating it.', error.message);
@@ -445,7 +465,7 @@ export class OrganigramClient {
     /**
      * Deploy several organs in one batch transaction.
      *
-     * @param deployOrgansInput Organ definitions to deploy.
+     * @param deployOrgansInput - Organ definitions to deploy.
      */
     async deployOrgans(deployOrgansInput) {
         const tx = await createContractWriteTransaction({
@@ -460,7 +480,7 @@ export class OrganigramClient {
         if (addresses.length === 0) {
             throw new Error('Organ deployment failed.');
         }
-        return await Promise.all(addresses.map(async (organAddress) => await this.getDeployedOrgan(organAddress, false).catch((error) => {
+        return await Promise.all(addresses.map(async (organAddress) => await this.loadOrgan(organAddress, { fresh: true }).catch((error) => {
             console.error('Unable to load organ with address ' +
                 organAddress +
                 ' after deploying it in batch.', error.message);
@@ -470,14 +490,11 @@ export class OrganigramClient {
     /**
      * Deploy a single ERC-20 asset clone.
      *
-     * @param name Token name exposed by the deployed contract.
-     * @param symbol Token symbol exposed by the deployed contract.
-     * @param initialSupply Human-readable token supply before conversion to wei.
-     * @param salt Optional deterministic clone salt.
-     * @param options Optional transaction controls.
+     * @param input - Token name and symbol, supply in whole tokens before conversion
+     * to wei, optional deterministic clone salt and transaction controls.
      * @returns The address of the deployed asset contract.
      */
-    async deployAsset(name, symbol, initialSupply, salt, options) {
+    async deployAsset({ name, symbol, initialSupply = ERC20_INITIAL_SUPPLY, salt, options }) {
         const tx = await createContractWriteTransaction({
             address: this.address,
             abi: OrganigramClientContractABI.abi,
@@ -485,7 +502,7 @@ export class OrganigramClient {
             args: [
                 name,
                 symbol,
-                parseEther(initialSupply.toString() ?? ERC20_INITIAL_SUPPLY.toString()),
+                parseEther(initialSupply.toString()),
                 formatSalt(salt)
             ],
             clients: this.getClients(),
@@ -502,19 +519,12 @@ export class OrganigramClient {
     /**
      * Deploy several assets in one batch transaction.
      *
-     * @param assets Assets to deploy.
-     * @param options Optional transaction controls.
+     * @param assets - Assets to deploy.
+     * @param options - Optional transaction controls.
      * @returns The deployed asset addresses in deployment order.
      */
     async deployAssets(assets, options) {
-        const formattedAssets = assets.map(asset => ({
-            name: asset.name,
-            symbol: asset.symbol,
-            initialSupply: formatAssetInitialSupply(asset),
-            salt: formatSalt(asset.salt),
-            isEquity: asset.kind === 'equity',
-            transferProcedure: asset.decisionProcedure ?? zeroAddress
-        }));
+        const formattedAssets = assets.map(prepareDeployAssetInput);
         const tx = await createContractWriteTransaction({
             address: this.address,
             abi: OrganigramClientContractABI.abi,
@@ -534,35 +544,21 @@ export class OrganigramClient {
     /**
      * Deploy a single procedure clone from one registered procedure type.
      *
-     * @param input Procedure type, role organs, optional metadata, and initialization args.
+     * @param input - Procedure type, role organs, optional metadata, and initialization args.
      */
     async deployProcedure(input) {
         if (this.walletClient == null) {
             throw new Error('Wallet client not connected.');
         }
         const initialProcedure = createInitialProcedureInput(input, this.chainId);
-        const initializeProcedure = await populateInitializeProcedure({
-            typeName: input.typeName,
-            options: input.options ?? {},
-            cid: input.cid ?? '',
-            deciders: input.deciders,
-            proposers: input.proposers ?? input.deciders,
-            moderators: input.moderators ?? zeroAddress,
-            withModeration: input.withModeration ?? false,
-            proposerMode: input.proposerMode ?? undefined,
-            moderatorMode: input.moderatorMode ?? undefined,
-            voterMode: input.voterMode ?? undefined,
-            requireMemberMajority: input.requireMemberMajority ?? undefined,
-            forwarder: input.forwarder ?? getDeployment(this.chainId, 'MetaGasStation'),
-            args: input.args ?? []
-        }, this.getClients());
-        const typeAddress = initialProcedure.type?.address ??
-            getProcedureType(this.chainId, input.typeName).address;
+        // Encoded like a batch deployment, so `data` and `args` mean the same in both.
+        const [prepared] = await prepareDeployProceduresInput([{ ...input, chainId: input.chainId ?? this.chainId }], this.getClients());
+        const typeAddress = initialProcedure.type?.address ?? prepared.procedureType;
         const tx = await createContractWriteTransaction({
             address: this.address,
             abi: OrganigramClientContractABI.abi,
             functionName: 'deployProcedure',
-            args: [typeAddress, initializeProcedure.data, formatSalt(input.salt)],
+            args: [typeAddress, prepared.data, prepared.salt],
             clients: this.getClients(),
             nonce: input.options?.nonce
         });
@@ -572,9 +568,9 @@ export class OrganigramClient {
         if (procedureAddress == null) {
             throw new Error('Procedure deployment failed.');
         }
-        return await this.getDeployedProcedure(procedureAddress, false, {
-            ...initialProcedure,
-            address: procedureAddress
+        return await this.loadProcedure(procedureAddress, {
+            fresh: true,
+            initial: { ...initialProcedure, address: procedureAddress }
         }).catch((error) => {
             throw new Error('Unable to load procedure with address ' +
                 procedureAddress +
@@ -585,7 +581,7 @@ export class OrganigramClient {
     /**
      * Deploy several procedures in one batch transaction.
      *
-     * @param deployProceduresInput Procedure definitions to deploy.
+     * @param deployProceduresInput - Procedure definitions to deploy.
      */
     async deployProcedures(deployProceduresInput) {
         const input = await prepareDeployProceduresInput(deployProceduresInput, this.getClients());
@@ -609,7 +605,10 @@ export class OrganigramClient {
                     address: procedureAddress
                 }
                 : undefined;
-            return await this.getDeployedProcedure(procedureAddress, false, initialProcedure).catch((error) => {
+            return await this.loadProcedure(procedureAddress, {
+                fresh: true,
+                initial: initialProcedure
+            }).catch((error) => {
                 console.error('Unable to load procedure with address ' +
                     procedureAddress +
                     ' after creating it.', error.message);
@@ -621,10 +620,10 @@ export class OrganigramClient {
      * Resolve what remains to deploy in an organigram and encode the
      * `deployOrganigram` arguments for it.
      *
-     * @param input Batch deployment input for the whole organigram.
+     * @param input - Batch deployment input for the whole organigram.
      */
-    async prepareOrganigramDeployment(input) {
-        const refreshedInput = await markExistingOrganigramDeployments(refreshUndeployedContractReferences(input, this.chainId), this.publicClient);
+    async prepareOrganigramDeployment(input, deployer) {
+        const refreshedInput = await markExistingOrganigramDeployments(refreshUndeployedContractReferences(input, this.chainId, deployer), this.publicClient);
         const organsToDeploy = refreshedInput.organs.filter(organ => organ.isDeployed !== true);
         const assetsToDeploy = refreshedInput.assets.filter(asset => asset.isDeployed !== true);
         const proceduresToDeploy = refreshedInput.procedures.filter(procedure => procedure.isDeployed !== true);
@@ -635,14 +634,7 @@ export class OrganigramClient {
             ? null
             : [
                 prepareDeployOrgansInput(organsToDeploy),
-                assetsToDeploy.map(asset => ({
-                    name: asset.name,
-                    symbol: asset.symbol,
-                    initialSupply: formatAssetInitialSupply(asset),
-                    salt: formatSalt(asset.salt),
-                    isEquity: asset.kind === 'equity',
-                    transferProcedure: asset.decisionProcedure ?? zeroAddress
-                })),
+                assetsToDeploy.map(prepareDeployAssetInput),
                 await prepareDeployProceduresInput(proceduresToDeploy, this.getClients())
             ];
         return { refreshedInput, organsToDeploy, assetsToDeploy, proceduresToDeploy, args };
@@ -650,12 +642,12 @@ export class OrganigramClient {
     /**
      * Estimate the gas a full organigram deployment would use, without a wallet.
      *
-     * @param input Batch deployment input for the whole organigram.
-     * @param account Address the deployment would be sent from.
+     * @param input - Batch deployment input for the whole organigram.
+     * @param account - Address the deployment would be sent from.
      * @returns The estimated gas, or 0n when nothing remains to deploy.
      */
     async estimateDeployOrganigramGas(input, account) {
-        const { args } = await this.prepareOrganigramDeployment(input);
+        const { args } = await this.prepareOrganigramDeployment(input, account);
         if (args == null)
             return 0n;
         return await this.publicClient.estimateContractGas({
@@ -669,14 +661,15 @@ export class OrganigramClient {
     /**
      * Deploy a full organigram, including its organs, assets, and procedures.
      *
-     * @param input Batch deployment input for the whole organigram.
-     * @returns The deployed organ, asset, and procedure addresses.
+     * @param input - Batch deployment input for the whole organigram.
+     * @returns The deployed organ, asset, and procedure addresses, and the input
+     * updated with them. Use `Organigram.deploy()` to get a loaded `Organigram`.
      */
     async deployOrganigram(input) {
         if (this.walletClient == null) {
             throw new Error('Wallet client not connected.');
         }
-        const { refreshedInput, organsToDeploy, assetsToDeploy, proceduresToDeploy, args } = await this.prepareOrganigramDeployment(input);
+        const { refreshedInput, organsToDeploy, assetsToDeploy, proceduresToDeploy, args } = await this.prepareOrganigramDeployment(input, await getWalletAddress(this.walletClient));
         if (args == null) {
             return createDeployOrganigramResult({ organs: [], assets: [], procedures: [] }, refreshedInput);
         }
@@ -703,17 +696,17 @@ export class OrganigramClient {
     /**
      * Attempt to load one deployed contract as an organ or procedure.
      *
-     * @param address Contract address to inspect.
-     * @param cached Whether cached instances may be reused.
+     * @param address - Contract address to inspect.
+     * @param input - `fresh` reads the chain even when the contract is cached.
      */
-    async loadContract(address, cached = true) {
-        return ((await this.getDeployedOrgan(address, cached)) ??
-            (await this.getDeployedProcedure(address, cached)));
+    async loadContract(address, { fresh = false } = {}) {
+        return ((await this.loadOrgan(address, { fresh })) ??
+            (await this.loadProcedure(address, { fresh })));
     }
     /**
      * Load a heterogeneous list of deployed contract addresses into an organigram.
      *
-     * @param contractAddresses Addresses to resolve as organs, procedures, or assets.
+     * @param contractAddresses - Addresses to resolve as organs, procedures, or assets.
      */
     async loadContracts(contractAddresses) {
         const organs = [];
@@ -721,17 +714,17 @@ export class OrganigramClient {
         const assets = [];
         for (const address of contractAddresses) {
             try {
-                const organ = await this.getDeployedOrgan(address);
+                const organ = await this.loadOrgan(address);
                 if (organ != null) {
                     organs.push(organ);
                     continue;
                 }
-                const procedure = await this.getDeployedProcedure(address);
+                const procedure = await this.loadProcedure(address);
                 if (procedure != null) {
                     procedures.push(procedure);
                     continue;
                 }
-                const asset = await this.getDeployedAsset(address);
+                const asset = await this.loadAsset(address);
                 if (asset != null) {
                     assets.push(asset);
                     continue;
@@ -756,10 +749,11 @@ export class OrganigramClient {
      * Undeployed placeholders are preserved as-is, while deployed organs,
      * procedures, and assets are refreshed from chain state.
      *
-     * @param organigram Organigram definition to hydrate.
-     * @param cached Whether previously cached instances may be reused.
+     * @param organigram - Organigram definition to hydrate.
+     * @param input - `fresh: false` reuses the organs, procedures and assets already
+     * in the client cache instead of reading them again.
      */
-    async loadOrganigram(organigram, cached = false) {
+    async loadOrganigram(organigram, { fresh = true } = {}) {
         const loadConcurrency = 4;
         const deployedOrgans = (await this.mapWithConcurrencyLimit(organigram.organs, loadConcurrency, async (organ) => {
             if (!organ.isDeployed ||
@@ -768,7 +762,7 @@ export class OrganigramClient {
                 return organ;
             }
             try {
-                return ((await this.getDeployedOrgan(organ.address, cached, organ)) ??
+                return ((await this.loadOrgan(organ.address, { fresh, initial: organ })) ??
                     organ);
             }
             catch (error) {
@@ -783,7 +777,10 @@ export class OrganigramClient {
                 return procedure;
             }
             try {
-                return ((await this.getDeployedProcedure(procedure.address, cached, procedure)) ?? procedure);
+                return ((await this.loadProcedure(procedure.address, {
+                    fresh,
+                    initial: procedure
+                })) ?? procedure);
             }
             catch (error) {
                 console.warn('Unable to hydrate deployed procedure in organigram load.', procedure.address, error.message);
@@ -797,7 +794,7 @@ export class OrganigramClient {
                 return asset;
             }
             try {
-                return ((await this.getDeployedAsset(asset.address, cached, asset)) ??
+                return ((await this.loadAsset(asset.address, { fresh, initial: asset })) ??
                     asset);
             }
             catch (error) {

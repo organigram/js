@@ -4,23 +4,37 @@ import { createRandom32BytesHexId, predictContractAddress } from './utils';
 import { getDefaultChainId } from './deployments';
 import { tryMulticall } from './multicall';
 import { getContractInstance, getWalletAddress } from './contracts';
+/** Default supply minted for a new asset, in whole tokens. */
 export const ERC20_INITIAL_SUPPLY = 10_000_000; // 10 million tokens.
-/**
- * In-memory representation of one ERC-20 asset managed by an organigram.
- */
+/** An ERC-20 token held by organs: a plain asset or company equity. */
 export class Asset {
+    /** Contract address, or a predicted address while it is a draft. */
     address;
+    /** Token name. */
     name;
+    /** Free description. */
     description;
+    /** Token symbol. */
     symbol;
+    /** Supply minted at deployment, in whole tokens. */
     initialSupply;
+    /** Chain the asset lives on. */
     chainId;
+    /** Salt that determines the clone address. */
     salt;
+    /** Logo URL. */
     image;
+    /** Whether the contract exists on chain. */
     isDeployed;
+    /** Balance of the connected wallet, in the smallest unit. */
     userBalance;
+    /** Organigram the asset belongs to. */
     organigramId;
+    /**
+     * `asset` for a plain token, `equity` for company shares whose transfers a procedure approves.
+     */
     kind;
+    /** Procedure that approves transfers of this equity token. */
     decisionProcedure;
     constructor(input) {
         if (!input.address && !input.chainId) {
@@ -50,9 +64,9 @@ export class Asset {
     /**
      * Hydrate an asset from chain state.
      *
-     * @param address Asset contract address.
-     * @param clients viem clients used to query the contract.
-     * @param initialAsset Optional fallback metadata merged into the loaded asset.
+     * @param address - Asset contract address.
+     * @param clients - viem clients used to query the contract.
+     * @param initialAsset - Optional fallback metadata merged into the loaded asset.
      */
     static load = async (address, clients, initialAsset) => {
         if (!address) {

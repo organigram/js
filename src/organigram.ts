@@ -7,20 +7,10 @@ import { getDefaultChainId } from './deployments'
 import { handleJsonBigInt } from './utils'
 import type { PublicClient, WalletClient } from 'viem'
 
-/**
- * Named organ roles used by procedure access control.
- */
+/** The three roles of a procedure: who proposes, who moderates, who decides. */
 export type ProcedureRoleTypeName = 'proposers' | 'moderators' | 'deciders'
 
-/**
- * Human-readable labels for the procedure role slots expected by the protocol.
- */
-export const procedureRoleTypes = [
-  { label: 'Create proposals', name: 'proposers' },
-  { label: 'Approve proposals', name: 'deciders' },
-  { label: 'Filter proposals', name: 'moderators' }
-]
-
+/** Line styles available to draw the links of an organigram. */
 export const organigramEdgeTypes = [
   'default',
   'straight',
@@ -29,15 +19,19 @@ export const organigramEdgeTypes = [
   // 'simplebezier'
 ] as const
 
+/** Line style of the links of an organigram. */
 export type OrganigramEdgeType = (typeof organigramEdgeTypes)[number]
 
+/** Line style used when none is set. */
 export const defaultOrganigramEdgeType: OrganigramEdgeType = 'default'
 
+/** Position of one node in the organigram diagram. */
 export type OrganigramNodePosition = {
   x: number
   y: number
 }
 
+/** Positions of the nodes in the organigram diagram, by contract address. */
 export type OrganigramNodePositions = Record<string, OrganigramNodePosition>
 
 export const normalizeOrganigramEdgeType = (
@@ -72,9 +66,7 @@ export const normalizeOrganigramNodePositions = (
   )
 }
 
-/**
- * JSON-safe serialized representation of an organigram.
- */
+/** An organigram as plain JSON, to store or send it. */
 export type OrganigramJson = {
   id: string
   slug: string
@@ -89,9 +81,7 @@ export type OrganigramJson = {
   workspaceId?: string | null
 }
 
-/**
- * Input used to create an in-memory organigram model.
- */
+/** The data of an organigram, such as a template from `getTemplate()`. */
 export type OrganigramInput = {
   id?: string | null
   slug?: string | null
@@ -110,31 +100,50 @@ export type OrganigramInput = {
   workspaceId?: string | null
 }
 
-/**
- * Default chain id used by the SDK templates.
- */
+/** Chain used by templates when none is given. */
 export const defaultChainId = getDefaultChainId()
 
 /**
- * In-memory representation of an Organigram project.
+ * A whole organization: its organs, procedures and assets, as a draft or as deployed contracts.
  *
- * The class can be created from raw inputs, a built-in template name, or left
- * blank to start from the default empty template.
+ * @remarks The organigram itself has no contract. Create one from a template or from data, attach an `OrganigramClient`, then call `deploy()`.
+ *
+ * @example
+ * ```ts
+ * const organigram = await new Organigram({
+ *   ...getTemplate('nonProfit', client.chainId),
+ *   organigramClient: client
+ * }).deploy()
+ * ```
  */
 export class Organigram {
+  /** Identifier of the organigram. */
   id: string
+  /** Organs of the organization. */
   organs: Organ[] = []
+  /** Assets of the organization. */
   assets: Asset[] = []
+  /** Procedures connecting the organs. */
   procedures: Procedure[] = []
+  /** Chain the organigram is deployed on. */
   chainId: string
+  /** URL-friendly name. */
   slug: string
+  /** Display name. */
   name: string
+  /** Free description. */
   description: string
+  /** Line style of the diagram links. */
   edgeType: OrganigramEdgeType
+  /** Positions of the diagram nodes. */
   nodePositions: OrganigramNodePositions
+  /** Workspace the organigram belongs to in the Organigram app. */
   workspaceId?: string | null
+  /** Client used to deploy and load the organigram. */
   organigramClient?: OrganigramClient | null
+  /** Client that signs transactions, when no `organigramClient` is attached. */
   walletClient?: WalletClient | null
+  /** Client used for reads, when no `organigramClient` is attached. */
   publicClient?: PublicClient | null
 
   constructor(input?: OrganigramInput | keyof typeof templates | string[]) {
@@ -168,6 +177,7 @@ export class Organigram {
     this.workspaceId = initial?.workspaceId
   }
 
+  /** Change the name, description or diagram layout. */
   editDetails({
     name,
     description,
@@ -186,22 +196,25 @@ export class Organigram {
     if (nodePositions !== undefined) this.nodePositions = nodePositions
   }
 
+  /** Replace the organs. */
   setOrgans(organs: Organ[]) {
     this.organs = organs
   }
 
+  /** Replace the assets. */
   setAssets(assets: Asset[]) {
     this.assets = assets
   }
 
+  /** Replace the procedures. */
   setProcedures(procedures: Procedure[]) {
     this.procedures = procedures
   }
 
   /**
-   * Hydrate every deployed object referenced by this organigram.
+   * Read every deployed organ, procedure and asset of the organigram from chain.
    *
-   * @param input Optional viem clients used when the organigram has no attached client yet.
+   * @param input - viem clients, used when no `organigramClient` is attached.
    */
   load = async (input?: {
     walletClient?: WalletClient | null
@@ -237,7 +250,9 @@ export class Organigram {
   }
 
   /**
-   * Deploy the full organigram through its attached client, then reload it from chain state.
+   * Deploy every contract of the organigram in one transaction, then read them back from chain.
+   *
+   * @remarks Requires an attached `organigramClient` with a wallet client.
    */
   async deploy() {
     if (!this.organigramClient) {
@@ -252,9 +267,7 @@ export class Organigram {
     return await this.load()
   }
 
-  /**
-   * Convert the organigram into a JSON-safe structure suitable for persistence or transport.
-   */
+  /** Convert the organigram into plain JSON. */
   toJson = (): OrganigramJson =>
     JSON.parse(
       JSON.stringify(

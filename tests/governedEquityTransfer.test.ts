@@ -7,7 +7,7 @@ import {
 } from '../src/procedure/utils'
 import deployedAddresses from '../src/deployments'
 import { PERMISSIONS } from '../src/utils'
-import { DeployProceduresInput } from '../src'
+import { DeployProcedureInput } from '../src'
 
 test('prepares every commercial equity template from ordinary procedure types', () => {
   const chainId = '99931337'
@@ -221,7 +221,7 @@ test('prepares SAS procedures for deployment without a special transfer procedur
   const template = getTemplate('sas', '31337')
   await expect(
     prepareDeployProceduresInput(
-      template.procedures as DeployProceduresInput[],
+      template.procedures as DeployProcedureInput[],
       {
         walletClient: {},
         publicClient: { getChainId: async () => 31337 }

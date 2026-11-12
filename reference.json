@@ -1,0 +1,50 @@
+[
+  {
+    "title": "Client",
+    "files": ["organigramClient", "deploymentReferences", "contracts"],
+    "intro": "Everything starts with an `OrganigramClient`, connected to the protocol on one chain through two viem clients: a public client to read, and a wallet client to sign. Without a wallet client, the library is read-only. The client deploys contracts, loads them, and keeps what it loaded in cache until you ask for a `fresh` read. Every write accepts `TransactionOptions`, to follow a transaction as soon as it is sent."
+  },
+  {
+    "title": "Organigrams and templates",
+    "files": ["organigram", "template/index"],
+    "intro": "An `Organigram` gathers the organs, procedures and assets of one organization. Start from a template with `getTemplate()`, or from your own data, attach a client, and deploy everything in one transaction with `organigram.deploy()`. Contracts are clones at addresses predicted from a salt, so that a draft can reference contracts that do not exist yet."
+  },
+  {
+    "title": "Organs",
+    "files": ["organ"],
+    "names": ["PERMISSIONS", "getPermissionsSet"],
+    "intro": "An organ is a group: a registry of entries, each a member, a document or both, a list of permissions, and a balance of assets. Each change requires a permission from `PERMISSIONS`. In a governed organization, those permissions belong to procedures rather than to people, so that every change goes through a decision."
+  },
+  {
+    "title": "Procedures and proposals",
+    "files": [
+      "procedure/index",
+      "procedure/nomination",
+      "procedure/vote",
+      "procedure/erc20Vote",
+      "procedure/utils"
+    ],
+    "intro": "A procedure lets the members of some organs change other organs. Proposers submit a proposal, a list of operations built with `Procedure.createOperation()`. With moderation, a moderator presents or blocks it. Deciders then adopt or reject it, alone in a `NominationProcedure`, by vote in a `VoteProcedure`, or by token-weighted vote in an `ERC20VoteProcedure`, and adoption runs the operations. Every action also exists as a signed variant: the user signs with a `sign…` method, and any account submits the signature with the matching `…BySig` method, so that users need no gas."
+  },
+  {
+    "title": "Assets",
+    "files": ["asset"],
+    "intro": "Assets are ERC-20 tokens held by organs: plain assets, or company equity whose transfers a procedure approves."
+  },
+  {
+    "title": "Off-chain content and encryption",
+    "files": ["ipfs/"],
+    "intro": "Contracts only store references. Metadata and documents live off-chain, and are referenced by CID references of the form `og://workspace/<workspace>/<key>`. Each version of a file is described by a manifest. Encrypted files use three levels of keys: a content key encrypts one file, a group key shared by the members of an access group wraps content keys, and the key pair of each member unwraps group keys. These functions run on the Web Crypto API of the user's device: keep private keys there, never send them to a server or log them."
+  },
+  {
+    "title": "Networks and deployments",
+    "files": ["deployments"],
+    "names": ["ContractName", "predictContractAddress"],
+    "intro": "The protocol contracts are deployed once per chain. These functions tell which chains are supported, where the contracts are, and at which address a new clone will be deployed."
+  },
+  {
+    "title": "Utilities",
+    "files": ["utils"],
+    "intro": "Small helpers used across the library and the Organigram app."
+  }
+]

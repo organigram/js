@@ -41,17 +41,18 @@ const replaceKnownAddressesInData = (data, replacements) => {
         return data;
     }
 };
-const getPredictedAddress = (type, chainId, item) => {
+const getPredictedAddress = (type, chainId, deployer, item) => {
     if (item.isDeployed === true || item.salt == null || item.salt === '') {
         return undefined;
     }
     return predictContractAddress({
         type,
         chainId,
-        salt: item.salt
+        salt: item.salt,
+        deployer
     });
 };
-export const refreshUndeployedContractReferences = (input, chainId) => {
+export const refreshUndeployedContractReferences = (input, chainId, deployer) => {
     const replacements = new Map();
     const addReplacement = (item, predictedAddress) => {
         const key = normalizeReplacementKey(item.address);
@@ -59,12 +60,12 @@ export const refreshUndeployedContractReferences = (input, chainId) => {
             replacements.set(key, predictedAddress);
         }
     };
-    input.organs.forEach(organ => addReplacement(organ, getPredictedAddress('Organ', chainId, organ)));
-    input.assets.forEach(asset => addReplacement(asset, getPredictedAddress(asset.kind === 'equity' ? 'EquityToken' : 'Asset', chainId, asset)));
-    input.procedures.forEach(procedure => addReplacement(procedure, getPredictedAddress(procedureContractNames[procedure.typeName], chainId, procedure)));
+    input.organs.forEach(organ => addReplacement(organ, getPredictedAddress('Organ', chainId, deployer, organ)));
+    input.assets.forEach(asset => addReplacement(asset, getPredictedAddress(asset.kind === 'equity' ? 'EquityToken' : 'Asset', chainId, deployer, asset)));
+    input.procedures.forEach(procedure => addReplacement(procedure, getPredictedAddress(procedureContractNames[procedure.typeName], chainId, deployer, procedure)));
     const organs = input.organs.map(organ => ({
         ...organ,
-        address: getPredictedAddress('Organ', chainId, organ) ??
+        address: getPredictedAddress('Organ', chainId, deployer, organ) ??
             organ.address,
         permissions: organ.permissions?.map(permission => ({
             ...permission,
@@ -73,12 +74,12 @@ export const refreshUndeployedContractReferences = (input, chainId) => {
     }));
     const assets = input.assets.map(asset => ({
         ...asset,
-        address: getPredictedAddress(asset.kind === 'equity' ? 'EquityToken' : 'Asset', chainId, asset) ?? asset.address,
+        address: getPredictedAddress(asset.kind === 'equity' ? 'EquityToken' : 'Asset', chainId, deployer, asset) ?? asset.address,
         decisionProcedure: replaceKnownAddress(asset.decisionProcedure, replacements)
     }));
     const procedures = input.procedures.map(procedure => ({
         ...procedure,
-        address: getPredictedAddress(procedureContractNames[procedure.typeName], chainId, procedure) ?? procedure.address,
+        address: getPredictedAddress(procedureContractNames[procedure.typeName], chainId, deployer, procedure) ?? procedure.address,
         deciders: replaceKnownAddress(procedure.deciders, replacements),
         proposers: replaceKnownAddress(procedure.proposers, replacements),
         moderators: replaceKnownAddress(procedure.moderators, replacements),

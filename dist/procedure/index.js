@@ -167,31 +167,63 @@ export const procedureFunctions = [
     }
 ];
 /**
- * Base SDK model shared by every procedure implementation.
+ * The rules by which the members of some organs may change other organs.
+ *
+ * @remarks A proposal is a list of operations. Proposers submit it with `propose()`. With moderation, a moderator presents it with `presentProposal()` or blocks it with `blockProposal()`. Deciders then adopt or reject it, depending on the procedure type, and adoption runs its operations.
+ * Every action also has a signed variant (`sign…` then `…BySig`), so that a relayer submits it and users need no gas.
  */
 export class Procedure {
+    /** ERC-165 interface identifier of procedure contracts. */
     static INTERFACE = '0x71dbd330';
+    /**
+     * Functions a proposal operation can call, with what a form needs to build them.
+     */
     static OPERATIONS_FUNCTIONS = procedureFunctions;
+    /** Display name. */
     name;
+    /** Free description. */
     description;
+    /** Contract address, or a predicted address while it is a draft. */
     address;
+    /** Procedure type: `nomination`, `vote` or `erc20Vote`. */
     typeName;
+    /** Reference to the off-chain metadata of the procedure. */
     cid;
+    /** Whether the contract exists on chain. */
     isDeployed;
+    /** Organ whose members adopt or reject proposals, or a single address. */
     deciders;
+    /** Organ whose members may submit proposals, or a single address. */
     proposers;
+    /** Whether proposals must be presented by a moderator before the decision. */
     withModeration;
+    /**
+     * Organ whose members may present or block proposals, when moderation is enabled.
+     */
     moderators;
+    /** Off-chain metadata, as a JSON string. */
     metadata;
+    /**
+     * Parameters specific to the procedure type, as a JSON string, such as the vote duration.
+     */
     data;
+    /** Trusted forwarder relaying gasless transactions. */
     forwarder;
+    /** Proposals submitted so far. */
     proposals;
+    /** viem contract instance, once loaded. */
     contract;
+    /** Salt that determines the clone address. */
     salt;
+    /** Chain the procedure lives on. */
     chainId;
+    /** Client that signs transactions. */
     walletClient;
+    /** Client used for reads. */
     publicClient;
+    /** Organigram the procedure belongs to. */
     organigramId;
+    /** Registered procedure type this procedure is a clone of. */
     type;
     constructor({ address, deciders, typeName, name, description, salt, cid, chainId, publicClient, walletClient, metadata, proposers, withModeration, forwarder, moderators, proposals, isDeployed, type, data, organigramId, }) {
         if (typeName == null || deciders == null) {
@@ -236,6 +268,7 @@ export class Procedure {
         this.type = type ?? getProcedureType(this.chainId, this.typeName);
         this.data = data ?? '';
     }
+    /** The viem clients of the procedure. */
     getClients() {
         if (this.publicClient == null) {
             throw new Error('Public client not connected.');
@@ -245,9 +278,11 @@ export class Procedure {
             walletClient: this.walletClient
         };
     }
+    /** @internal */
     static async _populateInitialize(_populateInitializeInput, _clients) {
         throw new Error('Procedure cannot be initialized.');
     }
+    /** Read the roles, metadata reference and proposal count of a procedure. */
     static async loadData(address, clients) {
         const contract = getContractInstance({
             address,
@@ -256,6 +291,7 @@ export class Procedure {
         });
         return normalizeProcedureData(await contract.read.getProcedure());
     }
+    /** Read one proposal of a procedure. */
     static async loadProposal(address, proposalKey, clients) {
         const contract = getContractInstance({
             address,
@@ -265,6 +301,7 @@ export class Procedure {
         const proposal = await contract.read.getProposal([BigInt(proposalKey)]);
         return normalizeProposal(proposal, proposalKey);
     }
+    /** Read every proposal of a procedure. */
     static async loadProposals(address, clients, data) {
         const procedureData = data ?? (await Procedure.loadData(address, clients));
         const proposalsLength = Number(procedureData.proposalsLength);
@@ -295,6 +332,7 @@ export class Procedure {
             });
         }))).filter((proposal) => proposal != null);
     }
+    /** Read a procedure from chain, with its proposals. */
     static async load(address, clients, initialProcedure) {
         if (!address) {
             throw new Error('No address provided.');
@@ -327,6 +365,7 @@ export class Procedure {
             isDeployed: true
         });
     }
+    /** @internal */
     static _stringifyParamType(type) {
         switch (type) {
             case 'cid':
@@ -361,6 +400,7 @@ export class Procedure {
                 return 'uint256';
         }
     }
+    /** @internal */
     static _extractParams(types, operation) {
         if (operation?.data != null) {
             const decodedParams = decodeAbiParameters(parseAbiParameters(types.map(type => Procedure._stringifyParamType(type)).join(', ')), `0x${operation.data.substring(10)}`);
@@ -383,6 +423,7 @@ export class Procedure {
         }
         return types.map(type => ({ type }));
     }
+    /** Normalize an operation read from chain. */
     static parseOperation(rawOperation) {
         const operationTuple = rawOperation;
         const index = (operationTuple.index ?? operationTuple[0]).toString();
@@ -409,6 +450,7 @@ export class Procedure {
                 : [];
         return operation;
     }
+    /** Tell whether a contract is a procedure. */
     static async isProcedure(address, clients) {
         const contract = getContractInstance({
             address,
@@ -417,30 +459,11 @@ export class Procedure {
         });
         return Boolean(await contract.read.supportsInterface(['0x01ffc9a7']));
     }
-    async updateCid(cid, options) {
-        const tx = await createContractWriteTransaction({
-            address: this.address,
-            abi: ProcedureContractABI.abi,
-            functionName: 'updateCid',
-            args: [cid],
-            clients: this.getClients(),
-            nonce: options?.nonce
-        });
-        options?.onTransaction?.(tx, `Update metadata of procedure ${this.address} with CID ${cid.toString()}`);
-        return tx;
-    }
-    async updateAdmin(address, options) {
-        const tx = await createContractWriteTransaction({
-            address: this.address,
-            abi: ProcedureContractABI.abi,
-            functionName: 'updateAdmin',
-            args: [address],
-            clients: this.getClients(),
-            nonce: options?.nonce
-        });
-        options?.onTransaction?.(tx, `Update admin of procedure ${this.address} to ${address}.`);
-        return tx;
-    }
+    /**
+     * Submit a proposal.
+     *
+     * @param input - Reference to the proposal metadata, which must be a CID reference, and its operations.
+     */
     async propose(input) {
         if (input.cid.trim() === '') {
             throw new Error('A proposal must include its metadata reference.');
@@ -493,6 +516,11 @@ export class Procedure {
         this.proposals.push(proposalWithTransaction);
         return proposalWithTransaction;
     }
+    /**
+     * Sign a proposal, so that another account submits it with `proposeBySig()`.
+     *
+     * @remarks The signer pays no gas: any account can submit the signature with the matching `…BySig` method.
+     */
     async signProposal(input) {
         if (this.walletClient == null) {
             throw new Error('Connected wallet cannot sign typed data.');
@@ -540,6 +568,7 @@ export class Procedure {
             }
         });
     }
+    /** Sign the presentation of a proposal, for `presentProposalBySig()`. */
     async signPresentProposal(input) {
         if (this.walletClient == null) {
             throw new Error('Connected wallet cannot sign typed data.');
@@ -563,6 +592,7 @@ export class Procedure {
             }
         });
     }
+    /** Sign the block of a proposal, for `blockProposalBySig()`. */
     async signBlockProposal(input) {
         if (this.walletClient == null) {
             throw new Error('Connected wallet cannot sign typed data.');
@@ -587,6 +617,7 @@ export class Procedure {
             }
         });
     }
+    /** Sign the application of a proposal, for `applyProposalBySig()`. */
     async signApplyProposal(input) {
         if (this.walletClient == null) {
             throw new Error('Connected wallet cannot sign typed data.');
@@ -610,6 +641,7 @@ export class Procedure {
             }
         });
     }
+    /** Submit a proposal signed by another account. */
     async proposeBySig(input) {
         const ops = input.operations.map(operation => ({
             index: operation.index != null && operation.index !== ''
@@ -636,6 +668,7 @@ export class Procedure {
         await tx.wait();
         return tx;
     }
+    /** Read the next signature nonce of an account. */
     async getNonce(account) {
         const contract = this.contract ??
             getContractInstance({
@@ -643,8 +676,9 @@ export class Procedure {
                 abi: ProcedureContractABI.abi,
                 ...this.getClients()
             });
-        return await contract.read.getNonce([account]);
+        return (await contract.read.getNonce([account]));
     }
+    /** EIP-712 domain of the signatures of this procedure. */
     getTypedDataDomain() {
         return {
             name: 'Organigram Procedure',
@@ -653,11 +687,26 @@ export class Procedure {
             verifyingContract: this.address
         };
     }
-    static createExternalCallOperation({ organAddress, target, data, value = 0, index = 0 }) {
+    /**
+     * Turn a contract call, such as the result of `Organ.populateTransaction()`,
+     * into a proposal operation.
+     */
+    static createOperation({ to, data, value = 0, index = 0 }) {
         return {
             index: index.toString(),
-            target: organAddress,
-            value: '0',
+            target: to,
+            data,
+            value: value.toString(),
+            functionSelector: data.slice(0, 10)
+        };
+    }
+    /**
+     * Build an operation that makes an organ call a contract outside the organization.
+     */
+    static createExternalCallOperation({ organAddress, target, data, value = 0, index = 0 }) {
+        return Procedure.createOperation({
+            to: organAddress,
+            index,
             data: encodeFunctionData({
                 abi: [
                     {
@@ -674,10 +723,10 @@ export class Procedure {
                 ],
                 functionName: 'executeWhitelisted',
                 args: [target, BigInt(value), data]
-            }),
-            functionSelector: toFunctionSelector('executeWhitelisted(address,uint256,bytes)')
-        };
+            })
+        });
     }
+    /** Block a proposal as a moderator, before its decision. */
     async blockProposal(proposalKey, reason, options) {
         const tx = await createContractWriteTransaction({
             address: this.address,
@@ -690,6 +739,7 @@ export class Procedure {
         options?.onTransaction?.(tx, `Block proposal ${proposalKey} of procedure ${this.address}`);
         return await tx.wait();
     }
+    /** Block a proposal signed by a moderator. */
     async blockProposalBySig(input, options) {
         const tx = await createContractWriteTransaction({
             address: this.address,
@@ -708,6 +758,7 @@ export class Procedure {
         options?.onTransaction?.(tx, `Block proposal ${input.proposalKey} of procedure ${this.address} by signature`);
         return await tx.wait();
     }
+    /** Present a proposal to the deciders, as a moderator. */
     async presentProposal(proposalKey, options) {
         const tx = await createContractWriteTransaction({
             address: this.address,
@@ -720,6 +771,7 @@ export class Procedure {
         options?.onTransaction?.(tx, `Present proposal ${proposalKey} of procedure ${this.address}`);
         return await tx.wait();
     }
+    /** Present a proposal signed by a moderator. */
     async presentProposalBySig(input, options) {
         const tx = await createContractWriteTransaction({
             address: this.address,
@@ -737,6 +789,9 @@ export class Procedure {
         options?.onTransaction?.(tx, `Present proposal ${input.proposalKey} of procedure ${this.address} by signature`);
         return await tx.wait();
     }
+    /**
+     * Settle a proposal: for a vote, count the ballots once it is over, then run or close it.
+     */
     async applyProposal(proposalKey, options) {
         const tx = await createContractWriteTransaction({
             address: this.address,
@@ -749,6 +804,7 @@ export class Procedure {
         options?.onTransaction?.(tx, `Apply proposal ${proposalKey} of procedure ${this.address}`);
         return await tx.wait();
     }
+    /** Settle a proposal, with an application signed by another account. */
     async applyProposalBySig(input, options) {
         const tx = await createContractWriteTransaction({
             address: this.address,
@@ -766,15 +822,18 @@ export class Procedure {
         options?.onTransaction?.(tx, `Apply proposal ${input.proposalKey} of procedure ${this.address} by signature`);
         return await tx.wait();
     }
+    /** Read every proposal again from chain. */
     async reloadProposals() {
         this.proposals = await Procedure.loadProposals(this.address, this.getClients());
         return this;
     }
+    /** Read one proposal again from chain. */
     async reloadProposal(proposalKey) {
         const proposal = await Procedure.loadProposal(this.address, proposalKey, this.getClients());
         this.proposals = this.proposals.map(existingProposal => existingProposal.key === proposalKey ? proposal : existingProposal);
         return this;
     }
+    /** Read the roles and metadata reference again from chain. */
     async reloadData() {
         const data = await Procedure.loadData(this.address, this.getClients());
         this.cid = data.cid;
@@ -784,6 +843,7 @@ export class Procedure {
         this.withModeration = data.withModeration;
         return this;
     }
+    /** Convert the procedure into plain JSON. */
     toJson = () => JSON.parse(JSON.stringify({
         address: this.address,
         salt: this.salt,

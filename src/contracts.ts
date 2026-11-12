@@ -2,6 +2,7 @@ import type {
   Abi,
   Account,
   Address,
+  GetContractReturnType,
   Hex,
   PublicClient,
   TransactionReceipt,
@@ -9,20 +10,28 @@ import type {
 } from 'viem'
 import { getAddress, getContract } from 'viem'
 
+/** The viem clients the SDK reads and writes with. */
 export type ContractClients = {
+  /** Client used for every read. */
   publicClient: PublicClient
+  /** Client that signs transactions. Without it, the SDK is read-only. */
   walletClient?: WalletClient | null
 }
 
+/** The receipt of a mined transaction. */
 export type OrganigramTransactionReceipt = TransactionReceipt & {
   gasPrice?: bigint | null
 }
 
+/** A sent transaction, with a `wait()` that resolves once it is mined. */
 export type OrganigramTransaction = {
+  /** Transaction hash. */
   hash: Hex
+  /** Wait for the transaction to be mined, and throw if it reverted. */
   wait: () => Promise<OrganigramTransactionReceipt>
 }
 
+/** Add a 20% margin plus 25,000 gas to a gas estimate. */
 export const bufferEstimatedGas = (estimatedGas: bigint): bigint =>
   (estimatedGas * 120n) / 100n + 25_000n
 
@@ -44,6 +53,7 @@ export const getWalletAccount = async (
   return address
 }
 
+/** Return the address of the account a wallet client signs with. */
 export const getWalletAddress = async (
   walletClient: WalletClient
 ): Promise<Address> => {
@@ -75,6 +85,12 @@ const createTransaction = (
   }
 })
 
+/** A viem contract instance bound to the SDK clients. */
+export type OrganigramContract = GetContractReturnType<
+  Abi,
+  PublicClient | { public: PublicClient; wallet: WalletClient }
+>
+
 export const getContractInstance = <TAbi extends Abi | readonly unknown[]>({
   address,
   abi,
@@ -83,7 +99,7 @@ export const getContractInstance = <TAbi extends Abi | readonly unknown[]>({
 }: {
   address: string
   abi: TAbi
-} & ContractClients) =>
+} & ContractClients): OrganigramContract =>
   getContract({
     address: getAddress(address as Address),
     abi: abi as Abi,
@@ -93,6 +109,9 @@ export const getContractInstance = <TAbi extends Abi | readonly unknown[]>({
         : publicClient
   })
 
+/**
+ * Send a contract call with a buffered gas estimate, and return it as an `OrganigramTransaction`.
+ */
 export const createContractWriteTransaction = async <
   TAbi extends Abi | readonly unknown[]
 >({

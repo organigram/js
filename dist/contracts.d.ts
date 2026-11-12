@@ -1,216 +1,39 @@
-import type { Abi, Account, Address, Hex, PublicClient, TransactionReceipt, WalletClient } from 'viem';
+import type { Abi, Account, Address, GetContractReturnType, Hex, PublicClient, TransactionReceipt, WalletClient } from 'viem';
+/** The viem clients the SDK reads and writes with. */
 export type ContractClients = {
+    /** Client used for every read. */
     publicClient: PublicClient;
+    /** Client that signs transactions. Without it, the SDK is read-only. */
     walletClient?: WalletClient | null;
 };
+/** The receipt of a mined transaction. */
 export type OrganigramTransactionReceipt = TransactionReceipt & {
     gasPrice?: bigint | null;
 };
+/** A sent transaction, with a `wait()` that resolves once it is mined. */
 export type OrganigramTransaction = {
+    /** Transaction hash. */
     hash: Hex;
+    /** Wait for the transaction to be mined, and throw if it reverted. */
     wait: () => Promise<OrganigramTransactionReceipt>;
 };
+/** Add a 20% margin plus 25,000 gas to a gas estimate. */
 export declare const bufferEstimatedGas: (estimatedGas: bigint) => bigint;
 export declare const getWalletAccount: (walletClient: WalletClient) => Promise<Account | Address>;
+/** Return the address of the account a wallet client signs with. */
 export declare const getWalletAddress: (walletClient: WalletClient) => Promise<Address>;
+/** A viem contract instance bound to the SDK clients. */
+export type OrganigramContract = GetContractReturnType<Abi, PublicClient | {
+    public: PublicClient;
+    wallet: WalletClient;
+}>;
 export declare const getContractInstance: <TAbi extends Abi | readonly unknown[]>({ address, abi, publicClient, walletClient }: {
     address: string;
     abi: TAbi;
-} & ContractClients) => {
-    read: {
-        [x: string]: (...parameters: [options?: import("viem").Prettify<import("viem").UnionOmit<import("viem").ReadContractParameters<Abi, string, readonly unknown[]>, "address" | "abi" | "functionName" | "args">> | undefined] | [args: readonly unknown[], options?: import("viem").Prettify<import("viem").UnionOmit<import("viem").ReadContractParameters<Abi, string, readonly unknown[]>, "address" | "abi" | "functionName" | "args">> | undefined]) => Promise<import("viem").ReadContractReturnType>;
-    };
-    estimateGas: {
-        [x: string]: (...parameters: [options: import("viem").Prettify<import("viem").UnionOmit<import("viem").EstimateContractGasParameters<Abi, string, readonly unknown[], import("viem").Chain | undefined>, "address" | "abi" | "functionName" | "args">>] | [args: readonly unknown[], options: import("viem").Prettify<import("viem").UnionOmit<import("viem").EstimateContractGasParameters<Abi, string, readonly unknown[], import("viem").Chain | undefined>, "address" | "abi" | "functionName" | "args">>]) => Promise<import("viem").EstimateContractGasReturnType>;
-    } & {
-        [x: string]: (...parameters: [options: import("viem").Prettify<import("viem").UnionOmit<import("viem").EstimateContractGasParameters<Abi, string, readonly unknown[], import("viem").Chain | undefined>, "address" | "abi" | "functionName" | "args">>] | [args: readonly unknown[], options: import("viem").Prettify<import("viem").UnionOmit<import("viem").EstimateContractGasParameters<Abi, string, readonly unknown[], import("viem").Chain | undefined>, "address" | "abi" | "functionName" | "args">>]) => Promise<import("viem").EstimateContractGasReturnType>;
-    };
-    simulate: {
-        [x: string]: <chainOverride extends import("viem").Chain | undefined = undefined, accountOverride extends Account | Address | undefined = undefined>(...parameters: [options?: Omit<import("viem").SimulateContractParameters<Abi, string, readonly unknown[], import("viem").Chain | undefined, chainOverride, accountOverride>, "address" | "abi" | "functionName" | "args"> | undefined] | [args: readonly unknown[], options?: Omit<import("viem").SimulateContractParameters<Abi, string, readonly unknown[], import("viem").Chain | undefined, chainOverride, accountOverride>, "address" | "abi" | "functionName" | "args"> | undefined]) => Promise<import("viem").SimulateContractReturnType>;
-    };
-    createEventFilter: {
-        [x: string]: <strict extends boolean | undefined = undefined>(...parameters: [options?: ({
-            fromBlock?: bigint | import("viem").BlockTag | undefined;
-            toBlock?: bigint | import("viem").BlockTag | undefined;
-        } & {
-            strict?: strict | undefined;
-        }) | undefined] | [args: readonly unknown[] | {
-            [x: string]: unknown;
-            address?: undefined;
-            abi?: undefined;
-            eventName?: undefined;
-            fromBlock?: undefined;
-            strict?: undefined;
-            toBlock?: undefined;
-            args?: undefined;
-        }, options?: ({
-            fromBlock?: bigint | import("viem").BlockTag | undefined;
-            toBlock?: bigint | import("viem").BlockTag | undefined;
-        } & {
-            strict?: strict | undefined;
-        }) | undefined]) => Promise<import("viem").CreateContractEventFilterReturnType>;
-    };
-    getEvents: {
-        [x: string]: (...parameters: [options?: {
-            blockHash?: `0x${string}` | undefined;
-            strict?: boolean | undefined;
-            fromBlock?: bigint | import("viem").BlockTag | undefined;
-            toBlock?: bigint | import("viem").BlockTag | undefined;
-        } | undefined] | [args?: readonly unknown[] | {
-            [x: string]: unknown;
-            address?: undefined;
-            abi?: undefined;
-            args?: undefined;
-            eventName?: undefined;
-            fromBlock?: undefined;
-            onError?: undefined;
-            onLogs?: undefined;
-            strict?: undefined;
-            poll?: undefined;
-            batch?: undefined;
-            pollingInterval?: undefined;
-        } | undefined, options?: {
-            blockHash?: `0x${string}` | undefined;
-            strict?: boolean | undefined;
-            fromBlock?: bigint | import("viem").BlockTag | undefined;
-            toBlock?: bigint | import("viem").BlockTag | undefined;
-        } | undefined]) => Promise<import("viem").GetContractEventsReturnType<Abi, string>>;
-    };
-    watchEvent: {
-        [x: string]: (...parameters: [options?: {
-            batch?: boolean | undefined | undefined;
-            pollingInterval?: number | undefined | undefined;
-            strict?: boolean | undefined;
-            fromBlock?: bigint | undefined;
-            onError?: ((error: Error) => void) | undefined | undefined;
-            onLogs: import("viem").WatchContractEventOnLogsFn<Abi, string, undefined>;
-            poll?: true | undefined | undefined;
-        } | undefined] | [args: readonly unknown[] | {
-            [x: string]: unknown;
-            address?: undefined;
-            abi?: undefined;
-            args?: undefined;
-            eventName?: undefined;
-            fromBlock?: undefined;
-            onError?: undefined;
-            onLogs?: undefined;
-            strict?: undefined;
-            poll?: undefined;
-            batch?: undefined;
-            pollingInterval?: undefined;
-        }, options?: {
-            batch?: boolean | undefined | undefined;
-            pollingInterval?: number | undefined | undefined;
-            strict?: boolean | undefined;
-            fromBlock?: bigint | undefined;
-            onError?: ((error: Error) => void) | undefined | undefined;
-            onLogs: import("viem").WatchContractEventOnLogsFn<Abi, string, undefined>;
-            poll?: true | undefined | undefined;
-        } | undefined]) => import("viem").WatchContractEventReturnType;
-    };
-    write: {
-        [x: string]: <chainOverride extends import("viem").Chain | undefined, options extends import("viem").UnionOmit<import("viem").WriteContractParameters<Abi, string, readonly unknown[], import("viem").Chain | undefined, undefined, chainOverride>, "address" | "abi" | "functionName" | "args"> extends infer T ? { [K in keyof T]: T[K]; } : never, Rest extends unknown[] = [options: options]>(...parameters: Rest | [args: readonly unknown[], ...parameters: Rest]) => Promise<import("viem").WriteContractReturnType>;
-    };
-    address: `0x${string}`;
-    abi: Abi;
-} | {
-    read: {
-        [x: string]: (...parameters: [options?: import("viem").Prettify<import("viem").UnionOmit<import("viem").ReadContractParameters<Abi, string, readonly unknown[]>, "address" | "abi" | "functionName" | "args">> | undefined] | [args: readonly unknown[], options?: import("viem").Prettify<import("viem").UnionOmit<import("viem").ReadContractParameters<Abi, string, readonly unknown[]>, "address" | "abi" | "functionName" | "args">> | undefined]) => Promise<import("viem").ReadContractReturnType>;
-    };
-    estimateGas: {
-        [x: string]: (...parameters: [options: import("viem").Prettify<import("viem").UnionOmit<import("viem").EstimateContractGasParameters<Abi, string, readonly unknown[], import("viem").Chain | undefined>, "address" | "abi" | "functionName" | "args">>] | [args: readonly unknown[], options: import("viem").Prettify<import("viem").UnionOmit<import("viem").EstimateContractGasParameters<Abi, string, readonly unknown[], import("viem").Chain | undefined>, "address" | "abi" | "functionName" | "args">>]) => Promise<import("viem").EstimateContractGasReturnType>;
-    } & {
-        [x: string]: (...parameters: [options: import("viem").Prettify<import("viem").UnionOmit<import("viem").EstimateContractGasParameters<Abi, string, readonly unknown[], import("viem").Chain | undefined>, "address" | "abi" | "functionName" | "args">>] | [args: readonly unknown[], options: import("viem").Prettify<import("viem").UnionOmit<import("viem").EstimateContractGasParameters<Abi, string, readonly unknown[], import("viem").Chain | undefined>, "address" | "abi" | "functionName" | "args">>]) => Promise<import("viem").EstimateContractGasReturnType>;
-    };
-    simulate: {
-        [x: string]: <chainOverride extends import("viem").Chain | undefined = undefined, accountOverride extends Account | Address | undefined = undefined>(...parameters: [options?: Omit<import("viem").SimulateContractParameters<Abi, string, readonly unknown[], import("viem").Chain | undefined, chainOverride, accountOverride>, "address" | "abi" | "functionName" | "args"> | undefined] | [args: readonly unknown[], options?: Omit<import("viem").SimulateContractParameters<Abi, string, readonly unknown[], import("viem").Chain | undefined, chainOverride, accountOverride>, "address" | "abi" | "functionName" | "args"> | undefined]) => Promise<import("viem").SimulateContractReturnType>;
-    };
-    createEventFilter: {
-        [x: string]: <strict extends boolean | undefined = undefined>(...parameters: [options?: ({
-            fromBlock?: bigint | import("viem").BlockTag | undefined;
-            toBlock?: bigint | import("viem").BlockTag | undefined;
-        } & {
-            strict?: strict | undefined;
-        }) | undefined] | [args: readonly unknown[] | {
-            [x: string]: unknown;
-            address?: undefined;
-            abi?: undefined;
-            eventName?: undefined;
-            fromBlock?: undefined;
-            strict?: undefined;
-            toBlock?: undefined;
-            args?: undefined;
-        }, options?: ({
-            fromBlock?: bigint | import("viem").BlockTag | undefined;
-            toBlock?: bigint | import("viem").BlockTag | undefined;
-        } & {
-            strict?: strict | undefined;
-        }) | undefined]) => Promise<import("viem").CreateContractEventFilterReturnType>;
-    };
-    getEvents: {
-        [x: string]: (...parameters: [options?: {
-            blockHash?: `0x${string}` | undefined;
-            strict?: boolean | undefined;
-            fromBlock?: bigint | import("viem").BlockTag | undefined;
-            toBlock?: bigint | import("viem").BlockTag | undefined;
-        } | undefined] | [args?: readonly unknown[] | {
-            [x: string]: unknown;
-            address?: undefined;
-            abi?: undefined;
-            args?: undefined;
-            eventName?: undefined;
-            fromBlock?: undefined;
-            onError?: undefined;
-            onLogs?: undefined;
-            strict?: undefined;
-            poll?: undefined;
-            batch?: undefined;
-            pollingInterval?: undefined;
-        } | undefined, options?: {
-            blockHash?: `0x${string}` | undefined;
-            strict?: boolean | undefined;
-            fromBlock?: bigint | import("viem").BlockTag | undefined;
-            toBlock?: bigint | import("viem").BlockTag | undefined;
-        } | undefined]) => Promise<import("viem").GetContractEventsReturnType<Abi, string>>;
-    };
-    watchEvent: {
-        [x: string]: (...parameters: [options?: {
-            batch?: boolean | undefined | undefined;
-            pollingInterval?: number | undefined | undefined;
-            strict?: boolean | undefined;
-            fromBlock?: bigint | undefined;
-            onError?: ((error: Error) => void) | undefined | undefined;
-            onLogs: import("viem").WatchContractEventOnLogsFn<Abi, string, undefined>;
-            poll?: true | undefined | undefined;
-        } | undefined] | [args: readonly unknown[] | {
-            [x: string]: unknown;
-            address?: undefined;
-            abi?: undefined;
-            args?: undefined;
-            eventName?: undefined;
-            fromBlock?: undefined;
-            onError?: undefined;
-            onLogs?: undefined;
-            strict?: undefined;
-            poll?: undefined;
-            batch?: undefined;
-            pollingInterval?: undefined;
-        }, options?: {
-            batch?: boolean | undefined | undefined;
-            pollingInterval?: number | undefined | undefined;
-            strict?: boolean | undefined;
-            fromBlock?: bigint | undefined;
-            onError?: ((error: Error) => void) | undefined | undefined;
-            onLogs: import("viem").WatchContractEventOnLogsFn<Abi, string, undefined>;
-            poll?: true | undefined | undefined;
-        } | undefined]) => import("viem").WatchContractEventReturnType;
-    };
-    write: {
-        [x: string]: <chainOverride extends import("viem").Chain | undefined, options extends import("viem").UnionOmit<import("viem").WriteContractParameters<Abi, string, readonly unknown[], import("viem").Chain | undefined, Account | undefined, chainOverride>, "address" | "abi" | "functionName" | "args"> extends infer T ? { [K in keyof T]: T[K]; } : never, Rest extends unknown[] = [options: options]>(...parameters: Rest | [args: readonly unknown[], ...parameters: Rest]) => Promise<import("viem").WriteContractReturnType>;
-    };
-    address: `0x${string}`;
-    abi: Abi;
-};
+} & ContractClients) => OrganigramContract;
+/**
+ * Send a contract call with a buffered gas estimate, and return it as an `OrganigramTransaction`.
+ */
 export declare const createContractWriteTransaction: <TAbi extends Abi | readonly unknown[]>({ address, abi, functionName, args, clients, nonce, value }: {
     address: string;
     abi: TAbi;

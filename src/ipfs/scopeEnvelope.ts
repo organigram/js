@@ -1,8 +1,7 @@
 import {
   CID_REF_PREFIX,
   ENCRYPTION_ALGORITHM,
-  FILE_VERSION_MANIFEST_KIND,
-  SCOPE_ENVELOPE_KIND
+  FILE_VERSION_MANIFEST_KIND
 } from './constants'
 import { textToBytes } from './encoding'
 import { bytesToHex } from 'viem'
@@ -13,7 +12,6 @@ import type {
   ScopeEnvelopeCheckpoint,
   ScopeEnvelopeContentType,
   ScopeEnvelopeItem,
-  ScopeEnvelopeManifest,
   ScopeEnvelopeReference,
   ScopeEnvelopeRetentionState,
   WrappedContentKey
@@ -52,6 +50,7 @@ export const sha256Hex = async (value: string): Promise<string> => {
   return createHash('sha256').update(value).digest('hex')
 }
 
+/** Create a workspace checkpoint. */
 export const createScopeEnvelopeCheckpoint = (input: {
   epoch: number
   membershipHash: string
@@ -62,6 +61,14 @@ export const createScopeEnvelopeCheckpoint = (input: {
   rootHash: input.rootHash
 })
 
+/**
+ * Build a CID reference, `og://workspace/<workspace>/<key>`, optionally pinned to one version.
+ *
+ * @example
+ * ```ts
+ * formatCidRef({ scopeType: 'workspace', scopeId: workspaceId }, 'bylaws')
+ * ```
+ */
 export const formatCidRef = (
   scopeRef: ScopeEnvelopeReference,
   logicalKey: string,
@@ -79,6 +86,7 @@ export const formatCidRef = (
     : `${reference}?version=${encodeURIComponent(manifestCid)}`
 }
 
+/** Split a CID reference into its parts, or return `null` if it is not one. */
 export const parseCidRef = (value?: string | null): ParsedCidRef | null => {
   if (value == null || !value.startsWith(CID_REF_PREFIX)) {
     return null
@@ -105,9 +113,11 @@ export const parseCidRef = (value?: string | null): ParsedCidRef | null => {
   }
 }
 
+/** Tell whether a string is a CID reference. */
 export const isCidRef = (value?: string | null): boolean =>
   parseCidRef(value) != null
 
+/** Describe the current version of one file for a workspace checkpoint. */
 export const createScopeEnvelopeItem = (input: {
   logicalKey: string
   currentManifestCid: string
@@ -129,6 +139,7 @@ export const createScopeEnvelopeItem = (input: {
       : input.updatedAt ?? new Date().toISOString()
 })
 
+/** Hash every file entry of a workspace into the root hash of a checkpoint. */
 export const computeScopeEnvelopeRoot = async (
   items: Record<string, ScopeEnvelopeItem>
 ): Promise<string> => {
@@ -138,6 +149,7 @@ export const computeScopeEnvelopeRoot = async (
   return await sha256Hex(stableStringify(sortedItems))
 }
 
+/** Build the message a member signs to vouch for a workspace checkpoint. */
 export const createScopeEnvelopeSignatureMessage = (input: {
   scopeRef: ScopeEnvelopeReference
   checkpoint: ScopeEnvelopeCheckpoint
@@ -159,45 +171,7 @@ export const createScopeEnvelopeSignatureMessage = (input: {
     `previousEnvelopeCid: ${input.previousEnvelopeCid ?? ''}`
   ].join('\n')
 
-export const createScopeEnvelopeManifest = (input: {
-  scopeRef: ScopeEnvelopeReference
-  checkpoint: ScopeEnvelopeCheckpoint
-  items: Record<string, ScopeEnvelopeItem>
-  wrappedEnvelopeKey: WrappedContentKey
-  previousEnvelopeCid?: string | null
-  signature?: string | null
-  signedByAddress?: string | null
-  createdAt?: Date | string
-}): ScopeEnvelopeManifest => ({
-  kind: SCOPE_ENVELOPE_KIND,
-  version: 1,
-  scopeRef: input.scopeRef,
-  checkpoint: input.checkpoint,
-  items: input.items,
-  wrappedEnvelopeKey: input.wrappedEnvelopeKey,
-  previousEnvelopeCid: input.previousEnvelopeCid ?? undefined,
-  signature: input.signature ?? undefined,
-  signedByAddress: input.signedByAddress?.toLowerCase(),
-  createdAt:
-    input.createdAt instanceof Date
-      ? input.createdAt.toISOString()
-      : input.createdAt ?? new Date().toISOString()
-})
-
-export const isScopeEnvelopeManifest = (
-  value: unknown
-): value is ScopeEnvelopeManifest => {
-  const candidate = value as Partial<ScopeEnvelopeManifest> | undefined
-  return (
-    candidate?.kind === SCOPE_ENVELOPE_KIND &&
-    candidate.version === 1 &&
-    candidate.scopeRef?.scopeType === 'workspace' &&
-    candidate.scopeRef.scopeId != null &&
-    candidate.checkpoint?.rootHash != null &&
-    candidate.wrappedEnvelopeKey?.ciphertext != null
-  )
-}
-
+/** Describe a new version of an encrypted file. */
 export const createFileVersionManifest = (input: {
   contentType: ScopeEnvelopeContentType
   scopeRef: ScopeEnvelopeReference
@@ -240,6 +214,7 @@ export const createFileVersionManifest = (input: {
       : input.createdAt ?? new Date().toISOString()
 })
 
+/** Describe a new version of a file stored in clear. */
 export const createPublicFileVersionManifest = (input: {
   contentType: ScopeEnvelopeContentType
   scopeRef: ScopeEnvelopeReference
